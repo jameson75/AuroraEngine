@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AC4AD65F-13F6-452F-BC30-DC1A784FB660}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CipherPark.AngelJacket.Core</RootNamespace>
+    <AssemblyName>AngelJacketCore</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="SharpDX">
+      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DirectInput">
+      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.DirectInput.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2">
+      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.XAudio2.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XInput">
+      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.XInput.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Camera.cs" />
+    <Compile Include="Module\GameLevel.cs" />
+    <Compile Include="Module\GameLevelConfiguration.cs" />
+    <Compile Include="Module\GameModule.cs" />
+    <Compile Include="Module\IGameApp.cs" />
+    <Compile Include="Module\ModuleEvent.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IGlobalGameStateService.cs" />
+    <Compile Include="Services\InputService.cs" />
+    <Compile Include="Services\ModuleService.cs" />
+    <Compile Include="UI\Animation\AnimationFrame.cs" />
+    <Compile Include="UI\Animation\AnimationProperty.cs" />
+    <Compile Include="UI\Animation\AnimationPropertyVector2.cs" />
+    <Compile Include="UI\Animation\AnimationSet.cs" />
+    <Compile Include="UI\Components\AliasResource.cs" />
+    <Compile Include="UI\Components\ColorStyle.cs" />
+    <Compile Include="UI\Components\FocusManager.cs" />
+    <Compile Include="UI\Components\IUIRoot.cs" />
+    <Compile Include="UI\Components\PathResource.cs" />
+    <Compile Include="UI\Components\TextStyle.cs" />
+    <Compile Include="UI\Components\UIResource.cs" />
+    <Compile Include="UI\Components\UIStyle.cs" />
+    <Compile Include="UI\Components\UITree.cs" />
+    <Compile Include="UI\Controls\Button.cs" />
+    <Compile Include="UI\Controls\ColorContent.cs" />
+    <Compile Include="UI\Controls\ContainerControl.cs" />
+    <Compile Include="UI\Controls\ContentControl.cs" />
+    <Compile Include="UI\Controls\DockPanel.cs" />
+    <Compile Include="UI\Controls\ImageContent.cs" />
+    <Compile Include="UI\Controls\ImageControl.cs" />
+    <Compile Include="UI\Controls\ItemControl.cs" />
+    <Compile Include="UI\Controls\ItemsControl.cs" />
+    <Compile Include="UI\Controls\Label.cs" />
+    <Compile Include="UI\Controls\LayoutManager.cs" />
+    <Compile Include="UI\Controls\ListControl.cs" />
+    <Compile Include="UI\Controls\Menu.cs" />
+    <Compile Include="UI\Controls\MenuItem.cs" />
+    <Compile Include="UI\Controls\Panel.cs" />
+    <Compile Include="UI\Controls\SceneControl.cs" />
+    <Compile Include="UI\Controls\Slider.cs" />
+    <Compile Include="UI\Controls\TextBox.cs" />
+    <Compile Include="UI\Controls\TextContent.cs" />
+    <Compile Include="UI\Controls\ToolMenu.cs" />
+    <Compile Include="UI\Controls\UIAnimationController.cs" />
+    <Compile Include="UI\Controls\UIContent.cs" />
+    <Compile Include="UI\Controls\UIControl.cs" />
+    <Compile Include="UI\Design\ColorStyleParser.cs" />
+    <Compile Include="UI\Design\ImageControlParser.cs" />
+    <Compile Include="UI\Design\ItemControlParser.cs" />
+    <Compile Include="UI\Design\ItemsControlParser.cs" />
+    <Compile Include="UI\Design\LabelControlParser.cs" />
+    <Compile Include="UI\Design\MenuControlParser.cs" />
+    <Compile Include="UI\Design\MenuItemControlParser.cs" />
+    <Compile Include="UI\Design\PathResourceParser.cs" />
+    <Compile Include="UI\Design\TextStyleParser.cs" />
+    <Compile Include="UI\Design\UIControlParser.cs" />
+    <Compile Include="UI\Design\UIPropertyParser.cs" />
+    <Compile Include="UI\Design\UIResourceParser.cs" />
+    <Compile Include="UI\Design\UIStyleParser.cs" />
+    <Compile Include="Utils\ColorParser.cs" />
+    <Compile Include="Utils\ControlInputState.cs" />
+    <Compile Include="Utils\GraphicsTookKit.cs" />
+    <Compile Include="Utils\InputState.cs" />
+    <Compile Include="Utils\Interop\ContentImporter.cs" />
+    <Compile Include="Utils\Interop\MarshalHelper.cs" />
+    <Compile Include="Utils\ObservableDictionary.cs" />
+    <Compile Include="Utils\Range.cs" />
+    <Compile Include="Utils\ToolKit.cs" />
+    <Compile Include="Utils\XnaExtensions.cs" />
+    <Compile Include="World\AnimationSystem.cs" />
+    <Compile Include="World\FXSystem.cs" />
+    <Compile Include="World\Scene.cs" />
+    <Compile Include="World\SceneNode.cs" />
+    <Compile Include="World\Trigger.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
