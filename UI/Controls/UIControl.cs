@@ -88,11 +88,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 return fnBuilder.ToString();   
             }
         }
-        public Game Game { get { return _game; } }
+        public IGameApp Game { get { return _game; } }
         public bool Enabled { get; set; }
         public bool Visible { get; set; }     
         public SpriteBatch ControlSpriteBatch { get { return _spriteBatch; } }
-        public Color BackgroundColor { get; set; }
+        public Color4 BackgroundColor { get; set; }
         public float ZOrder { get; set; }
         public float TabOrder { get; set; }
         public bool HasFocus

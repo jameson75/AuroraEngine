@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.UI.Components;
+using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
@@ -35,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(long gameTime)
         {       
             if (this.HasFocus)
             {        
@@ -44,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     throw new InvalidOperationException("Input services not available.");
                 ControlInputState cim = inputServices.GetControlInputState();       
                 //cim.UpdateState(gameTime);
-                if (cim.IsKeyReleased(Keys.Enter))
+                if (cim.IsKeyReleased(VirtualKey.Enter))
                     EnterKeyEvent(this, EventArgs.Empty);
                 WritableInput[] cis = ControlInputState.ConvertToWritableInput(cim.GetKeysDown(), true);
                 foreach (WritableInput ci in cis)
@@ -52,14 +53,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         this._content.Text += ci.Ascii.ToString();
                     else
                     {
-                        if (ci.Key == Keys.Back)
+                        if (ci.Key == VirtualKey.BackSpace)
                             if (this._content.Text.Length > 0)
                                 this._content.Text = this._content.Text.Substring(0, this._content.Text.Length - 1);
                     }
             }
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             if (this.Size == Vector2.Zero)
                 return;

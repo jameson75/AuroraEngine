@@ -5,6 +5,7 @@ using System.Text;
 using CipherPark.AngelJacket.Core.UI.Controls;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Utils;
+using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Components
 {
@@ -63,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if (focusTarget != null && focusTarget != _focusedControl)
                     SetFocus(focusTarget);
             }
-            else if (state.GetKeysDown().Contains(Microsoft.Xna.Framework.Input.Keys.Tab))
+            else if (state.GetKeysDown().Contains((int)KeyboardVirtualKeys.VK_Tab))
             {
                 //[Obsolete]
                 //UIControl focusTarget = FocusManager.GetNextTabTarget(_focusedControl);  
@@ -164,7 +165,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         //        return fromControl.Parent._GetNextFocusableChild(fromControl);          
         //}
 
-        public static UIControl GetFirstHitSibling(IEnumerable<UIControl> siblings, Point mouseLocation, bool mustBeVisible = true)
+        public static UIControl GetFirstHitSibling(IEnumerable<UIControl> siblings, DrawingPoint mouseLocation, bool mustBeVisible = true)
         {
             UIControl[] zOrderedSiblings = FocusManager.ToZOrderedControlArray(siblings);
             for (int i = 0; i < zOrderedSiblings.Length; i++)
@@ -173,7 +174,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             return null;
         }          
 
-        public static UIControl GetHitFocusTarget(IEnumerable<UIControl> siblings, Point mouseLocation)
+        public static UIControl GetHitFocusTarget(IEnumerable<UIControl> siblings, DrawingPoint mouseLocation)
         {
             UIControl hitSibling = FocusManager.GetFirstHitSibling(siblings, mouseLocation); //NOTE: we get the first VISIBLE hit sibling.
             if( hitSibling != null )

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.World
 {
     public class FXSystem
     {
-        private Game _game = null;
-        public FXSystem(Game game)
+        private IGameApp _game = null;
+        public FXSystem(IGameApp game)
         {
             _game = game;
         }

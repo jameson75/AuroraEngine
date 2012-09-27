@@ -8,7 +8,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public interface IUIRoot
     {
-        Game Game { get; }
+        IGameApp Game { get; }
 
         UIControlCollection Controls { get; }
         
@@ -16,9 +16,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         
         UIResourceCollection Resources { get; }
 
-        void Update(GameTime gameTime);
+        void Update(long gameTime);
 
-        void Draw(GameTime gameTime);
+        void Draw(long gameTime);
 
         event EventHandler LoadComplete;
 

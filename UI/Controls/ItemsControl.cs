@@ -4,10 +4,11 @@ using CipherPark.AngelJacket.Core.UI.Components;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {   
-    public abstract class ItemsControl : UIControl
+    public abstract class ItemsControl : UIControl, ICommandControl
     {
         private UIItemControlCollection _items = null;
         private int _selectedIndex = -1;
+        private ControlCommandWireUp _commandWireUp = null;
 
         public UIItemControlCollection Items { get { return _items; } }       
         
@@ -16,6 +17,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             _items = new UIItemControlCollection(this);
             _items.CollectionChanged += this.Items_CollectionChanged;
+            _commandWireUp = new ControlCommandWireUp(this);
         }      
 
         private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
@@ -39,7 +41,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected virtual void OnItemAdded(ItemControl item)
         {
             if( !Children.Contains(item) )
-                Children.Add(item);      
+                Children.Add(item);
         }
 
         protected virtual void OnItemRemoved(ItemControl item)
@@ -146,6 +148,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                    SelectedItemIndex = nextEnabledItemIndex;
             }
         }
+
+        public string CommandName { get; set; }
+
+        public event ControlCommandHandler ControlCommand;
     }
 
     public class UIItemControlCollection : System.Collections.ObjectModel.ObservableCollection<ItemControl>

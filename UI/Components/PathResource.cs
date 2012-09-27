@@ -8,7 +8,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public class PathResource : UIResource
     {
-        public PathResource(Game game) : base(game)
+        public PathResource(IGameApp game) : base(game)
         { }
         public string Path { get; set; }
     }

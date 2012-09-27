@@ -5,6 +5,7 @@ using System.Text;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils;
 using SharpDX;
+using SharpDX.Direct3D11;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {

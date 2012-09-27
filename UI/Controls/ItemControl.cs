@@ -4,7 +4,7 @@ using CipherPark.AngelJacket.Core.UI.Components;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public abstract class ItemControl : ContainerControl
+    public abstract class ItemControl : ContainerControl, ICommandControl
     {
         private UIContent _itemContent = null;
         private UIContent _selectContent = null;
@@ -65,8 +65,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     value.Container = this;
             }
         }
+        public string CommandName { get; set; }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {           
             if (ActiveContent != null)
                 ActiveContent.Draw(gameTime);
@@ -89,5 +90,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected virtual void OnUnselected()
         { }
+
+        protected virtual void OnControlCommand(ControlCommandArgs args)
+        {
+            ControlCommandHandler handler = ControlCommand;
+            if (handler != null)
+                handler(this, args);
+        }
+
+        public event ControlCommandHandler ControlCommand;
     }
 }
+

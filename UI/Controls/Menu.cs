@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using SharpDX;
 using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
@@ -36,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public bool AutoSize { get; set; }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             ControlSpriteBatch.Begin();
             //Vector2 itemPosition = this.Position;
@@ -59,7 +59,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //    return base._GetNextFocusableChild(fromControl);
         //}
 
-        public override void Update(GameTime gameTime)
+        public override void Update(long gameTime)
         {
             if (this.HasFocus)
             {
@@ -68,8 +68,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     throw new InvalidOperationException("Input services not available.");
                 ControlInputState cim = inputServices.GetControlInputState();
 
-                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(Keys.Up)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(Keys.Left));
-                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(Keys.Down)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(Keys.Right));
+                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(VirtualKey.Up)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(VirtualKey.Left));
+                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(VirtualKey.Down)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(VirtualKey.Right));
 
                 if (selectPreviousKeyDown)
                     this.SelectPreviousItem();
@@ -77,7 +77,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 else if (selectNextKeyDown)
                     this.SelectNextItem();
 
-                else if (cim.IsKeyReleased(Keys.Enter))
+                else if (cim.IsKeyReleased(VirtualKey.Enter))
                 {
                     if (this.SelectedItem != null && ((MenuItem)this.SelectedItem).CommandName != null)
                         this.OnItemClicked((MenuItem)this.SelectedItem);

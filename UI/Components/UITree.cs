@@ -6,12 +6,13 @@ using System.IO;
 using System.Xml.Linq;
 using CipherPark.AngelJacket.Core.UI.Design;
 using CipherPark.AngelJacket.Core.UI.Controls;
+using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public class UITree : IUIRoot
     {
-        private Game _game = null;
+        private IGameApp _game = null;
         private string _markUpFileName = null;
         private UIControlCollection controls = null;
         private UIStyleCollection styles = null;
@@ -21,8 +22,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private Dictionary<string, UIControlParser> _controlParsers = new Dictionary<string, UIControlParser>();
         private Dictionary<string, UIStyleParser> _styleParsers = new Dictionary<string, UIStyleParser>();
         private Dictionary<string, UIResourceParser> _resourceParsers = new Dictionary<string, UIResourceParser>();
-
-        public UITree(Game game)
+        
+        public UITree(IGameApp game)
         {
             _game = game;
             controls = new UIControlCollection();
@@ -31,7 +32,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             focusManager = new FocusManager(this);
         }
 
-        public Game Game { get { return _game; } }
+        public IGameApp Game { get { return _game; } }
 
         public UIControlCollection Controls { get { return controls; } }
 
@@ -48,12 +49,13 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         }
 
         public void LoadContent()
-        {
+        {            
             //Load control tree from markup file.
             if (_markUpFileName == null)
                 throw new InvalidOperationException("Markup file not specified. Must call Initialize([markupFileName]), first.");
-            Stream stream = TitleContainer.OpenStream(_markUpFileName);
+            Stream stream = new System.IO.FileStream(_markUpFileName, FileMode.Open);
             XDocument doc = XDocument.Load(stream);
+            stream.Close();
 
             XElement resourcesElement = doc.Root.Elements("Resources").First();
             foreach (XElement element in resourcesElement.Elements())
@@ -115,7 +117,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 return _resourceParsers[elementName];
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(long gameTime)
         {
             focusManager.Update();
 
@@ -123,7 +125,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 control.Update(gameTime);
         }
 
-        public void Draw(GameTime gameTime)
+        public void Draw(long gameTime)
         {
             foreach (UIControl control in this.controls)
                 control.Draw(gameTime);                
@@ -136,7 +138,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
             RegisterResourceParser(new PathResourceParser(), "PathResource");
 
-            RegisterControlParser(new MultiScreenControlParser(), "MultiScreen");
+            //RegisterControlParser(new MultiScreenControlParser(), "MultiScreen");
             RegisterControlParser(new MenuControlParser(), "Menu");
             RegisterControlParser(new ImageControlParser(), "Image");            
         }

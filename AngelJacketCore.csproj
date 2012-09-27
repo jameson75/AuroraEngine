@@ -61,12 +61,13 @@
     <Compile Include="Module\GameLevel.cs" />
     <Compile Include="Module\GameLevelConfiguration.cs" />
     <Compile Include="Module\GameModule.cs" />
-    <Compile Include="Module\IGameApp.cs" />
+    <Compile Include="IGameApp.cs" />
     <Compile Include="Module\ModuleEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IGlobalGameStateService.cs" />
     <Compile Include="Services\InputService.cs" />
     <Compile Include="Services\ModuleService.cs" />
+    <Compile Include="Services\ServiceTable.cs" />
     <Compile Include="UI\Animation\AnimationFrame.cs" />
     <Compile Include="UI\Animation\AnimationProperty.cs" />
     <Compile Include="UI\Animation\AnimationPropertyVector2.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="UI\Controls\ContainerControl.cs" />
     <Compile Include="UI\Controls\ContentControl.cs" />
     <Compile Include="UI\Controls\DockPanel.cs" />
+    <Compile Include="UI\Controls\ICommandControl.cs" />
     <Compile Include="UI\Controls\ImageContent.cs" />
     <Compile Include="UI\Controls\ImageControl.cs" />
     <Compile Include="UI\Controls\ItemControl.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="UI\Controls\MenuItem.cs" />
     <Compile Include="UI\Controls\Panel.cs" />
     <Compile Include="UI\Controls\SceneControl.cs" />
+    <Compile Include="UI\Controls\ScreenControl.cs" />
     <Compile Include="UI\Controls\Slider.cs" />
     <Compile Include="UI\Controls\TextBox.cs" />
     <Compile Include="UI\Controls\TextContent.cs" />
@@ -118,14 +121,13 @@
     <Compile Include="UI\Design\UIStyleParser.cs" />
     <Compile Include="Utils\ColorParser.cs" />
     <Compile Include="Utils\ControlInputState.cs" />
-    <Compile Include="Utils\GraphicsTookKit.cs" />
     <Compile Include="Utils\InputState.cs" />
     <Compile Include="Utils\Interop\ContentImporter.cs" />
     <Compile Include="Utils\Interop\MarshalHelper.cs" />
+    <Compile Include="Utils\SpriteFont.cs" />
     <Compile Include="Utils\ObservableDictionary.cs" />
     <Compile Include="Utils\Range.cs" />
-    <Compile Include="Utils\ToolKit.cs" />
-    <Compile Include="Utils\XnaExtensions.cs" />
+    <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="World\AnimationSystem.cs" />
     <Compile Include="World\FXSystem.cs" />
     <Compile Include="World\Scene.cs" />

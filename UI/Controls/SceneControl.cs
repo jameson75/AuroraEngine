@@ -8,6 +8,7 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.World;
 using SharpDX;
+using SharpDX.Direct3D11;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
@@ -39,8 +40,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public SceneControl(IUIRoot visualRoot) : base(visualRoot)
         {
-            _defaultCamera = new Camera(Matrix.CreateLookAt(new Vector3(0, 50, 100), new Vector3(0, 0, 0), Vector3.Up),
-                                        Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), this.DeviceAspectRatio, 1.0f, 1000.0f));
+            _defaultCamera = new Camera(Matrix.LookAtLH(new Vector3(0, 50, 100), new Vector3(0, 0, 0), Vector3.UnitY),
+                                        Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(45), this.DeviceAspectRatio, 1.0f, 1000.0f));
             _currentCamera = _defaultCamera;
             this.EditorMode = EditorMode.Select;
             _scene = new Scene(visualRoot.Game);
@@ -55,10 +56,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private float DeviceAspectRatio
         {
-            get { return (float)Game.GraphicsDevice.Viewport.Width / (float)Game.GraphicsDevice.Viewport.Height; }
+            get { return (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Width / (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Height; }
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             base.Draw(gameTime);
         }        
@@ -70,7 +71,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnSizeChanged();
         }     
 
-        public override void Update(GameTime gameTime)
+        public override void Update(long gameTime)
         {
             InputService inputServices = (InputService)Game.Services.GetService(typeof(InputService));
             InputState inputState = inputServices.GetInputState();
@@ -90,7 +91,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 OnMouseWheel(inputState.GetMouseWheelDelta());
         }
 
-        protected void OnMouseDown(InputState.MouseButton mouseButton, Point location)
+        protected void OnMouseDown(InputState.MouseButton mouseButton, DrawingPoint location)
         {          
             switch (this.EditorMode)
             {
@@ -100,7 +101,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         this.Capture = true;
                         this.mouseMoveFrom = location;
                         Vector2 vectorFrom = new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y);
-                        Vector2 vectorEllipseCenter = new Vector2(rotationRectangle.Location.X + (rotationRectangle.Width / 2), rotationRectangle.Y + (rotationRectangle.Height / 2));
+                        Vector2 vectorEllipseCenter = new Vector2(rotationRectangle.X + (rotationRectangle.Width / 2), rotationRectangle.Y + (rotationRectangle.Height / 2));
                         float distance = Vector2.Distance(vectorEllipseCenter, vectorFrom);
                         rotateAboutZ = (distance > rotationEllipseDiameter / 2);
                     }
@@ -108,9 +109,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 case EditorMode.Select:
                     if (mouseButton == InputState.MouseButton.Left)
                     {
-                        Viewport vp = Game.GraphicsDevice.Viewport;
-                        Vector3 mousePointNear = vp.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
-                        Vector3 mousePointFar = vp.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
+                        Viewport vp = Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0];
+                        //Vector3 mousePointNear = vp.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
+                        //Vector3 mousePointFar = vp.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
+                        Vector3 mousePointNear = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), vp.TopLeftX, vp.TopLeftX, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
+                        Vector3 mousePointFar = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), vp.TopLeftX, vp.TopLeftX, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
                         Vector3 mouseRay = mousePointFar - mousePointNear;
                         mouseRay.Normalize();
                         System.Diagnostics.Trace.WriteLine(mousePointNear);
@@ -119,21 +122,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected void OnMouseUp(InputState.MouseButton mouseButton, Point location)
+        protected void OnMouseUp(InputState.MouseButton mouseButton, DrawingPoint location)
         {          
             if (this.Capture)
             {
                 this.Capture = false;
-                this.mouseMoveFrom = Point.Zero;
+                this.mouseMoveFrom = new DrawingPoint(0,0);
             }
         }
 
         protected void OnMouseWheel(float mouseWheelDelta)
         {
-            CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.CreateTranslation(0, 0, mouseWheelDelta / 5);          
+            CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(0, 0, mouseWheelDelta / 5);          
         }
 
-        protected void OnMouseMove(InputState.MouseButton[] mouseButtonsDown, Point location)
+        protected void OnMouseMove(InputState.MouseButton[] mouseButtonsDown,DrawingPoint location)
         {         
             switch (EditorMode)
             {
@@ -145,8 +148,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                             if (mouseButtonsDown.Contains(InputState.MouseButton.Left))
                             {
                                 Vector2 offset = Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
-                                Vector3 negatedTranslation = Vector3.Negate(CurrentCamera.ViewMatrix.Translation);
-                                CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.CreateTranslation(negatedTranslation);
+                                Vector3 negatedTranslation = Vector3.Negate(CurrentCamera.ViewMatrix.TranslationVector);
+                                CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(negatedTranslation);
                                 if (rotateAboutZ)
                                 {      
                                     Vector2 zRotationOrigin = new Vector2(this.Bounds.Width / 2, this.Bounds.Height / 2);
@@ -154,17 +157,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                     Vector2 zMouseMoveFromVector = new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y) - zRotationOrigin;
                                     zLocationVector.Normalize();
                                     zMouseMoveFromVector.Normalize();
-                                    double zRotation = Math.Acos(MathHelper.Clamp(Vector2.Dot(zLocationVector, zMouseMoveFromVector), -1.0f, 1.0f));
+                                    double zRotation = Math.Acos(MathUtil.Clamp(Vector2.Dot(zLocationVector, zMouseMoveFromVector), -1.0f, 1.0f));
                                     double diff = Math.Atan2(zMouseMoveFromVector.Y, zMouseMoveFromVector.X) - Math.Atan2(zLocationVector.Y, zLocationVector.X);
                                     float factor = (diff > 0) ? 1 : -1;
                                     //float zRotation(MathHelper.ToRadians(-offset.Y);
-                                    CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.CreateRotationZ((float)zRotation * factor);
+                                    CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.RotationZ((float)zRotation * factor);
                                 }
                                 else
-                                    CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.CreateRotationX(MathHelper.ToRadians(offset.Y));
-                                CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.CreateTranslation(Vector3.Negate(negatedTranslation));
+                                    CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.RotationX(MathUtil.DegreesToRadians(offset.Y));
+                                CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(Vector3.Negate(negatedTranslation));
                                 if (!rotateAboutZ)
-                                    CurrentCamera.ViewMatrix = Matrix.Multiply(Matrix.CreateRotationY(MathHelper.ToRadians(offset.X)), CurrentCamera.ViewMatrix);
+                                    CurrentCamera.ViewMatrix = Matrix.Multiply(Matrix.RotationY(MathUtil.DegreesToRadians(offset.X)), CurrentCamera.ViewMatrix);
                                 mouseMoveFrom = location;                                
                             }
                             break;
@@ -177,7 +180,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                 //the intersection point of the bounding box surrounding the visible scene graph object closest to
                                 //the camera.
                                 float translationFactor = 5.0f;
-                                CurrentCamera.ViewMatrix = Matrix.Multiply(CurrentCamera.ViewMatrix, Matrix.CreateTranslation(offset.X * translationFactor, -offset.Y * translationFactor, 0));
+                                CurrentCamera.ViewMatrix = Matrix.Multiply(CurrentCamera.ViewMatrix, Matrix.Translation(offset.X * translationFactor, -offset.Y * translationFactor, 0));
                                 mouseMoveFrom = location;                               
                             }
                             break;

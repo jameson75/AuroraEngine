@@ -190,7 +190,7 @@ namespace CipherPark.AngelJacket.Core.Module
             _isLoaded = true;
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(long gameTime)
         {
             IInputService inputServices = (IInputService)Game.Services.GetService(typeof(IInputService));
             if (inputServices == null)
@@ -199,7 +199,7 @@ namespace CipherPark.AngelJacket.Core.Module
             InputState inputStateManager = inputServices.GetInputState();
 
             //The ESCAPE key on the key board Exits this module.
-            if (inputStateManager.IsKeyReleased(Keys.Escape))
+            if (inputStateManager.IsKeyReleased(VirtualKey.Escape))
                 this.SignalExitModule();
             else
             {
@@ -235,7 +235,6 @@ namespace CipherPark.AngelJacket.Core.Module
                         SetSceneObjectProperty(soTrigger.Target, soTrigger.TargetPropertyChanges[i].Name, soTrigger.TargetPropertyChanges[i].Value);
                         //so.Target.SetPropertyByName(soTrigger.TargetPropertyChagnes[i].Name, soTrigger.TargetPropertyChanges[i].Value);
                     break;
-
 
                 case TriggerType.Animation:
                     AnimationTrigger aTrigger = (AnimationTrigger)trigger;                
@@ -273,10 +272,12 @@ namespace CipherPark.AngelJacket.Core.Module
                     switch(bmTrigger.Action)
                     {
                         case AudioTriggerAction.Play:
-                            _bgMusicInstance.Play();
+                            //_bgMusicInstance.Play();
+                            __bgMusicInstance.Start();
                             break;
                         case AudioTriggerAction.Stop:
-                            _bgMusicInstance.Stop();
+                            //_bgMusicInstance.Stop();
+                            __bgMusicInstance.Stop();
                             break;
                     }
                     break;
@@ -308,7 +309,7 @@ namespace CipherPark.AngelJacket.Core.Module
             //_triggerQueue.Enqueue(overlayAnimationTrigger);
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             
         }

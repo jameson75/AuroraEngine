@@ -13,9 +13,9 @@ namespace CipherPark.AngelJacket.Core.World
 
     public class SceneNode
     {
-        private Game _game = null;
+        private IGameApp _game = null;
 
-        public SceneNode(Game game)
+        public SceneNode(IGameApp game)
         {
             _game = game;
         }

@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.IO;
+using SharpDX;
+using SharpDX.Direct3D11;
 
 namespace CipherPark.AngelJacket.Core.Utils.Interop
 {
-    public class ContentImporter
+    public static class ContentImporter
     {
         public static VoiceData LoadVoiceDataFromWav(string filePath)
         {
@@ -22,7 +24,14 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
             return voiceData;
         }
 
-        private class UnsafeNativeMethods
+        public static SpriteFont LoadFont(IGameApp game, string resource)
+        {            
+            //ShaderResourceView fontShaderResourceView = new ShaderResourceView(game.GraphicsDevice, resource);
+            SpriteFont font = new SpriteFont(game);
+            return font;
+        }
+
+        private static class UnsafeNativeMethods
         {
             [DllImport("AngelJacketNative.dll", EntryPoint = "LoadVoiceDataFromWav")]
             public static extern int LoadVoiceDataFromWav([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref VoiceDataThunk voiceData);

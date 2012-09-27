@@ -13,9 +13,11 @@ namespace CipherPark.AngelJacket.Core.Services
 
     public class ModuleService : IModuleService
     {
-        AngelJacketGame _game = null;
+        IGameApp _game = null;
+        string _signaledModuleSwitchName = null;
+        bool _exitModuleSignaled = false;
 
-        public ModuleService(AngelJacketGame game)
+        public ModuleService(IGameApp game)
         {
             _game = game;
         }
@@ -24,12 +26,12 @@ namespace CipherPark.AngelJacket.Core.Services
         {
             //TODO: Change this to a design where this module service peforms
             //all module management (ie: move module management from AngelJacketGame to this class).
-            _game.SignaledModuleSwitchName = moduleName;
+            this._signaledModuleSwitchName = moduleName;
         }
 
         public void SignalExit()
         {
-            _game.ExitModuleSignaled = true;
+            this._exitModuleSignaled = true;
         }
     }
 }

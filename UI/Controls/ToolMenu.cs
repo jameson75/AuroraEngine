@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CipherPark.AngelJacket.Core.UI.Components;
+using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
@@ -15,7 +16,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         { }
      
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             foreach (ToolMenuItem panel in Items)
                 panel.Draw(gameTime);
@@ -82,7 +83,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Button Button { get { return itemButton; } }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             itemButton.Draw(gameTime);
             if (this.Expanded)            

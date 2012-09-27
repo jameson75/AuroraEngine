@@ -19,7 +19,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
  
         public TextContent Content { get { return _textContent; } }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             Content.Draw(gameTime);
             base.Draw(gameTime);

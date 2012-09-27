@@ -36,13 +36,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         
         public SpriteFont Font { get; set; }
         
-        public Color FontColor { get; set; }
+        public Color4 FontColor { get; set; }
 
         public VerticalAlignment VAlignment { get; set; }
 
         public HorizontalAlignment HAlignment { get; set; }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             base.Draw(gameTime);
             

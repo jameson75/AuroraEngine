@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.Utils;
+using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
@@ -19,11 +20,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private void InitializeControl()
         {
-            GrooveTemplate = new ContentControl(VisualRoot, new ColorContent(Color.Red));
+            GrooveTemplate = new ContentControl(VisualRoot, new ColorContent(Colors.Red));
             GrooveTemplate.Size = new Vector2(0, 3);
             GrooveTemplate.HorizontalAlignment = HorizontalAlignment.Stretch;
             GrooveTemplate.VerticalAlignment = VerticalAlignment.Center;
-            HandleTemplate = new ContentControl(VisualRoot, new ColorContent(Color.Blue));
+            HandleTemplate = new ContentControl(VisualRoot, new ColorContent(Colors.Blue));
             HandleTemplate.Size = new Vector2(5, 0);
             HandleTemplate.VerticalAlignment = VerticalAlignment.Stretch;
             HandleTemplate.Margin = new Vector2(0, 0);
@@ -86,7 +87,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             GrooveTemplate.Draw(gameTime);
             HandleTemplate.Draw(gameTime);

@@ -17,6 +17,6 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                 resource.Name = element.Attribute(NameAttributeName).Value;
         }
 
-        public abstract UIResource CreateResource(Game game);
+        public abstract UIResource CreateResource(IGameApp game);
     }
 }

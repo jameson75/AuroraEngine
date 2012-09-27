@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.UI.Components;
 using SharpDX;
+using SharpDX.Direct3D11;
+
 using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
@@ -26,7 +28,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (Texture != null)
             {
                 Container.ControlSpriteBatch.Begin();
-                Container.ControlSpriteBatch.Draw(Texture, Container.PositionToSurface(Container.Position), Color.White);
+                Container.ControlSpriteBatch.Draw(Texture, Container.PositionToSurface(Container.Position), Colors.White);
                 Container.ControlSpriteBatch.End();
             }
 
@@ -38,7 +40,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (Texture == null)
                 return Rectangle.Empty;
             else
-                return new Rectangle(0, 0, Texture.Width, Texture.Height);
+                return new Rectangle(0, 0, Texture.Description.Width, Texture.Description.Height);
         }
     }
 }

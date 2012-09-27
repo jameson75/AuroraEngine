@@ -24,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             base.Parse(tree, element, resource);
         }
 
-        public override UIResource CreateResource(Game game)
+        public override UIResource CreateResource(IGameApp game)
         {
             return new PathResource(game);
         }

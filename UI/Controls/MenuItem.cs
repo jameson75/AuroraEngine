@@ -15,7 +15,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Size = new Vector2(100, 20);
         }
 
-        public MenuItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color fontColor)
+        public MenuItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 fontColor)
             : base(visualRoot)
         {
             Name = name;
@@ -26,7 +26,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Size = font.MeasureString(text) + (DefaultItemTextMargin * 2);   
         }
 
-        public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color itemFontColor, Color selectFontColor, string commandName = null)
+        public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 itemFontColor, Color4 selectFontColor, string commandName = null)
             : base(visualRoot)
         {
             Name = name;

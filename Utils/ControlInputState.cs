@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SharpDX.XInput;
 
 namespace CipherPark.AngelJacket.Core.Utils
 {
@@ -8,9 +9,9 @@ namespace CipherPark.AngelJacket.Core.Utils
     {
         public const long DelayTimeAfterPress = 300;
         public const long DelayTimeAfterHold = 80;
-        private List<Keys> _delayedScannedKeysDown = new List<Keys>();
-        private InputState _inputState = null; 
-        private Dictionary<Keys, long> _inputDelayExpirationTimes = new Dictionary<Keys, long>();
+        private List<VirtualKey> _delayedScannedKeysDown = new List<VirtualKey>();
+        private InputState _inputState = null;
+        private Dictionary<VirtualKey, long> _inputDelayExpirationTimes = new Dictionary<VirtualKey, long>();
 
         public ControlInputState(InputState inputState)
         {
@@ -22,12 +23,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             get { return _inputState; }
         }
 
-        public bool IsKeyUp(Keys key)
+        public bool IsKeyUp(VirtualKey key)
         {
             return _inputState.IsKeyUp(key);             
         }
 
-        public bool IsKeyDown(Keys key, bool scanRealTime = false)
+        public bool IsKeyDown(VirtualKey key, bool scanRealTime = false)
         { 
             if (scanRealTime)
                 return _inputState.IsKeyDown(key);
@@ -35,36 +36,36 @@ namespace CipherPark.AngelJacket.Core.Utils
                 return _delayedScannedKeysDown.Contains(key);
         }
 
-        public bool IsKeyReleased(Keys key)
+        public bool IsKeyReleased(VirtualKey key)
         {
             return _inputState.IsKeyReleased(key);
         }
 
-        public Keys[] GetKeysDown(bool scanRealTime = false)
+        public VirtualKey[] GetKeysDown(bool scanRealTime = false)
         {                       
-            Keys[] keysDown = (scanRealTime) ? _inputState.GetKeysDown() : _delayedScannedKeysDown.ToArray();
+            int[] keysDown = (scanRealTime) ? _inputState.GetKeysDown() : _delayedScannedKeysDown.ToArray();
             return keysDown;
         }
 
-        public Keys[] GetKeysReleased()
+        public VirtualKey[] GetKeysReleased()
         {
             return _inputState.GetKeysReleased();
         }
 
         public void UpdateState()
         {
-            List<Keys> keysToRemove = new List<Keys>();
-            foreach(Keys key in _inputDelayExpirationTimes.Keys)
+            List<VirtualKey> keysToRemove = new List<VirtualKey>();
+            foreach (VirtualKey key in _inputDelayExpirationTimes.Keys)
             {
                 if(_inputState.IsKeyUp(key))
                     keysToRemove.Add(key);
             }
-            foreach(Keys key in keysToRemove)                
+            foreach (VirtualKey key in keysToRemove)                
                 _inputDelayExpirationTimes.Remove(key);
 
             _delayedScannedKeysDown.Clear();
 
-            Keys[] keysDown = _inputState.GetKeysDown();
+            VirtualKey[] keysDown = _inputState.GetKeysDown();
             for(int i = 0; i < keysDown.Length; i++ )
             {
                 if (IsKeyDelayable(keysDown[i]))
@@ -88,108 +89,121 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
 
-        private bool IsKeyDelayable(Keys key)
+        private bool IsKeyDelayable(VirtualKey key)
         {
-            return !(key == Keys.RightShift ||
-                   key == Keys.LeftShift ||
-                   key == Keys.RightAlt ||
-                   key == Keys.LeftAlt ||
-                   key == Keys.RightControl ||
-                   key == Keys.LeftControl ||
-                   key == Keys.CapsLock);
+            return !(key == VirtualKey.RightShift ||
+                   key == VirtualKey.LeftShift ||
+                   key == VirtualKey.RightAlt ||
+                   key == VirtualKey.LeftAlt ||
+                   key == VirtualKey.RightControl ||
+                   key == VirtualKey.LeftControl ||
+                   key == VirtualKey.CapsLock);
         }
 
-        public static WritableInput[] ConvertToWritableInput(Keys[] keys, bool isEnterSpecialKey)
+        public static WritableInput[] ConvertToWritableInput(VirtualKey[] keys, bool isEnterSpecialKey)
         {
             List<WritableInput> input = new List<WritableInput>();
-            bool applyShift = keys.Any(k => k == Keys.LeftShift || k == Keys.RightShift);
-            bool applyCaps = (applyShift && keys.All(k => k != Keys.CapsLock)) ||
-                              (!applyShift && keys.Any(k => k == Keys.CapsLock));
+            bool applyShift = keys.Any(k => k == VirtualKey.LeftShift || k == VirtualKey.RightShift);
+            bool applyCaps = (applyShift && keys.All(k => k != VirtualKey.CapsLock)) ||
+                              (!applyShift && keys.Any(k => k == VirtualKey.CapsLock));
 
-            foreach (Keys key in keys)
+            foreach (VirtualKey key in keys)
             {
-                int xnaKeyCode = (int)key;
+                int virtualKeyInteger = (int)key;
                 char ascii = char.MinValue;
                               //A-Z or a-z
-                if (xnaKeyCode >= 65 && xnaKeyCode <= 90)
+                if (virtualKeyInteger >= 65 && virtualKeyInteger <= 90)
                 {
                     //A-Z
                     if (applyShift)
-                        ascii = (char)xnaKeyCode;
+                        ascii = (char)virtualKeyInteger;
                     //a-z
                     else
-                        ascii = (char)(xnaKeyCode + 32);
+                        ascii = (char)(virtualKeyInteger + 32);
                 }
+
                 //D_0 - D_9 or their respective shift-symbols
-                else if (xnaKeyCode >= 48 && xnaKeyCode <= 57)
+                else if (virtualKeyInteger >= 48 && virtualKeyInteger <= 57)
                 {
                     //D_0 - D_9
                     if (applyCaps)
                     {
-                        if (xnaKeyCode == 48)
+                        if (virtualKeyInteger == 48)
                             ascii = (char)41; //)
-                        else if (xnaKeyCode == 49)
+                        else if (virtualKeyInteger == 49)
                             ascii = (char)33; //!
-                        else if (xnaKeyCode == 50)
+                        else if (virtualKeyInteger == 50)
                             ascii = (char)64; //@
-                        else if (xnaKeyCode == 51)
+                        else if (virtualKeyInteger == 51)
                             ascii = (char)35; //#
-                        else if (xnaKeyCode == 52)
+                        else if (virtualKeyInteger == 52)
                             ascii = (char)36; //$
-                        else if (xnaKeyCode == 53)
+                        else if (virtualKeyInteger == 53)
                             ascii = (char)37; //%
-                        else if (xnaKeyCode == 54)
+                        else if (virtualKeyInteger == 54)
                             ascii = (char)94; //^
-                        else if (xnaKeyCode == 55)
+                        else if (virtualKeyInteger == 55)
                             ascii = (char)38; //&
-                        else if (xnaKeyCode == 56)
+                        else if (virtualKeyInteger == 56)
                             ascii = (char)42; //*
                         else //if (xnaKeyCode == 57)
                             ascii = (char)40; //(
                     }
                     else
-                        ascii = (char)xnaKeyCode;
+                        ascii = (char)virtualKeyInteger;
                 }
+
                 //NUM_PAD_0 - NUM_PAD_9
-                else if (xnaKeyCode >= 96 && xnaKeyCode <= 105)
-                    ascii = (char)(xnaKeyCode - 48);
-                else if (key == Keys.Space)
-                    ascii = (char)xnaKeyCode;
-                else if (key == Keys.Enter)
+                else if (virtualKeyInteger >= 96 && virtualKeyInteger <= 105)
+                    ascii = (char)(virtualKeyInteger - 48);
+
+                //NUM_OPERATORS
+                else if (key == VirtualKey.Divide)
+                    ascii = (char)47; // /
+                else if (key == VirtualKey.Add)
+                    ascii = (char)43; //+
+                else if (key == VirtualKey.Subtract)
+                    ascii = (char)45; //-
+                else if (key == VirtualKey.Multiply)
+                    ascii = (char)42; //*
+
+                else if (key == VirtualKey.Space)
+                    ascii = (char)virtualKeyInteger;
+                else if (key == VirtualKey.Enter)
                 {
                     if (!isEnterSpecialKey)
                         ascii = '\n';
                 }
-                else if (key == Keys.Tab)
+                else if (key == VirtualKey.Tab)
                     ascii = '\t';
-                else if (key == Keys.OemSemicolon)
-                    ascii = applyShift ? (char)58 : (char)59;
-                else if (key == Keys.OemPlus)
-                    ascii = applyShift ? (char)43 : (char)61;
-                else if (key == Keys.OemMinus)
-                    ascii = applyShift ? (char)159 : (char)45;
-                else if (key == Keys.OemPeriod)
-                    ascii = applyShift ? (char)62 : (char)46;
-                else if (key == Keys.OemQuestion)
-                    ascii = applyShift ? (char)63 : (char)47;
-                else if (key == Keys.OemTilde)
-                    ascii = applyShift ? (char)126 : (char)96;
-                else if (key == Keys.OemOpenBrackets)
-                    ascii = applyShift ? (char)91 : (char)123;
-                else if (key == Keys.OemPipe)
-                    ascii = applyShift ? (char)124 : (char)92;
-                else if (key == Keys.OemCloseBrackets)
-                    ascii = applyShift ? (char)93 : (char)125;
-                else if (key == Keys.OemQuotes)
-                    ascii = applyShift ? (char)34 : (char)39;
-                else if (key == Keys.OemBackslash)
-                    ascii = (char)92;
+                else if (key == VirtualKey.Semicolon)
+                    ascii = applyShift ? (char)58 : (char)59; // : or ;
+                else if (key == VirtualKey.Equals)
+                    ascii = applyShift ? (char)43 : (char)61; // + or =
+                else if (key == VirtualKey.Underscore)
+                    ascii = applyShift ? (char)159 : (char)45; // _ or -
+                else if (key == VirtualKey.Period)
+                    ascii = applyShift ? (char)62 : (char)46; // > or .
+                else if (key == VirtualKey.ForwardSlash)
+                    ascii = applyShift ? (char)63 : (char)47; // / or ?
+                else if (key == VirtualKey.Tilde)
+                    ascii = applyShift ? (char)126 : (char)96; // ~ or `
+                else if (key == VirtualKey.LeftBrace)
+                    ascii = applyShift ? (char)91 : (char)123; // { or [
+                else if (key == VirtualKey.BackSlash)
+                    ascii = applyShift ? (char)124 : (char)92; // | or \
+                else if (key == VirtualKey.RightBrace)
+                    ascii = applyShift ? (char)93 : (char)125; // } OR ]
+                else if (key == VirtualKey.Apostrophe)
+                    ascii = applyShift ? (char)34 : (char)39; // " or '
+                else if (key == VirtualKey.Comma)
+                    ascii = applyShift ? (char)60 : (char)44; // < or ,
 
                 WritableInput wi = new WritableInput();
                 wi.Ascii = ascii;
                 wi.KeyType = (ascii == char.MinValue) ? WritableInputType.Special : WritableInputType.Printable;
-                wi.IsAlt = keys.Any(k=> k == Keys.LeftAlt || k == Keys.RightAlt);
-                wi.IsCtrl = keys.Any(k=> k == Keys.LeftControl || k == Keys.RightControl);
+                wi.IsAlt = keys.Any(k => k == VirtualKey.LeftAlt || k == VirtualKey.RightAlt);
+                wi.IsCtrl = keys.Any(k => k == VirtualKey.LeftControl || k == VirtualKey.RightControl);
                 wi.Key = key;
                 input.Add(wi);
             }
@@ -199,7 +213,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public struct WritableInput
     {
-        public Keys Key;
+        public VirtualKey Key;
         public WritableInputType KeyType;
         public char Ascii;
         public bool IsAlt;
