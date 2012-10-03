@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Audio;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Utils;
@@ -42,13 +37,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             set { SelectedItemIndex = value; }
         }
 
-        public ScreenControl ActiveScreen
+        public ScreenPanel ActiveScreen
         {
-            get { return (ScreenControl)SelectedItem; }
+            get { return (ScreenPanel)SelectedItem; }
             set { SelectedItem = value; }
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(long gameTime)
         {
             IInputService inputServices = (IInputService)Game.Services.GetService(typeof(IInputService));
             
@@ -57,7 +52,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             InputState inputStateManager = inputServices.GetInputState();
             
-            if (inputStateManager.IsKeyReleased(Keys.Back))
+            if (inputStateManager.IsKeyReleased(VirtualKey.BackSpace))
                 SelectPreviousItem();
 
             if (ActiveScreen != null)
@@ -66,7 +61,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.Update(gameTime);
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(long gameTime)
         {
             if( ActiveScreen != null )
                 ActiveScreen.Draw(gameTime);

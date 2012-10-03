@@ -33,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("AngelJacketNative.dll", EntryPoint = "LoadVoiceDataFromWav")]
+            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadVoiceDataFromWav")]
             public static extern int LoadVoiceDataFromWav([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref VoiceDataThunk voiceData);
         }
     }
