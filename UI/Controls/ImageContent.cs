@@ -9,13 +9,38 @@ using CipherPark.AngelJacket.Core.Utils;
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class ImageContent : UIContent
-    {
-        public Texture2D Texture { get; set; }
+    {       
+        private ShaderResourceView _textureView = null;
+        private Texture2D _texture = null;
 
+        public Texture2D Texture
+        {
+            get { return _texture; }
+            set
+            {
+                if (_textureView != null)
+                {
+                    _textureView.Dispose();
+                    _textureView = null;
+                }
+
+                if (_texture != null)
+                {
+                    _texture.Dispose();
+                    _texture = null;
+                }
+
+                _texture = value;
+
+                if( _texture != null )                
+                    _textureView = new ShaderResourceView(Container.Game.GraphicsDevice, _texture);                
+            }
+        }
+       
         public ImageContent()
         { }
 
-        public ImageContent(Texture2D texture)
+        public ImageContent(Texture2D texture) 
         {
             Texture = texture;
         }
@@ -25,10 +50,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (this.Container == null)
                 throw new InvalidOperationException("Container is null");
 
-            if (Texture != null)
+            if (_textureView != null)
             {
                 Container.ControlSpriteBatch.Begin();
-                Container.ControlSpriteBatch.Draw(Texture, Container.PositionToSurface(Container.Position), Colors.White);
+                Container.ControlSpriteBatch.Draw(_textureView, Container.PositionToSurface(Container.Position), Colors.White);
                 Container.ControlSpriteBatch.End();
             }
 

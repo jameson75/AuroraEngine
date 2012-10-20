@@ -153,7 +153,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public event ControlCommandHandler ControlCommand;
 
-        public void NotifyCommandWireup(object sender, ControlCommandArgs args);
+        public void NotifyCommandWireUp(object sender, ControlCommandArgs args)
+        {
+            ControlCommandHandler handler = ControlCommand;
+            if (handler != null)
+                handler(sender, args);
+        }        
     }
 
     public class UIItemControlCollection : System.Collections.ObjectModel.ObservableCollection<ItemControl>

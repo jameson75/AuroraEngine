@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml.Linq;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.UI.Controls;
+using CipherPark.AngelJacket.Core.Utils.Interop;
 using System.Text.RegularExpressions;
 
 namespace CipherPark.AngelJacket.Core.UI.Design
@@ -34,7 +35,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                     throw new InvalidOperationException("Resource is not of type PathResource");
 
                 PathResource pr = (PathResource)tree.Resources[resourceName];
-                imageControl.Content.Texture = tree.Game.Content.Load<Texture2D>(element.Attribute(SourceAttributeName).Value);
+                imageControl.Content.Texture = ContentImporter.LoadTexture(tree.Game.GraphicsDeviceContext, element.Attribute(SourceAttributeName).Value);
             }
             base.Parse(tree, element, control);
         }

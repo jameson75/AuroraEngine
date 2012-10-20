@@ -99,6 +99,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public event ControlCommandHandler ControlCommand;
+
+        public void NotifyCommandWireUp(object sender, ControlCommandArgs args)
+        {
+            ControlCommandHandler handler = ControlCommand;
+            if (handler != null)
+                handler(sender, args);
+        }   
     }
 }
 

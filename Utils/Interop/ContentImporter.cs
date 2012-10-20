@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using System.IO;
 using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.XAudio2;
+using SharpDX.Multimedia;
 
 namespace CipherPark.AngelJacket.Core.Utils.Interop
 {
@@ -24,17 +26,41 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
             return voiceData;
         }
 
-        public static SpriteFont LoadFont(IGameApp game, string resource)
+        public static SourceVoice LoadVoice(XAudio2 audioDevice, string resource)
+        {
+            SourceVoice sourceVoice = null;
+            VoiceData vd = LoadVoiceDataFromWav(resource);
+            WaveFormat sourceVoiceFormat = WaveFormat.CreateCustomFormat((WaveFormatEncoding)vd.Format.FormatTag, (int)vd.Format.SamplesPerSec, (int)vd.Format.Channels, (int)vd.Format.AvgBytesPerSec, (int)vd.Format.BlockAlign, (int)vd.Format.BitsPerSample);
+            sourceVoice = new SourceVoice(audioDevice, sourceVoiceFormat);
+            AudioBuffer ab = new AudioBuffer();
+            ab.AudioBytes = vd.AudioBytes;
+            ab.Flags = BufferFlags.EndOfStream;
+            ab.Stream = new DataStream(vd.AudioBytes, true, true);
+            vd.AudioData.CopyTo(ab.Stream);
+            sourceVoice.SubmitSourceBuffer(ab, null);
+            return sourceVoice;
+        }
+
+        public static SpriteFont LoadFont(Device graphicsDevice, string resource)
         {            
             //ShaderResourceView fontShaderResourceView = new ShaderResourceView(game.GraphicsDevice, resource);
-            SpriteFont font = new SpriteFont(game);
+            SpriteFont font = new SpriteFont(graphicsDevice, resource);
             return font;
+        }
+
+        public static Texture2D LoadTexture(DeviceContext deviceContext, string fileName)
+        {
+            IntPtr _nativeShaderResourceView = UnsafeNativeMethods.CreateTextureFromFile(deviceContext.NativePointer, fileName);
+            return new Texture2D(_nativeShaderResourceView);
         }
 
         private static class UnsafeNativeMethods
         {
             [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadVoiceDataFromWav")]
             public static extern int LoadVoiceDataFromWav([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref VoiceDataThunk voiceData);
+
+            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
+            public static extern IntPtr CreateTextureFromFile(IntPtr deviceContext, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
         }
     }
 

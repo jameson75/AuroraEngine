@@ -21,11 +21,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private void InitializeControl()
         {
             GrooveTemplate = new ContentControl(VisualRoot, new ColorContent(Colors.Red));
-            GrooveTemplate.Size = new Vector2(0, 3);
+            GrooveTemplate.Size = new DrawingSizeF(0, 3);
             GrooveTemplate.HorizontalAlignment = HorizontalAlignment.Stretch;
             GrooveTemplate.VerticalAlignment = VerticalAlignment.Center;
             HandleTemplate = new ContentControl(VisualRoot, new ColorContent(Colors.Blue));
-            HandleTemplate.Size = new Vector2(5, 0);
+            HandleTemplate.Size = new DrawingSizeF(5, 0);
             HandleTemplate.VerticalAlignment = VerticalAlignment.Stretch;
             HandleTemplate.Margin = new Vector2(0, 0);
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);

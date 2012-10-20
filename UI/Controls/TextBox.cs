@@ -62,7 +62,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void Draw(long gameTime)
         {
-            if (this.Size == Vector2.Zero)
+            if (this.Size == DrawingSizeFExtension.Zero)
                 return;
           
             /*

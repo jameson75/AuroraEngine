@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Utils.Interop;
 using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class MenuItem : ItemControl
     {
-        public static readonly Vector2 DefaultItemTextMargin = new Vector2(5, 5);
+        public static readonly RectangleF DefaultItemTextMargin = new RectangleF(5, 5, 5, 5);
 
         public MenuItem(IUIRoot visualRoot) : base(visualRoot)
         {
-            this.Size = new Vector2(100, 20);
+            this.Size = new DrawingSizeF(100, 20);
         }
 
         public MenuItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 fontColor)
@@ -23,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             TextContent textContent = new TextContent(text, font, fontColor);
             ItemContent = textContent;
             //SelectContent = textContent;
-            Size = font.MeasureString(text) + (DefaultItemTextMargin * 2);   
+            Size = font.MeasureString(text).Add(DefaultItemTextMargin.GetSize()); 
         }
 
         public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 itemFontColor, Color4 selectFontColor, string commandName = null)
@@ -35,10 +36,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             ItemContent = itemContent;
             TextContent selectContent = new TextContent(text, font, selectFontColor);
             SelectContent = selectContent;
-            Size = font.MeasureString(text) + (DefaultItemTextMargin * 2);   
-        }
-
-        public string CommandName { get; set; }
+            Size = font.MeasureString(text).Add(DefaultItemTextMargin.GetSize());
+        }       
 
         //public override bool CanFocus
         //{

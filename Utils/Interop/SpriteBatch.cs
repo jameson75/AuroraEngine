@@ -30,7 +30,12 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
             UnsafeNativeMethods.Begin(this._nativeObject, mode, blendState.NativePointer, samplerState.NativePointer, depthStencilState.NativePointer, rasterizerState.NativePointer, customShaderFunc, _transformationMatrix);
         }
 
-        public void Draw(ShaderResourceView texture, Vector2 position, Rectangle? sourceRectangle, Color4 color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
+        public void Begin()
+        {
+            UnsafeNativeMethods.Begin(this._nativeObject);
+        }
+
+        public void Draw(ShaderResourceView texture, Vector2 position, Rectangle? sourceRectangle, Color4 clr, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects, float layerDepth)
         {
             IntPtr rectPtr = IntPtr.Zero;
             if(sourceRectangle.HasValue)
@@ -39,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
                 rectPtr = Marshal.AllocHGlobal(Marshal.SizeOf(rect));
                 Marshal.StructureToPtr(rect, rectPtr, false);
             }
-            UnsafeNativeMethods.Draw(this._nativeObject, texture.NativePointer, new XMFLOAT2(position), rectPtr, new XVECTOR4(color), rotation, new XMFLOAT2(origin), new XMFLOAT2(scale), effects, layerDepth);
+            UnsafeNativeMethods.Draw(this._nativeObject, texture.NativePointer, new FLOAT2(position), rectPtr, new XVECTOR4(clr), rotation, new FLOAT2(origin), new FLOAT2(scale), (int)effects, layerDepth);
             if( rectPtr != IntPtr.Zero )
             {
                 Marshal.FreeHGlobal(rectPtr);
@@ -49,7 +54,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
 
         public void Draw(ShaderResourceView texture, Vector2 position, Color4 color)
         {          
-            Draw(texture, position, null, color, 0, XMFLOAT2.Zero, XMFLOAT2.Unit, SpriteEffects.None, 0);
+            Draw(texture, position, null, color, 0, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
         }
 
         public void Draw(ShaderResourceView texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color4 color, float rotation, Vector2 origin, SpriteEffects effects, float layerDepth)
@@ -61,7 +66,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
                 rectPtr = Marshal.AllocHGlobal(Marshal.SizeOf(rect));
                 Marshal.StructureToPtr(rect, rectPtr, false);
             }
-            UnsafeNativeMethods.Draw(this._nativeObject, texture.NativePointer, new WIN32_RECT(destinationRectangle), rectPtr, new XVECTOR4(color), rotation, new XMFLOAT2(origin), effects, layerDepth);
+            UnsafeNativeMethods.Draw(this._nativeObject, texture.NativePointer, new WIN32_RECT(destinationRectangle), rectPtr, new XVECTOR4(color), rotation, new FLOAT2(origin), effects, layerDepth);
             if (rectPtr != IntPtr.Zero)
             {
                 Marshal.FreeHGlobal(rectPtr);
@@ -74,12 +79,12 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
             Draw(texture, destinationRectangle, sourceRectangle, color, 0, Vector2.Zero, SpriteEffects.None, 0);
         }
 
-        public void DrawText(SpriteFont font, string text, Vector2 position, Color4 color)
+        public void DrawString(SpriteFont font, string text, Vector2 position, Color4 color)
         {
             font.DrawString(this, text, position, color);
         }
 
-        public void DrawText(SpriteFont font, string text, Vector2 position, Color4 color, float rotation, Vector2 origin, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0)
+        public void DrawString(SpriteFont font, string text, Vector2 position, Color4 color, float rotation, Vector2 origin, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0)
         {
             font.DrawString(this, text, position, color, rotation, origin, effects, layerDepth);
         }
@@ -111,11 +116,14 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
             [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Begin")]
             public static extern void Begin(IntPtr nativeSpriteBatch, SpriteSortMode sortMode, IntPtr blendState, IntPtr samplerState, IntPtr depthStencilState, IntPtr rasterizerState, IntPtr customShaderFunction, [MarshalAs(UnmanagedType.LPArray, SizeConst=16)] float[] transformationMatrix);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Draw")]
-            public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, XMFLOAT2 position, IntPtr sourceRectangle, XVECTOR4 color, float rotation, XMFLOAT2 origin, XMFLOAT2 scale, SpriteEffects effects, float layerDepth);
+            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Begin_2")]
+            public static extern void Begin(IntPtr nativeSpriteBatch);
 
             [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Draw")]
-            public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, WIN32_RECT destinationRectangle, IntPtr sourceRectangle, XVECTOR4 color, float rotation, XMFLOAT2 origin, SpriteEffects effects, float layerDepth); 
+            public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, FLOAT2 position, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, FLOAT2 origin, FLOAT2 scale, int effects, float layerDepth);
+
+            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Draw_2")]
+            public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, WIN32_RECT destinationRectangle, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, FLOAT2 origin, SpriteEffects effects, float layerDepth); 
 
             [DllImport("AngelJacketNative.dll", EntryPoint = "End")]
             public static extern void End(IntPtr nativeSpriteBatch);

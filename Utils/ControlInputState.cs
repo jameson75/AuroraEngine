@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         public VirtualKey[] GetKeysDown(bool scanRealTime = false)
         {                       
-            int[] keysDown = (scanRealTime) ? _inputState.GetKeysDown() : _delayedScannedKeysDown.ToArray();
+            VirtualKey[] keysDown = (scanRealTime) ? _inputState.GetKeysDown() : _delayedScannedKeysDown.ToArray();
             return keysDown;
         }
 

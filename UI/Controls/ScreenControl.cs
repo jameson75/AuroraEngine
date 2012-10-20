@@ -20,7 +20,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnItemAdded(ItemControl item)
         {
-            if (item is ScreenControl == false)
+            if (item is ScreenPanel == false)
                 throw new ArgumentException("item", "item must be of type or derivative of ScreenControl");          
             base.OnItemAdded(item);           
         }
@@ -117,6 +117,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class ScreenPanel : ItemControl
     {
-
+        public ScreenPanel(Components.IUIRoot visualRoot)
+            : base(visualRoot)
+        { }
     }    
 }

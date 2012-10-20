@@ -89,7 +89,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 {
                     int width = newWidth.HasValue ? newWidth.Value : child.Bounds.Width;
                     int height = newHeight.HasValue ? newHeight.Value : child.Bounds.Height;
-                    child.Size = new Vector2(width, height);
+                    child.Size = new DrawingSizeF(width, height);
                 }
             }
         }      

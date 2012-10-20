@@ -37,8 +37,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     else
                         offset += Items[i - 1].Padding.Y;
                     Items[i].Position = new Vector2(0.0f, offset);
-                    Items[i].Size = new Vector2(this.Size.X, Items[i].Size.Y);
-                    offset += Items[0].Size.Y;
+                    Items[i].Size = new DrawingSizeF(this.Size.Width, Items[i].Size.Height);
+                    offset += Items[0].Size.Height;
                 }
                 isLayoutUpdating = false;                
             }            
@@ -106,13 +106,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             float totalLength = 0;
             if (this.Expanded)
             {
-                totalLength = this.itemButton.Size.Y + this.itemPanel.Size.Y;
+                totalLength = this.itemButton.Size.Height + this.itemPanel.Size.Height;
             }
             else
             {
-                totalLength = this.itemButton.Size.Y;
+                totalLength = this.itemButton.Size.Height;
             }
-            this.Size = new Vector2(this.Size.X, totalLength);
+            this.Size = new DrawingSizeF(this.Size.Width, totalLength);
         }
 
         protected override void OnChildAdded(UIControl child)

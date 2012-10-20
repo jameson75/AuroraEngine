@@ -22,6 +22,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             return r.X <= point.X && r.X + r.Width >= point.X &&
                    r.Y <= point.Y && r.Y + r.Height >= point.Y;
         }
+
+        public static Vector2 Position(this Rectangle r)
+        {
+            return new Vector2(r.X, r.Y);
+        }
     }
 
     public static class MouseStateExtension
@@ -54,4 +59,30 @@ namespace CipherPark.AngelJacket.Core.Utils
             return !IsKeyDown(ks, key);
         }
     }
+
+    public static class RectangleFExtension
+    {
+        public static DrawingSizeF GetSize(this RectangleF r)
+        {
+            return new DrawingSizeF(r.Right - r.Left, r.Bottom - r.Top);
+        }
+
+        public static Vector2 Position(this RectangleF r)
+        {
+            return new Vector2(r.Left, r.Top);
+        }
+    }
+
+    public static class DrawingSizeFExtension
+    {
+        private static DrawingSizeF _zero = new DrawingSizeF(0, 0);
+
+        public static DrawingSizeF Zero { get { return _zero; } }
+
+        public static DrawingSizeF Add(this DrawingSizeF s, DrawingSizeF s2)
+        {
+            return new DrawingSizeF(s.Width + s2.Width, s.Height + s2.Height);
+        }
+    }
+
 }

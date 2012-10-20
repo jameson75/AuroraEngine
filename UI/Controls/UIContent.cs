@@ -5,10 +5,10 @@ using SharpDX;
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public abstract class UIContent
-    {        
+    {
         public UIContent()
         {
-           
+            
         }
 
         public virtual void Draw(long gameTime)

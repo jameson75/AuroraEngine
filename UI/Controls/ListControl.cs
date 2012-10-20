@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CipherPark.AngelJacket.Core.UI.Components;
+using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
@@ -54,8 +55,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 foreach (ItemControl item in this.Items)
                 {
                     item.Position = new Vector2(previousColumnsWidth, previousItemsTotalHeight);
-                    previousItemsTotalHeight += item.Size.Y;
-                    maxItemWidth = Math.Max(maxItemWidth, item.Size.X);
+                    previousItemsTotalHeight += item.Size.Height;
+                    maxItemWidth = Math.Max(maxItemWidth, item.Size.Width);
                     currentRowIndex++;
                     if (MaxRowSize != ListControl.SizeInfinite && currentRowIndex >= MaxRowSize)
                     {                       
@@ -74,8 +75,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 foreach (ItemControl item in this.Items)
                 {
                     item.Position = new Vector2(previousItemsTotalWidth, previousColumnsHeight);
-                    previousItemsTotalWidth += item.Size.X;
-                    maxItemHeight = Math.Max(maxItemHeight, item.Size.Y);
+                    previousItemsTotalWidth += item.Size.Width;
+                    maxItemHeight = Math.Max(maxItemHeight, item.Size.Width);
                     currentColumnIndex++;
                     if (MaxRowSize != ListControl.SizeInfinite && currentColumnIndex >= MaxRowSize)
                     {

@@ -17,5 +17,13 @@ namespace CipherPark.AngelJacket.Core.Services
                     return service;
             return null;
         }
+
+        public void RegisterService(object inputService)
+        {
+            if( GetService(inputService.GetType()) == null )
+                _services.Add(inputService);
+            else
+                throw new InvalidOperationException("Service already registered.");
+        }
     }
 }

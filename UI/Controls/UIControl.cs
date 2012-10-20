@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Utils.Interop;
 using CipherPark.AngelJacket.Core.Module;
 using SharpDX;
 
@@ -15,7 +16,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private SpriteBatch _spriteBatch = null;
         //private bool _isInitialized = false;
         private UIControlCollection _children = null;
-        private Vector2 _size = Vector2.Zero;
+        private DrawingSizeF _size = DrawingSizeFExtension.Zero;
         private Vector2 _position = Vector2.Zero;
         private IControlLayoutManager _layoutManager = null;
         #endregion
@@ -31,7 +32,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Enabled = true;
             EnableFocus = true;
             Visible = true;
-            _spriteBatch = new SpriteBatch(visualRoot.Game.GraphicsDevice);
+            _spriteBatch = new SpriteBatch(visualRoot.Game.GraphicsDeviceContext);
             _children = new UIControlCollection();
             _children.CollectionChanged += Children_CollectionChanged;
             _layoutManager = new ContainerControlLayoutManager(this);
@@ -57,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public Vector2 Size
+        public DrawingSizeF Size
         {
             get
             {
@@ -169,7 +170,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         /// 
         /// </summary>
         /// <remarks>Bounds will always represent dimensions the control is rendered at. See UIControl.NativeBounds property.</remarks>
-        public Rectangle Bounds { get { return new Rectangle((int)Position.X, (int)Position.Y, (int)this.Size.X, (int)this.Size.Y); } }
+        public Rectangle Bounds { get { return new Rectangle((int)Position.X, (int)Position.Y, (int)this.Size.Width, (int)this.Size.Height); } }
         public Vector2 Padding { get; set; }
         public Vector2 Margin { get; set; }
         public UIControl Parent { get; set; }

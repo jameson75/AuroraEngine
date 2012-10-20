@@ -35,11 +35,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public CommandControlWireUp(ICommandControl commandControl)
         {
+            _wiredUpChildren = new List<ICommandControl>();
             UIControl uiControl = commandControl as UIControl;
-            if (uiControl != null)
-            {
+            if (uiControl != null)            
                 uiControl.Children.CollectionChanged += CommandControl_Children_CollectionChanged;
-            }
+            _commandControl = commandControl;          
         }
 
         private void CommandControl_Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)

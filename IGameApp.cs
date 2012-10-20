@@ -7,6 +7,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.XAudio2;
 using SharpDX.DirectInput;
+using SharpDX.DXGI;
 
 using CipherPark.AngelJacket.Core.Services;
 
@@ -20,12 +21,20 @@ namespace CipherPark.AngelJacket.Core
 
         SharpDX.Direct3D11.Device GraphicsDevice { get; }
 
-        MasteringVoice MasteringVoice { get; }       
+        MasteringVoice MasteringVoice { get; }
+
+        XAudio2 AudioDevice { get; }
 
         Keyboard Keyboard { get; }
 
         Mouse Mouse { get; }
 
         IntPtr DeviceHwnd { get; }
+
+        RenderTargetView RenderTarget { get; }
+
+        DepthStencilView DepthStencil { get; }
+
+        SwapChain SwapChain { get; }
     }
 }

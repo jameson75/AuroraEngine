@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                 control.Position = UIControlPropertyParser.ParseVector2(element.Attribute(PositionAttributeName).Value);
 
             if (element.Attribute(SizeAttributeName) != null)
-                control.Size = UIControlPropertyParser.ParseVector2(element.Attribute(SizeAttributeName).Value);
+                control.Size = UIControlPropertyParser.ParseDrawingSize(element.Attribute(SizeAttributeName).Value);
 
             if (element.Attribute(NameAttributeName) != null)
                 control.Name = element.Attribute(NameAttributeName).Value;

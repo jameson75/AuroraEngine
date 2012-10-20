@@ -104,7 +104,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 if (this.Items.Count == 1)
                     this.Size = item.Size;
                 else
-                    this.Size = (this.Orienation == MenuOrientation.Vertical) ? new Vector2(this.Size.X, this.Items.Sum(x => x.Bounds.Height)) : new Vector2(this.Items.Sum(x => x.Bounds.Width), this.Size.Y);                
+                    this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);                
             }
             base.OnItemAdded(item);
             UpdateLayout(LayoutUpdateReason.ChildCountChanged);
@@ -116,9 +116,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (AutoSize)
             {
                 if (this.Items.Count == 0)
-                    this.Size = Vector2.Zero;
+                    this.Size = new DrawingSizeF(0, 0);
                 else
-                    this.Size = (this.Orienation == MenuOrientation.Vertical) ? new Vector2(this.Size.X, this.Items.Sum(x => x.Bounds.Height)) : new Vector2(this.Items.Sum(x => x.Bounds.Width), this.Size.Y);
+                    this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
             }
             UpdateLayout(LayoutUpdateReason.ChildCountChanged);
             SelectedItemIndex = -1;
@@ -136,8 +136,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     else
                         offset += Items[i - 1].Padding.Y;
                     Items[i].Position = new Vector2(0.0f, offset);
-                    Items[i].Size = new Vector2(this.Size.X, Items[i].Size.Y);
-                    offset += Items[0].Size.Y;
+                    Items[i].Size = new DrawingSizeF(this.Size.Width, Items[i].Size.Height);
+                    offset += Items[0].Size.Height;
                 }
             }
             else
@@ -149,8 +149,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     else
                         offset += Items[i - 1].Padding.X;
                     Items[i].Position = new Vector2(offset, 0.0f);
-                    Items[i].Size = new Vector2(Items[i].Size.X, this.Size.Y);
-                    offset += Items[0].Size.X;
+                    Items[i].Size = new DrawingSizeF(Items[i].Size.Width, this.Size.Height);
+                    offset += Items[0].Size.Width;
                 }
             }
             base.OnLayoutChanged();

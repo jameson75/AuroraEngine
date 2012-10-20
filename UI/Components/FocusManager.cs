@@ -64,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if (focusTarget != null && focusTarget != _focusedControl)
                     SetFocus(focusTarget);
             }
-            else if (state.GetKeysDown().Contains((int)KeyboardVirtualKeys.VK_Tab))
+            else if (state.GetKeysDown().Contains(VirtualKey.Tab))
             {
                 //[Obsolete]
                 //UIControl focusTarget = FocusManager.GetNextTabTarget(_focusedControl);  

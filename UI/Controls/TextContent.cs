@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Utils.Interop;
 using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
@@ -60,8 +61,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 return Rectangle.Empty;
             else
             {
-                Vector2 textSize = Font.MeasureString(Text);
-                return new Rectangle(0, 0, (int)Math.Ceiling(textSize.X),(int) Math.Ceiling(textSize.Y));
+                DrawingSizeF textSize = Font.MeasureString(Text);
+                return new Rectangle(0, 0, (int)Math.Ceiling(textSize.Width),(int) Math.Ceiling(textSize.Height));
             }
         }
     }   

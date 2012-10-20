@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.AngelJacket.Core.Utils.Interop;
 
 namespace CipherPark.AngelJacket.Core.UI.Design
 {
@@ -37,10 +38,10 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                         throw new InvalidOperationException("Resource is not of type PathResource");
 
                     PathResource pr = (PathResource)tree.Resources[resourceName];
-                    textStyle.Font = tree.Game.Content.Load<SpriteFont>(pr.Path);
+                    textStyle.Font = ContentImporter.LoadFont(tree.Game.GraphicsDevice, pr.Path);
                 }
                 else
-                    textStyle.Font = tree.Game.Content.Load<SpriteFont>(element.Attribute(FontAttributeName).Value);
+                    textStyle.Font = ContentImporter.LoadFont(tree.Game.GraphicsDevice, (element.Attribute(FontAttributeName).Value));
             }
 
             if (element.Attribute(FontColorAttributeName) != null)
