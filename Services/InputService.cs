@@ -15,8 +15,12 @@ namespace CipherPark.AngelJacket.Core.Services
         /// Retreives the game's control input state manager.
         /// </summary>
         /// <returns></returns>
-        ControlInputState GetControlInputState();        /// <summary>
-  
+        ControlInputState GetControlInputState();
+
+        /// <summary>
+        /// Updates the input state.
+        /// </summary>
+        void UpdateState();  
     }
 
     /// <summary>
@@ -30,16 +34,11 @@ namespace CipherPark.AngelJacket.Core.Services
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Constructs a new input game-service initialized with the game's input state manager.
-        /// </summary>
-        /// <param name="ism">The game's input state manager.</param>
-        /// <param name="cim">The game's control input state manager.</param>
-        /// <param name="fm">The game's control focus manager.</param>
-        public InputService(InputState ism, ControlInputState cim)
+        public InputService(IGameApp game)
         {
-            _ism = ism;
-            _cim = cim;            
+            _ism = new InputState(game);
+            _cim = new ControlInputState(_ism);
+            Create(_ism, _cim);
         }
         #endregion
 
@@ -60,7 +59,28 @@ namespace CipherPark.AngelJacket.Core.Services
         public ControlInputState GetControlInputState()
         {
             return _cim;
-        }    
+        }
+
+        /// <summary>
+        /// Updates the state of the input state and, then, the control-input-state.
+        /// </summary>
+        public void UpdateState()
+        {
+            _ism.UpdateState();
+            _cim.UpdateState();
+        }
         #endregion
+
+        /// <summary>
+        /// Constructs a new input game-service initialized with the game's input state manager.
+        /// </summary>
+        /// <param name="ism">The game's input state manager.</param>
+        /// <param name="cim">The game's control input state manager.</param>
+        /// <param name="fm">The game's control focus manager.</param>
+        private void Create(InputState ism, ControlInputState cim)
+        {
+            _ism = ism;
+            _cim = cim;
+        }
     }
 }

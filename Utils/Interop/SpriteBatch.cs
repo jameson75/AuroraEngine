@@ -44,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
                 rectPtr = Marshal.AllocHGlobal(Marshal.SizeOf(rect));
                 Marshal.StructureToPtr(rect, rectPtr, false);
             }
-            UnsafeNativeMethods.Draw(this._nativeObject, texture.NativePointer, new FLOAT2(position), rectPtr, new XVECTOR4(clr), rotation, new FLOAT2(origin), new FLOAT2(scale), (int)effects, layerDepth);
+            UnsafeNativeMethods.Draw(this._nativeObject, texture.NativePointer, new XMFLOAT2(position), rectPtr, new XVECTOR4(clr), rotation, new XMFLOAT2(origin), new XMFLOAT2(scale), effects, layerDepth);
             if( rectPtr != IntPtr.Zero )
             {
                 Marshal.FreeHGlobal(rectPtr);
@@ -66,7 +66,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
                 rectPtr = Marshal.AllocHGlobal(Marshal.SizeOf(rect));
                 Marshal.StructureToPtr(rect, rectPtr, false);
             }
-            UnsafeNativeMethods.Draw(this._nativeObject, texture.NativePointer, new WIN32_RECT(destinationRectangle), rectPtr, new XVECTOR4(color), rotation, new FLOAT2(origin), effects, layerDepth);
+            UnsafeNativeMethods.Draw(this._nativeObject, texture.NativePointer, new WIN32_RECT(destinationRectangle), rectPtr, new XVECTOR4(color), rotation, new XMFLOAT2(origin), effects, layerDepth);
             if (rectPtr != IntPtr.Zero)
             {
                 Marshal.FreeHGlobal(rectPtr);
@@ -84,9 +84,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
             font.DrawString(this, text, position, color);
         }
 
-        public void DrawString(SpriteFont font, string text, Vector2 position, Color4 color, float rotation, Vector2 origin, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0)
+        public void DrawString(SpriteFont font, string text, Vector2 position, Color4 color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0)
         {
-            font.DrawString(this, text, position, color, rotation, origin, effects, layerDepth);
+            font.DrawString(this, text, position, color, rotation, origin, scale, effects, layerDepth);
         }
 
         public void End()
@@ -120,15 +120,15 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
             public static extern void Begin(IntPtr nativeSpriteBatch);
 
             [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Draw")]
-            public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, FLOAT2 position, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, FLOAT2 origin, FLOAT2 scale, int effects, float layerDepth);
+            public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, XMFLOAT2 position, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, XMFLOAT2 origin, XMFLOAT2 scale, SpriteEffects effects, float layerDepth);
 
             [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Draw_2")]
-            public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, WIN32_RECT destinationRectangle, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, FLOAT2 origin, SpriteEffects effects, float layerDepth); 
+            public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, WIN32_RECT destinationRectangle, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, XMFLOAT2 origin, SpriteEffects effects, float layerDepth); 
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "End")]
+            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_End")]
             public static extern void End(IntPtr nativeSpriteBatch);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "Delete")]
+            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Delete")]
             public static extern void Delete(IntPtr nativeSpriteBatch);
         }
     }

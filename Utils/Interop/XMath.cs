@@ -9,34 +9,34 @@ using SharpDX;
 namespace CipherPark.AngelJacket.Core.Utils.Interop
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct FLOAT2
+    public struct XMFLOAT2
     {
         public float X;
         public float Y;
         
-        public FLOAT2(float x, float y)
+        public XMFLOAT2(float x, float y)
         {
             X = x;
             Y = y;
         }
         
-        public FLOAT2(Vector2 v)
+        public XMFLOAT2(Vector2 v)
         {
             X = v.X;
             Y = v.Y;
         }
         
-        static FLOAT2()
+        static XMFLOAT2()
         {
-            _zero = new FLOAT2(0,0);
-            _unit = new FLOAT2(1,1);
+            _zero = new XMFLOAT2(0,0);
+            _unit = new XMFLOAT2(1,1);
         }
         
-        private static FLOAT2 _zero;
-        private static FLOAT2 _unit;
+        private static XMFLOAT2 _zero;
+        private static XMFLOAT2 _unit;
 
-        public static FLOAT2 Zero { get { return _zero; } }
-        public static FLOAT2 Unit { get { return _unit; } }
+        public static XMFLOAT2 Zero { get { return _zero; } }
+        public static XMFLOAT2 Unit { get { return _unit; } }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -75,12 +75,12 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
     [StructLayout(LayoutKind.Sequential)]
     public struct WIN32_RECT
     {
-        public long Left;
-        public long Top;
-        public long Right;
-        public long Bottom;
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
 
-        public WIN32_RECT(long l, long t, long r, long b)
+        public WIN32_RECT(int l, int t, int r, int b)
         {
             Left = l;
             Top = t;

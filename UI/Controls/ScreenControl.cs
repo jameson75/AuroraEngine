@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Utils;
+using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
@@ -52,7 +53,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             InputState inputStateManager = inputServices.GetInputState();
             
-            if (inputStateManager.IsKeyReleased(VirtualKey.BackSpace))
+            if (inputStateManager.IsKeyReleased(Key.Back))
                 SelectPreviousItem();
 
             if (ActiveScreen != null)

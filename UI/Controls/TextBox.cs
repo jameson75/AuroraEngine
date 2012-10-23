@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.UI.Components;
 using SharpDX;
+using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
@@ -45,7 +46,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     throw new InvalidOperationException("Input services not available.");
                 ControlInputState cim = inputServices.GetControlInputState();       
                 //cim.UpdateState(gameTime);
-                if (cim.IsKeyReleased(VirtualKey.Enter))
+                if (cim.IsKeyReleased(Key.Return))
                     EnterKeyEvent(this, EventArgs.Empty);
                 WritableInput[] cis = ControlInputState.ConvertToWritableInput(cim.GetKeysDown(), true);
                 foreach (WritableInput ci in cis)
@@ -53,7 +54,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         this._content.Text += ci.Ascii.ToString();
                     else
                     {
-                        if (ci.Key == VirtualKey.BackSpace)
+                        if (ci.Key == Key.Back)
                             if (this._content.Text.Length > 0)
                                 this._content.Text = this._content.Text.Substring(0, this._content.Text.Length - 1);
                     }

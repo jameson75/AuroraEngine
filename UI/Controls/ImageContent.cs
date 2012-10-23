@@ -53,7 +53,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (_textureView != null)
             {
                 Container.ControlSpriteBatch.Begin();
-                Container.ControlSpriteBatch.Draw(_textureView, Container.PositionToSurface(Container.Position), Colors.White);
+                Container.ControlSpriteBatch.Draw(_textureView, Container.PositionToSurface(Container.Position), Colors.White);              
                 Container.ControlSpriteBatch.End();
             }
 

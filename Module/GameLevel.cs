@@ -11,6 +11,7 @@ using CipherPark.AngelJacket.Core.Utils;
 using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
+using SharpDX.DirectInput;
 
 public enum RunningState
 {
@@ -199,7 +200,7 @@ namespace CipherPark.AngelJacket.Core.Module
             InputState inputStateManager = inputServices.GetInputState();
 
             //The ESCAPE key on the key board Exits this module.
-            if (inputStateManager.IsKeyReleased(VirtualKey.Escape))
+            if (inputStateManager.IsKeyReleased(Key.Escape))
                 this.SignalExitModule();
             else
             {

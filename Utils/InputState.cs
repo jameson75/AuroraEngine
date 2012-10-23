@@ -10,7 +10,7 @@ namespace CipherPark.AngelJacket.Core.Utils
     {
         KeyboardStateWindow keyboardStateWindow = null;
         MouseStateWindow mouseStateWindow = null;
-        VirtualKey[] _releasedKeys = null;
+        Key[] _releasedKeys = null;
         MouseButton[] _mouseButtonsReleased = null;
         MouseButton[] _mouseButtonsDown = null;
         MouseButton[] _mouseButtonsPressed = null;
@@ -46,10 +46,10 @@ namespace CipherPark.AngelJacket.Core.Utils
             //Update Key Press Time Stamps
             //----------------------------
             //Remove time stamps of keys which have just been released.
-            foreach (VirtualKey releasedKey in this.GetKeysReleased())
+            foreach (Key releasedKey in this.GetKeysReleased())
                 keyboardStateWindow.PressTime.Remove(releasedKey);
             //Set time stamps for keys which have just been pressed.
-            foreach (VirtualKey newPressedKey in keyboardStateWindow.NewState.PressedKeys)
+            foreach (Key newPressedKey in keyboardStateWindow.NewState.PressedKeys)
             {               
                 if(!keyboardStateWindow.PressTime.ContainsKey(newPressedKey))
                     keyboardStateWindow.PressTime.Add(newPressedKey, _stateUpdateTime);                
@@ -84,7 +84,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
         
-        public bool IsKeyUp(VirtualKey key)
+        public bool IsKeyUp(Key key)
         { 
              if(keyboardStateWindow == null)
                 return false;
@@ -92,7 +92,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                  return keyboardStateWindow.NewState.IsKeyUp(key);
         }
 
-        public bool IsKeyDown(VirtualKey key)
+        public bool IsKeyDown(Key key)
         {
               if(keyboardStateWindow == null)
                   return false;
@@ -100,7 +100,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                   return keyboardStateWindow.NewState.IsKeyDown(key);
         }
 
-        public bool IsKeyReleased(VirtualKey key)
+        public bool IsKeyReleased(Key key)
         {
             if(keyboardStateWindow == null)
                 return false;
@@ -108,24 +108,24 @@ namespace CipherPark.AngelJacket.Core.Utils
                 return keyboardStateWindow.OldState.IsKeyDown(key) && keyboardStateWindow.NewState.IsKeyUp(key);
         }
 
-        public VirtualKey[] GetKeysDown()
+        public Key[] GetKeysDown()
         {
             if(keyboardStateWindow == null)
-                return new VirtualKey[0];
+                return new Key[0];
             else
-                return DirectInputVKMap.ToVirtualKeys(keyboardStateWindow.NewState.PressedKeys);
+                return keyboardStateWindow.NewState.PressedKeys.ToArray();
         }
 
-        public VirtualKey[] GetKeysReleased()
+        public Key[] GetKeysReleased()
         {
             if (keyboardStateWindow == null)
-                return new VirtualKey[0];
+                return new Key[0];
             else
             {
                 if (_releasedKeys == null)
                 {
-                    List<VirtualKey> _releasedKeyList = new List<VirtualKey>();
-                    foreach (VirtualKey oldPressedKey in DirectInputVKMap.ToVirtualKeys(keyboardStateWindow.OldState.PressedKeys))
+                    List<Key> _releasedKeyList = new List<Key>();
+                    foreach (Key oldPressedKey in keyboardStateWindow.OldState.PressedKeys)
                         if (keyboardStateWindow.NewState.IsKeyUp(oldPressedKey))
                             _releasedKeyList.Add(oldPressedKey);
                     _releasedKeys = _releasedKeyList.ToArray();
@@ -139,7 +139,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public long GetKeyPressTime(VirtualKey key)
+        public long GetKeyPressTime(Key key)
         {
             if (keyboardStateWindow == null)
                 return 0;
@@ -155,7 +155,7 @@ namespace CipherPark.AngelJacket.Core.Utils
        /// </summary>
        /// <param name="key"></param>
        /// <returns></returns>
-        public TimeSpan GetKeyPressTimeSpan(VirtualKey key)
+        public TimeSpan GetKeyPressTimeSpan(Key key)
         {
             return (IsKeyDown(key)) ? new TimeSpan(0, 0, 0, 0, (int)(_stateUpdateTime - GetKeyPressTime(key))) : TimeSpan.Zero;             
         }
@@ -277,7 +277,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             public TState NewState { get; set; }            
         }
 
-        public class KeyboardStateWindow : StateWindow<KeyboardState, VirtualKey> 
+        public class KeyboardStateWindow : StateWindow<KeyboardState, Key> 
         { }
 
         public class MouseStateWindow : StateWindow<MouseState, MouseButton>
@@ -313,6 +313,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         Released,
     }
 
+    /*
     public enum VirtualKey
     {
         Unknown = 0,
@@ -430,7 +431,8 @@ namespace CipherPark.AngelJacket.Core.Utils
         LeftBrace = 219,
         Apostrophe = 222
     }
-
+    */
+   /*
     public static class DirectInputVKMap
     {
         private static VirtualKey[] map = new VirtualKey[] {
@@ -578,4 +580,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return (Key)Array.IndexOf(map, key);
         }
     }
+    */
 }
+
+   

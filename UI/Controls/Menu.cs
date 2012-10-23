@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
+using SharpDX.DirectInput;
 using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
@@ -68,8 +69,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     throw new InvalidOperationException("Input services not available.");
                 ControlInputState cim = inputServices.GetControlInputState();
 
-                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(VirtualKey.Up)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(VirtualKey.Left));
-                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(VirtualKey.Down)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(VirtualKey.Right));
+                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(Key.UpArrow)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(Key.Left));
+                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(Key.Down)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(Key.Right));
 
                 if (selectPreviousKeyDown)
                     this.SelectPreviousItem();
@@ -77,7 +78,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 else if (selectNextKeyDown)
                     this.SelectNextItem();
 
-                else if (cim.IsKeyReleased(VirtualKey.Enter))
+                else if (cim.IsKeyReleased(Key.Return))
                 {
                     if (this.SelectedItem != null && ((MenuItem)this.SelectedItem).CommandName != null)
                         this.OnItemClicked((MenuItem)this.SelectedItem);

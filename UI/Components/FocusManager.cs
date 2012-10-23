@@ -6,6 +6,7 @@ using CipherPark.AngelJacket.Core.UI.Controls;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Utils;
 using SharpDX;
+using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Components
 {
@@ -64,7 +65,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if (focusTarget != null && focusTarget != _focusedControl)
                     SetFocus(focusTarget);
             }
-            else if (state.GetKeysDown().Contains(VirtualKey.Tab))
+            else if (state.GetKeysDown().Contains(Key.Tab))
             {
                 //[Obsolete]
                 //UIControl focusTarget = FocusManager.GetNextTabTarget(_focusedControl);  

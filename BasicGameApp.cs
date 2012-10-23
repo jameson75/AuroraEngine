@@ -101,6 +101,8 @@ namespace CipherPark.AngelJacket.Core
             };
             _depthStencilBuffer = new Texture2D(_graphicsDevice, renderStencilDesc);
             _depthStencilView = new DepthStencilView(_graphicsDevice, _depthStencilBuffer);
+            _graphicsDeviceContext.Rasterizer.SetViewports(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height));
+            _graphicsDeviceContext.OutputMerger.SetTargets(DepthStencil, RenderTarget);
 
             //Initialize XAudio2 Resources.
             //-----------------------------

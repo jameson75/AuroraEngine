@@ -49,12 +49,12 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public static class KeyboardStateExtension
     {
-        public static bool IsKeyDown(this KeyboardState ks, VirtualKey key)
+        public static bool IsKeyDown(this KeyboardState ks, Key key)
         {
-            return ks.PressedKeys.Contains(DirectInputVKMap.ToDirectInputKey(key));
+            return ks.PressedKeys.Contains(key);
         }
 
-        public static bool IsKeyUp(this KeyboardState ks, VirtualKey key)
+        public static bool IsKeyUp(this KeyboardState ks, Key key)
         {
             return !IsKeyDown(ks, key);
         }
