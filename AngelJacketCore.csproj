@@ -89,6 +89,7 @@
     <Compile Include="UI\Controls\ContainerControl.cs" />
     <Compile Include="UI\Controls\ContentControl.cs" />
     <Compile Include="UI\Controls\DockPanel.cs" />
+    <Compile Include="UI\Controls\DropList.cs" />
     <Compile Include="UI\Controls\ICommandControl.cs" />
     <Compile Include="UI\Controls\ImageContent.cs" />
     <Compile Include="UI\Controls\ImageControl.cs" />

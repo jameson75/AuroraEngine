@@ -39,7 +39,9 @@ namespace CipherPark.AngelJacket.Core
 
         public void Run(Form form)
         {
-            InitializeDirectXResources(form);    
+            InitializeDirectXResources(form);
+
+            Initialize();
 
             LoadContent();
 
@@ -50,6 +52,8 @@ namespace CipherPark.AngelJacket.Core
             });
 
             UnloadContent();
+
+            Uninitialize();
         }
 
         protected virtual void Update()
@@ -58,10 +62,16 @@ namespace CipherPark.AngelJacket.Core
         protected virtual void Draw()
         { }
 
+        protected virtual void Initialize()
+        { }
+
         protected virtual void LoadContent()
         { }
 
         protected virtual void UnloadContent()
+        { }
+
+        protected virtual void Uninitialize()
         { }
 
         private void InitializeDirectXResources(Form form)

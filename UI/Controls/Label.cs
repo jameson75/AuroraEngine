@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using SharpDX;
+using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Utils.Interop;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
@@ -14,8 +17,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _textContent.Container = this;
         }
 
-        //TODO: Move this up a level.
-        public bool IsVisible { get; set; }
+        public Label(Components.IUIRoot visualRoot, TextContent content)
+            : base(visualRoot)
+        {
+            _textContent = content;
+            _textContent.Container = this;
+        }
+            
+        public Label(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor) : base(visualRoot)
+        {
+            _textContent = new TextContent(text, font, fontColor, backgroundColor);
+            _textContent.Container = this;
+        }
  
         public TextContent Content { get { return _textContent; } }
 

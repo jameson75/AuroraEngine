@@ -7,12 +7,13 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Utils.Interop;
 using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class Button : UIControl
+    public class Button : UIControl, ICommandControl
     {
-        UIContent _content = null;        
+        UIContent _content = null;
 
         public Button(IUIRoot visualRoot)
             : base(visualRoot)
@@ -44,9 +45,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
+        public string CommandName { get; set; }
+
+        public override bool CanFocus
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override void Draw(long gameTime)
         {
-            if( Content != null )            
+            if (Content != null)
                 Content.Draw(gameTime);
             base.Draw(gameTime);
         }
@@ -54,10 +65,45 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected virtual void OnContentChanged()
         {
             EventHandler handler = ContentChanged;
-            if( handler != null )
+            if (handler != null)
                 handler(this, EventArgs.Empty);
         }
 
-        public EventHandler ContentChanged;
+        public override void Update(long gameTime)
+        {
+            if (this.HasFocus)
+            {
+                Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
+                if (inputServices == null)
+                    throw new InvalidOperationException("Input services not available.");
+                ControlInputState cim = inputServices.GetControlInputState();
+
+                if (cim.IsKeyReleased(Key.Return))
+                {
+                    OnClick();
+                    if (this.CommandName != null)
+                        this.OnCommand(this.CommandName);
+                }
+            }
+            base.Update(gameTime);
+        }
+
+        protected virtual void OnClick()
+        {
+            EventHandler handler = Click;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnCommand(string commandName)
+        {
+            ControlCommandHandler handler = ControlCommand;
+            if (handler != null)
+                handler(this, new ControlCommandArgs(commandName));
+        }
+
+        public event EventHandler ContentChanged;
+        public event EventHandler Click;
+        public event ControlCommandHandler ControlCommand;
     }
 }

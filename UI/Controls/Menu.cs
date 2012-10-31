@@ -7,10 +7,113 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class Menu : ItemsControl
+    public abstract class SelectControl : ItemsControl
+    {
+        private int _selectedIndex = -1;
+        public SelectControl(Components.IUIRoot visualRoot) : base(visualRoot)
+        {
+
+        }
+
+        public ItemControl SelectedItem
+        {
+            get
+            {
+                if (_selectedIndex < 0 || _selectedIndex > Items.Count - 1)
+                    return null;
+                else
+                    return (ItemControl)Items[_selectedIndex];
+            }
+            set
+            {
+                if (Items.Contains(value) == false)
+                    throw new InvalidOperationException("Specified item is not a child of this control.");
+                else
+                    SelectedItemIndex = Items.IndexOf(value);
+            }
+        }
+
+        public int SelectedItemIndex
+        {
+            get { return _selectedIndex; }
+            set
+            {
+                if (value > Items.Count - 1 || value < -1)
+                    throw new ArgumentOutOfRangeException("Specified value for SelectedItemIndex is out of range.");
+
+                OnSelectedItemChanging();
+                _selectedIndex = value;
+                OnSelectedItemChanged();
+            }
+        }
+
+        public event EventHandler SelectedItemChanged;
+
+        public event EventHandler SelectedItemChanging;
+
+        protected virtual void OnSelectedItemChanging()
+        {
+            if (SelectedItem != null)
+                SelectedItem.IsSelected = false;
+            EventHandler handler = SelectedItemChanging;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnSelectedItemChanged()
+        {
+            if (SelectedItem != null)
+                SelectedItem.IsSelected = true;
+            EventHandler handler = SelectedItemChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        private int FindNextEnabledItemIndex()
+        {
+            int start = (_selectedIndex + 1 >= 0) ? _selectedIndex + 1 : 0;
+            for (int i = start; i < Items.Count; i++)
+                if (Items[i].Enabled)
+                    return i;
+            return -1;
+        }
+
+        private int FindPreviousEnabledItemIndex()
+        {
+            int start = (_selectedIndex - 1 <= Items.Count - 1) ? _selectedIndex - 1 : Items.Count - 1;
+            for (int i = start; i > -1; i--)
+                if (Items[i].Enabled)
+                    return i;
+            return -1;
+        }
+
+        public void SelectPreviousItem()
+        {
+            if (_selectedIndex > 0)
+            {
+                int previousEnabledItemIndex = FindPreviousEnabledItemIndex();
+                if (previousEnabledItemIndex != -1)
+                    SelectedItemIndex = previousEnabledItemIndex;
+            }
+        }
+
+        public void SelectNextItem()
+        {
+            if (_selectedIndex < Items.Count - 1)
+            {
+
+                int nextEnabledItemIndex = FindNextEnabledItemIndex();
+                if (nextEnabledItemIndex != -1)
+                    SelectedItemIndex = nextEnabledItemIndex;
+            }
+        }
+    }
+
+    public class Menu : SelectControl
     {
         private MenuOrientation _orientation = MenuOrientation.Vertical;
        
+
         public Menu(Components.IUIRoot visualRoot)
             : base(visualRoot)
         {
@@ -36,7 +139,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public bool AutoSize { get; set; }
-
+        
         public override void Draw(long gameTime)
         {
             ControlSpriteBatch.Begin();
@@ -80,8 +183,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
                 else if (cim.IsKeyReleased(Key.Return))
                 {
-                    if (this.SelectedItem != null && ((MenuItem)this.SelectedItem).CommandName != null)
+                    if (this.SelectedItem != null)
+                    {
                         this.OnItemClicked((MenuItem)this.SelectedItem);
+                        if (SelectedItem.CommandName != null)
+                            this.OnCommand(SelectedItem.CommandName);  
+                    }                       
                 }
             }
 

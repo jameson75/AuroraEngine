@@ -11,6 +11,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
 {    
     public class MenuControlParser : ItemsControlParser 
     {
+        private const string SelectedIndexAttributeName = "SelectedIndex";
         private const string OrientationAttributeName = "Orientation";
         //private static readonly MenuOrientation DefaultOrientation = MenuOrientation.Vertical;
         private MenuItemControlParser menuItemControlParser = new MenuItemControlParser();      
@@ -22,6 +23,9 @@ namespace CipherPark.AngelJacket.Core.UI.Design
 
             Menu newMenu = (Menu)control;
             
+            if (element.Attribute(SelectedIndexAttributeName) != null)
+                newMenu.SelectedItemIndex = int.Parse(element.Attribute(SelectedIndexAttributeName).Value);
+
             if (element.Attribute(OrientationAttributeName) != null)
                 newMenu.Orienation = UIControlPropertyParser.ParseEnum<MenuOrientation>(element.Attribute(OrientationAttributeName).Value);
             

@@ -13,6 +13,8 @@ namespace CipherPark.AngelJacket.Core.Module
 
         public GameModule(IGameApp game) { this._game = game; }
 
+        public string Name { get; set; }
+
         public abstract void Initialize();       
 
         public abstract void LoadContent();
@@ -36,13 +38,13 @@ namespace CipherPark.AngelJacket.Core.Module
         protected virtual void SignalExitModule()
         {
             IModuleService moduleService = (IModuleService)Game.Services.GetService(typeof(IModuleService));
-            moduleService.SignalExit();
+            moduleService.ExitOnUpdate();
         }
 
         protected virtual void SignalSwitchModule(string key)
         {
             IModuleService moduleService = (IModuleService)Game.Services.GetService(typeof(IModuleService));
-            moduleService.SignalSwitch(key);
+            moduleService.ActivateOnUpdate(key);
         }
     }
 }

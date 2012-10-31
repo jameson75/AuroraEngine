@@ -9,18 +9,13 @@ using CipherPark.AngelJacket.Core.UI.Controls;
 namespace CipherPark.AngelJacket.Core.UI.Design
 {
     public abstract class ItemsControlParser : UIControlParser
-    {
-        private const string SelectedIndexAttributeName = "SelectedIndex";
-      
+    { 
         public override void Parse(UITree tree, XElement element, UIControl control)
         {
             if (control is ItemsControl == false)
                 throw new ArgumentException("control parameters was not of type itemscontrol", "control");
 
-            ItemsControl itemsControl = (ItemsControl)control;
-
-            if (element.Attribute(SelectedIndexAttributeName) != null)
-                itemsControl.SelectedItemIndex = int.Parse(element.Attribute(SelectedIndexAttributeName).Value);
+            ItemsControl itemsControl = (ItemsControl)control;          
            
             var _menuitems = element.Descendants(ItemElementName);
             ItemControlParser childItemParser = (ItemControlParser)tree.GetRegisteredControlParser(ItemElementName);

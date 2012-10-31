@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.AngelJacket.Core.Utils.Interop;
 using SharpDX;
 using SharpDX.DirectInput;
 
@@ -15,7 +16,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public TextBox(IUIRoot visualRoot)
             : base(visualRoot)
         {
-            
+            _content = new TextContent();
+            _content.Container = this;
+        }
+
+        public TextBox(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor) : base(visualRoot)
+        {
+            _content = new TextContent(text, font, fontColor, backgroundColor);
+            _content.Container = this;
         }
 
         public TextBox(IUIRoot visualRoot, TextContent content) : base(visualRoot)
@@ -27,14 +35,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public TextContent Content 
         { 
             get { return _content; }
-            set
-            {
-                if (value == null && _content != null)
-                    _content.Container = null;
-                _content = value;
-                if (_content != null)
-                    _content.Container = this;
-            }
+            //set
+            //{
+            //    if (value == null && _content != null)
+            //        _content.Container = null;
+            //    _content = value;
+            //    if (_content != null)
+            //        _content.Container = this;
+            //}
         }
 
         public override void Update(long gameTime)

@@ -7,11 +7,14 @@ using System.Collections.Specialized;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public interface ICommandControl
+    public interface ICommandDispatcher
     {
-        string CommandName { get; set; }
         event ControlCommandHandler ControlCommand;
-        void NotifyCommandWireUp(object sender, ControlCommandArgs args);
+    }
+
+    public interface ICommandControl : ICommandDispatcher
+    {
+        string CommandName { get; set; }                
     }
 
     public class ControlCommandArgs : EventArgs
@@ -30,17 +33,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     internal sealed class CommandControlWireUp
     {
-        ICommandControl _commandControl = null;
-        List<ICommandControl> _wiredUpChildren = null;
+        ICommandDispatcher _commandDispatcher = null;
+        List<ICommandDispatcher> _wiredUpChildren = null;
 
-        public CommandControlWireUp(ICommandControl commandControl)
+        public CommandControlWireUp(ICommandDispatcher commandDispatcher)
         {
-            _wiredUpChildren = new List<ICommandControl>();
-            UIControl uiControl = commandControl as UIControl;
+            _wiredUpChildren = new List<ICommandDispatcher>();
+            UIControl uiControl = commandDispatcher as UIControl;
             if (uiControl != null)            
                 uiControl.Children.CollectionChanged += CommandControl_Children_CollectionChanged;
-            _commandControl = commandControl;          
+            _commandDispatcher = commandDispatcher;          
         }
+
+        public event ControlCommandHandler ChildControlCommand;
 
         private void CommandControl_Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
@@ -48,7 +53,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 foreach (UIControl control in args.NewItems)
                 {
-                    ICommandControl iChildCommandControl = control as ICommandControl;
+                    ICommandDispatcher iChildCommandControl = control as ICommandDispatcher;
                     if (iChildCommandControl != null)
                     {
                         iChildCommandControl.ControlCommand += CommandControl_Child_ControlCommand;
@@ -81,7 +86,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private void CommandControl_Child_ControlCommand(object sender, ControlCommandArgs args)
         {
-            this._commandControl.NotifyCommandWireUp(sender, args);
+            ControlCommandHandler handler = ChildControlCommand;
+            if (handler != null)
+                handler(this, args);
         }
     }
 

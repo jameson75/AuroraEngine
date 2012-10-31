@@ -7,7 +7,7 @@ using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class ScreenControl : ItemsControl
+    public class ScreenControl : SelectControl
     {
         private Dictionary<UIControl, UIControl> CachedFocusedElements = new Dictionary<UIControl, UIControl>();
 
@@ -116,10 +116,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //}
     }
 
-    public class ScreenPanel : ItemControl
+    public class ScreenPanel : ListControlItem, ICommandControl
     {
+        CommandControlWireUp _wireUp = null;
+
         public ScreenPanel(Components.IUIRoot visualRoot)
             : base(visualRoot)
-        { }
+        {
+            _wireUp = new CommandControlWireUp(this);
+            _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
+        }
+
+        void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
+        {
+            OnCommand(args.CommandName);
+        }       
     }    
 }

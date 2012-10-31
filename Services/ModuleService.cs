@@ -2,36 +2,89 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Services
 {
+  
     public interface IModuleService
     {
-        void SignalSwitch(string moduleName);
-        void SignalExit();
+        GameModule ActiveModule { get; }
+        void ActivateOnUpdate(string moduleName);
+        void ExitOnUpdate();
+        void RegisterModule(string registeredName, GameModule module);
+        void Update();
+        void Clear();
     }
 
     public class ModuleService : IModuleService
     {
         IGameApp _game = null;
-        string _signaledModuleSwitchName = null;
-        bool _exitModuleSignaled = false;
+        GameModule _pendingActiveModule = null;
+        GameModule _activeModule = null;
+        Dictionary<string, GameModule> _modules = null;
 
         public ModuleService(IGameApp game)
         {
             _game = game;
+            _modules = new Dictionary<string, GameModule>();
         }
 
-        public void SignalSwitch(string moduleName)
+        /// <summary>
+        /// Causes the module with specified name to become the active module 
+        /// the next time ModuleService.Update() is called for this instance.
+        /// </summary>
+        /// <param name="registeredModuleName"></param>
+        public void ActivateOnUpdate(string registeredModuleName)
         {
-            //TODO: Change this to a design where this module service peforms
-            //all module management (ie: move module management from AngelJacketGame to this class).
-            this._signaledModuleSwitchName = moduleName;
+            if (!_modules.ContainsKey(registeredModuleName))
+                throw new InvalidOperationException("The registered module name does not exist.");
+
+            this._pendingActiveModule = _modules[registeredModuleName];
         }
 
-        public void SignalExit()
+        public void ExitOnUpdate()
         {
-            this._exitModuleSignaled = true;
+            
         }
+
+        public void RegisterModule(string registeredName, GameModule module)
+        {
+            if (string.IsNullOrEmpty(registeredName))
+                throw new ArgumentException("A registered name was not specified", "registeredName");
+
+            if (module == null)
+                throw new ArgumentNullException("module");
+
+            if (_modules.ContainsKey(registeredName))
+                throw new InvalidOperationException("An entry with the registered name already exists.");
+
+            _modules.Add(registeredName, module);
+        }
+
+        public void Update()
+        {
+            if (_pendingActiveModule != null)
+            {
+                if (_activeModule != null && _activeModule.IsLoaded)
+                    _activeModule.UnloadContent();
+
+                if (!_pendingActiveModule.IsLoaded)
+                    _pendingActiveModule.LoadContent();
+                
+                _activeModule = _pendingActiveModule;
+                _pendingActiveModule = null;
+            }
+        }
+
+        public void Clear()
+        {
+            if (_activeModule != null && _activeModule.IsLoaded)
+                _activeModule.UnloadContent();
+
+            _modules.Clear();
+        }
+
+        public GameModule ActiveModule { get { return _activeModule; } }
     }
 }
