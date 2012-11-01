@@ -42,7 +42,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         #region Properties
         public IUIRoot VisualRoot { get { return _visualRoot; } }
 
-        protected IControlLayoutManager LayoutManager { get { return _layoutManager; } }
+        protected virtual IControlLayoutManager LayoutManager { get { return _layoutManager; } }
+
+        public Guid DivContainerId { get; set; }
 
         public Vector2 Position
         {
@@ -312,7 +314,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         protected virtual void OnLoad()
-        {} 
+        {}
 
         public event EventHandler LayoutChanged;
         public event EventHandler SizeChanging;

@@ -20,6 +20,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
         public const string MarginAttributeName = "Margin";
         public const string VerticleAlignmentAttributeName = "VerticleAlignment";
         public const string HortizontalAlignmentAttributeName = "HorizontalAlignment";
+        public const string DivContainerIdAttributeName = "DivContainerId";
         
         public virtual void Parse(UITree tree, XElement element, UIControl control)
         {
@@ -51,6 +52,14 @@ namespace CipherPark.AngelJacket.Core.UI.Design
 
             if (element.Attribute(HortizontalAlignmentAttributeName) != null)
                 control.HorizontalAlignment = UIControlPropertyParser.ParseEnum<HorizontalAlignment>(element.Attribute(HortizontalAlignmentAttributeName).Value);
+
+            if (element.Attribute(DivContainerIdAttributeName) != null)
+            {
+                Guid result = Guid.Empty;
+                if (!Guid.TryParse(element.Attribute(DivContainerIdAttributeName).Value, out result))
+                    throw new InvalidDataException("Property value not equal to Guid.");
+                control.DivContainerId = result;
+            }
         }
 
         public abstract UIControl CreateControl(IUIRoot visualRoot);

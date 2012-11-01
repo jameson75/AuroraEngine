@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils.Interop;
