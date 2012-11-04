@@ -67,7 +67,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnSizeChanged()
         {
             rotationEllipseDiameter = Math.Min(this.Bounds.Height, this.Bounds.Width) - 80;
-            rotationRectangle = new Rectangle((this.Bounds.Width - rotationEllipseDiameter) / 2, (this.Bounds.Height - rotationEllipseDiameter) / 2, rotationEllipseDiameter, rotationEllipseDiameter);
+            rotationRectangle = RectangleExtension.CreateLTWH((this.Bounds.Width - rotationEllipseDiameter) / 2, (this.Bounds.Height - rotationEllipseDiameter) / 2, rotationEllipseDiameter, rotationEllipseDiameter);
             base.OnSizeChanged();
         }     
 

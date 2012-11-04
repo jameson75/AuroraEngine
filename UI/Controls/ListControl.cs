@@ -98,7 +98,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ListColumnDirection ColumnDirection { get; set; }
 
-        //public bool WrapContents { get; set; }
+        public override void Update(long gameTime)
+        {
+            foreach (ListControlItem item in this.Items)
+                item.Update(gameTime);
+            base.Update(gameTime);
+        }
+
+        public override void Draw(long gameTime)
+        {
+            foreach (ListControlItem item in this.Items)
+                item.Draw(gameTime);
+            base.Draw(gameTime);
+        }
 
         protected override void OnLayoutChanged()
         {
@@ -183,8 +195,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Name = name;
             CommandName = name;
             Label childLabel = new Label(visualRoot, text, font, fontColor, backgroundColor);
+            childLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             Children.Add(childLabel);
-            Size = font.MeasureString(text).Add(DefaultItemTextMargin); 
+            Size = font.MeasureString(text).Add(DefaultItemTextMargin);            
         }
     }
 

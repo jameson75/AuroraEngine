@@ -54,6 +54,12 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 //TODO: Fire Event handlers.
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// This method isn't meant to be called from application code. Calling this method may result in a stack flow from recursion.
+        /// </remarks>
         public void Update()
         {
             IInputService inputService = (IInputService)_visualRoot.Game.Services.GetService(typeof(IInputService));
@@ -67,12 +73,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             }
             else if (state.GetKeysDown().Contains(Key.Tab))
             {
-                //[Obsolete]
-                //UIControl focusTarget = FocusManager.GetNextTabTarget(_focusedControl);  
-
                 UIControl startFromControl = null;
                 if (_focusedControl != null)
-                    startFromControl = _focusedControl;
+                    startFromControl = _GetNextTabOrdered(_focusedControl);
                 else
                 {
                     UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
@@ -82,12 +85,49 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
                 if (startFromControl != null)
                 {
-                    UIControl focusTarget = GetNextFocusableTarget(startFromControl, true);
+                    UIControl focusTarget = _GetNextFocusableTarget(startFromControl);
                     if (focusTarget != null)
                         SetFocus(focusTarget);
                 }
             }            
-        }      
+        }
+
+        private UIControl _GetNextTabOrdered(UIControl previousControl)
+        {
+            //*************************************************************
+            //TODO: allow control to inject optional search behavior here.
+            //*************************************************************
+
+            return GetNextTabOrdered(previousControl);
+        }
+
+        private UIControl _GetNextFocusableTarget(UIControl startFromControl)
+        {
+            //************************************************************
+            //TODO: allow control to inject optional search behavior here.
+            //************************************************************
+
+            return GetNextFocusableTarget(startFromControl, true);
+        }
+
+        public UIControl GetNextTabOrdered(UIControl previousControl)
+        {
+            if (previousControl.Children.Count > 0)
+                return previousControl.Children[0];
+            else
+            {
+                UIControl[] tabOrderedSiblingsAndSelf = null;
+                if (previousControl.Parent != null)
+                    tabOrderedSiblingsAndSelf = ToTabOrderedControlArray(previousControl.Parent.Children);
+                else
+                    tabOrderedSiblingsAndSelf = ToTabOrderedControlArray(previousControl.VisualRoot.Controls);
+                int startIndex = Array.IndexOf(tabOrderedSiblingsAndSelf, previousControl);
+                if (startIndex >= 0 && startIndex > tabOrderedSiblingsAndSelf.Length - 1)
+                    return tabOrderedSiblingsAndSelf[startIndex + 1];
+                else
+                    return null;
+            }
+        }
 
         public UIControl GetNextFocusableTarget(UIControl startFromControl, bool searchUpwards = false)
         {

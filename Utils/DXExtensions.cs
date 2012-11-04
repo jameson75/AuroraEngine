@@ -27,6 +27,16 @@ namespace CipherPark.AngelJacket.Core.Utils
         {
             return new Vector2(r.X, r.Y);
         }
+
+        public static DrawingSize GetSize(this Rectangle r)
+        {
+            return new DrawingSize(r.Right - r.Left, r.Bottom - r.Top);
+        }
+
+        public static Rectangle CreateLTWH(int l, int t, int width, int height)
+        {
+            return new Rectangle(l, t, l + width, t + height);
+        }
     }
 
     public static class MouseStateExtension
@@ -70,6 +80,11 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static Vector2 Position(this RectangleF r)
         {
             return new Vector2(r.Left, r.Top);
+        }
+
+        public static RectangleF CreateLTWH(float l, float t, float width, float height)
+        {
+            return new RectangleF(l, t, l + width, t + height);
         }
     }
 

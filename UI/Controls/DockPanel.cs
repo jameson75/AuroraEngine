@@ -38,11 +38,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             UpdateLayout(LayoutUpdateReason.ClientAreaChanged);
         }
 
-        protected override void OnLayoutChanged()
-        {
-            base.OnLayoutChanged();
-        }
-
         protected override void OnChildAdded(UIControl child)
         {
             if (child is DockPanelContainer == false)

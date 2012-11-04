@@ -40,18 +40,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             if( !Children.Contains(item) )
                 Children.Add(item);
+            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }
 
         protected virtual void OnItemRemoved(ItemControl item)
         {
             if(Children.Contains(item) )
                 Children.Remove(item);
+            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }
 
         protected virtual void OnItemsReset()
         {
             if( Children.Count > 0)
                 Children.Clear();
+            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }                     
 
         public event ControlCommandHandler ControlCommand;

@@ -45,8 +45,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void Draw(long gameTime)
         {
-            base.Draw(gameTime);
-            
+            base.Draw(gameTime);            
             if (Container == null)
                 throw new InvalidOperationException("No container for this content was specified.");          
             Container.ControlSpriteBatch.Begin();
@@ -62,7 +61,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             else
             {
                 DrawingSizeF textSize = Font.MeasureString(Text);
-                return new Rectangle(0, 0, (int)Math.Ceiling(textSize.Width),(int) Math.Ceiling(textSize.Height));
+                return RectangleExtension.CreateLTWH(0, 0, (int)Math.Ceiling(textSize.Width),(int) Math.Ceiling(textSize.Height));
             }
         }
     }   

@@ -172,7 +172,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         /// 
         /// </summary>
         /// <remarks>Bounds will always represent dimensions the control is rendered at. See UIControl.NativeBounds property.</remarks>
-        public Rectangle Bounds { get { return new Rectangle((int)Position.X, (int)Position.Y, (int)this.Size.Width, (int)this.Size.Height); } }
+        public Rectangle Bounds { get { return RectangleExtension.CreateLTWH((int)Position.X, (int)Position.Y, (int)this.Size.Width, (int)this.Size.Height); } }
         public Vector2 Padding { get; set; }
         public Vector2 Margin { get; set; }
         public UIControl Parent { get; set; }
@@ -195,7 +195,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Vector2 boundsOrigin = new Vector2(bounds.Left, bounds.Top);
             Vector2 surfaceBoundsOrigin = PositionToSurface(boundsOrigin);
-            return new Rectangle((int)surfaceBoundsOrigin.X, (int)surfaceBoundsOrigin.Y, bounds.Width, bounds.Height);
+            return RectangleExtension.CreateLTWH((int)surfaceBoundsOrigin.X, (int)surfaceBoundsOrigin.Y, bounds.Width, bounds.Height);
         }        
 
         public Vector2 PositionToSurface(Vector2 position)

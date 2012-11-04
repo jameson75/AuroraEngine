@@ -14,14 +14,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             
         }
 
-        //public ItemControl(IUIRoot visualRoot, string name, UIContent itemContent, UIContent selectContent = null) : base(visualRoot)
-        //{
-        //    Name = name;
-        //    ItemContent = itemContent; 
-        //    if(selectContent != null)
-        //        SelectContent = selectContent;
-        //}
-
         public bool IsSelected
         {
             get { return isSelected; }

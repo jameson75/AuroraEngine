@@ -13,8 +13,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         
         public ToolMenu(IUIRoot visualRoot)
             : base(visualRoot)
-        { }
-     
+        { }     
 
         public override void Draw(long gameTime)
         {
@@ -22,7 +21,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 panel.Draw(gameTime);
             base.Draw(gameTime);
         }
-
         
         protected override void OnLayoutChanged()
         {

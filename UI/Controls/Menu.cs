@@ -142,26 +142,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         
         public override void Draw(long gameTime)
         {
-            ControlSpriteBatch.Begin();
-            //Vector2 itemPosition = this.Position;
-            //foreach (MenuItem item in Items)
-            //{
-            //    Color fontColor = (!item.Enabled) ? Color.DarkGray : (item == SelectedItem) ? ((TextContent)item.ItemTemplate).FontColor : ((TextContent)item.FocusedItemTemplate).FontColor;
-            //    ControlSpriteBatch.DrawString(((TextContent)item.ItemTemplate).Font, ((TextContent)item.ItemTemplate).Text, itemPosition, fontColor);
-            //    //TODO: Define spacing between menu items.
-            //    itemPosition.Y += 20;
-            //}
             foreach (MenuItem item in Items)
-                item.Draw(gameTime);
-            ControlSpriteBatch.End();
+                item.Draw(gameTime);           
             base.Draw(gameTime);
         }
-
-        //[Obsolete]
-        //public override UIControl _GetNextFocusableChild(UIControl fromControl)
-        //{
-        //    return base._GetNextFocusableChild(fromControl);
-        //}
 
         public override void Update(long gameTime)
         {
@@ -204,7 +188,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         protected override void OnItemAdded(ItemControl item)
-        {
+        {           
             if (item is MenuItem == false)
                 throw new ArgumentException("item", "item must be of type or derivative of MenuItem");
             if (AutoSize)
@@ -215,7 +199,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);                
             }
             base.OnItemAdded(item);
-            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }
 
         protected override void OnItemRemoved(ItemControl item)
@@ -227,8 +210,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     this.Size = new DrawingSizeF(0, 0);
                 else
                     this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
-            }
-            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
+            }            
             SelectedItemIndex = -1;
         }
 

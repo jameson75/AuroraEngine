@@ -61,28 +61,29 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         private void CreateTextureResources()
-        {
-            const int COLOR_SIZE = 4;
-            int dataLength = (int)Container.Size.Width * (int)Container.Size.Height;
-            float[] colorData = new float[dataLength * COLOR_SIZE];
+        {            
+            int pixelCount = (int)Container.Size.Width * (int)Container.Size.Height;
             float[] fColor = _color.ToArray();
-            for (int i = 0; i < dataLength; i += COLOR_SIZE)
+            float[] colorData = new float[pixelCount * fColor.Length];            
+            float swapTemp = fColor[0]; fColor[0] = fColor[1]; fColor[1] = fColor[2]; fColor[2] = fColor[3]; fColor[3] = swapTemp;
+            for (int i = 0; i < pixelCount * fColor.Length; i += fColor.Length)
                 Array.Copy(fColor, 0, colorData, i, fColor.Length);
-            _nativeColorData = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(float)) * colorData.Length);
+            int sizeOfColorComponent = Marshal.SizeOf(typeof(float));
+            _nativeColorData = Marshal.AllocHGlobal(sizeOfColorComponent * colorData.Length);
             Marshal.Copy(colorData, 0, _nativeColorData, colorData.Length);
-            DataRectangle textureDataRect = new DataRectangle();
+            DataRectangle textureDataRect = new DataRectangle(_nativeColorData, (int)Container.Size.Width * sizeOfColorComponent * fColor.Length);
             textureDataRect.DataPointer = _nativeColorData;
             Texture2DDescription desc = new Texture2DDescription();
             desc.Width = (int)Container.Size.Width;
             desc.Height = (int)Container.Size.Height;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
-            desc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
+            desc.Format = SharpDX.DXGI.Format.R32G32B32A32_Float;
             desc.SampleDescription.Count = 1;
             desc.Usage = ResourceUsage.Dynamic;
             desc.BindFlags = BindFlags.ShaderResource;
             desc.CpuAccessFlags = CpuAccessFlags.Write;
-            _backgroundTexture = new Texture2D(Container.Game.GraphicsDevice, desc);
+            _backgroundTexture = new Texture2D(Container.Game.GraphicsDevice, desc, textureDataRect);
             _backgroundTextureView = new ShaderResourceView(Container.Game.GraphicsDevice, _backgroundTexture);
             _textureResourcesCreated = true;
         }

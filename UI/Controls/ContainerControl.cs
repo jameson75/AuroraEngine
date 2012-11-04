@@ -45,6 +45,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
 
             return null;
-        }         
+        }
+
+        protected override void OnChildAdded(UIControl child)
+        {
+            base.OnChildAdded(child);
+            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
+        }
+
+        protected override void OnChildRemoved(UIControl child)
+        {
+            base.OnChildRemoved(child);
+            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
+        }
+
+        protected override void OnChildReset()
+        {
+            base.OnChildReset();
+            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
+        }
     }
 }
