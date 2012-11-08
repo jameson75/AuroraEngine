@@ -64,5 +64,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 return RectangleExtension.CreateLTWH(0, 0, (int)Math.Ceiling(textSize.Width),(int) Math.Ceiling(textSize.Height));
             }
         }
+
+        public float GetTextLength(int startIndex, int count)
+        {
+            string subText = this.Text.Substring(startIndex, count);
+            return Font.MeasureString(subText).Width;
+        }
     }   
 }

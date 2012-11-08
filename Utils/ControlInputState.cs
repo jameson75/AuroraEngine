@@ -100,6 +100,142 @@ namespace CipherPark.AngelJacket.Core.Utils
                    key == Key.Capital);
         }
 
+        public static WritableInput[] ConvertToWritableInput(Key[] keys, WritableInputConversionFlags flags)
+        {
+            List<WritableInput> input = new List<WritableInput>();
+            bool applyShift = keys.Any(k => k == Key.LeftShift || k == Key.RightShift);
+            bool applyCaps = (applyShift && keys.All(k => k != Key.Capital)) ||
+                              (!applyShift && keys.Any(k => k == Key.Capital));
+
+            foreach (Key key in keys)
+            {
+                int dik = (int)key;
+                char ascii = char.MinValue;
+                //A-Z or a-z
+                if ((dik >= 0x10 && dik <= 0x19) ||
+                    (dik >= 0x1E && dik <= 0x26) ||
+                    (dik >= 0x2C && dik <= 0x32))
+                {
+                    byte[] qwertyuiopAsciiVals = new byte[] { 81, 87, 69, 82, 84, 89, 85, 73, 79, 80 };
+                    byte[] asdefghjklAsciiValues = new byte[] { 65, 83, 68, 70, 71, 72, 74, 75, 76 };
+                    byte[] zxcvbnmAsciiValues = new byte[] { 90, 88, 67, 86, 66, 78, 77 };
+                    byte val = 0;
+                    if (dik >= 0x10 && dik <= 0x19)
+                        val = qwertyuiopAsciiVals[dik - 0x10];
+                    else if (dik >= 0x1E && dik <= 0x26)
+                        val = asdefghjklAsciiValues[dik - 0x1E];
+                    else
+                        val = zxcvbnmAsciiValues[dik - 0x2C];
+                    //A-Z
+                    if (applyCaps)
+                        ascii = (char)val;
+                    //a-z
+                    else
+                        ascii = (char)(val + 32);
+                }
+
+                //D_0 - D_9 or their respective shift-symbols
+                else if (dik >= 0x02 && dik <= 0x0B)
+                {
+                    //D_0 - D_9
+                    if (applyShift)
+                    {
+                        if (dik == 0x0B)
+                            ascii = (char)41; //)
+                        else if (dik == 0x02)
+                            ascii = (char)33; //!
+                        else if (dik == 0x03)
+                            ascii = (char)64; //@
+                        else if (dik == 0x04)
+                            ascii = (char)35; //#
+                        else if (dik == 0x05)
+                            ascii = (char)36; //$
+                        else if (dik == 0x06)
+                            ascii = (char)37; //%
+                        else if (dik == 0x07)
+                            ascii = (char)94; //^
+                        else if (dik == 0x08)
+                            ascii = (char)38; //&
+                        else if (dik == 0x09)
+                            ascii = (char)42; //*
+                        else //if (xnaKeyCode == 0x0A)
+                            ascii = (char)40; //(
+                    }
+                    else
+                    {
+                        if (dik == 0x0B)
+                            ascii = (char)48; //0
+                        else
+                            ascii = (char)(48 + dik - 1);
+                    }
+                }
+
+                //NUM_PAD_0 - NUM_PAD_9
+                else if (dik >= 96 && dik <= 105)
+                    ascii = (char)(dik - 48);
+
+                //NUM_OPERATORS
+                else if (key == Key.Divide)
+                    ascii = (char)47; // /
+                else if (key == Key.Add)
+                    ascii = (char)43; //+
+                else if (key == Key.Subtract)
+                    ascii = (char)45; //-
+                else if (key == Key.Multiply)
+                    ascii = (char)42; //*
+
+                else if (key == Key.Space)
+                    ascii = (char)32;
+                else if (key == Key.Return)
+                {
+                    if (!flags.HasFlag(WritableInputConversionFlags.IgnoreNewLine))
+                        ascii = '\n';
+                }
+                else if (key == Key.Tab)
+                {
+                    if (!flags.HasFlag(WritableInputConversionFlags.IgnoreTab))
+                        ascii = '\t';
+                }
+                else if (key == Key.Semicolon)
+                    ascii = applyShift ? (char)58 : (char)59; // : or ;
+                else if (key == Key.Equals || key == Key.PreviousTrack)
+                    ascii = applyShift ? (char)43 : (char)61; // + or =
+                else if (key == Key.Minus)
+                    ascii = applyShift ? (char)95 : (char)45; // _ or -
+                else if (key == Key.Period)
+                    ascii = applyShift ? (char)62 : (char)46; // > or .
+                else if (key == Key.Slash)
+                    ascii = applyShift ? (char)63 : (char)47; // / or ?
+                else if (key == Key.Grave)
+                    ascii = applyShift ? (char)126 : (char)96; // ~ or `
+                else if (key == Key.LeftBracket)
+                    ascii = applyShift ? (char)91 : (char)123; // { or [
+                else if (key == Key.Backslash)
+                    ascii = applyShift ? (char)124 : (char)92; // | or \
+                else if (key == Key.RightBracket)
+                    ascii = applyShift ? (char)93 : (char)125; // } OR ]
+                else if (key == Key.Apostrophe)
+                    ascii = applyShift ? (char)34 : (char)39; // " or '
+                else if (key == Key.Comma)
+                    ascii = applyShift ? (char)60 : (char)44; // < or ,
+
+                WritableInput wi = new WritableInput();
+                wi.Ascii = ascii;
+                wi.KeyType = (ascii == char.MinValue) ? WritableInputType.Special : WritableInputType.Printable;
+                wi.IsAlt = keys.Any(k => k == Key.LeftAlt || k == Key.RightAlt);
+                wi.IsCtrl = keys.Any(k => k == Key.LeftControl || k == Key.RightControl);
+                wi.Key = key;
+                input.Add(wi);
+            }
+            return input.ToArray();
+        }
+
+        /* ConvertToWritableInput(...)
+        //*****************************************************************************************
+        //NOTE: The conversion code below was actually meant to take in a VirtualKey as a parameter,
+        //not a DirectInput Key. So I'm commenting out the code below and rewriting it for DirectInput 
+        //keys.
+        //*****************************************************************************************        
         public static WritableInput[] ConvertToWritableInput(Key[] keys, bool isEnterSpecialKey)
         {
             List<WritableInput> input = new List<WritableInput>();
@@ -115,7 +251,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 if (virtualKeyInteger >= 65 && virtualKeyInteger <= 90)
                 {
                     //A-Z
-                    if (applyShift)
+                    if (applyCaps)
                         ascii = (char)virtualKeyInteger;
                     //a-z
                     else
@@ -126,7 +262,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 else if (virtualKeyInteger >= 48 && virtualKeyInteger <= 57)
                 {
                     //D_0 - D_9
-                    if (applyCaps)
+                    if (applyShift)
                     {
                         if (virtualKeyInteger == 48)
                             ascii = (char)41; //)
@@ -181,7 +317,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 else if (key == Key.Equals)
                     ascii = applyShift ? (char)43 : (char)61; // + or =
                 else if (key == Key.Underline)
-                    ascii = applyShift ? (char)159 : (char)45; // _ or -
+                    ascii = applyShift ? (char)95 : (char)45; // _ or -
                 else if (key == Key.Period)
                     ascii = applyShift ? (char)62 : (char)46; // > or .
                 else if (key == Key.Slash)
@@ -209,6 +345,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
             return input.ToArray();
         }
+        */
     }
 
     public struct WritableInput
@@ -224,5 +361,12 @@ namespace CipherPark.AngelJacket.Core.Utils
     {
         Printable,
         Special
+    }
+
+    [Flags]
+    public enum WritableInputConversionFlags
+    {
+        IgnoreNewLine,
+        IgnoreTab
     }
 }

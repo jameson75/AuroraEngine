@@ -92,13 +92,13 @@ namespace CipherPark.AngelJacket.Core
             };
             SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.Debug, chainDesc, out _graphicsDevice, out _swapChain);
             _graphicsDeviceContext = _graphicsDevice.ImmediateContext;
-
             _renderTargetBuffer = Texture2D.FromSwapChain<Texture2D>(_swapChain, 0);
             _renderTargetView = new RenderTargetView(_graphicsDevice, _renderTargetBuffer);
 
+            
             Texture2DDescription renderStencilDesc = new Texture2DDescription()
             {
-                Format = Format.D32_Float_S8X24_UInt,
+                Format = BestSupportedDepthStencilFormat(_graphicsDevice),
                 ArraySize = 1,
                 MipLevels = 1,
                 Width = form.ClientSize.Width,
@@ -186,5 +186,13 @@ namespace CipherPark.AngelJacket.Core
         }
 
         #endregion
+
+        private static Format BestSupportedDepthStencilFormat(SharpDX.Direct3D11.Device graphicsDevice, bool includeStencil = true)
+        {
+            if ((graphicsDevice.CheckFormatSupport(Format.D32_Float_S8X24_UInt) & FormatSupport.DepthStencil) != 0)
+                return (includeStencil) ? Format.D32_Float_S8X24_UInt : Format.D32_Float;
+            else
+                return (includeStencil) ? Format.D24_UNorm_S8_UInt : Format.D16_UNorm;
+        }                
     }
 }

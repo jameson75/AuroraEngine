@@ -13,7 +13,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public ColorStyle(IGameApp game)
             : base(game)
         {
-            Color = Colors.Transparent;
+            Color = SharpDX.Color.Transparent;
         }
 
         public Color4 Color { get; set; }

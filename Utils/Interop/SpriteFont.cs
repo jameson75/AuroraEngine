@@ -50,13 +50,38 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
         public DrawingSizeF MeasureString(string text)
         {
             XVECTOR4 metrics = UnsafeNativeMethods.MeasureString(this._nativeObject, text);
-            return new DrawingSizeF(metrics.C1, metrics.C2);
+            //NOTE: The DirectXTK SpriteFont::MeasureString() doesn't account for trailings
+            //spaces. We call our helper method for a work around.
+            float trailingSpacesLength = MeasureTrailingSpaces(text);
+            return new DrawingSizeF(metrics.C1 + trailingSpacesLength, metrics.C2);
         }
 
         public bool ContainsCharacter(char character)
         {
             return UnsafeNativeMethods.ContainsCharacter(this._nativeObject, character);
-        }    
+        }
+
+        private float MeasureTrailingSpaces(string text)
+        {
+            float trailingSpacesLength = 0;
+            if (text.EndsWith(" "))
+            {
+                StringBuilder trailingSpaces = new StringBuilder();
+                if (text.Trim().Length != 0)
+                {
+                    int lastNonSpaceIndex = text.LastIndexOf(text.LastOrDefault((c => c != ' ')));
+                    trailingSpaces.Append(text.Substring(lastNonSpaceIndex + 1));
+                }
+                else
+                    trailingSpaces.Append(text);
+                string arbString = "W";
+                StringBuilder trailSpacesArb = new StringBuilder().Append(trailingSpaces).Append(arbString);
+                XVECTOR4 arbMetrics = UnsafeNativeMethods.MeasureString(this._nativeObject, arbString);
+                XVECTOR4 trailingSpacesArbMetrics = UnsafeNativeMethods.MeasureString(this._nativeObject, trailSpacesArb.ToString());
+                trailingSpacesLength = trailingSpacesArbMetrics.C1 - arbMetrics.C1;
+            }
+            return trailingSpacesLength;
+        }
 
         private static class UnsafeNativeMethods
         {

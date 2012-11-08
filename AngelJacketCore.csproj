@@ -31,22 +31,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.dll</HintPath>
+      <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net20\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11">
-      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net20\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DirectInput">
-      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.DirectInput.dll</HintPath>
+      <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net20\SharpDX.DirectInput.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI">
-      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net20\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XAudio2">
-      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.XAudio2.dll</HintPath>
+      <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net20\SharpDX.XAudio2.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.XInput">
-      <HintPath>..\..\..\..\Project Resources\Libraries\dotNET4.5\SharpDX-Full-2.2.0\Bin\Standard-net20\SharpDX.XInput.dll</HintPath>
+      <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net20\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

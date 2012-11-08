@@ -25,7 +25,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public UIControl(IUIRoot visualRoot) 
         {
             _visualRoot = visualRoot;
-            _visualRoot.LoadComplete += VisualRoot_LoadComplete;
+            _visualRoot.LoadComplete += VisualRoot_LoadComplete;            
             _game = visualRoot.Game;
             Padding = Vector2.Zero;
             Margin = Vector2.Zero;            
@@ -36,13 +36,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _children = new UIControlCollection();
             _children.CollectionChanged += Children_CollectionChanged;
             _layoutManager = new ContainerControlLayoutManager(this);
-        }
+        }       
         #endregion
 
         #region Properties
         public IUIRoot VisualRoot { get { return _visualRoot; } }
 
         protected virtual IControlLayoutManager LayoutManager { get { return _layoutManager; } }
+
+        public ICustomFocusManager CustomFocusManager { get; set; }
 
         public Guid DivContainerId { get; set; }
 

@@ -11,6 +11,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         private TextContent _content = null;
         //private ControlInputState cim = null;
+        private ContentControl _caret = null;
+        private long _lastCaretUpdateTime = 0;
 
         public TextBox(IUIRoot visualRoot)
             : base(visualRoot)
@@ -45,7 +47,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public override void Update(long gameTime)
-        {       
+        {
+            if (_caret == null)
+                BeginCaret();
+   
             if (this.HasFocus)
             {        
                 Services.InputService inputServices = (Services.InputService)Game.Services.GetService(typeof(Services.InputService));
@@ -54,17 +59,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 ControlInputState cim = inputServices.GetControlInputState();       
                 //cim.UpdateState(gameTime);
                 if (cim.IsKeyReleased(Key.Return))
-                    EnterKeyEvent(this, EventArgs.Empty);
-                WritableInput[] cis = ControlInputState.ConvertToWritableInput(cim.GetKeysDown(), true);
-                foreach (WritableInput ci in cis)
-                    if (ci.KeyType == WritableInputType.Printable)
-                        this._content.Text += ci.Ascii.ToString();
-                    else
-                    {
-                        if (ci.Key == Key.Back)
-                            if (this._content.Text.Length > 0)
-                                this._content.Text = this._content.Text.Substring(0, this._content.Text.Length - 1);
-                    }
+                    OnEnterKey();
+                else if (cim.GetKeysDown().Length > 0)
+                {
+                    WritableInput[] cis = ControlInputState.ConvertToWritableInput(cim.GetKeysDown(), WritableInputConversionFlags.IgnoreNewLine | WritableInputConversionFlags.IgnoreTab);
+                    foreach (WritableInput ci in cis)
+                        if (ci.KeyType == WritableInputType.Printable)
+                            this._content.Text += ci.Ascii.ToString();
+                        else
+                        {
+                            if (ci.Key == Key.Back)
+                                if (this._content.Text.Length > 0)
+                                    this._content.Text = this._content.Text.Substring(0, this._content.Text.Length - 1);
+                        }
+                    UpdateCaretPosition();
+                }
+            }            
+
+            if (_lastCaretUpdateTime == 0 || gameTime - _lastCaretUpdateTime > 500)
+            {
+                _caret.Visible = !_caret.Visible;
+                _lastCaretUpdateTime = gameTime;
             }
         }
 
@@ -88,8 +103,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             //EndClipping();
             ControlSpriteBatch.End();                             
             */
+
             if(_content != null)
-                _content.Draw(gameTime);           
+                _content.Draw(gameTime);
+           
+            if( this.HasFocus && _caret.Visible )
+                _caret.Draw(gameTime);
+           
             base.Draw(gameTime);
         }
 
@@ -116,5 +136,34 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //{
         //    Game.GraphicsDevice.RasterizerState = preClippingState;
         //}
+
+        private void BeginCaret()
+        {
+            //*****************************************************************************************************
+            //NOTE: Implementing the caret as a child control is over-kill but, currently, I have no other
+            //easy way of doing it. Right now, the only simple way I have of rendering a texture is 
+            //by using ImageContent or ColorConent and, as of now, contents do have a shape/size of their own -
+            //they assume the same of their container [controls].
+            //TODO: Implement the caret a simple texture.
+            //****************************************************************************************************
+            _caret = new ContentControl(this.VisualRoot, new ColorContent(Color.White));    
+            this.Children.Add(_caret);
+            _caret.Position = new Vector2(0, this.Bounds.Height - 15);
+            _caret.Size = new DrawingSizeF(5, 10);
+            _caret.Visible = false;
+        }
+
+        private void UpdateCaretPosition()
+        {
+            if(_content.Text != null )
+                _caret.Position = new Vector2(_content.GetTextLength(0, _content.Text.Length), _caret.Position.Y);
+        }
+
+        protected void OnEnterKey()
+        {
+            EventHandler handler = EnterKeyEvent;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
     }
 }

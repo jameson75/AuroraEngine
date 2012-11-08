@@ -1,10 +1,11 @@
 ﻿using System;
 using SharpDX;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.UI.Components;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class DropList : UIControl
+    public class DropList : UIControl, ICustomFocusManager
     {
         TextBox _textBox = null;
         ListControl _listControl = null;
@@ -16,23 +17,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(root)
         {
             InitializeControl();
+            root.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
         }
 
         private void InitializeControl()
         {
             Utils.Interop.SpriteFont tempSpriteFont = Utils.Interop.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
             
-            _textBox = new TextBox(this.VisualRoot, null, tempSpriteFont, Colors.White, Colors.Yellow);
+            _textBox = new TextBox(this.VisualRoot, null, tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Yellow);
             _textBox.DivContainerId = Guid.NewGuid();
+            _textBox.CustomFocusManager = this;
             Children.Add(_textBox);
             
             _listControl = new ListControl(this.VisualRoot);
             _listControl.DivContainerId = Guid.NewGuid();
-            _listControl.Items.Add(new ListControlItem(this.VisualRoot, "List_Item_1", "List Item 1", tempSpriteFont, Colors.White, Colors.Aqua));
+            _listControl.CustomFocusManager = this;
+            _listControl.Items.Add(new ListControlItem(this.VisualRoot, "List_Item_1", "List Item 1", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Aqua));
              Children.Add(_listControl);
             
-            _button = new Button(this.VisualRoot, "?", tempSpriteFont, Colors.White, Colors.Blue);
+            _button = new Button(this.VisualRoot, "?", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Blue);
             _button.DivContainerId = Guid.NewGuid();
+            _button.CustomFocusManager = this;
             Children.Add(_button);
 
             DivLayoutManager divLayoutManager = new DivLayoutManager(this);
@@ -117,6 +122,44 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             base.Update(gameTime);
         }
+        
+
+        public void SetNextFocus(UIControl focusedControl)
+        {
+            if (focusedControl == _textBox || focusedControl == _button)
+            {
+                VisualRoot.FocusManager.SetNextFocus(this, false);
+            }
+
+            //else if (focusedControl == _listControl)
+            //    _listControl.SelectNextItem();
+        }
+
+        public void SetPreviousFocus(UIControl focusedControl)
+        {
+            if (focusedControl == _textBox || focusedControl == _button)
+                VisualRoot.FocusManager.SetPreviousFocus(this);
+            //else if (focusedControl == _listControl)
+            //    _listControl.SelectPreviousItem();
+        }
+
+        private void FocusManager_ControlReceivedFocus(object sender, FocusChangedEventArgs args)
+        {
+            if (args.Control == this)
+                _textBox.HasFocus = true;
+        }
+
+        protected void OnListClosed()
+        {
+            if (_listControl.HasFocus)
+                _textBox.HasFocus = true;
+
+            EventHandler handler = ListClosed;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        public event EventHandler ListClosed;
     }
 
     public enum DropListState

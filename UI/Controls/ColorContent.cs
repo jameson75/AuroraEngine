@@ -11,7 +11,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class ColorContent : UIContent
     {
-        Color4 _color = Colors.Transparent;
+        Color4 _color = SharpDX.Color.Transparent;
         ShaderResourceView _backgroundTextureView = null;
         Texture2D _backgroundTexture = null;
         IntPtr _nativeColorData = IntPtr.Zero;
@@ -39,13 +39,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (Container == null)
                 throw new InvalidOperationException("No container for this content was specified.");
 
-            if (_color != Colors.Transparent)
+            if (_color != SharpDX.Color.Transparent)
             {
                 if (!_textureResourcesCreated)
                     CreateTextureResources();
                 Rectangle screenRectangle = Container.BoundsToSurface(Container.Bounds);
                 Container.ControlSpriteBatch.Begin();
-                Container.ControlSpriteBatch.Draw(_backgroundTextureView, screenRectangle.Position(), Colors.White);
+                Container.ControlSpriteBatch.Draw(_backgroundTextureView, screenRectangle.Position(), SharpDX.Color.White);
                 Container.ControlSpriteBatch.End();
             }
         }
@@ -61,24 +61,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         private void CreateTextureResources()
-        {            
-            int pixelCount = (int)Container.Size.Width * (int)Container.Size.Height;
-            float[] fColor = _color.ToArray();
-            float[] colorData = new float[pixelCount * fColor.Length];            
-            float swapTemp = fColor[0]; fColor[0] = fColor[1]; fColor[1] = fColor[2]; fColor[2] = fColor[3]; fColor[3] = swapTemp;
-            for (int i = 0; i < pixelCount * fColor.Length; i += fColor.Length)
-                Array.Copy(fColor, 0, colorData, i, fColor.Length);
-            int sizeOfColorComponent = Marshal.SizeOf(typeof(float));
-            _nativeColorData = Marshal.AllocHGlobal(sizeOfColorComponent * colorData.Length);
-            Marshal.Copy(colorData, 0, _nativeColorData, colorData.Length);
-            DataRectangle textureDataRect = new DataRectangle(_nativeColorData, (int)Container.Size.Width * sizeOfColorComponent * fColor.Length);
+        {     
+            const int SizeOfColorInBytes = sizeof(int);       
+            int pixelCount = (int)Container.Size.Width * (int)Container.Size.Height;           
+            int colorR8G8B8A8 = _color.ToRgba();            
+            int[] textureData = new int[pixelCount];
+            int sizeOfTextureInBytes = textureData.Length * SizeOfColorInBytes;
+            for (int i = 0; i < pixelCount; i++)
+                textureData[i] = colorR8G8B8A8;
+            _nativeColorData = Marshal.AllocHGlobal(sizeOfTextureInBytes);
+            Marshal.Copy(textureData, 0, _nativeColorData, textureData.Length);
+            DataRectangle textureDataRect = new DataRectangle(_nativeColorData, (int)Container.Size.Width * SizeOfColorInBytes);
             textureDataRect.DataPointer = _nativeColorData;
             Texture2DDescription desc = new Texture2DDescription();
             desc.Width = (int)Container.Size.Width;
             desc.Height = (int)Container.Size.Height;
             desc.MipLevels = 1;
             desc.ArraySize = 1;
-            desc.Format = SharpDX.DXGI.Format.R32G32B32A32_Float;
+            desc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
             desc.SampleDescription.Count = 1;
             desc.Usage = ResourceUsage.Dynamic;
             desc.BindFlags = BindFlags.ShaderResource;
