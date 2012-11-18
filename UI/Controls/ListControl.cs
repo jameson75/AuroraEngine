@@ -91,8 +91,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ListControl(IUIRoot root)
             : base(root)
-        {
-            ColumnDirection = ListColumnDirection.Horizontal;
+        {            
             MaxRowSize = ListControl.SizeInfinite;
         }
 
@@ -119,12 +118,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             if (ColumnDirection == ListColumnDirection.Horizontal)
             {
-                float previousItemsTotalHeight = 0.0f;
-                float previousColumnsWidth = 0.0f;
-                float maxItemWidth = 0;
+                float previousItemsTotalHeight = 0f;
+                float previousColumnsWidth = 0f;
+                float maxItemWidth = 0f;
                 foreach (ListControlItem item in this.Items)
                 {
-                    item.Position = new Vector2(previousColumnsWidth, previousItemsTotalHeight);
+                    item.Position = new DrawingPointF(previousColumnsWidth, previousItemsTotalHeight);
                     previousItemsTotalHeight += item.Size.Height;
                     maxItemWidth = Math.Max(maxItemWidth, item.Size.Width);
                     currentRowIndex++;
@@ -139,12 +138,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
             else
             {
-                float previousItemsTotalWidth = 0.0f;
-                float previousColumnsHeight = 0.0f;
+                float previousItemsTotalWidth = 0;
+                float previousColumnsHeight = 0;
                 float maxItemHeight = 0;
                 foreach (ListControlItem item in this.Items)
                 {
-                    item.Position = new Vector2(previousItemsTotalWidth, previousColumnsHeight);
+                    item.Position = new DrawingPointF(previousItemsTotalWidth, previousColumnsHeight);
                     previousItemsTotalWidth += item.Size.Width;
                     maxItemHeight = Math.Max(maxItemHeight, item.Size.Width);
                     currentColumnIndex++;
@@ -168,7 +167,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class ListControlItem : ItemControl
     {
-        public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10, 10);
+        public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10f, 10f);
 
         private CommandControlWireUp _wireUp = null;
 
@@ -199,6 +198,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             Children.Add(childLabel);
             Size = font.MeasureString(text).Add(DefaultItemTextMargin);            
+        }
+
+        protected override void OnSelected()
+        {
+            base.OnSelected();
+        }
+
+        protected override void OnUnselected()
+        {
+            base.OnUnselected();
         }
     }
 

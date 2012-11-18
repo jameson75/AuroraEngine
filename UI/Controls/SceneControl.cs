@@ -33,8 +33,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private Scene _scene = null;
         private EditorMode EditorMode = EditorMode.None;
         private NavigationMode NavigationMode = NavigationMode.None;
-        private Rectangle rotationRectangle = Rectangle.Empty;
-        private int rotationEllipseDiameter = 0;
+        private RectangleF rotationRectangle = RectangleF.Empty;
+        private float rotationEllipseDiameter = 0f;
         private DrawingPoint mouseMoveFrom = new DrawingPoint(0, 0);
         private bool rotateAboutZ = false;
 
@@ -66,8 +66,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnSizeChanged()
         {
-            rotationEllipseDiameter = Math.Min(this.Bounds.Height, this.Bounds.Width) - 80;
-            rotationRectangle = RectangleExtension.CreateLTWH((this.Bounds.Width - rotationEllipseDiameter) / 2, (this.Bounds.Height - rotationEllipseDiameter) / 2, rotationEllipseDiameter, rotationEllipseDiameter);
+            rotationEllipseDiameter = Math.Min(this.Bounds.Height, this.Bounds.Width) - 80f;
+            rotationRectangle = RectangleFExtension.CreateLTWH((this.Bounds.Width - rotationEllipseDiameter) / 2, (this.Bounds.Height - rotationEllipseDiameter) / 2, rotationEllipseDiameter, rotationEllipseDiameter);
             base.OnSizeChanged();
         }     
 

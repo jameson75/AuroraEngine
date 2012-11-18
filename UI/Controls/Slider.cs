@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             HandleTemplate = new ContentControl(VisualRoot, new ColorContent(SharpDX.Color.Blue));
             HandleTemplate.Size = new DrawingSizeF(5, 0);
             HandleTemplate.VerticalAlignment = VerticalAlignment.Stretch;
-            HandleTemplate.Margin = new Vector2(0, 0);
+            HandleTemplate.Margin = DrawingSizeFExtension.Zero;
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
         }
 

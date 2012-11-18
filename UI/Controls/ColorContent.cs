@@ -43,8 +43,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 if (!_textureResourcesCreated)
                     CreateTextureResources();
-                Rectangle screenRectangle = Container.BoundsToSurface(Container.Bounds);
-                Container.ControlSpriteBatch.Begin();
+                RectangleF screenRectangle = Container.BoundsToSurface(Container.Bounds);
+
+                if (!HasDrawParameters)
+                    Container.ControlSpriteBatch.Begin();
+                else
+                    Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Interop.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);
                 Container.ControlSpriteBatch.Draw(_backgroundTextureView, screenRectangle.Position(), SharpDX.Color.White);
                 Container.ControlSpriteBatch.End();
             }

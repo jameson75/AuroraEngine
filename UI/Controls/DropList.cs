@@ -11,16 +11,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         ListControl _listControl = null;
         Button _button = null;
         DropListState _dropListState = DropListState.Closed;
-        private IControlLayoutManager _layoutManager = null;
+        IControlLayoutManager _layoutManager = null;
 
         public DropList(Components.IUIRoot root)
             : base(root)
         {
-            InitializeControl();
+            _dropListState = DropListState.Closed;  
+            CreateChildControls();
             root.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
         }
 
-        private void InitializeControl()
+        private void CreateChildControls()
         {
             Utils.Interop.SpriteFont tempSpriteFont = Utils.Interop.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
             
@@ -31,8 +32,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             
             _listControl = new ListControl(this.VisualRoot);
             _listControl.DivContainerId = Guid.NewGuid();
-            _listControl.CustomFocusManager = this;
-            _listControl.Items.Add(new ListControlItem(this.VisualRoot, "List_Item_1", "List Item 1", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Aqua));
+            _listControl.CustomFocusManager = this;            
              Children.Add(_listControl);
             
             _button = new Button(this.VisualRoot, "?", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Blue);
@@ -45,11 +45,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             divLayoutManager.Divs.Add(new LayoutDiv(_button.DivContainerId, 20, 20));
             divLayoutManager.Divs.Add(new LayoutDiv(_listControl.DivContainerId, 100, LayoutDivUnits.Percentage, 0, LayoutDivUnits.Span));
             _layoutManager = divLayoutManager;
-
-            this._dropListState = DropListState.Open;
-
-            UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
+            UpdateLayout(LayoutUpdateReason.ChildSizeChanged);                      
         }
+
+        public ListControl List { get { return _listControl; } }
 
         protected override IControlLayoutManager LayoutManager
         {
@@ -85,7 +84,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void Update(long gameTime)
         {
-            if (this.HasFocus)
+            if (this._textBox.HasFocus)
             {
                 Services.IInputService inputService = (Services.IInputService)Game.Services.GetService(typeof(Services.InputService));
                 if (inputService == null)
@@ -155,6 +154,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _textBox.HasFocus = true;
 
             EventHandler handler = ListClosed;
+
             if (handler != null)
                 handler(this, EventArgs.Empty);
         }

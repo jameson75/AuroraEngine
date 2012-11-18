@@ -8,7 +8,7 @@ using CipherPark.AngelJacket.Core.UI.Components;
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public abstract class ContainerControl : UIControl
-    {
+    {         
         protected ContainerControl(IUIRoot root)
             : base(root)
         { }
@@ -25,6 +25,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             foreach (UIControl child in this.Children)
                 child.Update(gameTime);
             base.Update(gameTime);
+        }
+
+        public override void UpdateEffect(long gameTime)
+        {
+            foreach (UIControl child in this.Children)
+                child.UpdateEffect(gameTime);
+            base.UpdateEffect(gameTime);
         }
 
         [Obsolete]

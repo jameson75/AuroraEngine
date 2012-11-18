@@ -25,10 +25,10 @@ namespace CipherPark.AngelJacket.Core.UI.Design
         public virtual void Parse(UITree tree, XElement element, UIControl control)
         {
             if (element.Attribute(PositionAttributeName) != null)
-                control.Position = UIControlPropertyParser.ParseVector2(element.Attribute(PositionAttributeName).Value);
+                control.Position = UIControlPropertyParser.ParseDrawingPointF(element.Attribute(PositionAttributeName).Value);
 
             if (element.Attribute(SizeAttributeName) != null)
-                control.Size = UIControlPropertyParser.ParseDrawingSize(element.Attribute(SizeAttributeName).Value);
+                control.Size = UIControlPropertyParser.ParseDrawingSizeF(element.Attribute(SizeAttributeName).Value);
 
             if (element.Attribute(NameAttributeName) != null)
                 control.Name = element.Attribute(NameAttributeName).Value;
@@ -42,10 +42,10 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             }
 
             if (element.Attribute(PaddingAttributeName) != null)
-                control.Padding = UIControlPropertyParser.ParseVector2(element.Attribute(PaddingAttributeName).Value);
+                control.Padding = UIControlPropertyParser.ParseDrawingSizeF(element.Attribute(PaddingAttributeName).Value);
 
             if (element.Attribute(MarginAttributeName) != null)
-                control.Margin = UIControlPropertyParser.ParseVector2(element.Attribute(MarginAttributeName).Value);
+                control.Margin = UIControlPropertyParser.ParseDrawingSizeF(element.Attribute(MarginAttributeName).Value);
 
             if (element.Attribute(VerticleAlignmentAttributeName) != null)
                 control.VerticalAlignment = UIControlPropertyParser.ParseEnum<VerticalAlignment>(element.Attribute(VerticleAlignmentAttributeName).Value);

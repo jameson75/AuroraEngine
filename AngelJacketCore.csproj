@@ -77,9 +77,11 @@
     <Compile Include="UI\Animation\AnimationSet.cs" />
     <Compile Include="UI\Components\AliasResource.cs" />
     <Compile Include="UI\Components\ColorStyle.cs" />
+    <Compile Include="UI\Components\ControlStyleTemplate.cs" />
     <Compile Include="UI\Components\FocusManager.cs" />
     <Compile Include="UI\Components\IUIRoot.cs" />
     <Compile Include="UI\Components\PathResource.cs" />
+    <Compile Include="UI\Components\UIEffect.cs" />
     <Compile Include="UI\Components\TextStyle.cs" />
     <Compile Include="UI\Components\UIResource.cs" />
     <Compile Include="UI\Components\UIStyle.cs" />

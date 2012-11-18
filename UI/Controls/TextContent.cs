@@ -47,10 +47,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             base.Draw(gameTime);            
             if (Container == null)
-                throw new InvalidOperationException("No container for this content was specified.");          
-            Container.ControlSpriteBatch.Begin();
-            Vector2 contentSurfacePosition = Container.PositionToSurface(Container.Position);
-            Container.ControlSpriteBatch.DrawString(Font, Text == null ? string.Empty : Text, contentSurfacePosition, FontColor);
+                throw new InvalidOperationException("No container for this content was specified.");
+            
+            DrawingPointF contentSurfacePosition = Container.PositionToSurface(Container.Position);
+            if (!HasDrawParameters)
+                Container.ControlSpriteBatch.Begin();
+            else
+                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Interop.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);
+           
+            Container.ControlSpriteBatch.DrawString(Font, Text == null ? string.Empty : Text, contentSurfacePosition.ToVector2(), FontColor);
             Container.ControlSpriteBatch.End();                        
         }
 

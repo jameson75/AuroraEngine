@@ -27,14 +27,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (!isLayoutUpdating)
             {
                 isLayoutUpdating = true;
-                float offset = 0.0f;
+                float offset = 0f;
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += this.Margin.Y;
+                        offset += this.Margin.Width;
                     else
-                        offset += Items[i - 1].Padding.Y;
-                    Items[i].Position = new Vector2(0.0f, offset);
+                        offset += Items[i - 1].Padding.Height;
+                    Items[i].Position = new DrawingPointF(0f, offset);
                     Items[i].Size = new DrawingSizeF(this.Size.Width, Items[i].Size.Height);
                     offset += Items[0].Size.Height;
                 }
@@ -101,7 +101,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected virtual void OnExpandedChanged()
         {
-            float totalLength = 0;
+            float totalLength = 0f;
             if (this.Expanded)
             {
                 totalLength = this.itemButton.Size.Height + this.itemPanel.Size.Height;

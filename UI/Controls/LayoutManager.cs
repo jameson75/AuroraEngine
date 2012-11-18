@@ -15,7 +15,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class ContainerControlLayoutManager : IControlLayoutManager
     {
         private UIControl _container = null;
-        private Rectangle _cachedBounds = Rectangle.Empty;
+        private RectangleF _cachedBounds = RectangleF.Empty;
 
         public ContainerControlLayoutManager(UIControl container)
         {
@@ -34,13 +34,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 float? newPositionX = null;
                 float? newPositionY = null;
-                int? newWidth = null;
-                int? newHeight = null;
+                float? newWidth = null;
+                float? newHeight = null;
 
                 switch(child.HorizontalAlignment)
                 {
                     case HorizontalAlignment.Center:
-                        newPositionX = ((float)_container.Bounds.Width / 2.0f) - ((float)child.Bounds.Width / 2.0f);                       
+                        newPositionX = (int)((float)_container.Bounds.Width / 2.0f) - (int)((float)child.Bounds.Width / 2.0f);                       
                         break;
                     case HorizontalAlignment.Left:
                         //No need to do anything since child's x position is relative to Left side of container.
@@ -53,15 +53,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         }
                         break;
                     case HorizontalAlignment.Stretch:
-                        newPositionX = _container.Padding.X + child.Margin.X;
-                        newWidth = _container.Bounds.Width - (int)(_container.Padding.X * 2);
+                        newPositionX = _container.Padding.Width + child.Margin.Width;
+                        newWidth = _container.Bounds.Width - (int)(_container.Padding.Width * 2);
                         break;
                 }
                 
                 switch(child.VerticalAlignment)
                 {
                     case VerticalAlignment.Center:
-                         newPositionY = ((float)_container.Bounds.Height / 2.0f) - ((float)child.Bounds.Height / 2.0f);
+                         newPositionY = (_container.Bounds.Height / 2.0f) - (child.Bounds.Height / 2.0f);
                         break;
                     case VerticalAlignment.Top:
                         //No need to do anything since child's y position is relative to Top side of container.
@@ -74,8 +74,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         }
                         break;
                     case VerticalAlignment.Stretch:
-                        newPositionY = _container.Padding.Y + child.Margin.Y;                       
-                        newHeight = _container.Bounds.Height - (int)(_container.Padding.Y * 2);
+                        newPositionY = _container.Padding.Height + child.Margin.Height;                       
+                        newHeight = _container.Bounds.Height - (_container.Padding.Width * 2);
                         break;
                 }
 
@@ -83,13 +83,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 {
                     float positionX = newPositionX.HasValue ? newPositionX.Value : child.Position.X;
                     float positionY = newPositionY.HasValue ? newPositionY.Value : child.Position.Y;
-                    child.Position = new Vector2(positionX, positionY);
+                    child.Position = new DrawingPointF(positionX, positionY);
                 }
 
                 if (newWidth.HasValue || newHeight.HasValue)
                 {
-                    int width = newWidth.HasValue ? newWidth.Value : child.Bounds.Width;
-                    int height = newHeight.HasValue ? newHeight.Value : child.Bounds.Height;
+                    float width = newWidth.HasValue ? newWidth.Value : child.Bounds.Width;
+                    float height = newHeight.HasValue ? newHeight.Value : child.Bounds.Height;
                     child.Size = new DrawingSizeF(width, height);
                 }
             }
@@ -121,7 +121,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         private LayoutDivCollection _divs = null;
         private UIControl _container = null;
-        private Rectangle _cachedBounds = Rectangle.Empty;
+        private RectangleF _cachedBounds = RectangleF.Empty;
 
         public DivLayoutManager(UIControl container)
         {
@@ -157,25 +157,25 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private void ApplyDivContainership(LayoutDiv div, RectangleF divBounds, LayoutUpdateReason reason)
         {
-            float newPositionX = 0;
-            float newPositionY = 0;
-            int newWidth = 0;
-            int newHeight = 0;
+            float newPositionX = 0f;
+            float newPositionY = 0f;
+            float newWidth = 0f;
+            float newHeight = 0f;
             foreach (UIControl child in _container.Children)
             {
                 if (child.DivContainerId == div.Id)
                 {                   
-                    newPositionX = divBounds.Left + div.Padding.X + child.Margin.X;
-                    newWidth = (int)divBounds.Width - (int)(div.Padding.X * 2);                  
-                    newPositionY = divBounds.Top + div.Padding.Y + child.Margin.Y;
-                    newHeight = (int)divBounds.Height - (int)(div.Padding.Y * 2);                    
-                    child.Position = new Vector2((float)newPositionX, (float)newPositionY);      
-                    child.Size = new DrawingSizeF((float)newWidth, (float)newHeight);                   
+                    newPositionX = divBounds.Left + div.Padding.X + child.Margin.Width;
+                    newWidth = divBounds.Width - (div.Padding.X * 2f);                  
+                    newPositionY = divBounds.Top + div.Padding.Y + child.Margin.Width;
+                    newHeight = divBounds.Height - (div.Padding.Y * 2f);                    
+                    child.Position = new DrawingPointF(newPositionX, newPositionY);      
+                    child.Size = new DrawingSizeF(newWidth, newHeight);                   
                 }
             }
         }
 
-        public static RectangleF[] CalculateDivBounds(DrawingSize containerSize, LayoutDivCollection divs)
+        public static RectangleF[] CalculateDivBounds(DrawingSizeF containerSize, LayoutDivCollection divs)
         {
             int currentRow = 0;
             int currentColumn = 0;
@@ -207,11 +207,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             return divBoundsArray;
         }
      
-        private static DrawingSizeF CalculateDivSizeInPixels(DrawingSize containerSize, LayoutDivCollection divs, int divIndex, float divOriginX, float divOriginY)
+        private static DrawingSizeF CalculateDivSizeInPixels(DrawingSizeF containerSize, LayoutDivCollection divs, int divIndex, float divOriginX, float divOriginY)
         {
             LayoutDiv div = divs[divIndex];
-            float divWidth = 0.0f;
-            float divHeight = 0.0f;
+            float divWidth = 0;
+            float divHeight = 0;
 
             if (div.WidthUnits == LayoutDivUnits.Span)
             {
@@ -244,17 +244,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             else
                 divHeight = ToPixels(containerSize.Height, div.Height, div.HeightUnits);
 
+          
             return new DrawingSizeF(divWidth, divHeight);
         }
 
-        private static float ToPixels(int containerLength, float divLength, LayoutDivUnits units)
+        private static float ToPixels(float containerLength, float divLength, LayoutDivUnits units)
         {
             switch( units )
             {
                 case LayoutDivUnits.Pixels:
                     return divLength;
                 case LayoutDivUnits.Percentage:
-                    return (float)containerLength * divLength / 100.0f;
+                    return containerLength * divLength / 100.0f;
                 default:
                     throw new ArgumentException("Unsupported units specified", "units");
             }

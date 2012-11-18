@@ -9,7 +9,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class MenuItem : ItemControl
     {
-        public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10, 10);
+        public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10f, 10f);
         private UIContent _itemContent = null;
         private UIContent _selectContent = null;
 

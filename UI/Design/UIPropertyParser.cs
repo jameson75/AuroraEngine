@@ -63,18 +63,60 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             return vector;
         }
 
-        public static DrawingSizeF ParseDrawingSize(string value)
+        public static DrawingSize ParseDrawingSize(string value)
         {
-            DrawingSizeF vector = new DrawingSizeF();
+            DrawingSize size = new DrawingSize();
+            Match match = Regex.Match(value, drawingSizePattern, RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                size.Width = UIControlPropertyParser.SafeParseInt(match.Groups["w"].Value);
+                size.Height = UIControlPropertyParser.SafeParseInt(match.Groups["h"].Value);
+            }
+            else
+                throw new IOException("Invalid format for type DrawingSize");
+            return size;
+        }
+
+        public static DrawingSizeF ParseDrawingSizeF(string value)
+        {
+            DrawingSizeF size = new DrawingSizeF();
+            Match match = Regex.Match(value, drawingSizePattern, RegexOptions.IgnoreCase);
+            if (match.Success)  
+            {
+                size.Width = UIControlPropertyParser.SafeParseFloat(match.Groups["w"].Value);
+                size.Height = UIControlPropertyParser.SafeParseFloat(match.Groups["h"].Value);
+            }
+            else
+                throw new IOException("Invalid format for type DrawingSizeF");
+            return size;
+        }
+
+        public static DrawingPoint ParseDrawingPoint(string value)
+        {
+            DrawingPoint size = new DrawingPoint();
             Match match = Regex.Match(value, vector2Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                vector.Width = UIControlPropertyParser.SafeParseFloat(match.Groups["x"].Value);
-                vector.Height = UIControlPropertyParser.SafeParseFloat(match.Groups["y"].Value);
+                size.X = UIControlPropertyParser.SafeParseInt(match.Groups["x"].Value);
+                size.Y = UIControlPropertyParser.SafeParseInt(match.Groups["y"].Value);
             }
             else
-                throw new IOException("Invalid format for type Vector2");
-            return vector;
+                throw new IOException("Invalid format for type DrawingPoint");
+            return size;
+        }
+
+        public static DrawingPointF ParseDrawingPointF(string value)
+        {
+            DrawingPointF size = new DrawingPointF();
+            Match match = Regex.Match(value, vector2Pattern, RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                size.X = UIControlPropertyParser.SafeParseFloat(match.Groups["x"].Value);
+                size.Y = UIControlPropertyParser.SafeParseFloat(match.Groups["y"].Value);
+            }
+            else
+                throw new IOException("Invalid format for type DrawingPoint");
+            return size;
         }
 
         public static Rectangle ParseRectangle(string value)

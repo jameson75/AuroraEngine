@@ -207,7 +207,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (AutoSize)
             {
                 if (this.Items.Count == 0)
-                    this.Size = new DrawingSizeF(0, 0);
+                    this.Size = DrawingSizeFExtension.Zero;
                 else
                     this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
             }            
@@ -216,16 +216,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnLayoutChanged()
         {
-            float offset = 0.0f;
+            float offset = 0f;
             if (Orienation == MenuOrientation.Vertical)
             {
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += this.Margin.Y;
+                        offset += this.Margin.Width;
                     else
-                        offset += Items[i - 1].Padding.Y;
-                    Items[i].Position = new Vector2(0.0f, offset);
+                        offset += Items[i - 1].Padding.Height;
+                    Items[i].Position = new DrawingPointF(0f, offset);
                     Items[i].Size = new DrawingSizeF(this.Size.Width, Items[i].Size.Height);
                     offset += Items[0].Size.Height;
                 }
@@ -235,10 +235,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += this.Margin.X;
+                        offset += this.Margin.Width;
                     else
-                        offset += Items[i - 1].Padding.X;
-                    Items[i].Position = new Vector2(offset, 0.0f);
+                        offset += Items[i - 1].Padding.Width;
+                    Items[i].Position = new DrawingPointF(offset, 0f);
                     Items[i].Size = new DrawingSizeF(Items[i].Size.Width, this.Size.Height);
                     offset += Items[0].Size.Width;
                 }

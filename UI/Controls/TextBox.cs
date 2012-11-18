@@ -148,15 +148,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             //****************************************************************************************************
             _caret = new ContentControl(this.VisualRoot, new ColorContent(Color.White));    
             this.Children.Add(_caret);
-            _caret.Position = new Vector2(0, this.Bounds.Height - 15);
-            _caret.Size = new DrawingSizeF(5, 10);
+            _caret.Position = new DrawingPointF(0f, this.Bounds.Height - 15f);
+            _caret.Size = new DrawingSizeF(5f, 10f);
             _caret.Visible = false;
         }
 
         private void UpdateCaretPosition()
         {
             if(_content.Text != null )
-                _caret.Position = new Vector2(_content.GetTextLength(0, _content.Text.Length), _caret.Position.Y);
+                _caret.Position = new DrawingPointF(_content.GetTextLength(0, _content.Text.Length), _caret.Position.Y);
         }
 
         protected void OnEnterKey()

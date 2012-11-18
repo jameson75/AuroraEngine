@@ -12,12 +12,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         #region Fields
         private IUIRoot _visualRoot = null;
+        private ControlEffect _effect = null;
         private IGameApp _game = null;
         private SpriteBatch _spriteBatch = null;
         //private bool _isInitialized = false;
         private UIControlCollection _children = null;
         private DrawingSizeF _size = DrawingSizeFExtension.Zero;
-        private Vector2 _position = Vector2.Zero;
+        private DrawingPointF _position = DrawingPointFExtension.Zero;
         private IControlLayoutManager _layoutManager = null;
         #endregion
 
@@ -27,8 +28,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _visualRoot = visualRoot;
             _visualRoot.LoadComplete += VisualRoot_LoadComplete;            
             _game = visualRoot.Game;
-            Padding = Vector2.Zero;
-            Margin = Vector2.Zero;            
+            Padding = DrawingSizeFExtension.Zero;
+            Margin = DrawingSizeFExtension.Zero;            
             Enabled = true;
             EnableFocus = true;
             Visible = true;
@@ -40,6 +41,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         #endregion
 
         #region Properties
+        //public ControlEffect Effect
+        //{
+        //    get { return _effect; }
+        //    set
+        //    {
+        //        _effect = value;
+        //        OnStyleChanged();
+        //    }
+        //}
+
         public IUIRoot VisualRoot { get { return _visualRoot; } }
 
         protected virtual IControlLayoutManager LayoutManager { get { return _layoutManager; } }
@@ -48,7 +59,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Guid DivContainerId { get; set; }
 
-        public Vector2 Position
+        public DrawingPointF Position
         {
             get
             {
@@ -58,7 +69,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 OnPositionChanging();
                 _position = value;
-                OnPositionChanging();
+                OnPositionChanged();
             }
         }
 
@@ -97,7 +108,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public bool Enabled { get; set; }
         public bool Visible { get; set; }     
         public SpriteBatch ControlSpriteBatch { get { return _spriteBatch; } }
-        public Color4 BackgroundColor { get; set; }
         public float ZOrder { get; set; }
         public float TabOrder { get; set; }
         public bool HasFocus
@@ -127,8 +137,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 foreach (UIControl child in Children)
                     if (child.IsDescendant(control))
-                        return true;
-                
+                        return true;                
                 return false;
             }                   
         }
@@ -174,9 +183,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         /// 
         /// </summary>
         /// <remarks>Bounds will always represent dimensions the control is rendered at. See UIControl.NativeBounds property.</remarks>
-        public Rectangle Bounds { get { return RectangleExtension.CreateLTWH((int)Position.X, (int)Position.Y, (int)this.Size.Width, (int)this.Size.Height); } }
-        public Vector2 Padding { get; set; }
-        public Vector2 Margin { get; set; }
+        public RectangleF Bounds { get { return RectangleFExtension.CreateLTWH(Position.X, Position.Y, this.Size.Width, this.Size.Height); } }
+        public DrawingSizeF Padding { get; set; }
+        public DrawingSizeF Margin { get; set; }
         public UIControl Parent { get; set; }
         public UIControlCollection Children { get { return _children; } }
         public VerticalAlignment VerticalAlignment { get; set; }
@@ -191,22 +200,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
        
         public virtual void Update(long gameTime) { }
 
-        public virtual void Draw(long gameTime) { }      
+        public virtual void Draw(long gameTime) { }
 
-        public Rectangle BoundsToSurface(Rectangle bounds)
+        public virtual void ApplyTemplate(UIControlTemplate template)
         {
-            Vector2 boundsOrigin = new Vector2(bounds.Left, bounds.Top);
-            Vector2 surfaceBoundsOrigin = PositionToSurface(boundsOrigin);
-            return RectangleExtension.CreateLTWH((int)surfaceBoundsOrigin.X, (int)surfaceBoundsOrigin.Y, bounds.Width, bounds.Height);
+            OnStyleChanged();
+        }
+
+        public RectangleF BoundsToSurface(RectangleF bounds)
+        {
+            DrawingPointF boundsOrigin = new DrawingPointF(bounds.Left, bounds.Top);
+            DrawingPointF surfaceBoundsOrigin = PositionToSurface(boundsOrigin);
+            return RectangleFExtension.CreateLTWH(surfaceBoundsOrigin.X, surfaceBoundsOrigin.Y, bounds.Width, bounds.Height);
         }        
 
-        public Vector2 PositionToSurface(Vector2 position)
+        public DrawingPointF PositionToSurface(DrawingPointF position)
         {
-            Vector2 transformedPosition = position;
+            DrawingPointF transformedPosition = position;
             UIControl root = this.Parent;
             while (root != null)
             {
-                transformedPosition += root.Position;
+                transformedPosition = DrawingPointFExtension.Add(transformedPosition, root.Position);
                 root = root.Parent;
             }
             return transformedPosition;
@@ -318,6 +332,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected virtual void OnLoad()
         {}
 
+        protected virtual void OnStyleChanged()
+        {
+            EventHandler handler = EffectChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
         public event EventHandler LayoutChanged;
         public event EventHandler SizeChanging;
         public event EventHandler SizeChanged;
@@ -325,6 +346,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public event EventHandler PositionChanged;
         public event EventHandler PaddingChanged;
         public event EventHandler MarginChanged;
+        public event EventHandler EffectChanged;
 
         #endregion
     }

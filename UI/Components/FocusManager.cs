@@ -365,7 +365,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             UIControl[] zOrderedSiblings = FocusManager.ToZOrderedControlArray(siblings);
             for (int i = 0; i < zOrderedSiblings.Length; i++)
-                if ((zOrderedSiblings[i].Visible || !mustBeVisible) && zOrderedSiblings[i].Bounds.Contains(mouseLocation))
+                if ((zOrderedSiblings[i].Visible || !mustBeVisible) && zOrderedSiblings[i].Bounds.Contains(mouseLocation.ToDrawingPointF()))
                     return zOrderedSiblings[i];
             return null;
         }          
@@ -382,7 +382,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 {
                     if (hitSibling.Enabled && hitSibling.CanFocus)
                     {
-                        if (hitSibling.Bounds.Contains(mouseLocation))
+                        if (hitSibling.Bounds.Contains(mouseLocation.ToDrawingPointF()))
                             return hitSibling;
                     }
                 }

@@ -72,6 +72,12 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public static class RectangleFExtension
     {
+        public static bool Contains(this RectangleF r, DrawingPointF point)
+        {
+            return r.X <= point.X && r.X + r.Width >= point.X &&
+                   r.Y <= point.Y && r.Y + r.Height >= point.Y;
+        }
+
         public static DrawingSizeF GetSize(this RectangleF r)
         {
             return new DrawingSizeF(r.Right - r.Left, r.Bottom - r.Top);
@@ -98,6 +104,81 @@ namespace CipherPark.AngelJacket.Core.Utils
         {
             return new DrawingSizeF(s.Width + s2.Width, s.Height + s2.Height);
         }
+
+        public static DrawingSize ToDrawingSize(this DrawingSizeF sizeF)
+        {
+            return new DrawingSize(Convert.ToInt32(Math.Ceiling(sizeF.Width)), Convert.ToInt32(Math.Ceiling(sizeF.Height)));
+        } 
+
+        public static Vector2 ToVector2(this DrawingSizeF sizeF)
+        {
+            return new Vector2(sizeF.Width, sizeF.Height);
+        }
     }
 
+    public static class DrawingSizeExtension
+    {
+        private static DrawingSize _zero = new DrawingSize(0, 0);
+
+        public static DrawingSize Zero { get { return _zero; } }
+
+        public static DrawingSize Add(this DrawingSize s, DrawingSize s2)
+        {
+            return new DrawingSize(s.Width + s2.Width, s.Height + s2.Height);
+        }
+
+        public static DrawingSizeF ToDrawingSizeF(this DrawingSize size)
+        {
+            return new DrawingSizeF(Convert.ToSingle(size.Width), Convert.ToSingle(size.Height));
+        }
+
+        public static Vector2 ToVector2(this DrawingSize size)
+        {
+            return new Vector2(Convert.ToSingle(size.Width), Convert.ToSingle(size.Height));
+        }
+    }
+
+    public static class DrawingPointExtension
+    {
+        private static DrawingPoint _zero = new DrawingPoint(0, 0);
+
+        public static DrawingPoint Zero { get { return _zero; } }
+
+        public static DrawingPoint Add(this DrawingPoint s, DrawingPoint s2)
+        {
+            return new DrawingPoint(s.X + s2.X, s.Y + s2.Y);
+        }
+
+        public static DrawingPointF ToDrawingPointF(this DrawingPoint point)
+        {
+            return new DrawingPointF(Convert.ToInt32(point.X), Convert.ToInt32(point.Y));
+        }
+
+        public static Vector2 ToVector2(this DrawingPoint point)
+        {
+            return new Vector2(Convert.ToSingle(point.X), Convert.ToSingle(point.Y));
+        }
+    }
+
+    public static class DrawingPointFExtension
+    {
+        private static DrawingPointF _zero = new DrawingPointF(0, 0);
+
+        public static DrawingPointF Zero { get { return _zero; } }
+
+        public static DrawingPoint ToDrawingPoint(this DrawingPointF pointF)
+        {
+            return new DrawingPoint(Convert.ToInt32(Math.Floor(pointF.X)), Convert.ToInt32(Math.Floor(pointF.Y)));
+        }
+
+        public static DrawingPointF Add(this DrawingPointF s, DrawingPointF s2)
+        {
+            return new DrawingPointF(s.X + s2.X, s.Y + s2.Y);
+        }
+
+        public static Vector2 ToVector2(this DrawingPointF pointF)
+        {
+            return new Vector2(pointF.X, pointF.Y);
+        }
+    }
 }
