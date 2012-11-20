@@ -22,7 +22,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public override UIContent GenerateContent()
         {
-            TextContent content = new TextContent(null, Font, FontColor, Color);
+            TextContent content = new TextContent(null, Font, FontColor);
             return content;
         }
     }

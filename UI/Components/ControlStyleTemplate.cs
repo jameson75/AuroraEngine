@@ -10,7 +10,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public abstract class UIControlTemplate
     {
-        public UIControlTemplate[] ChildrenTemplates { get; set; }
+        
     }
 
     public class ListControlItemTemplate : UIControlTemplate
@@ -18,10 +18,12 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public ListControlItemTemplate()
         { }
 
-        public ListControlItemTemplate(UIControlTemplate[] childStyleTemplates)
+        public ListControlItemTemplate(UIControlTemplate childTemplate)
         {
-            ChildrenTemplates = childStyleTemplates;
-        }       
+            ChildTemplate = childTemplate;
+        }
+
+        UIControlTemplate ChildTemplate { get; set; }
     }
 
     public class LabelTemplate : UIControlTemplate
@@ -39,6 +41,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             if (caption != null || font != null || fontColor != null)
                 Text = new TextContentTemplate(caption, font, fontColor);
+        
             if (backgroundColor != null)
                 BackgroundColor = new ColorContentTemplate(backgroundColor);
         }

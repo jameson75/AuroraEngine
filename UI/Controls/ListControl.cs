@@ -170,44 +170,60 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10f, 10f);
 
         private CommandControlWireUp _wireUp = null;
-
+        
         public ListControlItem(IUIRoot root)
             : base(root)
         {
             _wireUp = new CommandControlWireUp(this);
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
-        }
-
-        private void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
-        {
-            OnCommand(args.CommandName);
-        }
+        }       
 
         public ListControlItem(UIControl control) : base(control.VisualRoot)
         {
             this.Children.Add(control);
+            _wireUp = new CommandControlWireUp(this);
+            _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }
 
-        public ListControlItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor)
+        public ListControlItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor, Color4? selectFontColor = null)
             : base(visualRoot)
         {
             Name = name;
             CommandName = name;
-            Label childLabel = new Label(visualRoot, text, font, fontColor, backgroundColor);
+            ItemTemplate = new LabelTemplate(text, font, fontColor, backgroundColor);
+            if (selectFontColor != null)
+                SelectTemplate = new LabelTemplate(text, font, selectFontColor, backgroundColor);
+            Label childLabel = new Label(visualRoot);
+            childLabel.ApplyTemplate(ItemTemplate);
             childLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             Children.Add(childLabel);
-            Size = font.MeasureString(text).Add(DefaultItemTextMargin);            
+            Size = font.MeasureString(text).Add(DefaultItemTextMargin);
+            _wireUp = new CommandControlWireUp(this);
+            _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }
 
         protected override void OnSelected()
         {
+            if (SelectTemplate != null && Children.Count != 0)
+                Children[0].ApplyTemplate(SelectTemplate);
             base.OnSelected();
         }
 
         protected override void OnUnselected()
         {
+            if (ItemTemplate != null && Children.Count != 0)
+                Children[0].ApplyTemplate(ItemTemplate);
             base.OnUnselected();
+        }
+
+        public UIControlTemplate ItemTemplate { get; set; }
+
+        public UIControlTemplate SelectTemplate { get; set; }
+
+        private void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
+        {
+            OnCommand(args.CommandName);
         }
     }
 

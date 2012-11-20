@@ -13,7 +13,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class Button : UIControl, ICommandControl
     {
-        UIContent _content = null;
+        TextContent _textContent = null;
+        UIContent _backgroundContent = null;
 
         public Button(IUIRoot visualRoot)
             : base(visualRoot)
@@ -22,26 +23,41 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Button(IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 bgColor)
             : base(visualRoot)
         {
-            Content = new TextContent(text, font, fontColor, bgColor);
+            BackgroundContent = new ColorContent(bgColor);
+            TextContent = new TextContent(text, font, fontColor);
         }
 
         public Button(IUIRoot visualRoot, Texture2D texture)
             : base(visualRoot)
         {
-            Content = new ImageContent(texture);
+            BackgroundContent = new ImageContent(texture);
         }
 
-        public UIContent Content
+        public TextContent TextContent
         {
-            get { return _content; }
+            get { return _textContent; }
             set
             {
-                if (value == null && _content != null)
-                    _content.Container = null;
-                _content = value;
-                if (_content != null)
-                    _content.Container = this;
-                OnContentChanged();
+                if (value == null && _textContent != null)
+                    _textContent.Container = null;
+                _textContent = value;
+                if (_textContent != null)
+                    _textContent.Container = this;
+                OnTextContentChanged();
+            }
+        }
+
+        public UIContent BackgroundContent
+        {
+            get { return _backgroundContent; }
+            set
+            {
+                if (value == null && _backgroundContent != null)
+                    _backgroundContent.Container = null;
+                _backgroundContent = value;
+                if (_backgroundContent != null)
+                    _backgroundContent.Container = this;
+                OnBackgroundContentChanged();
             }
         }
 
@@ -57,14 +73,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void Draw(long gameTime)
         {
-            if (Content != null)
-                Content.Draw(gameTime);
+            if (TextContent != null)
+                TextContent.Draw(gameTime);
             base.Draw(gameTime);
         }
 
-        protected virtual void OnContentChanged()
+        protected virtual void OnTextContentChanged()
         {
-            EventHandler handler = ContentChanged;
+            EventHandler handler = TextContentChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnBackgroundContentChanged()
+        {
+            EventHandler handler = BackgroundContentChanged;
             if (handler != null)
                 handler(this, EventArgs.Empty);
         }
@@ -102,7 +125,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 handler(this, new ControlCommandArgs(commandName));
         }
 
-        public event EventHandler ContentChanged;
+        public event EventHandler BackgroundContentChanged;
+        public event EventHandler TextContentChanged;
         public event EventHandler Click;
         public event ControlCommandHandler ControlCommand;
     }

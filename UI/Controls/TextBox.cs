@@ -9,7 +9,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class TextBox : UIControl
     {
-        private TextContent _content = null;
+        private ColorContent _backgroundContent = null;
+        private TextContent _textContent = null;
         //private ControlInputState cim = null;
         private ContentControl _caret = null;
         private long _lastCaretUpdateTime = 0;
@@ -17,25 +18,31 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public TextBox(IUIRoot visualRoot)
             : base(visualRoot)
         {
-            _content = new TextContent();
-            _content.Container = this;
+            _backgroundContent = new ColorContent();
+            _backgroundContent.Container = this;
+            _textContent = new TextContent();
+            _textContent.Container = this;            
         }
 
         public TextBox(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor) : base(visualRoot)
         {
-            _content = new TextContent(text, font, fontColor, backgroundColor);
-            _content.Container = this;
+            _backgroundContent = new ColorContent(backgroundColor);
+            _backgroundContent.Container = this;
+            _textContent = new TextContent(text, font, fontColor);
+            _textContent.Container = this;
         }
 
-        public TextBox(IUIRoot visualRoot, TextContent content) : base(visualRoot)
+        public TextBox(IUIRoot visualRoot, TextContent textContent, ColorContent backgroundContent) : base(visualRoot)
         {
-            _content = content;
-            _content.Container = this;
+            _backgroundContent = backgroundContent;
+            _backgroundContent.Container = this;
+            _textContent = textContent;
+            _textContent.Container = this;
         }
 
-        public TextContent Content 
+        public TextContent Text 
         { 
-            get { return _content; }
+            get { return _textContent; }
             //set
             //{
             //    if (value == null && _content != null)
@@ -44,6 +51,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             //    if (_content != null)
             //        _content.Container = this;
             //}
+        }
+
+        public ColorContent BackgroundColor
+        {
+            get { return _backgroundContent; }
         }
 
         public override void Update(long gameTime)
@@ -65,12 +77,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     WritableInput[] cis = ControlInputState.ConvertToWritableInput(cim.GetKeysDown(), WritableInputConversionFlags.IgnoreNewLine | WritableInputConversionFlags.IgnoreTab);
                     foreach (WritableInput ci in cis)
                         if (ci.KeyType == WritableInputType.Printable)
-                            this._content.Text += ci.Ascii.ToString();
+                            this._textContent.Text += ci.Ascii.ToString();
                         else
                         {
                             if (ci.Key == Key.Back)
-                                if (this._content.Text.Length > 0)
-                                    this._content.Text = this._content.Text.Substring(0, this._content.Text.Length - 1);
+                                if (this._textContent.Text.Length > 0)
+                                    this._textContent.Text = this._textContent.Text.Substring(0, this._textContent.Text.Length - 1);
                         }
                     UpdateCaretPosition();
                 }
@@ -104,8 +116,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             ControlSpriteBatch.End();                             
             */
 
-            if(_content != null)
-                _content.Draw(gameTime);
+            if (_backgroundContent != null)
+                _backgroundContent.Draw(gameTime);
+
+            if(_textContent != null)
+                _textContent.Draw(gameTime);
            
             if( this.HasFocus && _caret.Visible )
                 _caret.Draw(gameTime);
@@ -155,8 +170,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private void UpdateCaretPosition()
         {
-            if(_content.Text != null )
-                _caret.Position = new DrawingPointF(_content.GetTextLength(0, _content.Text.Length), _caret.Position.Y);
+            if(_textContent.Text != null )
+                _caret.Position = new DrawingPointF(_textContent.GetTextLength(0, _textContent.Text.Length), _caret.Position.Y);
         }
 
         protected void OnEnterKey()

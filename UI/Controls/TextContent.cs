@@ -6,7 +6,7 @@ using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class TextContent : ColorContent
+    public class TextContent : UIContent
     {
         public TextContent()
         {
@@ -15,16 +15,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public TextContent(string text, SpriteFont font, Color4 fontColor)
-        {
-            Text = text;
-            Font = font;
-            FontColor = fontColor;
-            VAlignment = VerticalAlignment.Top;
-            HAlignment = HorizontalAlignment.Left;
-        }
-
-        public TextContent(string text, SpriteFont font, Color4 fontColor, Color4 bgColor)
-            : base(bgColor)
         {
             Text = text;
             Font = font;
@@ -53,8 +43,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (!HasDrawParameters)
                 Container.ControlSpriteBatch.Begin();
             else
-                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Interop.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);
-           
+                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Interop.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);           
             Container.ControlSpriteBatch.DrawString(Font, Text == null ? string.Empty : Text, contentSurfacePosition.ToVector2(), FontColor);
             Container.ControlSpriteBatch.End();                        
         }
@@ -74,6 +63,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             string subText = this.Text.Substring(startIndex, count);
             return Font.MeasureString(subText).Width;
+        }
+
+        public override void ApplyTemplate(Components.UIContentTemplate template)
+        {
+            Components.TextContentTemplate textTemplate = template as Components.TextContentTemplate;
+            if (textTemplate == null)
+                throw new ArgumentException("Template is not of type TextContentTemplate", "textTemplate");
+
+            if (textTemplate.Text != null)
+                this.Text = textTemplate.Text;
+
+            if (textTemplate.Font != null)
+                this.Font = textTemplate.Font;
+
+            if (textTemplate.FontColor != null)
+                this.FontColor = textTemplate.FontColor.Value;
+
+            base.ApplyTemplate(template);
         }
     }   
 }

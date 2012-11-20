@@ -12,7 +12,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             
         }
-
         
         public SpriteSortMode? SpriteSortMode { get; set; }
 
@@ -56,5 +55,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public UIControl Container { get; set; }
 
         public abstract Rectangle CalculateSmallestBoundingRect();
+
+        public virtual void ApplyTemplate(Components.UIContentTemplate template)
+        {
+
+        }
     }
 }

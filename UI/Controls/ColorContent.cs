@@ -108,5 +108,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _textureResourcesCreated = false;
             }
         }
+
+        public override void ApplyTemplate(Components.UIContentTemplate template)
+        {
+            Components.ColorContentTemplate colorTemplate = template as Components.ColorContentTemplate;
+            if (colorTemplate == null)
+                throw new ArgumentException("Template was not of type ColorContentTemplate", "template");
+
+            if (colorTemplate.Color != null)
+                this.Color = colorTemplate.Color.Value;
+
+            base.ApplyTemplate(template);
+        }
     }
 }

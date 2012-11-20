@@ -27,13 +27,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.Update(gameTime);
         }
 
-        public override void UpdateEffect(long gameTime)
-        {
-            foreach (UIControl child in this.Children)
-                child.UpdateEffect(gameTime);
-            base.UpdateEffect(gameTime);
-        }
-
         [Obsolete]
         public override UIControl _GetNextFocusableChild(UIControl fromControl)
         {
