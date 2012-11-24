@@ -101,6 +101,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     case DropListState.Open:
                         if (cim.IsKeyReleased(SharpDX.DirectInput.Key.Escape))
                             _dropListState = DropListState.Closed;
+                        if (cim.IsKeyReleased(SharpDX.DirectInput.Key.Down))
+                        {
+                            if (this.List.SelectedItems.Count > 0)
+                            {
+                                int lastSelectedIndex = this.List.Items.IndexOf(this.List.SelectedItems[this.List.SelectedItems.Count - 1]);
+                                if (lastSelectedIndex < this.List.Items.Count - 1)
+                                    this.List.SelectItems(new[] { this.List.Items[lastSelectedIndex + 1] });
+                            }
+                            else if (this.List.Items.Count > 0)
+                                this.List.SelectItems(new[] { this.List.Items[0] });                                
+                        }
                         break;
                 }
             }

@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicGameApp.cs" />
-    <Compile Include="Camera.cs" />
+    <Compile Include="World\Camera.cs" />
     <Compile Include="Module\GameLevel.cs" />
     <Compile Include="Module\GameLevelConfiguration.cs" />
     <Compile Include="Module\GameModule.cs" />
@@ -138,6 +138,7 @@
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="World\AnimationSystem.cs" />
     <Compile Include="World\FXSystem.cs" />
+    <Compile Include="World\Mesh.cs" />
     <Compile Include="World\Scene.cs" />
     <Compile Include="World\SceneNode.cs" />
     <Compile Include="World\Trigger.cs" />

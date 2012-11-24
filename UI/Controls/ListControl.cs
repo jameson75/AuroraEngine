@@ -34,11 +34,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             switch (args.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    foreach (ItemsControl item in args.NewItems)
+                    foreach (ItemControl item in args.NewItems)
                         OnSelectedItemAdded(item);
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    foreach (ItemsControl item in args.OldItems)
+                    foreach (ItemControl item in args.OldItems)
                         OnSelectedItemRemoved(item);
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
@@ -47,12 +47,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected virtual void OnSelectedItemAdded(ItemsControl item)
+        protected virtual void OnSelectedItemAdded(ItemControl item)
         {
            
         }
 
-        protected virtual void OnSelectedItemRemoved(ItemsControl item)
+        protected virtual void OnSelectedItemRemoved(ItemControl item)
         {
            
         }
@@ -63,6 +63,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }        
 
         public UIListItemControlCollection SelectedItems { get { return _selectedItems; } }
+
+        public void SelectItems(IEnumerable<ItemControl> items)
+        {
+            this._selectedItems.Clear();
+            foreach (ListControlItem item in items)
+            {
+                this._selectedItems.Add((ListControlItem)item);
+                item.IsSelected = true;
+            }
+        }
     }
 
     public class ListControl : MultiSelectControl

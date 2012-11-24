@@ -6,7 +6,6 @@ using CipherPark.AngelJacket.Core.UI.Controls;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Utils.Interop;
 using CipherPark.AngelJacket.Core.Module;
-
 using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Components
