@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -60,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicGameApp.cs" />
+    <Compile Include="Utils\Interop\BasicEffect.cs" />
     <Compile Include="World\Camera.cs" />
     <Compile Include="Module\GameLevel.cs" />
     <Compile Include="Module\GameLevelConfiguration.cs" />
@@ -138,6 +140,7 @@
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="World\AnimationSystem.cs" />
     <Compile Include="World\FXSystem.cs" />
+    <Compile Include="World\Triangle.cs" />
     <Compile Include="World\Mesh.cs" />
     <Compile Include="World\Scene.cs" />
     <Compile Include="World\SceneNode.cs" />

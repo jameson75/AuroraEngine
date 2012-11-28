@@ -66,13 +66,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public void SelectItems(IEnumerable<ItemControl> items)
         {
-            this._selectedItems.Clear();
+            UnSelectItems(_selectedItems);
             foreach (ListControlItem item in items)
             {
                 this._selectedItems.Add((ListControlItem)item);
                 item.IsSelected = true;
             }
         }
+
+        public void UnSelectItems(IEnumerable<ItemControl> items)
+        {
+            List<ItemControl> auxList = new List<ItemControl>(items);
+            foreach (ListControlItem item in auxList)
+                _selectedItems.Remove(item);
+        }            
     }
 
     public class ListControl : MultiSelectControl
