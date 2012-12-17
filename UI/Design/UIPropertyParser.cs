@@ -15,7 +15,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
         private const string vector3Pattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*,\s*(?:(?:z\s*=\s*(?<z>[0-9]))|(?<z>[0-9]))?\s*}$";
         private const string vector2Pattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*}$";
         private const string vector4Pattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*,\s*(?:(?:z\s*=\s*(?<z>[0-9]))|(?<z>[0-9]))?\s*,\s*(?:(?:w\s*=\s*(?<w>[0-9]))|(?<w>[0-9]))?\s*}$";
-        private const string rectanglePattern =    @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*,\s*(?:(?:(?:width|w)\s*=\s*(?<width>[0-9]))|(?<width>[0-9]))?\s*,\s*(?:(?:(?:height|h)\s*=\s*(?<height>[0-9]))|(?<height>[0-9]))?\s*}$";
+        private const string rectanglePattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*,\s*(?:(?:(?:width|w)\s*=\s*(?<width>[0-9]))|(?<width>[0-9]))?\s*,\s*(?:(?:(?:height|h)\s*=\s*(?<height>[0-9]))|(?<height>[0-9]))?\s*}$";
         private const string drawingSizePattern = @"^{\s*(?:(?:w\s*=\s*(?<w>[0-9]))|(?<w>[0-9]))?\s*,\s*(?:(?:h\s*=\s*(?<h>[0-9]))|(?<h>[0-9]))?\s*}$";
 
         public static Vector4 ParseVector4(string value)

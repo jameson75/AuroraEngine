@@ -12,7 +12,7 @@ using CipherPark.AngelJacket.Core.Utils.Interop;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public class Mesh<VertexType> where VertexType : struct
+    public class Mesh
     {
         private DXBuffer _vertexBuffer = null;
         private DXBuffer _indexBuffer = null;
@@ -21,29 +21,24 @@ namespace CipherPark.AngelJacket.Core.World
         private int _indexCount = 0;
         private int _vertexStride = 0;
         private InputLayout _vertexLayout = null;
-        private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;
+        private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;      
 
-        public Mesh(IGameApp app, string fileName)
-        {
-            _app = app;
-        }
-
-        public Mesh(IGameApp app, MeshDescription meshDescription, VertexType[] meshData, short[] indexData = null)
+        public Mesh(IGameApp app, MeshDescription meshDescription)
         {
             _app = app;
             _vertexStride = meshDescription.VertexStride;
             _vertexLayout = meshDescription.VertexLayout;
             _topology = meshDescription.Topology;
-            _vertexCount = meshData.Length;           
-            _vertexBuffer = DXBuffer.Create<VertexType>(app.GraphicsDevice, meshData, meshDescription.VertexBufferDescription);
-            if (indexData != null)
+            _vertexCount = meshDescription.VertexCount;
+            _vertexBuffer = meshDescription.VertexBuffer;
+            if (meshDescription.IndexBuffer != null)
             {
-                _indexCount = indexData.Length;
-                _indexBuffer = DXBuffer.Create<short>(app.GraphicsDevice, indexData, meshDescription.IndexBufferDescription);
+                _indexCount = meshDescription.IndexCount;
+                _indexBuffer = meshDescription.IndexBuffer;
             }
         }
 
-        public void WriteVertices(VertexType[] vertices, long bufferOffset = 0, int vertexOffset = 0 )
+        public void WriteVertices<T>(T[] vertices, long bufferOffset = 0, int vertexOffset = 0 ) where T : struct
         {
             if (_vertexBuffer == null)
                 throw new InvalidOperationException("Vertex buffer was not created.");
@@ -71,9 +66,9 @@ namespace CipherPark.AngelJacket.Core.World
             stream.Dispose();
         }
 
-        public void AddTriangle(long bufferOffset, VertexType v1, VertexType v2, VertexType v3)
+        public void AddTriangle<T>(long bufferOffset, T v1, T v2, T v3) where T : struct
         {
-            WriteVertices(new VertexType[] { v1, v2, v3 }, bufferOffset );
+            WriteVertices(new T[] { v1, v2, v3 }, bufferOffset );
         }
 
         public void AddIndexedTriangle(long bufferOffset, short i1, short i2, short i3)
@@ -81,9 +76,9 @@ namespace CipherPark.AngelJacket.Core.World
             WriteIndices(new short[] {i1, i2, i3}, bufferOffset);
         }
 
-        public void AddLine(long bufferOffset, VertexType v1, VertexType v2)
+        public void AddLine<T>(long bufferOffset, T v1, T v2)  where T : struct
         {
-            WriteVertices( new VertexType[] {v1, v2} );
+            WriteVertices( new T[] {v1, v2} );
         }
 
         public void AddIndexLine(long bufferOffset, short i1, short i2)
@@ -114,50 +109,60 @@ namespace CipherPark.AngelJacket.Core.World
 
     public struct MeshDescription
     {
-        public BufferDescription IndexBufferDescription { get; set; }
-        public BufferDescription VertexBufferDescription { get; set; }
+        public DXBuffer IndexBuffer { get; set; }
+        public DXBuffer VertexBuffer { get; set; }
         public int VertexStride { get; set; }
+        public int VertexCount { get; set; }
+        public int IndexCount { get; set; }
         public InputLayout VertexLayout { get; set; }
         public PrimitiveTopology Topology { get; set; }
     }
 
     public class ReferenceGrid
     {
-        private Mesh<VertexPositionColor> _mesh = null;
-        private BasicEffect _effect = null;
-        
-        public ReferenceGrid(IGameApp app, DrawingSize quadSize, DrawingSizeF unitSize, Color4 color)
+        private Mesh _mesh = null;
+        private BasicEffect _effect = null;       
+
+        public ReferenceGrid(IGameApp app, DrawingSizeF gridSize, Vector2 gridSteps, Color4 color)
         {
+            //*******************************************************************
+            //TODO: Port this logic into a static ReferenceGrid.Create() method.*
+            //*******************************************************************
             _effect = new BasicEffect(app.GraphicsDevice);
             _effect.SetWorld(Matrix.Identity);
             _effect.SetVertexColorEnabled(true);
             byte[] shaderCode = _effect.SelectShaderByteCode();
-
             Vector4 gridColor = color.ToVector4();
-            int xSteps = (quadSize.Width * 2 + 1);
-            int zSteps = (quadSize.Height * 2 + 1);
+            int xSteps = (int)gridSteps.X;
+            int zSteps = (int)gridSteps.Y;
+            float halfWidth = gridSize.Width / 2.0f;
+            float halfHeight = gridSize.Height / 2.0f;
             int nVertices = 2 * ( xSteps + zSteps );
+            float xStepSize = (float)gridSize.Width / (gridSteps.X - 1);
+            float zStepSize = (float)gridSize.Height / (gridSteps.Y - 1);
             VertexPositionColor[] vertices = new VertexPositionColor[nVertices];
-            Vector3 v1 = new Vector3(-quadSize.Width, 0.0f, -quadSize.Height);
-            Vector3 v2 = new Vector3(-quadSize.Width, 0.0f, quadSize.Height);
-            for(int i = 0; i < xSteps; i+=2)
+            Vector3 vOrigin = new Vector3(-halfWidth, 0f, halfHeight);
+            Vector3 vBackRight = new Vector3(gridSize.Width - halfWidth, 0f, halfHeight);
+            Vector3 vFrontLeft = new Vector3(-halfWidth, 0f, -gridSize.Height + halfHeight);
+            Vector3 vx1 = vOrigin;
+            Vector3 vx2 = vFrontLeft;
+            for (int i = 0; i < xSteps; i++)
             {
-                vertices[i] = new VertexPositionColor(v1, gridColor);
-                vertices[i+1] = new VertexPositionColor(v2, gridColor);
-                v1+= new Vector3(unitSize.Width, 0f, 0f);
-                v2 += new Vector3(unitSize.Width, 0f, 0f);
+                vertices[i * 2] = new VertexPositionColor(vx1, Color.Gray.ToVector4());
+                vertices[i * 2 + 1] = new VertexPositionColor(vx2, Color.Gray.ToVector4());
+                vx1 += new Vector3(xStepSize, 0f, 0f);
+                vx2 += new Vector3(xStepSize, 0f, 0f);
             }
-
-            v1 = new Vector3(-quadSize.Width, 0.0f, -quadSize.Height);
-            v2 = new Vector3(quadSize.Width, 0.0f, -quadSize.Height);
-            for (int i = 0; i < zSteps; i += 2)
+            int k = zSteps * 2;
+            Vector3 vz1 = vOrigin;
+            Vector3 vz2 = vBackRight;
+            for (int i = 0; i < zSteps; i++)
             {
-                vertices[i] = new VertexPositionColor(v1, gridColor);
-                vertices[i + 1] = new VertexPositionColor(v2, gridColor);
-                v1 += new Vector3(0f, 0f, unitSize.Height);
-                v2 += new Vector3(0f, 0f, unitSize.Height);
-            }                 
-
+                vertices[i * 2 + k] = new VertexPositionColor(vz1, Color.Gray.ToVector4());
+                vertices[i * 2 + 1 + k] = new VertexPositionColor(vz2, Color.Gray.ToVector4());
+                vz1 += new Vector3(0f, 0f, -zStepSize);
+                vz2 += new Vector3(0f, 0f, -zStepSize);
+            }
             //NOTE: We must get the shader byte code
             MeshDescription meshDesc = new MeshDescription();
             BufferDescription vertexBufferDesc = new BufferDescription();
@@ -166,11 +171,12 @@ namespace CipherPark.AngelJacket.Core.World
             vertexBufferDesc.SizeInBytes = vertices.Length * VertexPositionColor.ElementSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
-            meshDesc.VertexBufferDescription = vertexBufferDesc;
+            meshDesc.VertexCount = vertices.Length;
+            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(app.GraphicsDevice, vertices, vertexBufferDesc);
             meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, VertexPositionColor.InputElements);
             meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = PrimitiveTopology.LineList;
-            _mesh = new Mesh<VertexPositionColor>(app, meshDesc, vertices);           
+            _mesh = new Mesh(app, meshDesc);           
         }
 
         public void Draw(long gameTime)
@@ -199,7 +205,7 @@ namespace CipherPark.AngelJacket.Core.World
         {
             _inputElements = new InputElement[]
              {
-                 new InputElement("SV_Position", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
                  new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 16, 0)
              };
             _elementSize = 32;
@@ -211,7 +217,7 @@ namespace CipherPark.AngelJacket.Core.World
         }
         public VertexPositionColor(Vector3 position, Vector4 color)
         {
-            Position = new Vector4(position, 0);
+            Position = new Vector4(position, 1.0f);
             Color = color;
         }
     }

@@ -40,7 +40,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public SceneControl(IUIRoot visualRoot) : base(visualRoot)
         {
-            _defaultCamera = new Camera(Matrix.LookAtLH(new Vector3(0, 50, 100), new Vector3(0, 0, 0), Vector3.UnitY),
+            _defaultCamera = new Camera(visualRoot.Game,
+                                        Matrix.LookAtLH(new Vector3(0, 50, 100), new Vector3(0, 0, 0), Vector3.UnitY),
                                         Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(45), this.DeviceAspectRatio, 1.0f, 1000.0f));
             _currentCamera = _defaultCamera;
             this.EditorMode = EditorMode.Select;
@@ -117,6 +118,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         Vector3 mouseRay = mousePointFar - mousePointNear;
                         mouseRay.Normalize();
                         System.Diagnostics.Trace.WriteLine(mousePointNear);
+                        System.Diagnostics.Trace.WriteLine(mousePointFar);
                     }
                     break;
             }

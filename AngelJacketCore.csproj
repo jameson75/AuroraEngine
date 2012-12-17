@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -139,11 +139,13 @@
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="World\AnimationSystem.cs" />
+    <Compile Include="World\Character.cs" />
     <Compile Include="World\FXSystem.cs" />
     <Compile Include="World\Triangle.cs" />
     <Compile Include="World\Mesh.cs" />
     <Compile Include="World\Scene.cs" />
     <Compile Include="World\SceneNode.cs" />
+    <Compile Include="World\TriEffect.cs" />
     <Compile Include="World\Trigger.cs" />
   </ItemGroup>
   <ItemGroup />

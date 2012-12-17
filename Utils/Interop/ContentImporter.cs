@@ -1,19 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.IO;
 using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.Direct3D;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
+using System.Xml.XPath;
+using CipherPark.AngelJacket.Core.World;
+using DXBuffer = SharpDX.Direct3D11.Buffer;
+using System.Text.RegularExpressions;
 
 namespace CipherPark.AngelJacket.Core.Utils.Interop
 {
     public static class ContentImporter
     {
+        private const string vertexPositionColorPattern = @"^(?:\s*(?<px>(?:[0-9]*.)?[0-9]+)\s*(?<py>(?:[0-9]*.)?[0-9]+)\s*(?<pz>(?:[0-9]*.)?[0-9]+)\s*(?<c>[0-9]+)\s*,?\s*)*$";
+        private const string indexPattern = "";
+        public static Model LoadModel(IGameApp game, string filePath) 
+        {
+            XDocument xmlDoc = XDocument.Load(filePath);
+            var meshInfo = (from element in xmlDoc.Descendants("mesh")
+                            select new 
+                                {
+                                    IndexCount = element.Attribute("IndexCount") != null ? Convert.ToInt32(element.Attribute("IndexCount").Value) : 0,
+                                    VertexCount = Convert.ToInt32(element.Attribute("VertexCount").Value)                                   
+                                }).First();           
+                       
+            string[] vertexStrings = xmlDoc.XPathSelectElement("mesh/vertices").Value.Split(',');
+            int vertexElementSize = VertexPositionColor.ElementSize;
+            InputElement[] vertexInputElements = VertexPositionColor.InputElements;            ;
+            VertexPositionColor[] vertexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("mesh/vertices").Value, vertexPositionColorPattern)
+                          select new VertexPositionColor()
+                          {
+                                Position = new Vector4(Convert.ToSingle(m.Groups["px"].Value),
+                                                       Convert.ToSingle(m.Groups["py"].Value),
+                                                       Convert.ToSingle(m.Groups["pz"].Value),
+                                                       1.0f),
+                                Color = new Color(Convert.ToInt32(m.Groups["c"].Value)).ToVector4()                                            
+                          }).ToArray();
+            BasicEffect effect = new BasicEffect(game.GraphicsDevice);
+            effect.SetWorld(Matrix.Identity);
+            effect.SetVertexColorEnabled(true);
+            byte[] shaderCode = effect.SelectShaderByteCode();        
+
+            MeshDescription meshDesc = new MeshDescription();
+            BufferDescription vertexBufferDesc = new BufferDescription();
+            vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
+            vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
+            vertexBufferDesc.SizeInBytes = meshInfo.VertexCount * vertexElementSize;
+            vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
+            vertexBufferDesc.StructureByteStride = 0; 
+            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(game.GraphicsDevice, vertexData, vertexBufferDesc);
+
+            if(meshInfo.IndexCount > 0)
+            {
+                short[] indexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("mesh/indices").Value, indexPattern)
+                                     select Convert.ToInt16(m.Groups[0].Value)).ToArray();
+                BufferDescription indexBufferDesc = new BufferDescription();
+                indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
+                indexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
+                indexBufferDesc.SizeInBytes = meshInfo.IndexCount * sizeof(short);
+                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
+                indexBufferDesc.StructureByteStride = 0;
+                meshDesc.IndexBuffer = DXBuffer.Create<short>(game.GraphicsDevice, indexData, indexBufferDesc);
+            }
+
+            meshDesc.VertexCount = meshInfo.VertexCount;
+            meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderCode, vertexInputElements);
+            meshDesc.VertexStride = vertexElementSize;
+            meshDesc.Topology = PrimitiveTopology.TriangleList;              
+            Mesh mesh = new Mesh(game, meshDesc);
+            Model model = new Model(game);
+            model.Mesh = mesh;
+            model.Effect = new BasicGameEffect(effect);
+
+            return model;
+        }
+
         public static VoiceData LoadVoiceDataFromWav(string filePath)
         {
             VoiceDataThunk vdt = new VoiceDataThunk();

@@ -31,6 +31,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             _releasedKeys = null;
             _mouseButtonsDown = null;
             _mouseButtonsReleased = null;
+            _mouseButtonsPressed = null;
 
             //Update Old/New Snapshots
             //------------------------
@@ -215,7 +216,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 return new MouseButton[0];
             else
             {
-                if (_mouseButtonsPressed != null)
+                if (_mouseButtonsPressed == null)
                 {
                     List<MouseButton> _mouseButtonsPressedList = new List<MouseButton>();
                     MouseButton[] oldMouseButtonsUp = InputState._GetMouseButtonsInState(mouseStateWindow.OldState, ButtonState.Released);

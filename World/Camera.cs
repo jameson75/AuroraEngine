@@ -8,16 +8,25 @@ namespace CipherPark.AngelJacket.Core.World
 {
     public class Camera
     {
-        public Matrix ViewMatrix = Matrix.Identity;
-        public Matrix ProjectionMatrix = Matrix.Identity;
+        private IGameApp _game = null;    
 
-        public Camera()
-        { }
-
-        public Camera(Matrix viewMatrix, Matrix projectionMatrix)
+        public Camera(IGameApp game)
         {
+            _game = game;
+            ViewMatrix = Matrix.Identity;
+            ProjectionMatrix = Matrix.Identity;
+        }
+
+        public Camera(IGameApp game, Matrix viewMatrix, Matrix projectionMatrix)
+        {
+            _game = game;
             ViewMatrix = viewMatrix;
             ProjectionMatrix = projectionMatrix;
         }
+
+        public IGameApp Game { get { return _game; } }
+        
+        public Matrix ViewMatrix { get; set; }
+        public Matrix ProjectionMatrix { get; set; }
     }
 }
