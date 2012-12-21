@@ -27,26 +27,26 @@ namespace CipherPark.AngelJacket.Core.World
             _game = game;
         }
 
-
         public IGameApp Game { get { return _game; } }
 
         public Mesh Mesh { get; set; }
 
-        public IGameEffect Effect { get; set; }
-    }
+        public BasicEffect Effect { get; set; }
 
-    public interface IGameEffect
-    {
+        public Camera Camera { get; set; }
 
-    }
-
-    public class BasicGameEffect : IGameEffect
-    {
-        private BasicEffect _innerEffect = null;
-
-        public new BasicGameEffect(BasicEffect basicEffect)
+        public virtual void Draw(long gameTime)
         {
-            _innerEffect = basicEffect;
-        }
+            if (Effect != null)
+            {
+                Effect.SetWorld(Matrix.Identity);
+                Effect.SetView(Camera.ViewMatrix);
+                Effect.SetProjection(Camera.ProjectionMatrix);
+                Effect.Apply();
+            }
+
+            if (Mesh != null)
+                Mesh.Draw(gameTime);
+        }        
     }
 }

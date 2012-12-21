@@ -11,11 +11,12 @@ namespace CipherPark.AngelJacket.Core.World
 
     }
 
-    public class SceneNode
+    public abstract class SceneNode
     {
         private IGameApp _game = null;
         private SceneNode _parent = null;
         private SceneNodes _children = null;
+        
         public SceneNode(IGameApp game)
         {
             _game = game;
@@ -23,10 +24,15 @@ namespace CipherPark.AngelJacket.Core.World
         }
 
         public SceneNode Parent { get { return _parent; } set { _parent = value; } }
+
         public SceneNodes Children { get { return _children; } }
         
         [Obsolete]
         public ISceneObject SceneObject { get; set; }
+
+        public virtual void Draw(long gameTime) { }
+
+        public virtual void Update(long gameTime) { }
     }
      
     public class SceneNodes :  System.Collections.ObjectModel.ObservableCollection<SceneNode>
@@ -67,7 +73,15 @@ namespace CipherPark.AngelJacket.Core.World
             Model = model;
         }
 
-        public Model Model { get; set; }            
+        public Model Model { get; set; }
+
+        public override void Draw(long gameTime)
+        {
+            if (Model != null)
+            {
+                Model.Draw(gameTime);
+            }
+        }
     }
 
     public class CameraSceneNode : SceneNode

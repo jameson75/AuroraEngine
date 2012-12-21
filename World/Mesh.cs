@@ -36,55 +36,7 @@ namespace CipherPark.AngelJacket.Core.World
                 _indexCount = meshDescription.IndexCount;
                 _indexBuffer = meshDescription.IndexBuffer;
             }
-        }
-
-        public void WriteVertices<T>(T[] vertices, long bufferOffset = 0, int vertexOffset = 0 ) where T : struct
-        {
-            if (_vertexBuffer == null)
-                throw new InvalidOperationException("Vertex buffer was not created.");
-
-            DataStream stream = null;
-            _app.GraphicsDeviceContext.MapSubresource(_vertexBuffer, MapMode.Write, SharpDX.Direct3D11.MapFlags.None, out stream);
-            stream.Position = bufferOffset;
-            for (int i = vertexOffset; i < vertices.Length; i++ )
-                stream.Write(vertices[i]);                
-            _app.GraphicsDeviceContext.UnmapSubresource(_vertexBuffer, 0);
-            stream.Dispose();
-        }
-
-        public void WriteIndices(short[] indices, long bufferOffset = 0, short indexOffset = 0)
-        {
-            if (_indexBuffer == null)
-                throw new InvalidOperationException("Index buffer was not created");
-
-            DataStream stream = null;
-            _app.GraphicsDeviceContext.MapSubresource(_vertexBuffer, MapMode.Write, SharpDX.Direct3D11.MapFlags.None, out stream);
-            stream.Position = bufferOffset;
-            for (short i = indexOffset; i < indices.Length; i++ )
-                stream.Write(indices[i]);                
-            _app.GraphicsDeviceContext.UnmapSubresource(_vertexBuffer, 0);
-            stream.Dispose();
-        }
-
-        public void AddTriangle<T>(long bufferOffset, T v1, T v2, T v3) where T : struct
-        {
-            WriteVertices(new T[] { v1, v2, v3 }, bufferOffset );
-        }
-
-        public void AddIndexedTriangle(long bufferOffset, short i1, short i2, short i3)
-        {
-            WriteIndices(new short[] {i1, i2, i3}, bufferOffset);
-        }
-
-        public void AddLine<T>(long bufferOffset, T v1, T v2)  where T : struct
-        {
-            WriteVertices( new T[] {v1, v2} );
-        }
-
-        public void AddIndexLine(long bufferOffset, short i1, short i2)
-        {
-            WriteIndices( new short[] { i1, i2 }, bufferOffset );
-        }
+        }      
 
         public void Draw(long gameTime)
         {

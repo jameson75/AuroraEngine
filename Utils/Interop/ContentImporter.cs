@@ -20,8 +20,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
 {
     public static class ContentImporter
     {
-        private const string vertexPositionColorPattern = @"^(?:\s*(?<px>(?:[0-9]*.)?[0-9]+)\s*(?<py>(?:[0-9]*.)?[0-9]+)\s*(?<pz>(?:[0-9]*.)?[0-9]+)\s*(?<c>[0-9]+)\s*,?\s*)*$";
-        private const string indexPattern = "";
+        private const string vertexPositionColorPattern = @"\G\s*(?<x>[0-9]+(?:\.[0-9]+)?)\s+(?<y>[0-9]+(?:\.[0-9]+)?)\s+(?<z>[0-9]+(?:\.[0-9]+)?)\s+(?<c>[0-9]+)\s*(?:,|$)";
+        private const string indexPattern = @"\G\s*(?<i>[0-9]+)(?:\s+|$)";
+
         public static Model LoadModel(IGameApp game, string filePath) 
         {
             XDocument xmlDoc = XDocument.Load(filePath);
@@ -30,17 +31,16 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
                                 {
                                     IndexCount = element.Attribute("IndexCount") != null ? Convert.ToInt32(element.Attribute("IndexCount").Value) : 0,
                                     VertexCount = Convert.ToInt32(element.Attribute("VertexCount").Value)                                   
-                                }).First();           
-                       
-            string[] vertexStrings = xmlDoc.XPathSelectElement("mesh/vertices").Value.Split(',');
+                                }).First();                                  
+          
             int vertexElementSize = VertexPositionColor.ElementSize;
             InputElement[] vertexInputElements = VertexPositionColor.InputElements;            ;
-            VertexPositionColor[] vertexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("mesh/vertices").Value, vertexPositionColorPattern)
+            VertexPositionColor[] vertexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("model/mesh/vertices").Value, vertexPositionColorPattern)
                           select new VertexPositionColor()
                           {
-                                Position = new Vector4(Convert.ToSingle(m.Groups["px"].Value),
-                                                       Convert.ToSingle(m.Groups["py"].Value),
-                                                       Convert.ToSingle(m.Groups["pz"].Value),
+                                Position = new Vector4(Convert.ToSingle(m.Groups["x"].Value),
+                                                       Convert.ToSingle(m.Groups["y"].Value),
+                                                       Convert.ToSingle(m.Groups["z"].Value),
                                                        1.0f),
                                 Color = new Color(Convert.ToInt32(m.Groups["c"].Value)).ToVector4()                                            
                           }).ToArray();
@@ -60,7 +60,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
 
             if(meshInfo.IndexCount > 0)
             {
-                short[] indexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("mesh/indices").Value, indexPattern)
+                short[] indexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("model/mesh/indices").Value, indexPattern)
                                      select Convert.ToInt16(m.Groups[0].Value)).ToArray();
                 BufferDescription indexBufferDesc = new BufferDescription();
                 indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
@@ -78,7 +78,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Interop
             Mesh mesh = new Mesh(game, meshDesc);
             Model model = new Model(game);
             model.Mesh = mesh;
-            model.Effect = new BasicGameEffect(effect);
+            model.Effect = effect;
 
             return model;
         }

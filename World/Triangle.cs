@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CipherPark.AngelJacket.Core.Utils.Interop;
 using SharpDX;
 using SharpDX.Direct3D11;
+using DXBuffer = SharpDX.Direct3D11.Buffer;
 
 namespace CipherPark.AngelJacket.Core.World
 {
@@ -16,7 +17,7 @@ namespace CipherPark.AngelJacket.Core.World
         private BasicEffect _effect = null;
         //private TriEffect _effect = null;
         private IGameApp _app = null;
-        private Mesh<VertexPositionColor> _mesh = null;
+        private Mesh _mesh = null;
 
         public Triangle(IGameApp app)
         {
@@ -38,12 +39,14 @@ namespace CipherPark.AngelJacket.Core.World
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
             vertexBufferDesc.SizeInBytes = verts.Length * VertexPositionColor.ElementSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-            vertexBufferDesc.StructureByteStride = 0;
-            meshDesc.VertexBufferDescription = vertexBufferDesc;
+            vertexBufferDesc.StructureByteStride = 0;            
+            DXBuffer vBuffer = DXBuffer.Create<VertexPositionColor>(app.GraphicsDevice, verts, vertexBufferDesc);
+            meshDesc.VertexBuffer = vBuffer;
+            meshDesc.VertexCount = verts.Length;
             meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, VertexPositionColor.InputElements);
             meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
-            _mesh = new Mesh<VertexPositionColor>(app, meshDesc, verts); 
+            _mesh = new Mesh(app, meshDesc); 
         }
 
         public void Draw(long gameTime)

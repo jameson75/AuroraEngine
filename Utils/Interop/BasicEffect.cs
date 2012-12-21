@@ -9,7 +9,7 @@ using SharpDX.Direct3D11;
 
 namespace CipherPark.AngelJacket.Core.Utils.Interop
 {
-    class BasicEffect
+    public class BasicEffect
     {
         private IntPtr _nativeObject = IntPtr.Zero;
         private Device _device = null;
