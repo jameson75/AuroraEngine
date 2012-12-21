@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicGameApp.cs" />
-    <Compile Include="Utils\Interop\BasicEffect.cs" />
+    <Compile Include="Utils\Toolkit\BasicEffect.cs" />
     <Compile Include="World\Camera.cs" />
     <Compile Include="Module\GameLevel.cs" />
     <Compile Include="Module\GameLevelConfiguration.cs" />
@@ -130,23 +130,22 @@
     <Compile Include="Utils\ColorParser.cs" />
     <Compile Include="Utils\ControlInputState.cs" />
     <Compile Include="Utils\InputState.cs" />
-    <Compile Include="Utils\Interop\ContentImporter.cs" />
-    <Compile Include="Utils\Interop\MarshalHelper.cs" />
-    <Compile Include="Utils\Interop\SpriteBatch.cs" />
-    <Compile Include="Utils\Interop\SpriteFont.cs" />
-    <Compile Include="Utils\Interop\XMath.cs" />
+    <Compile Include="Utils\Toolkit\ContentImporter.cs" />
+    <Compile Include="Utils\Toolkit\MarshalHelper.cs" />
+    <Compile Include="Utils\Toolkit\SpriteBatch.cs" />
+    <Compile Include="Utils\Toolkit\SpriteFont.cs" />
+    <Compile Include="Utils\Toolkit\XMath.cs" />
     <Compile Include="Utils\ObservableDictionary.cs" />
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />
-    <Compile Include="World\AnimationSystem.cs" />
-    <Compile Include="World\Character.cs" />
-    <Compile Include="World\FXSystem.cs" />
+    <Compile Include="Systems\Animation\Animation.cs" />
+    <Compile Include="World\Model.cs" />
+    <Compile Include="Systems\Sequencer\Sequencer.cs" />
     <Compile Include="World\Triangle.cs" />
     <Compile Include="World\Mesh.cs" />
-    <Compile Include="World\Scene.cs" />
-    <Compile Include="World\SceneNode.cs" />
+    <Compile Include="World\Scene\Scene.cs" />
+    <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="World\TriEffect.cs" />
-    <Compile Include="World\Trigger.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

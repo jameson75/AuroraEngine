@@ -39,8 +39,8 @@ namespace CipherPark.AngelJacket.Core.Module
         public XAudio2 __audioDevice = null;
         private RunningState _levelRunningState = RunningState.Stopped;
         private int _levelStartTime = 0;
-        private AnimationSystem AnimationSystem = null;
-        private FXSystem FXSystem = null;
+        private AnimationClock AnimationSystem = null;
+        private Sequencer FXSystem = null;
         private UITree _uiTree = null;
         private bool _isInitialized = false;
         private bool _isLoaded = false;
@@ -48,7 +48,7 @@ namespace CipherPark.AngelJacket.Core.Module
         public GameLevel(IGameApp game) : base(game)
         {
             _scene = new Scene(game);
-            this.AnimationSystem = new AnimationSystem(game);
+            this.AnimationSystem = new AnimationClock(game);
             _uiTree = new UITree(game);
         }
 
