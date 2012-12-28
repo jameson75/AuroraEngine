@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.AngelJacket.Core.UI.Animation;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using CipherPark.AngelJacket.Core.Module;
 using SharpDX;
 
@@ -12,7 +13,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         #region Fields
         private IUIRoot _visualRoot = null;
-        private ControlEffect _effect = null;
         private IGameApp _game = null;
         private SpriteBatch _spriteBatch = null;
         //private bool _isInitialized = false;
@@ -372,7 +372,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 foreach (UIControl control in this)
                     if (control.Name == controlName)
-                        return control;
+                        return control;            
                 return null;
             }
             else

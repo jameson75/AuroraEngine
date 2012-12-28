@@ -12,11 +12,11 @@ using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.UI.Controls;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.Services;
 
-namespace CipherPark.AngelJacket.Core.World
+namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public class Model
     {

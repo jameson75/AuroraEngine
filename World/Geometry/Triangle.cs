@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using SharpDX;
 using SharpDX.Direct3D11;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
 
-namespace CipherPark.AngelJacket.Core.World
+namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public class Triangle
     {

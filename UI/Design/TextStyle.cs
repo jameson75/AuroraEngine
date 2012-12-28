@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using CipherPark.AngelJacket.Core.UI.Controls;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using CipherPark.AngelJacket.Core.Module;
 using SharpDX;
 

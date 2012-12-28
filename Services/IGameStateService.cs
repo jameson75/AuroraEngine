@@ -9,8 +9,7 @@ namespace CipherPark.AngelJacket.Core.Services
 {
     public class Player
     {
-        public bool Active { get; set; }
-        public ISceneObject Avatar { get; set; }
+        public bool Active { get; set; }        
         public bool HasControl { get; set; }        
     }
 
@@ -27,7 +26,7 @@ namespace CipherPark.AngelJacket.Core.Services
         }
     }
 
-    public interface IGlobalGameStateService
+    public interface IGameStateService
     {
         GameState State { get; }
     }

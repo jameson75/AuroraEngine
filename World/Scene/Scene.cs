@@ -15,7 +15,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public Scene(IGameApp game)
         {
             _game = game;
-            _nodes = new SceneNodes(this);
+            _nodes = new SceneNodes();
         }
 
         public IGameApp Game { get { return _game; } }

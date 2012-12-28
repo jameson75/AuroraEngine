@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls

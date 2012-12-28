@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 
-namespace CipherPark.AngelJacket.Core.Utils.Interop
+namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct XMFLOAT2

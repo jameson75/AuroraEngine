@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SharpDX;
+using SharpDX.Direct3D11;
+using CipherPark.AngelJacket.Core.Systems.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.Scene
 {
@@ -11,22 +14,26 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
     }
 
-    public abstract class SceneNode
+    public abstract class SceneNode : ITransformable
     {
         private IGameApp _game = null;
         private SceneNode _parent = null;
         private SceneNodes _children = null;
         
+        
         public SceneNode(IGameApp game)
         {
             _game = game;
-            _children = new SceneNodes(this);
+            _children = new SceneNodes();
+            Transform = new Transform { Translation = Vector3.Zero, Rotation = Quaternion.Identity };
         }
 
         public SceneNode Parent { get { return _parent; } set { _parent = value; } }
 
         public SceneNodes Children { get { return _children; } }
         
+        public Transform Transform { get; set; }
+
         [Obsolete]
         public ISceneObject SceneObject { get; set; }
 
@@ -36,17 +43,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     }
      
     public class SceneNodes :  System.Collections.ObjectModel.ObservableCollection<SceneNode>
-    {
-        private SceneNode _owner = null;
-
-        [Obsolete]
+    {   
         public SceneNodes()
-        { }
-
-        public SceneNodes(SceneNode owner)
-        {
-            _owner = owner;
-        }
+        { }    
        
         public void AddRange(IEnumerable<SceneNode> nodes)
         {
@@ -68,12 +67,12 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             : base(game)
         { }
 
-        public ModelSceneNode(Model model) : base(model.Game)
+        public ModelSceneNode(Geometry.Model model) : base(model.Game)
         {
             Model = model;
         }
 
-        public Model Model { get; set; }
+        public Geometry.Model Model { get; set; }
 
         public override void Draw(long gameTime)
         {

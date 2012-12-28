@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DirectInput;

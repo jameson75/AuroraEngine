@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace CipherPark.AngelJacket.Core.Utils.Interop
+namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 {
     static class MarshalHelper
     {

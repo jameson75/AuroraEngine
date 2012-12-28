@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (!HasDrawParameters)
                 Container.ControlSpriteBatch.Begin();
             else
-                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Interop.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);           
+                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);           
             Container.ControlSpriteBatch.DrawString(Font, Text == null ? string.Empty : Text, contentSurfacePosition.ToVector2(), FontColor);
             Container.ControlSpriteBatch.End();                        
         }

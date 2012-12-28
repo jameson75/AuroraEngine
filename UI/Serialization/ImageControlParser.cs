@@ -6,7 +6,7 @@ using System.IO;
 using System.Xml.Linq;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using System.Text.RegularExpressions;
 
 namespace CipherPark.AngelJacket.Core.UI.Design

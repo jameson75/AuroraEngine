@@ -23,7 +23,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private void CreateChildControls()
         {
-            Utils.Interop.SpriteFont tempSpriteFont = Utils.Interop.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
+            Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
             
             _textBox = new TextBox(this.VisualRoot, null, tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Yellow);
             _textBox.DivContainerId = Guid.NewGuid();

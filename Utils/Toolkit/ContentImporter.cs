@@ -12,15 +12,15 @@ using SharpDX.Direct3D;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using System.Xml.XPath;
-using CipherPark.AngelJacket.Core.World;
+using CipherPark.AngelJacket.Core.World.Geometry;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
 using System.Text.RegularExpressions;
 
-namespace CipherPark.AngelJacket.Core.Utils.Interop
+namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 {
     public static class ContentImporter
     {
-        private const string vertexPositionColorPattern = @"\G\s*(?<x>[0-9]+(?:\.[0-9]+)?)\s+(?<y>[0-9]+(?:\.[0-9]+)?)\s+(?<z>[0-9]+(?:\.[0-9]+)?)\s+(?<c>[0-9]+)\s*(?:,|$)";
+        private const string vertexPositionColorPattern = @"\G\s*(?<x>-?[0-9]+(?:\.[0-9]+)?)\s+(?<y>-?[0-9]+(?:\.[0-9]+)?)\s+(?<z>-?[0-9]+(?:\.[0-9]+)?)\s+(?<c>[0-9]+)\s*(?:,|$)";
         private const string indexPattern = @"\G\s*(?<i>[0-9]+)(?:\s+|$)";
 
         public static Model LoadModel(IGameApp game, string filePath) 

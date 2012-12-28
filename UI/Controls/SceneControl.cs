@@ -5,8 +5,9 @@ using System.Text;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.World;
+using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.AngelJacket.Core.World.Scene;
 using SharpDX;
 using SharpDX.Direct3D11;
 

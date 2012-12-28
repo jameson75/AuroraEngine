@@ -8,9 +8,9 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.AngelJacket.Core.Utils.Interop;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
-namespace CipherPark.AngelJacket.Core.World
+namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public class Mesh
     {

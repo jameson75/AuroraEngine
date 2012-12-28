@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
 
-namespace CipherPark.AngelJacket.Core.Utils.Interop
+namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 {
     public class SpriteBatch
     {

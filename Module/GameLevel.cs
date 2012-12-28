@@ -150,7 +150,7 @@ namespace CipherPark.AngelJacket.Core.Module
             //_bgMusic = Game.Content.Load<SoundEffect>(config.BackgroundMusicPath);
             //_bgMusicInstance = _bgMusic.CreateInstance();
            
-            CipherPark.AngelJacket.Core.Utils.Interop.VoiceData vd = CipherPark.AngelJacket.Core.Utils.Interop.ContentImporter.LoadVoiceDataFromWav(config.BackgroundMusicPath);
+            CipherPark.AngelJacket.Core.Utils.Toolkit.VoiceData vd = CipherPark.AngelJacket.Core.Utils.Toolkit.ContentImporter.LoadVoiceDataFromWav(config.BackgroundMusicPath);
             WaveFormat sourceVoiceFormat = WaveFormat.CreateCustomFormat((WaveFormatEncoding)vd.Format.FormatTag, (int)vd.Format.SamplesPerSec, (int)vd.Format.Channels, (int)vd.Format.AvgBytesPerSec, (int)vd.Format.BlockAlign, (int)vd.Format.BitsPerSample);
             __audioDevice = new XAudio2();
             __bgMusic = new MasteringVoice(__audioDevice);
