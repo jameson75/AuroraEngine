@@ -31,30 +31,39 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         private void Elements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            if(args.Action == NotifyCollectionChangedAction.Add)
-                foreach(FormElement newElement in args.NewItems)
-                    OnElementAdded(newElement);
-            else if(args.Action == NotifyCollectionChangedAction.Remove)
-                foreach(FormElement oldElement in args.OldItems)
-                    OnElementRemoved(oldElement);
+            OnLayoutChanged();
         }
 
-        protected virtual void OnElementAdded(FormElement newElement)
-        {
-
-        }
-
-        protected virtual void OnElementRemoved(FormElement oldElement)
-        {
-
-        }
+        protected virtual void OnLayoutChanged()
+        { }
     }
 
     public class GridForm : Form
     {
-        public DrawingSize Dimensions { get; set; }
-        public 
+        private Vector3 _dimensions = Vector3.Zero;
+        private Vector3 _elementDistance = Vector3.Zero;
 
+        public DrawingSize Dimensions 
+        {
+            get { return _dimensions; }
+            set
+            {
+                _dimensions = value;
+                OnLayoutChanged();
+            }
+        }
+
+        protected override void OnLayoutChanged()
+        {
+            for(int i = 0; i < (int)Dimensions.X; i++ )
+                for (int j = 0; j < (int)Dimensions.Y; j++)
+                    for (int k = 0; k < (int)Dimensions.Z; k++)
+                    {
+                        Vector3 elementOrigin = new Vector3(i * _elementDistance.X + _elementDistance.X * 0.5f, 
+                                                            j * _elementDistance.Y + _elementDistance.Y * 0.5f, 
+                                                            k * _elementDistance.Z + _elementDistance.Z * 0.5f);
+                    }
+        } 
     }
 
     public class FormElement
