@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicGameApp.cs" />
+    <Compile Include="Utils\ContentBuilder.cs" />
     <Compile Include="Utils\Toolkit\BasicEffect.cs" />
     <Compile Include="World\Camera.cs" />
     <Compile Include="Module\GameModule.cs" />
@@ -121,13 +122,12 @@
     <Compile Include="UI\Serialization\UIResourceParser.cs" />
     <Compile Include="UI\Serialization\UIStyleParser.cs" />
     <Compile Include="Utils\ColorParser.cs" />
-    <Compile Include="Utils\Toolkit\ControlInputState.cs" />
+    <Compile Include="Utils\ControlInputState.cs" />
     <Compile Include="Utils\InputState.cs" />
     <Compile Include="Utils\Toolkit\ContentImporter.cs" />
     <Compile Include="Utils\Toolkit\MarshalHelper.cs" />
     <Compile Include="Utils\Toolkit\SpriteBatch.cs" />
     <Compile Include="Utils\Toolkit\SpriteFont.cs" />
-    <Compile Include="Utils\Toolkit\XMath.cs" />
     <Compile Include="Utils\ObservableDictionary.cs" />
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />

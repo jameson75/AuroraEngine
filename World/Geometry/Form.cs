@@ -10,29 +10,28 @@ using System.Collections.Specialized;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public abstract class Form
+    public abstract class Form : Model
     {
-        ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();
-        public ObservableCollection<FormElement> Elements { get { return _elements; } }
+        private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();            
 
-        public Form()
+        public Form(IGameApp game) : base(game)
         {
-            _elements.CollectionChanged+= Elements_CollectionChanged;
+            
         }
 
-        public void Draw(long gameTime)
+        public override void Draw(long gameTime)
         {
+            this.Effect.SetView(Camera.ViewMatrix);
+            this.Effect.SetProjection(Camera.ProjectionMatrix);
             foreach (FormElement element in _elements)
             {
-                element.Model.Transform = this.Transform * element.Transform;
-                element.Model.Draw(gameTime);
+                this.Effect.SetWorld(this.Transform * element.Transform);               
+                this.Effect.Apply();
+                Mesh.Draw(gameTime);
             }                
-        }
-
-        private void Elements_CollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            OnLayoutChanged();
-        }
+        }    
+        
+        protected ObservableCollection<FormElement> Elements { get { return _elements; } }      
 
         protected virtual void OnLayoutChanged()
         { }
@@ -41,34 +40,75 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class GridForm : Form
     {
         private Vector3 _dimensions = Vector3.Zero;
-        private Vector3 _elementDistance = Vector3.Zero;
+        private Vector3 _cellSpacining = Vector3.Zero;
 
-        public DrawingSize Dimensions 
+        public GridForm(IGameApp game)
+            : base(game)
+        { }
+
+        public GridForm(IGameApp game, Vector3 dimensions, Vector3 cellSpacing) : base(game)
+        {
+            _dimensions = dimensions;
+            _cellSpacining = cellSpacing;
+            GenerateElements();
+        }
+
+        public Vector3 Dimensions 
         {
             get { return _dimensions; }
             set
             {
                 _dimensions = value;
-                OnLayoutChanged();
+                GenerateElements();                
+            }
+        }
+
+        public Vector3 CellSpacing
+        {
+            get { return _cellSpacining; }
+            set
+            {
+                _cellSpacining = value;
+                GenerateElements();                
             }
         }
 
         protected override void OnLayoutChanged()
+        {         
+            int i = 0;
+            foreach (FormElement element in Elements)
+            {
+                int xIndex = i % (int)Dimensions.X;
+                int zIndex = i / (int)Dimensions.X;
+                int yIndex = i / ((int)Dimensions.X * (int)Dimensions.Z);
+                Vector3 elementOrigin = new Vector3();
+                elementOrigin.X = ((xIndex * CellSpacing.X) + (CellSpacing.X * 0.5f));
+                elementOrigin.Y = ((yIndex * CellSpacing.Y) + (CellSpacing.Y * 0.5f));
+                elementOrigin.Z = ((zIndex * CellSpacing.Z) + (CellSpacing.Z * 0.5f));
+                element.Transform = Matrix.Translation(elementOrigin);
+                i++;
+            }
+        }
+
+        private void GenerateElements()
         {
-            for(int i = 0; i < (int)Dimensions.X; i++ )
-                for (int j = 0; j < (int)Dimensions.Y; j++)
-                    for (int k = 0; k < (int)Dimensions.Z; k++)
-                    {
-                        Vector3 elementOrigin = new Vector3(i * _elementDistance.X + _elementDistance.X * 0.5f, 
-                                                            j * _elementDistance.Y + _elementDistance.Y * 0.5f, 
-                                                            k * _elementDistance.Z + _elementDistance.Z * 0.5f);
-                    }
-        } 
+            Elements.Clear();
+            int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);
+            for (int i = 0; i < elementCount; i++)
+                Elements.Add(new FormElement(this));    
+            OnLayoutChanged();
+        }
     }
 
     public class FormElement
     {
-        public Model Model { get; set; }
+        public Form _form = null;
+        public FormElement(Form form)
+        {
+            _form = form;
+            Transform = Matrix.Identity;
+        }
+        public Form Form { get { return _form; } }
         public Matrix Transform { get; set; }
     }
 }

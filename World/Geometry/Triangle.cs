@@ -54,13 +54,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _effect.SetWorld(Transform);
             _effect.SetView(Camera.ViewMatrix);
             _effect.SetProjection(Camera.ProjectionMatrix);
-            //_effect.World = Matrix.Identity;
-            //_effect.View = Camera.ViewMatrix;
-            //_effect.Projection = Camera.ProjectionMatrix;
-            _effect.Apply();
-            RasterizerStateDescription stateDesc = this._app.GraphicsDeviceContext.Rasterizer.State.Description;
-            stateDesc.CullMode = CullMode.None;
-            this._app.GraphicsDeviceContext.Rasterizer.State = new RasterizerState(_app.GraphicsDevice, stateDesc);
+            _effect.Apply();            
             _mesh.Draw(gameTime);
         }
     }

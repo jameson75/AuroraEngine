@@ -27,6 +27,7 @@ namespace CipherPark.AngelJacket.Core.World
         public IGameApp Game { get { return _game; } }
         
         public Matrix ViewMatrix { get; set; }
+        
         public Matrix ProjectionMatrix { get; set; }
     }
 }

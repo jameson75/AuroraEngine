@@ -105,13 +105,13 @@ namespace CipherPark.AngelJacket.Core.Systems.Animation
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
             DrawingSizeF frameVal0 = (f0.Value != null) ? (DrawingSizeF)f0.Value : Utils.DrawingSizeFExtension.Zero;
-            DrawingSizeF frameVal1 = (f1 != null && f1.Value != null) ? (DrawingSizeF)f0.Value : Utils.DrawingSizeFExtension.Zero;
+            DrawingSizeF frameVal1 = (f1 != null && f1.Value != null) ? (DrawingSizeF)f1.Value : Utils.DrawingSizeFExtension.Zero;
             if (f1 == null)
                 return frameVal0;
             else
             {
                 float pctT = (float)(t - f0.Time) / (float)(f1.Time - f0.Time);
-                if (f0.InterpolationCurve != null && f0.InterpolationCurve.Length != 0)
+                if (f0.InterpolationCurve == null || f0.InterpolationCurve.Length == 0)
                 {
                     float w = (float)Lerp(frameVal0.Width, frameVal1.Height, pctT);
                     float h = (float)Lerp(frameVal0.Width, frameVal1.Height, pctT);
@@ -138,13 +138,13 @@ namespace CipherPark.AngelJacket.Core.Systems.Animation
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
             DrawingPointF frameVal0 = (f0.Value != null) ? (DrawingPointF)f0.Value : Utils.DrawingPointFExtension.Zero;
-            DrawingPointF frameVal1 = (f1 != null && f1.Value != null) ? (DrawingPointF)f0.Value : Utils.DrawingPointFExtension.Zero;
+            DrawingPointF frameVal1 = (f1 != null && f1.Value != null) ? (DrawingPointF)f1.Value : Utils.DrawingPointFExtension.Zero;
             if (f1 == null)
                 return frameVal0;
             else
             {
                 float pctT = (float)(t - f0.Time) / (float)(f1.Time - f0.Time);
-                if (f0.InterpolationCurve != null && f0.InterpolationCurve.Length != 0)
+                if (f0.InterpolationCurve == null || f0.InterpolationCurve.Length == 0)
                 {
                     float x = (float)Lerp(frameVal0.X, frameVal1.Y, pctT);
                     float y = (float)Lerp(frameVal0.Y, frameVal1.Y, pctT);
@@ -186,7 +186,7 @@ namespace CipherPark.AngelJacket.Core.Systems.Animation
             else
             {
                 float pctT = (float)(t - f0.Time) / (float)(f1.Time - f0.Time);
-                if (f0.InterpolationCurve != null && f0.InterpolationCurve.Length != 0)
+                if (f0.InterpolationCurve == null || f0.InterpolationCurve.Length == 0)
                     return (float)Lerp(frameVal0, frameVal1, pctT);
                 else
                 {
@@ -213,20 +213,20 @@ namespace CipherPark.AngelJacket.Core.Systems.Animation
 
     public class TransformAnimation : Animation
     {
-        private long? _lastGameTime = null;
+        private long? _animationStartTime = null;
  
         public Transform GetValueAtT(ulong t)
         {
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
             Transform frameVal0 = (f0.Value != null) ? (Transform)f0.Value : Transform.Zero;
-            Transform frameVal1 = (f1 != null && f1.Value != null) ? (Transform)f0.Value : Transform.Zero;
+            Transform frameVal1 = (f1 != null && f1.Value != null) ? (Transform)f1.Value : Transform.Zero;
             if (f1 == null)
                 return frameVal0;
             else
             {
                 float pctT = (float)(t - f0.Time) / (float)(f1.Time - f0.Time);
-                if (f0.InterpolationCurve != null && f0.InterpolationCurve.Length != 0)
+                if (f0.InterpolationCurve == null || f0.InterpolationCurve.Length == 0)
                 {
                     Quaternion r = Quaternion.Lerp(frameVal0.Rotation, frameVal1.Rotation, pctT);
                     Vector3 x = Vector3.Lerp(frameVal0.Translation, frameVal1.Translation, pctT);
@@ -247,15 +247,15 @@ namespace CipherPark.AngelJacket.Core.Systems.Animation
 
         public void Start()
         {
-            _lastGameTime = null;
+            _animationStartTime = null;
         }
 
         public void UpdateAnimation(long gameTime, ITransformable transformable)
         {
-            if (_lastGameTime == null)
-                _lastGameTime = gameTime;
+            if (_animationStartTime == null)
+                _animationStartTime = gameTime;
 
-            ulong timeT = (ulong)(gameTime - _lastGameTime.Value);
+            ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
 
             transformable.Transform = this.GetValueAtT(timeT);
         }
@@ -267,8 +267,16 @@ namespace CipherPark.AngelJacket.Core.Systems.Animation
         private static Transform _identity = new Transform { Rotation = Quaternion.Identity, Translation = Vector3.Zero };
         public Quaternion Rotation { get; set; }
         public Vector3 Translation { get; set; }
+        public Matrix ToMatrix() { return Matrix.AffineTransformation(1.0f, Rotation, Translation); }
+        public static Transform FromMatrix(Matrix m)
+        {
+            Quaternion r = Quaternion.RotationMatrix(m);
+            Vector3 t = m.TranslationVector;
+            return new Transform() { Translation = t, Rotation = r };
+        }
         public static Transform Zero { get { return _zero; } }
         public static Transform Identity { get { return _identity; } }
+
     }
 
     public interface ITransformable

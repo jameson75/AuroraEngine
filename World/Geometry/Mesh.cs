@@ -51,7 +51,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, _vertexStride, 0));
             if (_indexBuffer != null)
             {
-                _app.GraphicsDeviceContext.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R32_UInt, 0);
+                _app.GraphicsDeviceContext.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R16_SInt, 0);
                 _app.GraphicsDeviceContext.DrawIndexed(_indexCount, 0, 0);
             }
             else

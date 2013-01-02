@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Systems.Animation;
+using CipherPark.AngelJacket.Core.World.Geometry;
 
 namespace CipherPark.AngelJacket.Core.World.Scene
 {
@@ -16,17 +18,18 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
     public abstract class SceneNode : ITransformable
     {
-        private IGameApp _game = null;
+        private Scene _scene = null;
         private SceneNode _parent = null;
-        private SceneNodes _children = null;
+        private SceneNodes _children = null;        
         
-        
-        public SceneNode(IGameApp game)
+        public SceneNode(Scene scene)
         {
-            _game = game;
+            _scene = scene;
             _children = new SceneNodes();
-            Transform = new Transform { Translation = Vector3.Zero, Rotation = Quaternion.Identity };
+            Transform = Transform.Identity;
         }
+
+        public Scene Scene { get { return _scene; } }
 
         public SceneNode Parent { get { return _parent; } set { _parent = value; } }
 
@@ -42,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public virtual void Update(long gameTime) { }
     }
      
-    public class SceneNodes :  System.Collections.ObjectModel.ObservableCollection<SceneNode>
+    public class SceneNodes :  ObservableCollection<SceneNode>
     {   
         public SceneNodes()
         { }    
@@ -56,45 +59,78 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
     public class NullSceneNode : SceneNode
     {
-        public NullSceneNode(IGameApp game)
-            : base(game)
+        public NullSceneNode(Scene scene)
+            : base(scene)
         { }
     }
 
     public class ModelSceneNode : SceneNode
     {
-        public ModelSceneNode(IGameApp game)
-            : base(game)
+        public ModelSceneNode(Scene scene)
+            : base(scene)
         { }
 
-        public ModelSceneNode(Geometry.Model model) : base(model.Game)
+        public ModelSceneNode(Scene scene, Model model) : base(scene)
         {
             Model = model;
         }
 
-        public Geometry.Model Model { get; set; }
+        public Model Model { get; set; }
 
         public override void Draw(long gameTime)
         {
             if (Model != null)
             {
+                Matrix cachedTransform = Model.Transform;
+                Model.Transform = Scene.WorldTransform.Transform * cachedTransform;            
                 Model.Draw(gameTime);
+                Model.Transform = cachedTransform;
             }
         }
     }
 
     public class CameraSceneNode : SceneNode
     {
-        
-        public CameraSceneNode(IGameApp game)
-            : base(game)
-        { }
+        private Matrix _cachedViewMatrix = Matrix.Zero;
 
-        public CameraSceneNode(Camera camera) : base(camera.Game)
+        public CameraSceneNode(Scene scene)
+            : base(scene)
         {
-            Camera = camera;
+            scene.BeginUpdate += Scene_BeginUpdate;
+            scene.EndDraw += Scene_EndDraw;
+        }
+        
+        public CameraSceneNode(Scene scene, Camera camera) : base(scene)
+        {
+            Camera = camera;           
+            scene.EndDraw += Scene_EndDraw; scene.BeginUpdate += Scene_BeginUpdate;
+            scene.EndDraw += Scene_EndDraw;
         }
 
         public Camera Camera { get; set; }
+
+        public override void Update(long gameTime)
+        {
+            if (Camera != null)
+            {                
+                Camera.ViewMatrix = Scene.WorldTransform.Transform * _cachedViewMatrix;
+            }
+        }
+
+        private void Scene_EndDraw(object sender, EventArgs e)
+        {
+            if (Camera != null)
+            {
+                Camera.ViewMatrix = _cachedViewMatrix;
+            }
+        }
+
+        private void Scene_BeginUpdate(object sender, EventArgs e)
+        {
+            if (Camera != null)
+            {
+                _cachedViewMatrix = Camera.ViewMatrix;
+            }
+        }
     }
 }

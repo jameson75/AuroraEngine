@@ -25,6 +25,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public Model(IGameApp game)
         {
             _game = game;
+            Transform = Matrix.Identity;
         }
 
         public IGameApp Game { get { return _game; } }
@@ -35,11 +36,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public Camera Camera { get; set; }
 
+        public Matrix Transform { get; set; }
+
         public virtual void Draw(long gameTime)
         {
             if (Effect != null)
             {
-                Effect.SetWorld(Matrix.Identity);
+                Effect.SetWorld(Transform);
                 Effect.SetView(Camera.ViewMatrix);
                 Effect.SetProjection(Camera.ProjectionMatrix);
                 Effect.Apply();
