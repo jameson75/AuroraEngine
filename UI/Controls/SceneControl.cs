@@ -139,7 +139,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(0, 0, mouseWheelDelta / 5);          
         }
 
-        protected void OnMouseMove(InputState.MouseButton[] mouseButtonsDown,DrawingPoint location)
+        protected void OnMouseMove(InputState.MouseButton[] mouseButtonsDown, DrawingPoint location)
         {         
             switch (EditorMode)
             {
@@ -150,11 +150,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                             //this.Cursor = Cursors.Cross;
                             if (mouseButtonsDown.Contains(InputState.MouseButton.Left))
                             {
+                                //get the offset between the last location we captured mouse movement and the current mouse location.
                                 Vector2 offset = Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
-                                Vector3 negatedTranslation = Vector3.Negate(CurrentCamera.ViewMatrix.TranslationVector);
+                                //negate the view matrix's translation vector and multiply it against the view matrix so that the view matrix becomes a rotation matrix about the origin.
+                                Vector3 negatedTranslation = Vector3.Negate(CurrentCamera.ViewMatrix.TranslationVector);                               
                                 CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(negatedTranslation);
+                                //if the verticle mouse movement results in a rotation about the z-axis, we rotate the camera around it's own z-axis (view-space z-axis).
+                                //We accomplish this by right multiplying the rotation about z before we re-apply the translations.
                                 if (rotateAboutZ)
                                 {      
+#if ENABLE_SCENE_CONTROL_ROTATION_RAY
                                     Vector2 zRotationOrigin = new Vector2(this.Bounds.Width / 2, this.Bounds.Height / 2);
                                     Vector2 zLocationVector = new Vector2(location.X, location.Y) - zRotationOrigin;
                                     Vector2 zMouseMoveFromVector = new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y) - zRotationOrigin;
@@ -163,12 +168,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                     double zRotation = Math.Acos(MathUtil.Clamp(Vector2.Dot(zLocationVector, zMouseMoveFromVector), -1.0f, 1.0f));
                                     double diff = Math.Atan2(zMouseMoveFromVector.Y, zMouseMoveFromVector.X) - Math.Atan2(zLocationVector.Y, zLocationVector.X);
                                     float factor = (diff > 0) ? 1 : -1;
-                                    //float zRotation(MathHelper.ToRadians(-offset.Y);
-                                    CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.RotationZ((float)zRotation * factor);
+#else
+                                    float zRotation = MathHelper.ToRadians(-offset.Y);
+#endif                                    
+                                    CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.RotationZ((float)zRotation * factor);                                    
                                 }
-                                else
+                                //otherwise, the verticle mouse movement results in a revolution of the camera about an axis, v, which passes through
+                                //the world origin and is parallel with the camera's (view-space) x-axis. We accomplish this 
+                                //by right multiplying the rotation about x before we re-apply the translations.
+                                else                            
                                     CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.RotationX(MathUtil.DegreesToRadians(offset.Y));
+                                //Reapply the translations we negated earlier.
                                 CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(Vector3.Negate(negatedTranslation));
+                                //if verticle mouse movement doesn't result in a rotation about the z-axis, we revolve the camera about the world's (world space) y-axis by
+                                //left multiplying a rotation about y, after reapplying the translations.
                                 if (!rotateAboutZ)
                                     CurrentCamera.ViewMatrix = Matrix.Multiply(Matrix.RotationY(MathUtil.DegreesToRadians(offset.X)), CurrentCamera.ViewMatrix);
                                 mouseMoveFrom = location;                                
