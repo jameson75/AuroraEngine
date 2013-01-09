@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.DirectInput;
 
@@ -16,6 +17,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         MouseButton[] _mouseButtonsPressed = null;
         long _stateUpdateTime = 0;
         IGameApp _game = null;
+        HwndMessageHook _messageHook = null;
 
         public InputState(IGameApp game)
         {
@@ -32,6 +34,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             _mouseButtonsDown = null;
             _mouseButtonsReleased = null;
             _mouseButtonsPressed = null;
+
+            if (_messageHook == null)
+            {
+                _messageHook = new HwndMessageHook();
+                _messageHook.Initialize(_game.DeviceHwnd);
+            }
 
             //Update Old/New Snapshots
             //------------------------
@@ -62,10 +70,13 @@ namespace CipherPark.AngelJacket.Core.Utils
             {
                 mouseStateWindow = new MouseStateWindow();
                 mouseStateWindow.OldState = _game.Mouse.GetCurrentState();
+                SetMouseCurrentPosition(mouseStateWindow.OldState);
             }
             else
                 mouseStateWindow.OldState = mouseStateWindow.NewState;
-            mouseStateWindow.NewState = _game.Mouse.GetCurrentState();            
+            mouseStateWindow.NewState = _game.Mouse.GetCurrentState();
+            SetMouseCurrentPosition(mouseStateWindow.NewState);          
+          
             
             //Update Mouse Press Time Stamps
             //------------------------------
@@ -306,6 +317,89 @@ namespace CipherPark.AngelJacket.Core.Utils
         //    public Dictionary<Keys, long> KeyPressTime { get { return _keyPressTime; } }
         //    public KeyboardStateWindow() { _keyPressTime = new Dictionary<Keys,long>(); }
         //}       
+
+        private void SetMouseCurrentPosition(MouseState state)
+        {
+            DrawingPoint mousePos = this.GetMousePosition();
+            state.X = mousePos.X;
+            state.Y = mousePos.Y;
+            state.Z = _messageHook.LastMouseWheelDelta;
+            _messageHook.LastMouseWheelDelta = 0;
+        }
+        
+        public DrawingPoint GetMousePosition()
+        {         
+            UnsafeNativeMethods.WIN32_POINT point;
+            if (!UnsafeNativeMethods.GetCursorPos(out point))
+                throw new InvalidOperationException("Failed retreiving win32 mouse coordinates.");
+
+            if(!UnsafeNativeMethods.ScreenToClient(this._game.DeviceHwnd, ref point))
+                throw new InvalidOperationException("Failed converting mouse position to client coordinates.");
+
+            return new DrawingPoint(point.X, point.Y);            
+        }
+
+        
+        private static class UnsafeNativeMethods
+        {
+            [StructLayout(LayoutKind.Sequential)]
+            public struct WIN32_POINT
+            {
+                public int X;
+                public int Y;
+            }
+
+            [DllImport("user32.dll")]
+            public static extern bool GetCursorPos(out WIN32_POINT point);
+
+            [DllImport("user32.dll")]
+            public static extern bool ScreenToClient(IntPtr hWnd, ref WIN32_POINT point);
+        }
+
+        private class HwndMessageHook
+        {
+            private const int WM_MOUSEWHEEL = 0x020A;
+            private delegate IntPtr WndProcDelegate(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+            private WndProcDelegate _hookWndProcDelegate = null;
+            private Delegate _originalWndProcDelegate = null;
+            public void Initialize(IntPtr hWnd)
+            {
+                _hookWndProcDelegate = new WndProcDelegate(WndProc);             
+                IntPtr hookWndProcFuncPtr = Marshal.GetFunctionPointerForDelegate(_hookWndProcDelegate);
+                IntPtr originalWndProcFuncPtr = (UnsafeNativeMethods.SetWindowLong(hWnd, UnsafeNativeMethods.GWL_WNDPROC, hookWndProcFuncPtr));
+                if (originalWndProcFuncPtr != IntPtr.Zero)
+                    _originalWndProcDelegate = Marshal.GetDelegateForFunctionPointer(originalWndProcFuncPtr, typeof(WndProcDelegate));
+                
+            }
+
+            private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
+            {
+                //OnWndProc(hWnd, msg, wParam, lParam);
+                switch (msg)
+                {
+                    case WM_MOUSEWHEEL:
+                        LastMouseWheelDelta = ((short)((int)wParam >> 16));
+                        break;
+                }
+                return (IntPtr)_originalWndProcDelegate.DynamicInvoke(hWnd, msg, wParam, lParam);
+            }
+
+            private static class UnsafeNativeMethods
+            {
+                public const int GWL_WNDPROC = -4;
+
+                [DllImport("user32.dll")]
+                public static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
+
+                [DllImport("user32.dll")]
+                public static extern IntPtr DefWindowProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam);
+
+                [DllImport("user32.dll")]
+                public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+            }
+
+            public int LastMouseWheelDelta { get; set; }
+        }
     }
 
     public enum ButtonState

@@ -76,7 +76,7 @@ namespace CipherPark.AngelJacket.Core
 
         private void InitializeDirectXResources(Form form)
         {
-            _deviceHwnd = form.Handle;
+            _deviceHwnd = form.Handle;            
 
             //Initialize Direct3D11 Resources.
             //--------------------------------
@@ -192,6 +192,6 @@ namespace CipherPark.AngelJacket.Core
                 return (includeStencil) ? Format.D32_Float_S8X24_UInt : Format.D32_Float;
             else
                 return (includeStencil) ? Format.D24_UNorm_S8_UInt : Format.D16_UNorm;
-        }                
+        }
     }
 }

@@ -44,9 +44,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                                                        1.0f),
                                 Color = new Color(Convert.ToInt32(m.Groups["c"].Value)).ToVector4()                                            
                           }).ToArray();
-            BasicEffect effect = new BasicEffect(game.GraphicsDevice);
-            effect.SetWorld(Matrix.Identity);
-            effect.SetVertexColorEnabled(true);
+            BasicEffectEx effect = new BasicEffectEx(game.GraphicsDevice);
+            effect.World = Matrix.Identity;
+            effect.EnableVertexColor = true;
             byte[] shaderCode = effect.SelectShaderByteCode();        
 
             MeshDescription meshDesc = new MeshDescription();

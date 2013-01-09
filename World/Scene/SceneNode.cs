@@ -26,6 +26,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         {
             _scene = scene;
             _children = new SceneNodes();
+            _children.CollectionChanged += Children_CollectionChanged;
             Transform = Transform.Identity;
         }
 
@@ -43,6 +44,51 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public virtual void Draw(long gameTime) { }
 
         public virtual void Update(long gameTime) { }
+
+        public Matrix LocalToWorld(Matrix localTransform)
+        {
+            MatrixStack stack = new MatrixStack();
+            SceneNode node = this;
+            while (node != null)
+            {
+                stack.Push(node.Transform.ToMatrix());
+                node = node.Parent;
+            }
+            return stack.Transform;
+        }
+
+        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    foreach (SceneNode child in args.NewItems)
+                        OnChildAdded(child);
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    foreach (SceneNode child in args.OldItems)
+                        OnChildRemoved(child);
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    OnChildReset();
+                    break;
+            }
+        }
+
+        protected void OnChildAdded(SceneNode child)
+        {
+            if (child.Parent != this)
+                child.Parent = this;
+        }
+
+        protected void OnChildRemoved(SceneNode child)
+        {
+            if (child.Parent != this)
+                child.Parent = this;
+        }
+
+        protected void OnChildReset()
+        { }
     }
      
     public class SceneNodes :  ObservableCollection<SceneNode>
@@ -81,10 +127,11 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         {
             if (Model != null)
             {
-                Matrix cachedTransform = Model.Transform;
-                Model.Transform = Scene.WorldTransform.Transform * cachedTransform;            
+                Model.Effect.World = LocalToWorld(this.Transform.ToMatrix());
+                Model.Effect.View = Scene.Camera.ViewMatrix;
+                Model.Effect.Projection = Scene.Camera.ProjectionMatrix;
+                Model.Effect.Apply();
                 Model.Draw(gameTime);
-                Model.Transform = cachedTransform;
             }
         }
     }
@@ -113,7 +160,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         {
             if (Camera != null)
             {                
-                Camera.ViewMatrix = Scene.WorldTransform.Transform * _cachedViewMatrix;
+                //TODO: Figure out how to use
+                //if(Camera.LockonTarget != null )
+                Camera.ViewMatrix = Matrix.Translation(-LocalToWorld(Transform.ToMatrix()).TranslationVector) * _cachedViewMatrix;
             }
         }
 

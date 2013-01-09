@@ -40,14 +40,10 @@ namespace CipherPark.AngelJacket.Core.Systems.Animation
         {            
             for (int i = _keyFrames.Count - 1; i >= 0; i--)
             {
-                if (_keyFrames[_keyFrames.Keys[i]].Time > timeT)
-                    return _keyFrames[_keyFrames.Keys[i - 1]];
+                if (_keyFrames[_keyFrames.Keys[i]].Time <= timeT)
+                    return _keyFrames[_keyFrames.Keys[i]];
             }
-            if (_keyFrames.Count != 0 &&
-                _keyFrames[0].Time <= timeT)
-                return _keyFrames[0];
-            else
-                return null;
+            throw new InvalidOperationException("No key frame exist for specified time t");
         }
 
         public AnimationKeyFrame GetNextKeyFrame(AnimationKeyFrame keyFrame)

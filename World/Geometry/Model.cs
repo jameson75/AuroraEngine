@@ -21,35 +21,44 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class Model
     {
         private IGameApp _game = null;
-
+       
         public Model(IGameApp game)
         {
-            _game = game;
-            Transform = Matrix.Identity;
+            _game = game;           
+            //Transform = Matrix.Identity;
         }
 
         public IGameApp Game { get { return _game; } }
 
         public Mesh Mesh { get; set; }
+       
+        //public BasicEffect Effect { get; set; }
 
-        public BasicEffect Effect { get; set; }
+        public BasicEffectEx Effect { get; set; }
 
-        public Camera Camera { get; set; }
+        //public Camera Camera { get; set; }
 
-        public Matrix Transform { get; set; }
+        //public Matrix Transform { get; set; }
+
+        //public void ApplyEffect()
+        //{
+        //    _effect.Apply(_effectParameters);
+        //}
 
         public virtual void Draw(long gameTime)
         {
-            if (Effect != null)
-            {
-                Effect.SetWorld(Transform);
-                Effect.SetView(Camera.ViewMatrix);
-                Effect.SetProjection(Camera.ProjectionMatrix);
-                Effect.Apply();
-            }
-
+            //if (Effect != null)
+            //{
+            //    Effect.SetWorld(Transform);
+            //    Effect.SetView(Camera.ViewMatrix);
+            //    Effect.SetProjection(Camera.ProjectionMatrix);
+            //    Effect.Apply();
+            //}
+            //Effect.Apply();
             if (Mesh != null)
                 Mesh.Draw(gameTime);
-        }        
+        } 
     }
+
+   
 }

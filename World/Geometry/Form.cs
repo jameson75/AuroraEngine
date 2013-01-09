@@ -21,14 +21,18 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public override void Draw(long gameTime)
         {
-            this.Effect.SetView(Camera.ViewMatrix);
-            this.Effect.SetProjection(Camera.ProjectionMatrix);
+            //this.Effect.SetView(Camera.ViewMatrix);
+            //this.Effect.SetProjection(Camera.ProjectionMatrix);
+            Matrix formTransform = this.Effect.World;
             foreach (FormElement element in _elements)
             {
-                this.Effect.SetWorld(this.Transform * element.Transform);               
+                //this.Effect.SetWorld(this.Transform * element.Transform);               
+                this.Effect.World = formTransform * element.Transform;
                 this.Effect.Apply();
                 Mesh.Draw(gameTime);
-            }                
+            }
+            this.Effect.World = formTransform;
+            this.Effect.Apply();
         }    
         
         protected ObservableCollection<FormElement> Elements { get { return _elements; } }      

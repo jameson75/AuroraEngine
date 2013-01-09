@@ -24,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public IGameApp Game { get { return _game; } }
         public SceneNodes Nodes { get { return _nodes; } }
-        public MatrixStack WorldTransform { get { return _worldTransformStack; } }
+        public Camera Camera { get; set; }
 
         public void Update(long gameTime)
         {
@@ -42,22 +42,18 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             OnEndDraw();
         }
         
-        private void _UpdateNodeHierarchy(long gameTime, SceneNode parent)
-        {
-            parent.Update(gameTime);
-            _worldTransformStack.Push(parent.Transform.ToMatrix());
-            foreach (SceneNode child in parent.Children)
-                _UpdateNodeHierarchy(gameTime, child);
-            _worldTransformStack.Pop();
+        private void _UpdateNodeHierarchy(long gameTime, SceneNode node)
+        {       
+            node.Update(gameTime);            
+            foreach (SceneNode child in node.Children)
+                _UpdateNodeHierarchy(gameTime, child);           
         }
 
-        private void _DrawNodeHierarchy(long gameTime, SceneNode parent)
-        { 
-            _worldTransformStack.Push(parent.Transform.ToMatrix());
-            parent.Draw(gameTime);           
-            foreach (SceneNode child in parent.Children)
+        private void _DrawNodeHierarchy(long gameTime, SceneNode node)
+        {            
+            node.Draw(gameTime);           
+            foreach (SceneNode child in node.Children)
                 _DrawNodeHierarchy(gameTime, child);
-            _worldTransformStack.Pop();
         }
 
         protected virtual void OnBeginDraw()

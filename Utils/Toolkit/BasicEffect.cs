@@ -13,6 +13,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
     {
         private IntPtr _nativeObject = IntPtr.Zero;
         private Device _device = null;
+        private Matrix _world = Matrix.Zero;
+        private Matrix _view = Matrix.Zero;
+        private Matrix _projection = Matrix.Zero;
 
         public IntPtr NativeObject
         {
@@ -37,7 +40,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public void Apply()
         {
             UnsafeNativeMethods.Apply(_nativeObject, _device.ImmediateContext.NativePointer);
-        }
+        }       
        
         public byte[] SelectShaderByteCode()
         {
@@ -51,14 +54,14 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 Marshal.Copy(bytePtr, bytes, 0, (int)sizeRef);
             }
             return bytes;
-        }
+        }       
 
         public void SetWorld(Matrix world)
         {
             UnsafeNativeMethods.SetWorld(_nativeObject, world.ToArray());
         }
        
-        public  void SetView(Matrix world)
+        public void SetView(Matrix world)
         {
             UnsafeNativeMethods.SetView(_nativeObject, world.ToArray());
         }
@@ -250,6 +253,70 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
             [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetTexture")]
              public static extern void SetTexture(IntPtr basicEffect, IntPtr value);
+        }
+    }
+
+    public class BasicEffectEx
+    {
+        private Matrix _world;
+        private Matrix _view;
+        private Matrix _projection;
+        private BasicEffect _effect = null;
+        private bool _enableVertexColor = false;
+
+        public BasicEffectEx(Device device) 
+        {
+            _effect = new BasicEffect(device);
+        }
+
+        public Matrix World
+        {
+            get { return _world; }
+            set
+            {
+                _world = value;
+                _effect.SetWorld(_world);
+            }
+        }
+
+        public Matrix View
+        {
+            get { return _view; }
+            set
+            {
+                _view = value;
+                _effect.SetView(_view);
+            }
+        }
+
+        public Matrix Projection
+        {
+            get { return _projection; }
+            set
+            {
+                _projection = value;
+                _effect.SetProjection(_projection);
+            }
+        }       
+
+        public bool EnableVertexColor
+        {
+            get { return _enableVertexColor; }
+            set
+            {
+                _enableVertexColor = value;
+                _effect.SetVertexColorEnabled(_enableVertexColor);
+            }
+        }
+
+        public void Apply()
+        {
+            _effect.Apply();
+        }
+
+        public byte[] SelectShaderByteCode()
+        {
+            return _effect.SelectShaderByteCode();
         }
     }
 }

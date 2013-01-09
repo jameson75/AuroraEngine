@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SharpDX;
+using CipherPark.AngelJacket.Core.World.Geometry;
 
 namespace CipherPark.AngelJacket.Core.World
 {
@@ -27,6 +28,8 @@ namespace CipherPark.AngelJacket.Core.World
         public IGameApp Game { get { return _game; } }
         
         public Matrix ViewMatrix { get; set; }
+
+        public Model LockonTarget { get; set; }
         
         public Matrix ProjectionMatrix { get; set; }
     }

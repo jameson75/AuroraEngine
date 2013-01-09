@@ -77,6 +77,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public ReferenceGrid(IGameApp app, DrawingSizeF gridSize, Vector2 gridSteps, Color4 color)
         {
+            Transform = Matrix.Identity;
+
             //*******************************************************************
             //TODO: Port this logic into a static ReferenceGrid.Create() method.*
             //*******************************************************************
@@ -133,7 +135,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public void Draw(long gameTime)
         {
-            _effect.SetWorld(Matrix.Identity);
+            _effect.SetWorld(Transform);
             _effect.SetView(Camera.ViewMatrix);
             _effect.SetProjection(Camera.ProjectionMatrix);
             _effect.Apply();
@@ -141,6 +143,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
 
         public Camera Camera { get; set; }
+
+        public Matrix Transform { get; set; }
     }
 
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
