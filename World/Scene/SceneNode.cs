@@ -36,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public SceneNodes Children { get { return _children; } }
         
-        public Transform Transform { get; set; }
+        public virtual Transform Transform { get; set; }
 
         [Obsolete]
         public ISceneObject SceneObject { get; set; }
@@ -147,6 +147,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             scene.EndDraw += Scene_EndDraw;
         }
         
+        public SceneNode LockOnTarget { get; set; }
+
         public CameraSceneNode(Scene scene, Camera camera) : base(scene)
         {
             Camera = camera;           
@@ -161,8 +163,16 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             if (Camera != null)
             {                
                 //TODO: Figure out how to use
-                //if(Camera.LockonTarget != null )
-                Camera.ViewMatrix = Matrix.Translation(-LocalToWorld(Transform.ToMatrix()).TranslationVector) * _cachedViewMatrix;
+                if (this.LockOnTarget != null)
+                {
+                    Matrix targetTransform = LockOnTarget.LocalToWorld(LockOnTarget.Transform.ToMatrix());
+                    Matrix cameraTransform = LocalToWorld(this.Transform.ToMatrix());
+                    Vector3 worldViewFrom = -(Camera.ViewMatrix * Matrix.Invert(Camera.ViewMatrix * Matrix.Translation(-Camera.ViewMatrix.TranslationVector))).TranslationVector + cameraTransform.TranslationVector;
+                    Vector3 targetWorldPosition = (targetTransform * Matrix.Invert(targetTransform * Matrix.Translation(-targetTransform.TranslationVector))).TranslationVector;
+                    Camera.ViewMatrix = Matrix.LookAtLH(worldViewFrom, targetWorldPosition, Vector3.UnitY);
+                }
+                else 
+                    Camera.ViewMatrix = Matrix.Translation(-LocalToWorld(Transform.ToMatrix()).TranslationVector) * _cachedViewMatrix;
             }
         }
 

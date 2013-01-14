@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.World
         
         public Matrix ViewMatrix { get; set; }
 
-        public Model LockonTarget { get; set; }
+        //public Model LockonTarget { get; set; }
         
         public Matrix ProjectionMatrix { get; set; }
     }
