@@ -131,15 +131,15 @@
     <Compile Include="Utils\ObservableDictionary.cs" />
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />
-    <Compile Include="Systems\Animation\Animation.cs" />
+    <Compile Include="Animation\Animation.cs" />
     <Compile Include="World\Geometry\Form.cs" />
     <Compile Include="World\Geometry\Model.cs" />
-    <Compile Include="Systems\Sequencer\Sequencer.cs" />
+    <Compile Include="Sequencer\Sequencer.cs" />
     <Compile Include="World\Geometry\Triangle.cs" />
     <Compile Include="World\Geometry\Mesh.cs" />
     <Compile Include="World\Scene\Scene.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
-    <Compile Include="World\TriEffect.cs" />
+    <Compile Include="Sandbox\TestEffect.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

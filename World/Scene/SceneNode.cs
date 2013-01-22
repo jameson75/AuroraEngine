@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Systems.Animation;
+using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.World.Geometry;
 
 namespace CipherPark.AngelJacket.Core.World.Scene

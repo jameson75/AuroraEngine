@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using CipherPark.AngelJacket.Core.Module;
 
-namespace CipherPark.AngelJacket.Core.Systems.Sequencer
+namespace CipherPark.AngelJacket.Core.Sequencer
 {
     public class Sequencer
     {

@@ -94,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             int nVertices = 2 * ( xSteps + zSteps );
             float xStepSize = (float)gridSize.Width / (gridSteps.X - 1);
             float zStepSize = (float)gridSize.Height / (gridSteps.Y - 1);
-            VertexPositionColor[] vertices = new VertexPositionColor[nVertices];
+            BasicVertexPositionColor[] vertices = new BasicVertexPositionColor[nVertices];
             Vector3 vOrigin = new Vector3(-halfWidth, 0f, halfHeight);
             Vector3 vBackRight = new Vector3(gridSize.Width - halfWidth, 0f, halfHeight);
             Vector3 vFrontLeft = new Vector3(-halfWidth, 0f, -gridSize.Height + halfHeight);
@@ -102,8 +102,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Vector3 vx2 = vFrontLeft;
             for (int i = 0; i < xSteps; i++)
             {
-                vertices[i * 2] = new VertexPositionColor(vx1, Color.Gray.ToVector4());
-                vertices[i * 2 + 1] = new VertexPositionColor(vx2, Color.Gray.ToVector4());
+                vertices[i * 2] = new BasicVertexPositionColor(vx1, Color.Gray.ToVector4());
+                vertices[i * 2 + 1] = new BasicVertexPositionColor(vx2, Color.Gray.ToVector4());
                 vx1 += new Vector3(xStepSize, 0f, 0f);
                 vx2 += new Vector3(xStepSize, 0f, 0f);
             }
@@ -112,8 +112,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Vector3 vz2 = vBackRight;
             for (int i = 0; i < zSteps; i++)
             {
-                vertices[i * 2 + k] = new VertexPositionColor(vz1, Color.Gray.ToVector4());
-                vertices[i * 2 + 1 + k] = new VertexPositionColor(vz2, Color.Gray.ToVector4());
+                vertices[i * 2 + k] = new BasicVertexPositionColor(vz1, Color.Gray.ToVector4());
+                vertices[i * 2 + 1 + k] = new BasicVertexPositionColor(vz2, Color.Gray.ToVector4());
                 vz1 += new Vector3(0f, 0f, -zStepSize);
                 vz2 += new Vector3(0f, 0f, -zStepSize);
             }
@@ -122,13 +122,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
-            vertexBufferDesc.SizeInBytes = vertices.Length * VertexPositionColor.ElementSize;
+            vertexBufferDesc.SizeInBytes = vertices.Length * BasicVertexPositionColor.ElementSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
             meshDesc.VertexCount = vertices.Length;
-            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(app.GraphicsDevice, vertices, vertexBufferDesc);
-            meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, VertexPositionColor.InputElements);
-            meshDesc.VertexStride = VertexPositionColor.ElementSize;
+            meshDesc.VertexBuffer = DXBuffer.Create<BasicVertexPositionColor>(app.GraphicsDevice, vertices, vertexBufferDesc);
+            meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, BasicVertexPositionColor.InputElements);
+            meshDesc.VertexStride = BasicVertexPositionColor.ElementSize;
             meshDesc.Topology = PrimitiveTopology.LineList;
             _mesh = new Mesh(app, meshDesc);           
         }
@@ -148,7 +148,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     }
 
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct VertexPositionColor
+    public struct BasicVertexPositionColor
     {       
         public Vector4 Position;
         public Vector4 Color;     
@@ -157,7 +157,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private  static int _elementSize = 0;
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
-        static VertexPositionColor()
+        static BasicVertexPositionColor()
         {
             _inputElements = new InputElement[]
              {
@@ -166,15 +166,77 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
              };
             _elementSize = 32;
         }        
-        public VertexPositionColor(Vector3 position)
+        public BasicVertexPositionColor(Vector3 position)
         {
             Position = new Vector4(position, 0);
             Color = SharpDX.Color.Transparent.ToVector4();
         }
-        public VertexPositionColor(Vector3 position, Vector4 color)
+        public BasicVertexPositionColor(Vector3 position, Vector4 color)
         {
             Position = new Vector4(position, 1.0f);
             Color = color;
+        }
+    }
+
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct BasicVertexPositionTexture
+    {
+        public Vector4 Position;
+        public Vector2 TextureCoord;
+
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+        static BasicVertexPositionTexture()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 16, 0)
+             };
+            _elementSize = 24;
+        }
+        public BasicVertexPositionTexture(Vector3 position)
+        {
+            Position = new Vector4(position, 0);
+            TextureCoord = Vector2.Zero; 
+        }
+        public BasicVertexPositionTexture(Vector3 position, Vector2 textureCoord)
+        {
+            Position = new Vector4(position, 1.0f);
+            TextureCoord = textureCoord;
+        }
+    }
+
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct ScreenVertexPositionTexture
+    {
+        public Vector2 Position;
+        public Vector2 TextureCoord;
+
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+        static ScreenVertexPositionTexture()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32_Float, 0, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 8, 0)
+             };
+            _elementSize = 16;
+        }
+        public ScreenVertexPositionTexture(Vector2 position)
+        {
+            Position = position;
+            TextureCoord = Vector2.Zero;
+        }
+        public ScreenVertexPositionTexture(Vector2 position, Vector2 textureCoord)
+        {
+            Position = position;
+            TextureCoord = textureCoord;
         }
     }
 }

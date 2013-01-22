@@ -5,7 +5,7 @@ using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
-using CipherPark.AngelJacket.Core.Systems.Animation;
+using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.Scene
 {
@@ -36,10 +36,12 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public void Draw(long gameTime)
         {
+            Camera.PostEffectChain.Begin(gameTime);
             OnBeginDraw();
             foreach (SceneNode node in Nodes)
                 _DrawNodeHierarchy(gameTime, node);
             OnEndDraw();
+            Camera.PostEffectChain.End(gameTime);
         }
         
         private void _UpdateNodeHierarchy(long gameTime, SceneNode node)

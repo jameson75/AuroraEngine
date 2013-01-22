@@ -7,7 +7,7 @@ using SharpDX.Direct3D11;
 
 using CipherPark.AngelJacket.Core.Module;
 
-namespace CipherPark.AngelJacket.Core.Systems.Animation
+namespace CipherPark.AngelJacket.Core.Animation
 {
     public class AnimationController
     {

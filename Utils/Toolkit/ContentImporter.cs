@@ -33,10 +33,10 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                                     VertexCount = Convert.ToInt32(element.Attribute("VertexCount").Value)                                   
                                 }).First();                                  
           
-            int vertexElementSize = VertexPositionColor.ElementSize;
-            InputElement[] vertexInputElements = VertexPositionColor.InputElements;            ;
-            VertexPositionColor[] vertexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("model/mesh/vertices").Value, vertexPositionColorPattern)
-                          select new VertexPositionColor()
+            int vertexElementSize = BasicVertexPositionColor.ElementSize;
+            InputElement[] vertexInputElements = BasicVertexPositionColor.InputElements;            ;
+            BasicVertexPositionColor[] vertexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("model/mesh/vertices").Value, vertexPositionColorPattern)
+                          select new BasicVertexPositionColor()
                           {
                                 Position = new Vector4(Convert.ToSingle(m.Groups["x"].Value),
                                                        Convert.ToSingle(m.Groups["y"].Value),
@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             vertexBufferDesc.SizeInBytes = meshInfo.VertexCount * vertexElementSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0; 
-            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(game.GraphicsDevice, vertexData, vertexBufferDesc);
+            meshDesc.VertexBuffer = DXBuffer.Create<BasicVertexPositionColor>(game.GraphicsDevice, vertexData, vertexBufferDesc);
 
             if(meshInfo.IndexCount > 0)
             {
