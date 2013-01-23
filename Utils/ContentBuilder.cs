@@ -25,7 +25,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildQuad<BasicVertexPositionColor>(game, shaderByteCode, verts, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize);
         }
 
-        public static Mesh BuildQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Vector2[] textureCoords)
+        public static Mesh BuildTexturedQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Vector2[] textureCoords)
         {
             BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[6];
             verts[0] = new BasicVertexPositionTexture(new Vector3(dimension.Left, 0, dimension.Top), textureCoords[0]);
@@ -37,7 +37,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildQuad<BasicVertexPositionTexture>(game, shaderByteCode, verts, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize);
         }
 
-        public static Mesh BuildScreenQuad(IGameApp game, byte[] shaderByteCode)
+        public static Mesh BuildViewportQuad(IGameApp game, byte[] shaderByteCode)
         {
             Rectangle dimension = new Rectangle(-1, 1, 1, -1);
             Vector2[] textureCoords = { new Vector2( 0, 0 ), new Vector2( 1, 0 ), new Vector2( 1, 1 ), new Vector2( 0, 1 ) };

@@ -159,7 +159,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                 //We accomplish this by right multiplying the rotation about z before we re-apply the translations.
                                 if (rotateAboutZ)
                                 {      
-#if ENABLE_SCENE_CONTROL_ROTATION_RAY
+#if !DISABLE_SCENE_CONTROL_ROTATION_RAY
                                     Vector2 zRotationOrigin = new Vector2(this.Bounds.Width / 2, this.Bounds.Height / 2);
                                     Vector2 zLocationVector = new Vector2(location.X, location.Y) - zRotationOrigin;
                                     Vector2 zMouseMoveFromVector = new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y) - zRotationOrigin;
