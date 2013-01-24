@@ -533,11 +533,11 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             DataBox dataBox = _graphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             Matrix worldViewProjection = this.World * this.View * this.Projection;
             worldViewProjection.Transpose();
-            Utilities.Write<Matrix>(dataBox.DataPointer, ref worldViewProjection);
+            dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);                
             Vector4 vForegroundColor = ForegroundColor.ToVector4();
-            Utilities.Write<Vector4>(dataBox.DataPointer, ref vForegroundColor);
+            dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref vForegroundColor);
             Vector4 vBackgroundColor = BackgroundColor.ToVector4();
-            Utilities.Write<Vector4>(dataBox.DataPointer, ref vBackgroundColor);
+            dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref vBackgroundColor);
             _graphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
         }
     }

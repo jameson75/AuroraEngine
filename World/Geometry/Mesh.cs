@@ -168,7 +168,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }        
         public BasicVertexPositionColor(Vector3 position)
         {
-            Position = new Vector4(position, 0);
+            Position = new Vector4(position, 1.0f);
             Color = SharpDX.Color.Transparent.ToVector4();
         }
         public BasicVertexPositionColor(Vector3 position, Vector4 color)
@@ -199,7 +199,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
         public BasicVertexPositionTexture(Vector3 position)
         {
-            Position = new Vector4(position, 0);
+            Position = new Vector4(position, 1.0f);
             TextureCoord = Vector2.Zero; 
         }
         public BasicVertexPositionTexture(Vector3 position, Vector2 textureCoord)

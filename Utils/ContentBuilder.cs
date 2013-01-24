@@ -25,15 +25,16 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildQuad<BasicVertexPositionColor>(game, shaderByteCode, verts, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize);
         }
 
-        public static Mesh BuildTexturedQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Vector2[] textureCoords)
+        public static Mesh BuildTexturedQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Vector2[] textureCoords = null)
         {
             BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[6];
-            verts[0] = new BasicVertexPositionTexture(new Vector3(dimension.Left, 0, dimension.Top), textureCoords[0]);
-            verts[1] = new BasicVertexPositionTexture(new Vector3(dimension.Right, 0, dimension.Top), textureCoords[1]);
-            verts[2] = new BasicVertexPositionTexture(new Vector3(dimension.Right, 0, dimension.Bottom), textureCoords[2]);
-            verts[3] = new BasicVertexPositionTexture(new Vector3(dimension.Right, 0, dimension.Bottom), textureCoords[2]);
-            verts[4] = new BasicVertexPositionTexture(new Vector3(dimension.Left, 0, dimension.Bottom), textureCoords[3]);
-            verts[5] = new BasicVertexPositionTexture(new Vector3(dimension.Left, 0, dimension.Top), textureCoords[0]);
+            Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1) };
+            verts[0] = new BasicVertexPositionTexture(new Vector3(dimension.Left, 0, dimension.Top), _textureCoords[0]);
+            verts[1] = new BasicVertexPositionTexture(new Vector3(dimension.Right, 0, dimension.Top), _textureCoords[1]);
+            verts[2] = new BasicVertexPositionTexture(new Vector3(dimension.Right, 0, dimension.Bottom), _textureCoords[2]);
+            verts[3] = new BasicVertexPositionTexture(new Vector3(dimension.Right, 0, dimension.Bottom), _textureCoords[2]);
+            verts[4] = new BasicVertexPositionTexture(new Vector3(dimension.Left, 0, dimension.Bottom), _textureCoords[3]);
+            verts[5] = new BasicVertexPositionTexture(new Vector3(dimension.Left, 0, dimension.Top), _textureCoords[0]);
             return BuildQuad<BasicVertexPositionTexture>(game, shaderByteCode, verts, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize);
         }
 
