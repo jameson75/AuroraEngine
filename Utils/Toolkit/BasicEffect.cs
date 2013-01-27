@@ -438,8 +438,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public void Begin(long gameTime)
         {
             _originalRenderView = _game.GraphicsDeviceContext.OutputMerger.GetRenderTargets(1)[0];
-            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_textureRenderTarget);
+            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_game.DepthStencil, _textureRenderTarget);
             _game.GraphicsDeviceContext.ClearRenderTargetView(_textureRenderTarget, Color.Black);
+            _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
             _isEffectInProgress = true;
         }
 
@@ -449,9 +450,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             
             foreach (PostEffect postEffect in this)
             {
-                _game.GraphicsDeviceContext.OutputMerger.SetTargets(_auxTextureRenderTarget);
+                _game.GraphicsDeviceContext.OutputMerger.SetTargets(_game.DepthStencil, _auxTextureRenderTarget);
                 _game.GraphicsDeviceContext.ClearRenderTargetView(_auxTextureRenderTarget, Color.Black);
-                _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 0.0f, 0);
+                _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
                 
                 postEffect.Texture = _textureShaderResource;
                 postEffect.BeginDraw();
@@ -462,8 +463,8 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 Swap<RenderTargetView>(ref _textureRenderTarget, ref _auxTextureRenderTarget);
             }
                 
-            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalRenderView);            
-            _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 0.0f, 0);
+            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_game.DepthStencil, _originalRenderView);            
+            _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
             passThruEffect.Texture = _textureShaderResource;
             passThruEffect.BeginDraw();
             _quad.Draw(gameTime);

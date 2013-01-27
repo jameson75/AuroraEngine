@@ -42,7 +42,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                                                        Convert.ToSingle(m.Groups["y"].Value),
                                                        Convert.ToSingle(m.Groups["z"].Value),
                                                        1.0f),
-                                Color = new Color(Convert.ToInt32(m.Groups["c"].Value)).ToVector4()                                            
+                                Color = Color.Red.ToVector4() /*new Color(Convert.ToInt32(m.Groups["c"].Value)).ToVector4()*/                                           
                           }).ToArray();
             BasicEffectEx effect = new BasicEffectEx(game.GraphicsDevice);
             effect.World = Matrix.Identity;

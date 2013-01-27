@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using CipherPark.AngelJacket.Core.UI.Design;
 using CipherPark.AngelJacket.Core.UI.Controls;
 using CipherPark.AngelJacket.Core.Module;
+using SharpDX.Direct3D11;
 
 namespace CipherPark.AngelJacket.Core.UI.Components
 {
@@ -127,8 +128,18 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public void Draw(long gameTime)
         {
+            //******************************************************************************
+            // NOTE: When using the SpriteBatch, the DepthStencilState and RasterizerState
+            // resets so we cache them before drawing the control tree, then use it later.
+            //******************************************************************************
+            DepthStencilState oldState = Game.GraphicsDeviceContext.OutputMerger.DepthStencilState;
+            RasterizerState oldRasterizerState = Game.GraphicsDeviceContext.Rasterizer.State;
+            
             foreach (UIControl control in this.controls)
-                control.Draw(gameTime);                
+                control.Draw(gameTime);
+            
+            Game.GraphicsDeviceContext.OutputMerger.DepthStencilState = oldState;
+            Game.GraphicsDeviceContext.Rasterizer.State = oldRasterizerState;
         }      
 
         private void RegisterStandardParsers()

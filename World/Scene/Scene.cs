@@ -92,7 +92,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public event EventHandler EndUpdate;
     }
 
-    public class MatrixStack
+     public class MatrixStack
     {
         private List<Matrix> _innerList = new List<Matrix>();
 
@@ -129,6 +129,52 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             {
                 if (_innerList.Count == 0)
                     return Matrix.Identity;
+                else
+                    return _innerList.Last();
+            }
+        }
+    }
+
+    public class TransformStack
+    {
+        private List<Transform> _innerList = new List<Transform>();
+
+        public Transform Transform
+        {
+            get
+            {
+                Transform t = Transform.Identity;
+                foreach (Transform m in _innerList)
+                {
+                    t.Rotation *= m.Rotation;
+                    t.Translation += m.Translation;
+                }
+                return t;
+            }
+        }
+
+        public void Push(Transform t)
+        {
+            _innerList.Add(t);
+        }
+
+        public Transform Pop()
+        {
+            if (_innerList.Count == 0)
+                throw new InvalidOperationException("Transform stack is empty.");
+
+            int lastIndex = _innerList.Count - 1;
+            Transform m = _innerList[lastIndex];
+            _innerList.RemoveAt(lastIndex);
+            return m;
+        }
+
+        public Transform Top
+        {
+            get
+            {
+                if (_innerList.Count == 0)
+                    return Transform.Identity;
                 else
                     return _innerList.Last();
             }
