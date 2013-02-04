@@ -29,46 +29,49 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class SceneControl : UIControl
     {
-        private Camera _defaultCamera = null;
-        private Camera _currentCamera = null;
-        private Scene _scene = null;
+        //private Camera _defaultCamera = null;
+        //private Camera _currentCamera = null;
         private EditorMode EditorMode = EditorMode.None;
         private NavigationMode NavigationMode = NavigationMode.None;
         private RectangleF rotationRectangle = RectangleF.Empty;
         private float rotationEllipseDiameter = 0f;
         private DrawingPoint mouseMoveFrom = new DrawingPoint(0, 0);
         private bool rotateAboutZ = false;
+        private SceneNode _selectedNode = null;
 
         public SceneControl(IUIRoot visualRoot) : base(visualRoot)
         {
-            _defaultCamera = new Camera(visualRoot.Game,
-                                        Matrix.LookAtLH(new Vector3(0, 50, 100), new Vector3(0, 0, 0), Vector3.UnitY),
-                                        Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(45), this.DeviceAspectRatio, 1.0f, 1000.0f));
-            _currentCamera = _defaultCamera;
-            this.EditorMode = EditorMode.Select;
-            _scene = new Scene(visualRoot.Game);
+           // _defaultCamera = new Camera(visualRoot.Game,
+           //                             Matrix.LookAtLH(new Vector3(0, 50, 100), new Vector3(0, 0, 0), Vector3.UnitY),
+           //                             Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(45), this.DeviceAspectRatio, 1.0f, 1000.0f));
+            //_currentCamera = _defaultCamera;
+            this.EditorMode = EditorMode.Navigate;
+            this.NavigationMode = Controls.NavigationMode.Rotate;
         }
 
-        public Scene Scene { get { return _scene; } }
+        public Scene Scene { get; set; }
+
+        public SceneNode SelectedNode { get { return _selectedNode; } }
 
         public Camera CurrentCamera
         {
-            get { return _currentCamera; }
+            get { return Scene.Camera; }
         }
 
-        private float DeviceAspectRatio
-        {
-            get { return (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Width / (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Height; }
-        }
+        //private float DeviceAspectRatio
+        //{
+        //    get { return (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Width / (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Height; }
+        //}
 
         public override void Draw(long gameTime)
         {
+            Scene.Draw(gameTime);
             base.Draw(gameTime);
         }        
 
         protected override void OnSizeChanged()
         {
-            rotationEllipseDiameter = Math.Min(this.Bounds.Height, this.Bounds.Width) - 80f;
+            rotationEllipseDiameter = this.Bounds.Width / 3.0f;
             rotationRectangle = RectangleFExtension.CreateLTWH((this.Bounds.Width - rotationEllipseDiameter) / 2, (this.Bounds.Height - rotationEllipseDiameter) / 2, rotationEllipseDiameter, rotationEllipseDiameter);
             base.OnSizeChanged();
         }     
@@ -120,9 +123,44 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         mouseRay.Normalize();
                         System.Diagnostics.Trace.WriteLine(mousePointNear);
                         System.Diagnostics.Trace.WriteLine(mousePointFar);
+                        _selectedNode = SceneControl.PickNode(Scene.Nodes, mousePointNear, mousePointFar);
                     }
                     break;
             }
+        }
+
+        private static SceneNode PickNode(SceneNodes nodes, Vector3 near, Vector3 far)
+        {           
+            foreach(SceneNode node in nodes )
+            {
+                if (SceneControl.HitTestNode(node, near, far))
+                    return node;
+                else
+                {
+                    SceneNode pickedChild = PickNode(node.Children, near, far);
+                    if (pickedChild != null)
+                        return pickedChild;
+                }
+            }
+            return null;
+        }     
+
+        private static bool HitTestNode(SceneNode node, Vector3 near, Vector3 far)
+        {
+            //TODO: Modify this condition when I have suitable design-time entities
+            //for scene graph. The design-time node should lend it's self to hit testing
+            //or, at least, indicate it's hit testable.            
+            if (node is ModelSceneNode)
+            {          
+                Vector3 dir = far - near;
+                Ray ray = new Ray(near, dir);
+                World.Geometry.Model model = ((ModelSceneNode)node).Model;
+                BoundingBox wBoundingBox = BoundingBoxExtension.Transform(model.Mesh.BoundingBox, node.LocalToWorld(node.Transform).ToMatrix());
+                if (wBoundingBox.Intersects(ref ray))
+                    return true;                
+            }
+
+            return false;
         }
 
         protected void OnMouseUp(InputState.MouseButton mouseButton, DrawingPoint location)
@@ -151,7 +189,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                             if (mouseButtonsDown.Contains(InputState.MouseButton.Left))
                             {
                                 //get the offset between the last location we captured mouse movement and the current mouse location.
-                                Vector2 offset = Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
+                                Vector2 offset = -Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
                                 //negate the view matrix's translation vector and multiply it against the view matrix so that the view matrix becomes a rotation matrix about the origin.
                                 Vector3 negatedTranslation = Vector3.Negate(CurrentCamera.ViewMatrix.TranslationVector);                               
                                 CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(negatedTranslation);

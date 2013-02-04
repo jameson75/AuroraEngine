@@ -15,6 +15,7 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.Services;
+using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
@@ -28,9 +29,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             //Transform = Matrix.Identity;
         }
 
+        public string Name { get; set; }
+
         public IGameApp Game { get { return _game; } }
 
         public Mesh Mesh { get; set; }
+
+        public Transform Transform { get; set; }
        
         //public BasicEffect Effect { get; set; }
 

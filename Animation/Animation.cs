@@ -281,11 +281,21 @@ namespace CipherPark.AngelJacket.Core.Animation
         public Quaternion Rotation { get; set; }
         public Vector3 Translation { get; set; }
         public Matrix ToMatrix() { return Matrix.AffineTransformation(1.0f, Rotation, Translation); }
-        public static Transform FromMatrix(Matrix m)
+        public Transform (Matrix m) : this()
         {
-            Quaternion r = Quaternion.RotationMatrix(m);
-            Vector3 t = m.TranslationVector;
-            return new Transform() { Translation = t, Rotation = r };
+            Rotation = Quaternion.RotationMatrix(m);
+            Translation = m.TranslationVector;
+        }
+        public Transform(Vector3 translation) : this()
+        {
+            Rotation = Quaternion.Identity;
+            Translation = translation;
+        }
+        public Transform(Quaternion rotation, Vector3? translation) : this()
+        {
+            Rotation = rotation;
+            if (translation != null)
+                Translation = translation.Value;
         }
         public static Transform Zero { get { return _zero; } }
         public static Transform Identity { get { return _identity; } }

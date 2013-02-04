@@ -181,4 +181,14 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new Vector2(pointF.X, pointF.Y);
         }
     }
+
+    public static class BoundingBoxExtension
+    {
+        public static BoundingBox Transform(this BoundingBox boundingBox, Matrix matrix)
+        {
+            Vector4 vMin = Vector3.Transform(boundingBox.Minimum, matrix);
+            Vector4 vMax = Vector3.Transform(boundingBox.Maximum, matrix);
+            return new BoundingBox(new Vector3(vMin.X, vMin.Y, vMin.Z), new Vector3(vMax.X, vMax.Y, vMax.Z));
+        }
+    }
 }

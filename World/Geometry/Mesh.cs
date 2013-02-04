@@ -21,7 +21,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private int _indexCount = 0;
         private int _vertexStride = 0;
         private InputLayout _vertexLayout = null;
-        private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;      
+        private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;
+        public BoundingBox BoundingBox { get; private set; }
 
         public Mesh(IGameApp app, MeshDescription meshDescription)
         {
@@ -31,6 +32,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _topology = meshDescription.Topology;
             _vertexCount = meshDescription.VertexCount;
             _vertexBuffer = meshDescription.VertexBuffer;
+            BoundingBox = meshDescription.BoundingBox;
+
             if (meshDescription.IndexBuffer != null)
             {
                 _indexCount = meshDescription.IndexCount;
@@ -68,6 +71,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public int IndexCount { get; set; }
         public InputLayout VertexLayout { get; set; }
         public PrimitiveTopology Topology { get; set; }
+        public BoundingBox BoundingBox { get; set; }
     }
 
     public class ReferenceGrid

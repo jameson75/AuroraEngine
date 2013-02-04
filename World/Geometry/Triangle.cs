@@ -46,6 +46,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, BasicVertexPositionColor.InputElements);
             meshDesc.VertexStride = BasicVertexPositionColor.ElementSize;
             meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            Vector3[] positions = (from v in verts select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
+            meshDesc.BoundingBox = BoundingBox.FromPoints(positions);         
             _mesh = new Mesh(app, meshDesc); 
         }
 

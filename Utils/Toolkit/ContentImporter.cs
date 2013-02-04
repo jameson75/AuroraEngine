@@ -74,7 +74,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             meshDesc.VertexCount = meshInfo.VertexCount;
             meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderCode, vertexInputElements);
             meshDesc.VertexStride = vertexElementSize;
-            meshDesc.Topology = PrimitiveTopology.TriangleList;              
+            meshDesc.Topology = PrimitiveTopology.TriangleList;    
+            Vector3[] vertices = (from v in vertexData select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
+            meshDesc.BoundingBox = BoundingBox.FromPoints(vertices);
             Mesh mesh = new Mesh(game, meshDesc);
             Model model = new Model(game);
             model.Mesh = mesh;
