@@ -479,6 +479,8 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             a = b;
             b = temp;
         }
+
+        public bool IsEffectInProgress { get { return _isEffectInProgress; } }
     }
 
     public class PlexicNodeEffect

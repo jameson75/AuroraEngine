@@ -257,21 +257,21 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
-        private Vector3 DetermineUpVector(Vector3 camLocation, Vector3 camLookAt)
-        {
-            Vector4 r3 = LocalToWorld(this.Transform).ToMatrix().Row3;
-            Vector4 r2  = LocalToWorld(this.Transform).ToMatrix().Row2;
-            Vector3 orientationZ = Vector3.Normalize(new Vector3(r3.X, r3.Y, r3.Z));
-            Vector3 orientationY = Vector3.Normalize(new Vector3(r2.X, r2.Y, r3.Z));          
-            Vector3 u = Vector3.Normalize(camLookAt - camLocation);
-            Vector3 v = orientationZ;
-            Vector3 n = Vector3.Cross(u, v);
-            float cosTheta = Vector3.Dot(u, v);           
-            float theta = (float)Math.Acos(cosTheta);
-            float thetaDegrees = MathUtil.RadiansToDegrees(theta); //for debugging purposes.            
-            Vector3 up = Vector3.Normalize(Vector3.Transform(orientationY, Quaternion.RotationAxis(n, theta)));
-            return up;
-        }
+        //private Vector3 DetermineUpVector(Vector3 camLocation, Vector3 camLookAt)
+        //{
+        //    Vector4 r3 = LocalToWorld(this.Transform).ToMatrix().Row3;
+        //    Vector4 r2  = LocalToWorld(this.Transform).ToMatrix().Row2;
+        //    Vector3 orientationZ = Vector3.Normalize(new Vector3(r3.X, r3.Y, r3.Z));
+        //    Vector3 orientationY = Vector3.Normalize(new Vector3(r2.X, r2.Y, r3.Z));          
+        //    Vector3 u = Vector3.Normalize(camLookAt - camLocation);
+        //    Vector3 v = orientationZ;
+        //    Vector3 n = Vector3.Cross(u, v);
+        //    float cosTheta = Vector3.Dot(u, v);           
+        //    float theta = (float)Math.Acos(cosTheta);
+        //    float thetaDegrees = MathUtil.RadiansToDegrees(theta); //for debugging purposes.            
+        //    Vector3 up = Vector3.Normalize(Vector3.Transform(orientationY, Quaternion.RotationAxis(n, theta)));
+        //    return up;
+        //}
     }
 
     public class PlexSceneNode
