@@ -93,8 +93,8 @@ namespace CipherPark.AngelJacket.Core
             SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.Debug, chainDesc, out _graphicsDevice, out _swapChain);
             _graphicsDeviceContext = _graphicsDevice.ImmediateContext;
             _renderTargetBuffer = Texture2D.FromSwapChain<Texture2D>(_swapChain, 0);
-            _renderTargetView = new RenderTargetView(_graphicsDevice, _renderTargetBuffer);
-            
+            _renderTargetView = new RenderTargetView(_graphicsDevice, _renderTargetBuffer);           
+           
             Texture2DDescription renderStencilDesc = new Texture2DDescription()
             {
                 Format = BestSupportedDepthStencilFormat(_graphicsDevice),

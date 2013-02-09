@@ -322,45 +322,109 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
     }
 
     public abstract class PostEffect
-    {
-        public Device GraphicsDevice { get; private set; }
-
+    {       
+        public Device GraphicsDevice { get; protected set; }
+        
         public PostEffect(Device graphicsDevice)
         {
-            GraphicsDevice = graphicsDevice;
+            GraphicsDevice = graphicsDevice;            
         }
+
         public ShaderResourceView Texture { get; set; }
-        public abstract void BeginDraw();
-        public abstract void EndDraw();
+        public ShaderResourceView Depth { get; set; }
+
+        public abstract void Apply();
     }
 
     public class PassThruPostEffect : PostEffect
     {
-        private VertexShader _vertexShader = null;
-        private PixelShader _pixelShader = null;
+        private Mesh _quad = null;
         private byte[] _vertexShaderByteCode = null;
+        public VertexShader VertexShader { get; protected set; }
+        public PixelShader PixelShader { get; protected set; }
 
-        public PassThruPostEffect(Device graphicsDevice)
+        public PassThruPostEffect(Device graphicsDevice, IGameApp game)
             : base(graphicsDevice)
         {
             string psFileName = "Content\\Shaders\\postpassthru-ps.cso";
             string vsFileName = "Content\\Shaders\\postpassthru-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
-            _vertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
-            _pixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
+            VertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
+            PixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
+            _quad = ContentBuilder.BuildViewportQuad(game, _vertexShaderByteCode);
         }
 
-        public override void BeginDraw()
+        public override void Apply()
         {
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+            GraphicsDevice.ImmediateContext.VertexShader.Set(VertexShader);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(PixelShader);            
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
+
+            _quad.Draw(0);
+
+            //Un-bind Texture from pixel shader input so it can possibly be used later as a render target.
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);            
         }
 
-        public override void EndDraw()
+        public byte[] SelectShaderByteCode()
         {
+            return _vertexShaderByteCode;
+        }
+    }  
+
+    public class BokehEffect : PostEffect
+    {
+        private byte[] _vertexShaderByteCode = null;
+        private VertexShader _frameVertexShader = null;
+        private PixelShader _dofPixelShader = null;
+        private PixelShader _smartBlurPixelShader = null;
+        private PixelShader _horzBlurPixelShader = null;
+        private PixelShader _vertBlurPixelShader = null;
+        private Mesh _quad = null;
+        private Texture2D _passThruTexture1 = null;
+        private Texture2D _passThruTexture2 = null;
+        private ShaderResourceView _passThruShaderResource1 = null;
+        private ShaderResourceView _passThruShaderResource2 = null;
+        private RenderTargetView _passTh
+        public BokehEffect(Device graphicsDevice, IGameApp game)
+            : base(graphicsDevice)
+        {
+            string vsFileName = "Content\\Shaders\\bokeh-knu-x1x2x3x4-vs.cso";
+            string psDofFileName = "Content\\Shaders\\bokeh-knu-x1-ps.cso";
+            string psSmartBlurFileName = "Content\\Shaders\\bokeh-knu-x2-ps.cso";
+            string psHorzBlurFileName = "Content\\Shaders\\bokeh-knu-x3-ps.cso";
+            string psVertBlurFileName = "Content\\Shaders\\bokeh-knu-x4-ps.cso";            
+            _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
+            _frameVertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
+            _dofPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psDofFileName));
+            _smartBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psSmartBlurFileName));
+            _horzBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psHorzBlurFileName));
+            _vertBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psVertBlurFileName));
+            _quad = ContentBuilder.BuildViewportQuad(game, _vertexShaderByteCode);
+        }
+
+        public override void Apply()
+        {            
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);            
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, Depth);
+
+            //Pass 0
+            GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_dofPixelShader);
+            _quad.Draw(0);
+
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, PassThruTexture);
+            GraphicsDevice.Im
+            
+            //Pass 1            
+            GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_smartBlurPixelShader);
+            _quad.Draw(0);
+
             //Un-bind Texture from pixel shader input so it can possibly be used later as a render target.
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
+            //Un-bind Depth from pixel shader input so it can be used as a render target.
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
         }
 
         public byte[] SelectShaderByteCode()
@@ -378,11 +442,12 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         private Texture2D _auxTexture = null;
         private RenderTargetView _auxTextureRenderTarget = null;
         private ShaderResourceView _auxTextureShaderResource = null;
+        private ShaderResourceView _depthShaderResource = null;
         private IGameApp _game = null;
         private Matrix _quadTransform = Matrix.Zero;
         private Matrix _viewMatrix = Matrix.Zero;
         private Matrix _projectionMatrix = Matrix.Zero;
-        private Mesh _quad = null;
+        
         private RenderTargetView _originalRenderView = null;
         //private DepthStencilView _cachedDepthStencilTarget = null;
         private bool _isEffectInProgress = false;
@@ -425,11 +490,10 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             resourceDesc.Texture2D.MipLevels = 1;
             effectChain._textureShaderResource = new ShaderResourceView(game.GraphicsDevice, effectChain._texture, resourceDesc);
             effectChain._auxTextureShaderResource = new ShaderResourceView(game.GraphicsDevice, effectChain._auxTexture, resourceDesc);
+            effectChain._depthShaderResource = new ShaderResourceView(game.GraphicsDevice, game.DepthStencil.ResourceAs<Texture2D>(), resourceDesc);
 
-            effectChain.passThruEffect = new PassThruPostEffect(game.GraphicsDevice);           
-            byte[] targetShaderByteCode = effectChain.passThruEffect.SelectShaderByteCode();
-
-            effectChain._quad = ContentBuilder.BuildViewportQuad(game, targetShaderByteCode);
+            effectChain.passThruEffect = new PassThruPostEffect(game.GraphicsDevice, game)           
+            byte[] targetShaderByteCode = effectChain.passThruEffect.SelectShaderByteCode();        
             
             return effectChain;
             //TODO: Validate this method call.
@@ -440,7 +504,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             _originalRenderView = _game.GraphicsDeviceContext.OutputMerger.GetRenderTargets(1)[0];
             _game.GraphicsDeviceContext.OutputMerger.SetTargets(_game.DepthStencil, _textureRenderTarget);
             _game.GraphicsDeviceContext.ClearRenderTargetView(_textureRenderTarget, Color.Black);
-            _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
+           // _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
             _isEffectInProgress = true;
         }
 
@@ -452,23 +516,19 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             {
                 _game.GraphicsDeviceContext.OutputMerger.SetTargets(_game.DepthStencil, _auxTextureRenderTarget);
                 _game.GraphicsDeviceContext.ClearRenderTargetView(_auxTextureRenderTarget, Color.Black);
-                _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
+                //_game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
                 
                 postEffect.Texture = _textureShaderResource;
-                postEffect.BeginDraw();
-                _quad.Draw(gameTime);
-                postEffect.EndDraw();
-                               
+                postEffect.Depth = _depthShaderResource;
+                postEffect.Apply();       
                 Swap<ShaderResourceView>(ref _textureShaderResource, ref _auxTextureShaderResource);
                 Swap<RenderTargetView>(ref _textureRenderTarget, ref _auxTextureRenderTarget);
             }
                 
             _game.GraphicsDeviceContext.OutputMerger.SetTargets(_game.DepthStencil, _originalRenderView);            
-            _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
+            //_game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
             passThruEffect.Texture = _textureShaderResource;
-            passThruEffect.BeginDraw();
-            _quad.Draw(gameTime);
-            passThruEffect.EndDraw();           
+            passThruEffect.Apply();        
 
             this._isEffectInProgress = false;
         }
