@@ -13,6 +13,8 @@ using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using System.Xml.XPath;
 using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.AngelJacket.Core.Effects;
+
 using DXBuffer = SharpDX.Direct3D11.Buffer;
 using System.Text.RegularExpressions;
 

@@ -97,19 +97,23 @@ namespace CipherPark.AngelJacket.Core
            
             Texture2DDescription renderStencilDesc = new Texture2DDescription()
             {
-                Format = BestSupportedDepthStencilFormat(_graphicsDevice),
+                Format = BestSupportedDepthStencilFormat(_graphicsDevice, false, true),
                 ArraySize = 1,
                 MipLevels = 1,
                 Width = form.ClientSize.Width,
                 Height = form.ClientSize.Height,
                 SampleDescription = new SampleDescription(1,0),
                 Usage = ResourceUsage.Default,
-                BindFlags = BindFlags.DepthStencil,
-                CpuAccessFlags = CpuAccessFlags.None,
-                OptionFlags = ResourceOptionFlags.None
-            };
+                BindFlags = BindFlags.DepthStencil | BindFlags.ShaderResource,
+                CpuAccessFlags = CpuAccessFlags.None,                
+                OptionFlags = ResourceOptionFlags.None               
+            };            
             _depthStencilBuffer = new Texture2D(_graphicsDevice, renderStencilDesc);
-            _depthStencilView = new DepthStencilView(_graphicsDevice, _depthStencilBuffer);
+            DepthStencilViewDescription dsvd = new DepthStencilViewDescription();
+            dsvd.Dimension = DepthStencilViewDimension.Texture2D;
+            dsvd.Flags = DepthStencilViewFlags.None;
+            dsvd.Format = BestSupportedDepthStencilFormat(_graphicsDevice, false);
+            _depthStencilView = new DepthStencilView(_graphicsDevice, _depthStencilBuffer, dsvd);
             _graphicsDeviceContext.Rasterizer.SetViewports(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f));
             _graphicsDeviceContext.OutputMerger.SetTargets(DepthStencil, RenderTarget);
             
@@ -190,12 +194,12 @@ namespace CipherPark.AngelJacket.Core
 
         #endregion
 
-        private static Format BestSupportedDepthStencilFormat(SharpDX.Direct3D11.Device graphicsDevice, bool includeStencil = true)
+        private static Format BestSupportedDepthStencilFormat(SharpDX.Direct3D11.Device graphicsDevice, bool includeStencil = true, bool usingAsShaderResource = false)
         {
             if ((graphicsDevice.CheckFormatSupport(Format.D32_Float_S8X24_UInt) & FormatSupport.DepthStencil) != 0)
-                return (includeStencil) ? Format.D32_Float_S8X24_UInt : Format.D32_Float;
+                return (includeStencil) ? Format.D32_Float_S8X24_UInt : (usingAsShaderResource) ?  Format.R32_Typeless : Format.D32_Float;
             else
-                return (includeStencil) ? Format.D24_UNorm_S8_UInt : Format.D16_UNorm;
+                return (includeStencil) ? Format.D24_UNorm_S8_UInt : (usingAsShaderResource) ? Format.R16_Typeless : Format.D16_UNorm;
         }
     }
 }

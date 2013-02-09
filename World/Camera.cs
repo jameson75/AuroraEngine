@@ -6,8 +6,8 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.AngelJacket.Core.Effects;
 
 namespace CipherPark.AngelJacket.Core.World
 {

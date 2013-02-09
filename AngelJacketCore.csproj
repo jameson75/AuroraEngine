@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -60,9 +61,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation\AnimationController.cs" />
+    <Compile Include="Animation\AnimationInterpolationPoint.cs" />
+    <Compile Include="Animation\AnimationKeyFrame.cs" />
+    <Compile Include="Animation\BooleanAnimation.cs" />
+    <Compile Include="Animation\DrawingPointAnimation.cs" />
+    <Compile Include="Animation\DrawingSizeAnimation.cs" />
+    <Compile Include="Animation\FloatAnimation.cs" />
+    <Compile Include="Animation\PropertyGroupAnimation.cs" />
+    <Compile Include="Animation\StringAnimation.cs" />
+    <Compile Include="Animation\Transform.cs" />
+    <Compile Include="Animation\TransformAnimation.cs" />
     <Compile Include="BasicGameApp.cs" />
+    <Compile Include="Effects\BasicEffectEx.cs" />
+    <Compile Include="Effects\BokehEffectMGE.cs" />
+    <Compile Include="Effects\PassThruPostEffect.cs" />
+    <Compile Include="Effects\PlexicNodeEffect.cs" />
+    <Compile Include="Effects\PostEffect.cs" />
+    <Compile Include="Effects\PostEffectChain.cs" />
     <Compile Include="Utils\ContentBuilder.cs" />
+    <Compile Include="Utils\MatrixStack.cs" />
     <Compile Include="Utils\Toolkit\BasicEffect.cs" />
+    <Compile Include="Utils\TransformStackcs.cs" />
     <Compile Include="World\Camera.cs" />
     <Compile Include="Module\GameModule.cs" />
     <Compile Include="IGameApp.cs" />
@@ -133,10 +153,16 @@
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="Animation\Animation.cs" />
     <Compile Include="World\Geometry\Form.cs" />
+    <Compile Include="World\Geometry\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
+    <Compile Include="World\Scene\CameraSceneNode.cs" />
+    <Compile Include="World\Scene\ModelSceneNode.cs" />
+    <Compile Include="World\Geometry\ReferenceGrid.cs" />
     <Compile Include="World\Geometry\Triangle.cs" />
     <Compile Include="World\Geometry\Mesh.cs" />
+    <Compile Include="World\Geometry\VertexTypes.cs" />
+    <Compile Include="World\Scene\NullSceneNode.cs" />
     <Compile Include="World\Scene\Scene.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="Sandbox\TestEffect.cs" />

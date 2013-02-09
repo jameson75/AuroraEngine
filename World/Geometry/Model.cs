@@ -16,6 +16,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.AngelJacket.Core.Effects;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {

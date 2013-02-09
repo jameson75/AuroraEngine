@@ -61,19 +61,19 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
         }
     }
 
-    public abstract class UIContentAnimation : PropertyGroupAnimation
-    {
-        public SpriteSortMode? SpriteSortMode { get; set; }
-        public BlendState BlendState { get; set; }
-        public SamplerState SamplerState { get; set; }
-        public DepthStencilState DepthStencilState { get; set; }
-        public RasterizerState RasterizerState { get; set; }
-        public Action CustomShaderCallback { get; set; }
-        public Matrix? TransformationMatrix { get; set; }
-    }
+    //public abstract class UIContentAnimation : PropertyGroupAnimation
+    //{
+    //    public SpriteSortMode? SpriteSortMode { get; set; }
+    //    public BlendState BlendState { get; set; }
+    //    public SamplerState SamplerState { get; set; }
+    //    public DepthStencilState DepthStencilState { get; set; }
+    //    public RasterizerState RasterizerState { get; set; }
+    //    public Action CustomShaderCallback { get; set; }
+    //    public Matrix? TransformationMatrix { get; set; }
+    //}
 
-    public class ListControlItemEffect : PropertyGroupAnimation
-    {
+    //public class ListControlItemEffect : PropertyGroupAnimation
+    //{
 
-    }   
+    //}   
 }
