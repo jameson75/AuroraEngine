@@ -11,6 +11,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
+    [Obsolete]
     public class BokehEffect : PostEffect
     {
         private byte[] _vertexShaderByteCode = null;
@@ -20,13 +21,14 @@ namespace CipherPark.AngelJacket.Core.Effects
         private PixelShader _horzBlurPixelShader = null;
         private PixelShader _vertBlurPixelShader = null;
         private Mesh _quad = null;
-        private ShaderResourceView _passThrougShaderResource = null;
-        private ShaderResourceView _auxShaderResource = null;
-        private RenderTargetView _passThruRenderTarget = null;
-        private RenderTargetView _auxRenderTarget = null;
+        private ShaderResourceView _renderShaderResource2 = null;
+        private ShaderResourceView _renderShaderResource1 = null;
+        private RenderTargetView _renderTargetView1 = null;
+        private RenderTargetView _renderTargetView2 = null;
         private RenderTargetView _originalRenderTargetView = null;
         private DepthStencilView _originalDepthStencilView = null;
         private SharpDX.Direct3D11.Buffer _constantsBuffer = null;
+        private int _constantBufferSize = 80;
 
         public float RetinaFocus { get; set; }
         public float RelaxedEyeFocus { get; set; }
@@ -60,8 +62,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             _smartBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psSmartBlurFileName));
             _horzBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psHorzBlurFileName));
             _vertBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psVertBlurFileName));
-            int bufferSize = 80;
-            _constantsBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            
+            _constantBufferSize = 80;
+            _constantsBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, _constantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
 
             _quad = ContentBuilder.BuildViewportQuad(game, _vertexShaderByteCode);
 
@@ -83,77 +86,95 @@ namespace CipherPark.AngelJacket.Core.Effects
             targetDesc.Format = textureDesc.Format;
             targetDesc.Dimension = RenderTargetViewDimension.Texture2D;
             targetDesc.Texture2D.MipSlice = 0;
-            _passThruRenderTarget = new RenderTargetView(game.GraphicsDevice, _texture, targetDesc);
-            _auxRenderTarget = new RenderTargetView(game.GraphicsDevice, _texture2, targetDesc);
+            _renderTargetView1 = new RenderTargetView(game.GraphicsDevice, _texture, targetDesc);
+            _renderTargetView2 = new RenderTargetView(game.GraphicsDevice, _texture2, targetDesc);
 
             ShaderResourceViewDescription resourceDesc = new ShaderResourceViewDescription();
             resourceDesc.Format = targetDesc.Format;
             resourceDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
             resourceDesc.Texture2D.MostDetailedMip = 0;
             resourceDesc.Texture2D.MipLevels = 1;
-            _auxShaderResource = new ShaderResourceView(game.GraphicsDevice, _texture, resourceDesc);
-            _passThrougShaderResource = new ShaderResourceView(game.GraphicsDevice, _texture2, resourceDesc);
+            _renderShaderResource1 = new ShaderResourceView(game.GraphicsDevice, _texture, resourceDesc);
+            _renderShaderResource2 = new ShaderResourceView(game.GraphicsDevice, _texture2, resourceDesc);
         }
 
         public override void Apply()
         {
+            _originalRenderTargetView = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out _originalDepthStencilView)[0];
+            ShaderResourceView _lastPassRenderTarget = null;
+            RenderTargetView _currentPassRenderTarget = null;
+            
+            //Set the shader's constants
+            //--------------------------
             SetShaderConstants();
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantsBuffer);
 
-            _originalRenderTargetView = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out _originalDepthStencilView)[0];
-
-            //Pass 0
-            //------
+            //Set the resource's used by all pasess
+            //-------------------------------------
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, Depth);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Mirror, AddressV = TextureAddressMode.Mirror, AddressW = TextureAddressMode.Mirror }));
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Clamp, AddressV = TextureAddressMode.Clamp, AddressW = TextureAddressMode.Clamp }));
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(2, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Mirror, AddressV = TextureAddressMode.Mirror, AddressW = TextureAddressMode.Mirror }));
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_passThruRenderTarget);
+                        
+            //Pass 0
+            //------
+            _currentPassRenderTarget = _renderTargetView1;
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_dofPixelShader);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_dofPixelShader);            
             _quad.Draw(0);
 
             //Pass 1
-            //------            
-            PostEffectChain.Swap<RenderTargetView>(ref _passThruRenderTarget, ref _auxRenderTarget);
-            PostEffectChain.Swap<ShaderResourceView>(ref _passThrougShaderResource, ref _auxShaderResource);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _passThrougShaderResource);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_passThruRenderTarget);
+            //------    
+            //Since we want to use the output from the last pass as input to this pass, we need to flip the roles of the input and output textures.
+            _currentPassRenderTarget = _renderTargetView2;
+            _lastPassRenderTarget = _renderShaderResource1;
+            //Unbind new output from input.
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, null);
+            //NOTE: the next call will have the effect of unbinding the new input from output.    
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget); 
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_smartBlurPixelShader);
             _quad.Draw(0);
 
             //Pass 2
             //------
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
-            PostEffectChain.Swap<RenderTargetView>(ref _passThruRenderTarget, ref _auxRenderTarget);
-            PostEffectChain.Swap<ShaderResourceView>(ref _passThrougShaderResource, ref _auxShaderResource);
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _passThrougShaderResource);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_passThruRenderTarget);
+            //Since we want to use the output from the last pass as input to this pass, we need to flip the roles of the input and output textures.
+            _currentPassRenderTarget = _renderTargetView1;
+            _lastPassRenderTarget = _renderShaderResource2;           
+            //Unbind new output from input.
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, null);
+            //NOTE: the next call will have the effect of unbinding the new input from output.    
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget);                      
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_horzBlurPixelShader);
             _quad.Draw(0);
 
             //Pass 3
             //------
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
-            PostEffectChain.Swap<RenderTargetView>(ref _passThruRenderTarget, ref _auxRenderTarget);
-            PostEffectChain.Swap<ShaderResourceView>(ref _passThrougShaderResource, ref _auxShaderResource);
-            //GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _passThrougShaderResource);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_originalDepthStencilView, _passThruRenderTarget);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_originalRenderTargetView);
+            //Since we want to use the output from the last pass as input to this pass, we need to flip the roles of the input and output textures.
+            //However, unlike the previous passes, the output texture is the render target cached at the begining of this method.
+            _currentPassRenderTarget = _originalRenderTargetView;
+            _lastPassRenderTarget = _renderShaderResource1;
+            //Unbind new output from input.
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, null);             
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_vertBlurPixelShader);
             _quad.Draw(0);
+            
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderTargetView);            
 
             //Un-bind resources from pixel shader.
             for (int i = 0; i < 3; i++)
             {
                 GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(i, null);
-                GraphicsDevice.ImmediateContext.PixelShader.SetSampler(i, null);
+                //GraphicsDevice.ImmediateContext.PixelShader.SetSampler(i, null);
             }
         }
 
@@ -164,57 +185,65 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void SetShaderConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            const int HLSL_Component_Boundary_Size = 4;
+            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);            
+            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, _constantBufferSize);
 
-            float retinaFocus = this.RetinaFocus;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref retinaFocus);
+            int offset = 0;     
 
-            float relaxedEyeFocus = this.RelaxedEyeFocus;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref relaxedEyeFocus);
+            dataBuffer.Set(offset, RetinaFocus);
+            offset += sizeof(float);
 
-            float accomodation = this.Accomodation;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref accomodation);
+            dataBuffer.Set(offset, RelaxedEyeFocus);
+            offset += sizeof(float);
 
-            float pupilDiameterRange = this.PupilDiameterRange;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref pupilDiameterRange);
+            dataBuffer.Set(offset, Accomodation);
+            offset += sizeof(float);
 
-            float baseBlurRadius = this.BaseBlurRadius;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref baseBlurRadius);
+            dataBuffer.Set(offset, PupilDiameterRange);
+            offset += sizeof(float);
 
-            float blurFalloff = this.BlurFalloff;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref blurFalloff);
+            dataBuffer.Set(offset, BaseBlurRadius);
+            offset += sizeof(float);
 
-            float maxBlurRadius = this.MaximumBlurRadius;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref maxBlurRadius);
+            dataBuffer.Set(offset, BlurFalloff);
+            offset += sizeof(float);
 
-            bool useDistantBlur = this.UseDistantBlur;
-            dataBox.DataPointer = Utilities.WriteAndPosition<bool>(dataBox.DataPointer, ref useDistantBlur);
-            dataBox.DataPointer = Utilities.WriteAndPosition<bool>(dataBox.DataPointer, ref useDistantBlur);
+            dataBuffer.Set(offset, MaximumBlurRadius);
+            offset += sizeof(float);
 
-            float distantBlurStartRange = this.DistantBlurStartRange;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref distantBlurStartRange);
+            dataBuffer.Set(offset, DistantBlurStartRange);
+            offset += sizeof(float);
 
-            float distantBlurEndRange = this.DistantBlurEndRange;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref distantBlurEndRange);
+            dataBuffer.Set(offset, DistantBlurEndRange);
+            offset += sizeof(float);
 
-            float distantBlurPower = this.DistantBlurPower;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref distantBlurPower);
+            dataBuffer.Set(offset, DistantBlurPower);
+            offset += sizeof(float);
 
-            bool noWeaponBlur = this.NoWeapoBlur;
-            dataBox.DataPointer = Utilities.WriteAndPosition<bool>(dataBox.DataPointer, ref noWeaponBlur);
-            dataBox.DataPointer = Utilities.WriteAndPosition<bool>(dataBox.DataPointer, ref noWeaponBlur);
-
-            float weaponBlurCutoff = this.WeaponBlurCutOff;
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref weaponBlurCutoff);
+            dataBuffer.Set(offset, WeaponBlurCutOff);
+            offset += sizeof(float);
 
             float nearZ = -this.ProjectionMatrix.M43 / this.ProjectionMatrix.M33;
+            dataBuffer.Set(offset, nearZ);
+            offset += sizeof(float);
+
             float farZ = this.ProjectionMatrix.M43 / (1.0f - this.ProjectionMatrix.M33);
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref nearZ);
-            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref farZ);
+            dataBuffer.Set(offset, farZ);
+            offset += sizeof(float);
+
+            dataBuffer.Set(offset, UseDistantBlur);
+            offset += HLSL_Component_Boundary_Size;
+
+            dataBuffer.Set(offset, NoWeapoBlur);
+            offset += HLSL_Component_Boundary_Size;
+
+            offset += HLSL_Component_Boundary_Size; //The next Vector2 data will straddel 16 byte alignment boundary so we need to skip to the begning of the next boundary.
 
             Vector2 reciprocalScreenRes = new Vector2(1.0f / ScreenWidth, 1.0f / ScreenHeight);
-            dataBox.DataPointer = Utilities.WriteAndPosition<Vector2>(dataBox.DataPointer, ref reciprocalScreenRes);
-
+            dataBuffer.Set(offset, reciprocalScreenRes);
+            offset += (sizeof(float) * 2);
+            
             GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);
         }
     }

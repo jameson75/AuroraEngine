@@ -15,6 +15,8 @@ namespace CipherPark.AngelJacket.Core.Effects
     {
         private Mesh _quad = null;
         private byte[] _vertexShaderByteCode = null;
+        private SamplerState _samplerState = null;
+
         public VertexShader VertexShader { get; protected set; }
         public PixelShader PixelShader { get; protected set; }
 
@@ -24,6 +26,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             string psFileName = "Content\\Shaders\\postpassthru-ps.cso";
             string vsFileName = "Content\\Shaders\\postpassthru-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
+            _samplerState = new SamplerState(graphicsDevice, SamplerStateDescription.Default());
             VertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
             PixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
             _quad = ContentBuilder.BuildViewportQuad(game, _vertexShaderByteCode);
@@ -34,11 +37,11 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.Set(VertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(PixelShader);            
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
-
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _samplerState);
             _quad.Draw(0);
-
             //Un-bind Texture from pixel shader input so it can possibly be used later as a render target.
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);            
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
         }
 
         public byte[] SelectShaderByteCode()

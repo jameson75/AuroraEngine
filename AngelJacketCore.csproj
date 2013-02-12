@@ -74,7 +74,9 @@
     <Compile Include="Animation\TransformAnimation.cs" />
     <Compile Include="BasicGameApp.cs" />
     <Compile Include="Effects\BasicEffectEx.cs" />
-    <Compile Include="Effects\BokehEffectMGE.cs" />
+    <Compile Include="Effects\Obsolete\BokehEffectMGE.cs" />
+    <Compile Include="Effects\DofEffect.cs" />
+    <Compile Include="Effects\Effect.cs" />
     <Compile Include="Effects\PassThruPostEffect.cs" />
     <Compile Include="Effects\PlexicNodeEffect.cs" />
     <Compile Include="Effects\PostEffect.cs" />

@@ -47,11 +47,29 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public void Apply()
         {
+            BlendStateDescription blendDesc = BlendStateDescription.Default();
+            for (int i = 0; i < blendDesc.RenderTarget.Length; i++)
+            {
+                blendDesc.RenderTarget[i].IsBlendEnabled = true;
+                blendDesc.RenderTarget[i].SourceBlend = BlendOption.SourceAlpha;
+                blendDesc.RenderTarget[i].SourceAlphaBlend = BlendOption.SourceAlpha;
+                blendDesc.RenderTarget[i].DestinationBlend = BlendOption.InverseSourceAlpha;
+                blendDesc.RenderTarget[i].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
+            }
+            BlendState newBlendState = new BlendState(_graphicsDevice, blendDesc);
+            //Game.GraphicsDeviceContext.OutputMerger.BlendFactor = Color.Zero;
+            BlendState oldBlendState = _graphicsDevice.ImmediateContext.OutputMerger.BlendState;
+            _graphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;
+
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             SetShaderConstants();
             _graphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
             _graphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
+            
+            _graphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
+            _graphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
+            _graphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
         }
 
         public byte[] SelectShaderByteCode()

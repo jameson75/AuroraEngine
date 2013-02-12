@@ -9,16 +9,15 @@ using SharpDX.Direct3D11;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public abstract class PostEffect
+    public abstract class PostEffect : Effect
     {
-        public Device GraphicsDevice { get; protected set; }
-
-        public PostEffect(Device graphicsDevice)
-        {
-            GraphicsDevice = graphicsDevice;
-        }
-
         public ShaderResourceView Texture { get; set; }
+
+        protected PostEffect(Device graphicsDevice)
+            : base(graphicsDevice)
+        { }
+
+        [Obsolete]
         public ShaderResourceView Depth { get; set; }
 
         public abstract void Apply();

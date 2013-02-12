@@ -11,7 +11,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class BasicEffectEx
+    public class BasicEffectEx : Effect
     {
         private Matrix _world;
         private Matrix _view;
@@ -19,7 +19,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         private BasicEffect _effect = null;
         private bool _enableVertexColor = false;
 
-        public BasicEffectEx(Device device)
+        public BasicEffectEx(Device device) : base(device)
         {
             _effect = new BasicEffect(device);
         }

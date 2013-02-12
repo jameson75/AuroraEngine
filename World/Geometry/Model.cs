@@ -17,6 +17,7 @@ using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
+using CoreEffect = CipherPark.AngelJacket.Core.Effects.Effect;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
@@ -40,7 +41,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
        
         //public BasicEffect Effect { get; set; }
 
-        public BasicEffectEx Effect { get; set; }
+        //public BasicEffectEx Effect { get; set; }
+
+        public DofLightingEffect Effect { get; set; }
 
         //public Camera Camera { get; set; }
 

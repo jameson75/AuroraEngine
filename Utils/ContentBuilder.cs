@@ -9,7 +9,6 @@ using SharpDX.Direct3D11;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
 
-
 namespace CipherPark.AngelJacket.Core.Utils
 {
     public static class ContentBuilder
@@ -71,6 +70,19 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
         }
 
+        //Constructs an equilateral triangle.
+        public static Mesh BuildLitTexturedTriangle(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Vector2[] textureCoords = null)
+        {
+            Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0.5f, 0), new Vector2(1, 1), new Vector2(0, 1)};
+            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[3];
+            verts[0] = new BasicVertexPositionNormalTexture(new Vector3(0, 0, dimension.Top), Vector3.UnitY, _textureCoords[0]);
+            verts[1] = new BasicVertexPositionNormalTexture(new Vector3(dimension.Right, 0, 0), Vector3.UnitY, _textureCoords[1]);
+            verts[2] = new BasicVertexPositionNormalTexture(new Vector3(dimension.Left, 0, 0), Vector3.UnitY, _textureCoords[2]);
+            Vector3[] positions = (from v in verts select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
+        }
+
         public static Mesh BuildReferenceGrid(IGameApp game, byte[] shaderByteCode, DrawingSizeF gridSize, Vector2 gridSteps, Color gridColor)
         {
             //Transform = Matrix.Identity;
@@ -128,6 +140,21 @@ namespace CipherPark.AngelJacket.Core.Utils
             Vector3[] positions = (from v in vertices select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
             BoundingBox boundingBox = BoundingBox.FromPoints(positions); 
             return new Mesh(game, meshDesc); 
+        }
+
+        public static Mesh BuildLitTexturedQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Vector2[] textureCoords = null)
+        {
+            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[6];
+            Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1) };
+            verts[0] = new BasicVertexPositionNormalTexture(new Vector3(dimension.Left, 0, dimension.Top), Vector3.UnitY, _textureCoords[0]);
+            verts[1] = new BasicVertexPositionNormalTexture(new Vector3(dimension.Right, 0, dimension.Top), Vector3.UnitY, _textureCoords[1]);
+            verts[2] = new BasicVertexPositionNormalTexture(new Vector3(dimension.Right, 0, dimension.Bottom), Vector3.UnitY, _textureCoords[2]);
+            verts[3] = new BasicVertexPositionNormalTexture(new Vector3(dimension.Right, 0, dimension.Bottom), Vector3.UnitY, _textureCoords[2]);
+            verts[4] = new BasicVertexPositionNormalTexture(new Vector3(dimension.Left, 0, dimension.Bottom), Vector3.UnitY, _textureCoords[3]);
+            verts[5] = new BasicVertexPositionNormalTexture(new Vector3(dimension.Left, 0, dimension.Top), Vector3.UnitY, _textureCoords[0]);
+            Vector3[] positions = (from v in verts select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
         private static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
