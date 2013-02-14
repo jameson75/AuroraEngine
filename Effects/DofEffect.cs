@@ -16,12 +16,13 @@ namespace CipherPark.AngelJacket.Core.Effects
         public const int ConstantsBufferSize = 16;
         public const int ConstantsBufferSize2 = 32;
 
-        private SharpDX.Direct3D11.Buffer _constantsBuffer = null;
+        private SharpDX.Direct3D11.Buffer _constantsBuffer1 = null;
         private SharpDX.Direct3D11.Buffer _constantsBuffer2 = null;
         private VertexShader _downSampleVertexShader = null;
         private PixelShader _downSamplePixelShader = null;
-        private VertexShader _guassianVertexShader = null;
-        private PixelShader _guassianPixelShader = null;
+        private VertexShader _gaussianVertexShader = null;
+        private PixelShader _gaussianPixelShader = null;
+        private PixelShader _gaussianPixelShader2 = null;
         private VertexShader _depthFinal1VertexShader = null;
         private PixelShader _depthFinal1PixelShader = null;
         private VertexShader _depthFinal2VertexShader = null;
@@ -49,13 +50,14 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\dof_downsample_vs.cso", out _downSampleVertexShader);
             LoadPixelShader("Content\\Shaders\\dof_downsample_ps.cso", out _downSamplePixelShader);
-            LoadVertexShader("Content\\Shaders\\dof_gaussian_vs.cso", out _guassianVertexShader);
-            LoadPixelShader("Content\\Shaders\\dof_gaussian_ps.cso", out _guassianPixelShader);
+            LoadVertexShader("Content\\Shaders\\dof_gaussian_vs.cso", out _gaussianVertexShader);
+            LoadPixelShader("Content\\Shaders\\dof_gaussian_ps.cso", out _gaussianPixelShader);
+            LoadPixelShader("Content\\Shaders\\dof_gaussian2_ps.cso", out _gaussianPixelShader2);
             LoadVertexShader("Content\\Shaders\\dof_depthfinal1_vs.cso", out _depthFinal1VertexShader);
             LoadPixelShader("Content\\Shaders\\dof_depthfinal1_ps.cso", out _depthFinal1PixelShader);
             LoadVertexShader("Content\\Shaders\\dof_depthfinal2_vs.cso", out _depthFinal2VertexShader);
             LoadPixelShader("Content\\Shaders\\dof_depthfinal2_ps.cso", out _depthFinal2PixelShader);
-            _constantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _constantsBuffer1 = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _constantsBuffer2 = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantsBufferSize2, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
@@ -98,8 +100,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             _lowResShaderResource = new ShaderResourceView(GraphicsDevice, lowResTexture, resourceDesc);
             _lowResSampler = new SamplerState(GraphicsDevice, samplerDesc);
 
-            //Create Temp: texture, rendertarget, shaderresource and samplerstate
-            //-------------------------------------------------------------------
+            //Create Temp: texture, rendertarget, shaderresource and samplerstate.
+            //--------------------------------------------------------------------
             Texture2D tempTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
             targetDesc = new RenderTargetViewDescription();
             targetDesc.Format = textureDesc.Format;
@@ -121,13 +123,13 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void WriteShaderConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer1, 0, MapMode.WriteDiscard, MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, ConstantsBufferSize);
             int offset = 0;
             dataBuffer.Set(offset, ViewportSize.X);
             offset += sizeof(float);
             dataBuffer.Set(offset, ViewportSize.Y);           
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);
+            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer1, 0);
         }
 
         private void WriteShaderConstants2()
@@ -148,7 +150,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         public override void Apply()
         {
             WriteShaderConstants();
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantsBuffer);
+            WriteShaderConstants2();
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer1);
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantsBuffer1);            
             RenderTargetView originalRenderTarget = null;
             DepthStencilView originalDepthStencilView = null;
             originalRenderTarget = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out originalDepthStencilView)[0];
@@ -180,8 +184,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _lowResShaderResource);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _lowResSampler);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_tempTarget);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_guassianVertexShader);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_guassianPixelShader);
+            GraphicsDevice.ImmediateContext.VertexShader.Set(_gaussianVertexShader);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_gaussianPixelShader);
             _quad.Draw(0);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -198,8 +202,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _tempSampler);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_lowResTarget);
             //*******************************************************************************
-            //NOTE: We are reusing the Guassian vertex and pixel shaders from previous pass.
+            //NOTE: We are reusing the Guassian vertex shader from previous pass.
             //*******************************************************************************
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_gaussianPixelShader2);
             _quad.Draw(0);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -229,7 +234,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //**********************************************************************************
 
             //////////////////////////////////////////////////////////////////////////////////
-            //Pass3
+            //Pass4
             //-----
             //Name: DepthOfFieldPass2
             //Texture: ScreenImage, LowRes

@@ -134,7 +134,21 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
             [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
             public static extern IntPtr CreateTextureFromFile(IntPtr deviceContext, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
+
+            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
+            public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
         }
+
+        public static Mesh ImportFBX(Device graphicsDevice, string fileName)
+        {
+            FBXMeshThunk fbxMeshThunk;
+            ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
+        }
+    }
+
+    public struct FBXMeshThunk
+    {
+
     }
 
     public struct VoiceData
