@@ -13,8 +13,21 @@ namespace CipherPark.AngelJacket.Core.Effects
 {
     class PostGlowEffect : PostEffect
     {
+        private IGameApp _game = null;
         private const int ConstantBufferSize = 32;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
+        private VertexShader _vertexShaderP1 = null;
+        private PixelShader _pixelShaderP1P2 = null;
+        private VertexShader _vertexShaderP2 = null;
+        private VertexShader _vertexShaderP3 = null;
+        private PixelShader _pixelShaderP3 = null;
+        private VertexShader _vertexShaderP4 = null;
+        private PixelShader _pixelShaderP4 = null;
+        private byte[] _vertexShaderByteCode = null;
+        private RenderTargetView _tempRenderTarget = null;
+        private ShaderResourceView _tempShaderResource = null;
+        private SamplerState _tempSamplerState = null;
+        private Mesh _quad = null;
 
         public float GlowSpan { get; set; }
         public float Glowness { get; set; }
@@ -25,12 +38,63 @@ namespace CipherPark.AngelJacket.Core.Effects
         public PostGlowEffect(Device graphicsDevice, IGameApp app)
             : base(graphicsDevice)
         {
+            _game = app;
             _constantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            CreateShaders();
+            CreateShaderTargets();
         }
 
         public override void Apply()
         {
             WriteConstants();
+            _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\postglowfs-x1-vs.cso", out _vertexShaderP1);                       
+        }
+
+        private void CreateShaders()
+        {
+            LoadPixelShader("Content\\Shaders\\postglowfs-x1x2-ps.cso", out _pixelShaderP1P2);
+            LoadVertexShader("Content\\Shaders\\postflowfs-x2-vs.cso", out _vertexShaderP2);
+            LoadVertexShader("Content\\Shaders\\postflowfs-x3-vs.cso", out _vertexShaderP3);
+            LoadPixelShader("Content\\Shaders\\postflowfs-x3-ps.cso", out _pixelShaderP3);
+            LoadVertexShader("Content\\Shaders\\postflowfs-x4-vs.cso", out _vertexShaderP4);
+            LoadPixelShader("Content\\Shaders\\postflowfs-x4-ps.cso", out _pixelShaderP4);
+        }
+
+        private void CreateShaderTargets()
+        {
+            _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);
+            
+            SamplerStateDescription samplerDesc = SamplerStateDescription.Default();
+            samplerDesc.Filter = Filter.MinMagMipLinear;
+            samplerDesc.AddressU = TextureAddressMode.Clamp;
+            samplerDesc.AddressV = TextureAddressMode.Clamp;
+            samplerDesc.AddressU = TextureAddressMode.Clamp;
+            _tempSamplerState = new SamplerState(GraphicsDevice, samplerDesc);
+
+            Texture2DDescription textureDesc = new Texture2DDescription();
+            textureDesc.ArraySize = 1;
+            textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
+            textureDesc.CpuAccessFlags = CpuAccessFlags.None;
+            textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
+            textureDesc.Height = _game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
+            textureDesc.Width = _game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
+            textureDesc.MipLevels = 1;
+            textureDesc.OptionFlags = ResourceOptionFlags.None;
+            textureDesc.Usage = ResourceUsage.Default;
+            textureDesc.SampleDescription.Count = 1;
+
+            Texture2D tempTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
+            RenderTargetViewDescription targetDesc = new RenderTargetViewDescription();
+            targetDesc.Format = textureDesc.Format;
+            targetDesc.Dimension = RenderTargetViewDimension.Texture2D;
+            targetDesc.Texture2D.MipSlice = 0;
+            _tempRenderTarget = new RenderTargetView(_game.GraphicsDevice, tempTexture, targetDesc);
+            ShaderResourceViewDescription resourceDesc = new ShaderResourceViewDescription();
+            resourceDesc.Format = targetDesc.Format;
+            resourceDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
+            resourceDesc.Texture2D.MostDetailedMip = 0;
+            resourceDesc.Texture2D.MipLevels = 1;
+            _tempShaderResource = new ShaderResourceView(GraphicsDevice, tempTexture, resourceDesc);           
         }
 
         private void WriteConstants()

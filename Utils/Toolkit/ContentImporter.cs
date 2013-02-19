@@ -141,8 +141,10 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         public static Mesh ImportFBX(Device graphicsDevice, string fileName)
         {
+            Mesh result = null;
             FBXMeshThunk fbxMeshThunk;
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
+            return result;
         }
     }
 
