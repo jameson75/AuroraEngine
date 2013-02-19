@@ -112,7 +112,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Set the resource's used by all pasess
             //-------------------------------------
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, Depth);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Mirror, AddressV = TextureAddressMode.Mirror, AddressW = TextureAddressMode.Mirror }));
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Clamp, AddressV = TextureAddressMode.Clamp, AddressW = TextureAddressMode.Clamp }));

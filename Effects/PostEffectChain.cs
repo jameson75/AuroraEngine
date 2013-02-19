@@ -100,7 +100,7 @@ namespace CipherPark.AngelJacket.Core.Effects
                 _game.GraphicsDeviceContext.OutputMerger.SetTargets(_auxTextureRenderTarget);
                 //_game.GraphicsDeviceContext.ClearRenderTargetView(_auxTextureRenderTarget, Color.Black);
                 //_game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);                
-                postEffect.Texture = _textureShaderResource;
+                postEffect.InputTexture = _textureShaderResource;
                 //postEffect.Depth = _depthShaderResource;
                 postEffect.Apply();       
                 Swap<ShaderResourceView>(ref _textureShaderResource, ref _auxTextureShaderResource);
@@ -109,7 +109,7 @@ namespace CipherPark.AngelJacket.Core.Effects
                 
             _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderView);            
             //_game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
-            passThruEffect.Texture = _textureShaderResource;
+            passThruEffect.InputTexture = _textureShaderResource;
             passThruEffect.Apply();        
 
             this._isEffectInProgress = false;

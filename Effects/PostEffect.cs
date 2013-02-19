@@ -11,7 +11,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 {
     public abstract class PostEffect : Effect
     {
-        public ShaderResourceView Texture { get; set; }
+        public ShaderResourceView InputTexture { get; set; }
 
         protected PostEffect(Device graphicsDevice)
             : base(graphicsDevice)

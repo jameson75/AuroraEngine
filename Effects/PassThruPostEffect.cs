@@ -36,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             GraphicsDevice.ImmediateContext.VertexShader.Set(VertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(PixelShader);            
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _samplerState);
             _quad.Draw(0);
             //Un-bind Texture from pixel shader input so it can possibly be used later as a render target.

@@ -16,13 +16,13 @@ namespace CipherPark.AngelJacket.Core.Effects
         private IGameApp _game = null;
         private const int ConstantBufferSize = 32;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
+        private VertexShader _vertexShaderP0 = null;
+        private PixelShader _pixelShaderP0P1 = null;
         private VertexShader _vertexShaderP1 = null;
-        private PixelShader _pixelShaderP1P2 = null;
         private VertexShader _vertexShaderP2 = null;
+        private PixelShader _pixelShaderP2 = null;
         private VertexShader _vertexShaderP3 = null;
         private PixelShader _pixelShaderP3 = null;
-        private VertexShader _vertexShaderP4 = null;
-        private PixelShader _pixelShaderP4 = null;
         private byte[] _vertexShaderByteCode = null;
         private RenderTargetView _tempRenderTarget = null;
         private ShaderResourceView _tempShaderResource = null;
@@ -46,18 +46,70 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public override void Apply()
         {
+            //********************************************************************************************
+            //NOTE: This method assumes that the input shader resource view (InputTexture) is bound to the same texture
+            //as the current render target.
+            //********************************************************************************************
+
+            RenderTargetView previousRenderTarget = null;
+            DepthStencilView previousDepthStencil = null;
+            previousRenderTarget = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out previousDepthStencil)[0];
+
             WriteConstants();
-            _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\postglowfs-x1-vs.cso", out _vertexShaderP1);                       
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
+
+            /////////
+            //Pass0
+            /////////
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_tempRenderTarget);
+            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP0);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP0P1);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
+            
+            /////////
+            //Pass1
+            /////////
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _tempShaderResource);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
+            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP1);
+            //NOTE: We're using the same pixel shader from pass0.
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
+
+            //////////
+            //Pass2
+            //////////
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_tempRenderTarget);
+            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP2);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP2);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
+
+            //////////
+            //Pass3
+            //////////
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _tempShaderResource);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
+            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP3);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP3);
+
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
+
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousDepthStencil, previousRenderTarget);
         }
 
         private void CreateShaders()
         {
-            LoadPixelShader("Content\\Shaders\\postglowfs-x1x2-ps.cso", out _pixelShaderP1P2);
-            LoadVertexShader("Content\\Shaders\\postflowfs-x2-vs.cso", out _vertexShaderP2);
-            LoadVertexShader("Content\\Shaders\\postflowfs-x3-vs.cso", out _vertexShaderP3);
-            LoadPixelShader("Content\\Shaders\\postflowfs-x3-ps.cso", out _pixelShaderP3);
-            LoadVertexShader("Content\\Shaders\\postflowfs-x4-vs.cso", out _vertexShaderP4);
-            LoadPixelShader("Content\\Shaders\\postflowfs-x4-ps.cso", out _pixelShaderP4);
+            _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\postglowfs-x1-vs.cso", out _vertexShaderP0);                       
+            LoadPixelShader("Content\\Shaders\\postglowfs-x1x2-ps.cso", out _pixelShaderP0P1);
+            LoadVertexShader("Content\\Shaders\\postflowfs-x2-vs.cso", out _vertexShaderP1);
+            LoadVertexShader("Content\\Shaders\\postflowfs-x3-vs.cso", out _vertexShaderP2);
+            LoadPixelShader("Content\\Shaders\\postflowfs-x3-ps.cso", out _pixelShaderP2);
+            LoadVertexShader("Content\\Shaders\\postflowfs-x4-vs.cso", out _vertexShaderP3);
+            LoadPixelShader("Content\\Shaders\\postflowfs-x4-ps.cso", out _pixelShaderP3);
         }
 
         private void CreateShaderTargets()

@@ -164,7 +164,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Texture: ScreenImage
             //RenderTarget: LowRes
             /////////////////////////////            
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _screenImageSampler);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_lowResTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_downSampleVertexShader);
@@ -220,7 +220,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //so that it ends up being averaged with the shader from the next pass
             /////////////////////////////////////////////////////////////////////////////////////
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantsBuffer2);
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _screenImageSampler);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, _lowResShaderResource);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, _lowResSampler);
