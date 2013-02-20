@@ -8,6 +8,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
+
 namespace CipherPark.AngelJacket.Core.Effects
 {
     public class SHLightingEffect : Effect

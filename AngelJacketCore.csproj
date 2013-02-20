@@ -161,6 +161,7 @@
     <Compile Include="World\Geometry\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
+    <Compile Include="World\ParticleSystem\Emitter.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />
     <Compile Include="World\Geometry\ReferenceGrid.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="Sandbox\TestEffect.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
