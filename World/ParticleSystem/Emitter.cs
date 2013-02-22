@@ -14,13 +14,40 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
 {
     public class Emitter
     {
+        private List<Particle> _particles = new List<Particle>();
+
         public Transform Transform { get; set; } 
-        public float EmissionAngle { get; set; }
-        public float EmissionRange { get; set; }
-        public ParticleController ParticleController { get; set; }
+        
+        public Vector3 EmissionDirection { get; set; }
+        
+        public float EmissionRangePitch { get; set; }
+        
+        public float EmissionRangeYaw { get; set; }
+        
+        public ParticleDescription ParticleDescription { get; set; }        
+       
+        public void Emit()
+        {
+            Particle p = Spawn(ParticleDescription);
+            _particles.Add(p);
+        }
+
+        public void Update(long gameTime)
+        {
+            if (ParticleDescription.BirthRate != 0)
+            {
+
+            }
+        }
+
+        private static Particle Spawn(ParticleDescription description)
+        {
+            Particle p = new Particle();
+            return p;
+        }
     }
 
-    public class ParticleController
+    public class ParticleDescription
     {
         public int BirthRate { get; set; }
         public int BirthRateRandomness { get; set; }
@@ -35,6 +62,12 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         public float ScaleRandomness { get; set; }
         public float PointSize { get; set; }
         public int RandomSeed { get; set; }
+        public Texture2D Texture { get; set; }
+    }
+
+    public class Particle
+    {
+
     }
 }
     
