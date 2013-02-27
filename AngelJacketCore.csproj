@@ -84,6 +84,7 @@
     <Compile Include="Effects\PostEffectChain.cs" />
     <Compile Include="Effects\PostGlowEffect.cs" />
     <Compile Include="Effects\SHLightingEffect.cs" />
+    <Compile Include="Utils\GameAssets.cs" />
     <Compile Include="Utils\ContentBuilder.cs" />
     <Compile Include="Utils\MatrixStack.cs" />
     <Compile Include="Utils\Toolkit\BasicEffect.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Sequencer\Sequencer.cs" />
     <Compile Include="World\Geometry\SkySphere.cs" />
     <Compile Include="World\ParticleSystem\Emitter.cs" />
+    <Compile Include="World\ParticleSystem\Plexic.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />
     <Compile Include="World\Geometry\ReferenceGrid.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="World\Scene\Scene.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="Sandbox\TestEffect.cs" />
+    <Compile Include="World\WorldSimulator.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
