@@ -11,17 +11,25 @@ namespace CipherPark.AngelJacket.Core.World
 {
     public class WorldSimulator
     {
-        IGameApp _game = null;
-        Scene.Scene _scene = null;
+        IGameApp _game = null;       
 
-        public IGameApp Game { get { return _game; } }
+        public IGameApp Game { get { return _game; } }    
 
-        public Scene.Scene Scene { get { return _scene; } }
-
-        public WorldSimulator(Scene.Scene scene)
+        public WorldSimulator(IGameApp game)
         {
-            _game = scene.Game;
-            _scene = scene;
+            _game = game;
         }
+
+        public WorldSimulatorSettings Settings { get; set; }
+
+        public void Update(Scene.Scene scene, long gameTime)
+        {
+
+        }
+    }
+
+    public class WorldSimulatorSettings
+    {
+        
     }
 }

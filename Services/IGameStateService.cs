@@ -15,15 +15,12 @@ namespace CipherPark.AngelJacket.Core.Services
 
     public class GameState
     {
-        private Player[] _players = null;
+        public RunningState RunningState { get; set; }
+    }
 
-        public Player[] Players
-        {
-            get
-            {
-                return _players;
-            }
-        }
+    public enum RunningState
+    {
+        Play
     }
 
     public interface IGameStateService

@@ -5,26 +5,38 @@ using System.Text;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.UI.Components;
 
 namespace CipherPark.AngelJacket.Core.Sequencer
 {
     public class Sequencer
     {
-        private IGameApp _game = null;
-        private GameAssets _assets = null;
-        private Scene _scene = null;
+        private IGameApp _game = null;     
 
         public IGameApp Game { get { return _game; } }
 
-        public GameAssets Assets { get { return _assets; } }
+        public GameAssets Assets { get; set; }
 
-        public Scene Scene { get { return _scene; } } 
-
-        public Sequencer(GameAssets assets, Scene scene)
+        public Sequence Sequence { get; set; }
+ 
+        public Sequencer(IGameApp game)
         {
-            _game = assets.Game;
-            _assets = assets;
-            _scene = scene;
+            _game = game;
         }
+
+        public void Update(Scene scene, UITree ui, long gameTime)
+        {
+
+        }
+    }
+
+    public class Sequence : List<Trigger>
+    {
+
+    }
+
+    public class Trigger
+    {
+
     }
 }
