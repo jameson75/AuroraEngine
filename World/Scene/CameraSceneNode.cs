@@ -15,16 +15,16 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     {
         private Matrix _cachedViewMatrix = Matrix.Zero;
 
-        public CameraSceneNode(Scene scene)
-            : base(scene)
+        public CameraSceneNode(IGameApp game)
+            : base(game)
         {
 
         }
 
         public SceneNode LockOnTarget { get; set; }
 
-        public CameraSceneNode(Scene scene, Camera camera)
-            : base(scene)
+        public CameraSceneNode(Camera camera)
+            : base(camera.Game)
         {
             Camera = camera;
         }

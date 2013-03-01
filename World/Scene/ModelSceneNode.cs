@@ -13,14 +13,14 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class ModelSceneNode : SceneNode
     {
-        public ModelSceneNode(Scene scene)
-            : base(scene)
+        public ModelSceneNode(IGameApp game)
+            : base(game)
         {
             HitTestable = true;
         }
 
-        public ModelSceneNode(Scene scene, Model model)
-            : base(scene)
+        public ModelSceneNode(Model model)
+            : base(model.Game)
         {
             Model = model;
             HitTestable = true;

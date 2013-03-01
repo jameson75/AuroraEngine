@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using SharpDX;
@@ -19,19 +20,19 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
     public abstract class SceneNode : ITransformable
     {
-        private Scene _scene = null;
+        private IGameApp _game = null;
         private SceneNode _parent = null;
         private SceneNodes _children = null;        
         
-        public SceneNode(Scene scene)
+        public SceneNode(IGameApp game)
         {
-            _scene = scene;
+            _game = game;
             _children = new SceneNodes();
             _children.CollectionChanged += Children_CollectionChanged;
            // Transform = Transform.Identity;
         }
 
-        public Scene Scene { get { return _scene; } }
+        public Scene Scene { get; set; }
 
         public SceneNode Parent { get { return _parent; } set { _parent = value; } }
 
@@ -92,14 +93,17 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         protected void OnChildAdded(SceneNode child)
         {
-            if (child.Parent != this)
+            if (child.Parent != this)            
                 child.Parent = this;
+
+            if (child.Scene != this.Scene)
+                child.Scene = this.Scene;
         }
 
         protected void OnChildRemoved(SceneNode child)
         {
-            if (child.Parent != this)
-                child.Parent = this;
+            child.Parent = null;
+            child.Scene = null;
         }
 
         protected void OnChildReset()
@@ -116,5 +120,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             foreach( SceneNode node in nodes )
                 this.Add(node);
         }
+
+     
     }  
 }
