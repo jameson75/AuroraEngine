@@ -9,6 +9,7 @@ using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.World.ParticleSystem;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.World.Scene;
+using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.Utils
 {
@@ -17,6 +18,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         private IGameApp _game = null;
         private Dictionary<string, Camera> _cameras = new Dictionary<string, Camera>();
         private Dictionary<string, SceneNode> _sceneNodes = new Dictionary<string, SceneNode>();
+        private Dictionary<string, Animation.Animation> _animations = new Dictionary<string, Animation.Animation>();
 
         public GameAssets(IGameApp game)
         {
@@ -30,5 +32,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         public Dictionary<string, Camera> Cameras { get { return _cameras; } }
 
         public Dictionary<string, SceneNode> SceneNodes { get { return _sceneNodes; } }
+
+        public Dictionary<string, Animation.Animation> Animations { get { return _animations; } }
     }
 }
