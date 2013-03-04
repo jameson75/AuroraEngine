@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         //public BasicEffectEx Effect { get; set; }
 
-        public DofLightingEffect Effect { get; set; }
+        public CoreEffect Effect { get; set; }
 
         //public Camera Camera { get; set; }
 

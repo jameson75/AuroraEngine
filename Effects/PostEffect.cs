@@ -18,8 +18,6 @@ namespace CipherPark.AngelJacket.Core.Effects
         { }
 
         [Obsolete]
-        public ShaderResourceView Depth { get; set; }
-
-        public abstract void Apply();
+        public ShaderResourceView Depth { get; set; }       
     }
 }

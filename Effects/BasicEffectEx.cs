@@ -24,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             _effect = new BasicEffect(device);
         }
 
-        public Matrix World
+        public override Matrix World
         {
             get { return _world; }
             set
@@ -34,7 +34,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
         }
 
-        public Matrix View
+        public override Matrix View
         {
             get { return _view; }
             set
@@ -44,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
         }
 
-        public Matrix Projection
+        public override Matrix Projection
         {
             get { return _projection; }
             set
@@ -64,12 +64,12 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
         }
 
-        public void Apply()
+        public override void Apply()
         {
             _effect.Apply();
         }
 
-        public byte[] SelectShaderByteCode()
+        public override byte[] SelectShaderByteCode()
         {
             return _effect.SelectShaderByteCode();
         }

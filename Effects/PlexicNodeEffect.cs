@@ -11,25 +11,18 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class PlexicNodeEffect
+    public class PlexicNodeEffect : Effect
     {
         private VertexShader _vertexShader = null;
         private PixelShader _pixelShader = null;
         private byte[] _vertexShaderByteCode = null;
-        private Device _graphicsDevice = null;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
 
-        public Device GraphicsDevice { get { return _graphicsDevice; } }
-
-        public Matrix World { get; set; }
-        public Matrix View { get; set; }
-        public Matrix Projection { get; set; }
         public Color ForegroundColor { get; set; }
         public Color BackgroundColor { get; set; }
 
-        public PlexicNodeEffect(Device graphicsDevice)
-        {
-            _graphicsDevice = graphicsDevice;
+        public PlexicNodeEffect(Device graphicsDevice) : base(graphicsDevice)        {
+      
             ForegroundColor = Color.Transparent;
             BackgroundColor = Color.Transparent;
             World = Matrix.Identity;
@@ -45,7 +38,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             _constantBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
-        public void Apply()
+        public override void Apply()
         {
             BlendStateDescription blendDesc = BlendStateDescription.Default();
             for (int i = 0; i < blendDesc.RenderTarget.Length; i++)
@@ -56,30 +49,30 @@ namespace CipherPark.AngelJacket.Core.Effects
                 blendDesc.RenderTarget[i].DestinationBlend = BlendOption.InverseSourceAlpha;
                 blendDesc.RenderTarget[i].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
             }
-            BlendState newBlendState = new BlendState(_graphicsDevice, blendDesc);
+            BlendState newBlendState = new BlendState(GraphicsDevice, blendDesc);
             //Game.GraphicsDeviceContext.OutputMerger.BlendFactor = Color.Zero;
-            BlendState oldBlendState = _graphicsDevice.ImmediateContext.OutputMerger.BlendState;
-            _graphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;
+            BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
+            GraphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;
 
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             SetShaderConstants();
-            _graphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
-            _graphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
-            
-            _graphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
-            _graphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
-            _graphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
+
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
+            GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
         }
 
-        public byte[] SelectShaderByteCode()
+        public override byte[] SelectShaderByteCode()
         {
             return _vertexShaderByteCode;
         }
 
         private void SetShaderConstants()
         {
-            DataBox dataBox = _graphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             Matrix worldViewProjection = this.World * this.View * this.Projection;
             worldViewProjection.Transpose();
             dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);
@@ -87,7 +80,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref vForegroundColor);
             Vector4 vBackgroundColor = BackgroundColor.ToVector4();
             dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref vBackgroundColor);
-            _graphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
+            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
         }
     }
 }

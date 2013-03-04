@@ -17,5 +17,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public NullSceneNode(IGameApp game)
             : base(game)
         { }
+
+        public NullSceneNode(IGameApp game, string name)
+            : base(game, name)
+        { }
     }
 }

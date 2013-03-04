@@ -37,6 +37,13 @@ namespace CipherPark.AngelJacket.Core.Sequencer
 
     public class Trigger
     {
+        public long Time { get; set; }
 
+        public Trigger() { }
+
+        public Trigger(long time)
+        {
+            Time = time;
+        }
     }
 }

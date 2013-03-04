@@ -19,7 +19,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     }
 
     public abstract class SceneNode : ITransformable
-    {
+    {        
         private IGameApp _game = null;
         private SceneNode _parent = null;
         private SceneNodes _children = null;        
@@ -31,6 +31,14 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             _children.CollectionChanged += Children_CollectionChanged;
            // Transform = Transform.Identity;
         }
+
+        public SceneNode(IGameApp game, string name)
+            : this(game)
+        {
+            Name = name;
+        }
+
+        public virtual string Name { get; set; }
 
         public Scene Scene { get; set; }
 
@@ -121,6 +129,15 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 this.Add(node);
         }
 
-     
+        public SceneNode this[string name]
+        {
+            get
+            {
+                for (int i = 0; i < this.Count; i++)
+                    if (this[i].Name == name)
+                        return this[i];
+                return null;
+            }
+        }
     }  
 }

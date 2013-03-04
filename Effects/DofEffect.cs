@@ -257,10 +257,10 @@ namespace CipherPark.AngelJacket.Core.Effects
                 blendDesc.RenderTarget[i].DestinationBlend = BlendOption.InverseSourceAlpha;
                 blendDesc.RenderTarget[i].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
             }
-            BlendState oldBlendState = _graphicsDevice.ImmediateContext.OutputMerger.BlendState;
-            _graphicsDevice.ImmediateContext.OutputMerger.BlendState = new BlendState(_graphicsDevice, blendDesc);
+            BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
+            GraphicsDevice.ImmediateContext.OutputMerger.BlendState = new BlendState(GraphicsDevice, blendDesc);
             _quad.Draw(0);
-            _graphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
+            GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
@@ -282,9 +282,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         private const int VSConstantsBufferSize = 144;
         private const int PSConstantsBufferSize = 80;
 
-        public Matrix World { get; set; }
-        public Matrix View { get; set; }
-        public Matrix Projection { get; set; }
+        //public Matrix World { get; set; }
+        //public Matrix View { get; set; }
+        //public Matrix Projection { get; set; }
         public Matrix WorldView { get { return World * View; } }
         public Matrix WorldViewProjectionMatix { get { return World * View * Projection; } }        
         public Vector3 LightDirection { get; set; }
@@ -311,19 +311,19 @@ namespace CipherPark.AngelJacket.Core.Effects
             _psConstantsBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, PSConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
-        public byte[] SelectShaderByteCode()
+        public override byte[] SelectShaderByteCode()
         {
             return _vertexShaderByteCode;
         }
 
-        public void Apply()
+        public override void Apply()
         {
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             WriteVSShaderConstants();
             WritePSShaderConstants();
-            _graphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _vsConstantsBuffer);
-            _graphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _psConstantsBuffer);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _vsConstantsBuffer);
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _psConstantsBuffer);
         }
 
         private void WriteVSShaderConstants()

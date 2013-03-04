@@ -178,7 +178,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
         }
 
-        public byte[] SelectShaderByteCode()
+        public override byte[] SelectShaderByteCode()
         {
             return _vertexShaderByteCode;
         }

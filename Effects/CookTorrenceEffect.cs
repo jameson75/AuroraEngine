@@ -19,9 +19,6 @@ namespace CipherPark.AngelJacket.Core.Effects
         private VertexShader _vertexShader = null;
         private byte[] _vertexShaderByteCode = null;
 
-        public Matrix World { get; set; }
-        public Matrix View { get; set; }
-        public Matrix Projection { get; set; }
         public Matrix WorldViewProjection { get { return World * View * Projection; } }
         public Vector4 VectorLightDirection { get; set; }
         public Vector4 VectorEye { get; set; }
@@ -34,16 +31,16 @@ namespace CipherPark.AngelJacket.Core.Effects
             _constantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
-        public void Apply()
+        public override void Apply()
         {
             WriteConstants();
-            _graphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
-            _graphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);        
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);        
         }
 
-        public byte[] SelectShaderByteCode()
+        public override byte[] SelectShaderByteCode()
         { 
             return _vertexShaderByteCode;
         }

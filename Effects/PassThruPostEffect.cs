@@ -44,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
         }
 
-        public byte[] SelectShaderByteCode()
+        public override byte[] SelectShaderByteCode()
         {
             return _vertexShaderByteCode;
         }

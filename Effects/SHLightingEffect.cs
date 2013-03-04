@@ -33,16 +33,16 @@ namespace CipherPark.AngelJacket.Core.Effects
             _constantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }        
 
-        public void Apply()
+        public override void Apply()
         {
             WriteConstants();
-            _graphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);       
-            _graphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);        
+            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);        
         }
 
-        public byte[] SelectShaderByteCode()
+        public override byte[] SelectShaderByteCode()
         {
             return _vertexShaderByteCode;
         }

@@ -13,7 +13,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 {
     public abstract class Effect
     {
-        public Device _graphicsDevice = null;
+        private Device _graphicsDevice = null;
         
         protected Effect(Device graphicsDevice)
         {
@@ -21,6 +21,20 @@ namespace CipherPark.AngelJacket.Core.Effects
         }
         
         public Device GraphicsDevice { get { return _graphicsDevice; } }
+
+        public virtual Matrix World { get; set; }
+
+        public virtual Matrix View { get; set; }
+
+        public virtual Matrix Projection { get; set; }
+
+        public virtual byte[] SelectShaderByteCode()
+        {
+            return null;
+        }
+
+        public virtual void Apply()
+        { }
 
         protected byte[] LoadVertexShader(string fileName, out VertexShader shader)
         {
