@@ -4,22 +4,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.AngelJacket.Core.World;
+using CipherPark.AngelJacket.Core.World.Scene;
 
 namespace CipherPark.AngelJacket.Core.Sequencer
 {
-    public class AnimationTrigger : Trigger
+    public class TransformAnimationTrigger : Trigger
     {
-        private List<Animation.Animation> _animations = new List<Animation.Animation>();       
+        public TransformAnimationTrigger() { }
 
-        public AnimationTrigger() { }
-
-        public AnimationTrigger(long time, IEnumerable<Animation.Animation> animations, AnimationTriggerAction action = AnimationTriggerAction.Start) : base(time)
+        public TransformAnimationTrigger(long time, TransformAnimation animation, ITransformable target, AnimationTriggerAction action = AnimationTriggerAction.Start) : base(time)
         {
-            _animations.AddRange(animations);
+            Animation = animation;
+            Target = target;
             Action = action;
         }
-        
+
+        public TransformAnimation Animation { get; set; }
+
         public AnimationTriggerAction Action { get; set; }
+
+        public ITransformable Target { get; set; }
+
+        public override void Fire(long gameTime, SequencerContext context)
+        {
+            if (Action == AnimationTriggerAction.Start)
+            {
+                TransformAnimationController controller = new TransformAnimationController(Animation, Target);
+                context.Simulator.AnimationControllers.Add(controller);
+                controller.Start();
+            }
+        }
     }
 
     public enum AnimationTriggerAction

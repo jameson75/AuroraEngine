@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.AngelJacket.Core.World;
+using CipherPark.AngelJacket.Core.World.Scene;
 
 namespace CipherPark.AngelJacket.Core.Sequencer
 {
@@ -24,6 +26,21 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         public PostEffectChain Chain { get; set; }
 
         public PostEffect Effect { get; set; }
+
+        public override void Fire(long gameTime, SequencerContext context)
+        {
+            if( (Action & PostEffectChainTriggerAction.Add) != 0 )
+                Chain.Add(Effect);
+            
+            if ((Action & PostEffectChainTriggerAction.Enable) != 0)
+                Effect.Enabled = true;
+            
+            if ((Action & PostEffectChainTriggerAction.Remove) != 0)
+                Chain.Remove(Effect);
+            
+            if ((Action & PostEffectChainTriggerAction.Disable) != 0)
+                Effect.Enabled = false;
+        }
     }
 
     [Flags]

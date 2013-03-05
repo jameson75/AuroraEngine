@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CipherPark.AngelJacket.Core.Module;
+using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.UI.Components;
@@ -15,8 +16,6 @@ namespace CipherPark.AngelJacket.Core.Sequencer
 
         public IGameApp Game { get { return _game; } }
 
-        public GameAssets Assets { get; set; }
-
         public Sequence Sequence { get; set; }
  
         public Sequencer(IGameApp game)
@@ -24,7 +23,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
             _game = game;
         }
 
-        public void Update(Scene scene, UITree ui, long gameTime)
+        public void Update(long gameTime, SequencerContext context)
         {
 
         }
@@ -35,7 +34,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
 
     }
 
-    public class Trigger
+    public abstract class Trigger
     {
         public long Time { get; set; }
 
@@ -45,5 +44,20 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         {
             Time = time;
         }
+
+        public abstract void Fire(long gameTime, SequencerContext context);
+    }
+
+    public struct SequencerContext
+    {
+        public SequencerContext(Scene scene, WorldSimulator simulator, UITree ui) : this()
+        {            
+            Scene = scene;
+            Simulator = simulator;
+            UI = ui;
+        } 
+        public Scene Scene { get; set; }
+        public WorldSimulator Simulator { get; set; }
+        public UITree UI { get; set; }
     }
 }
