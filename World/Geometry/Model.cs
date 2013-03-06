@@ -21,7 +21,7 @@ using CoreEffect = CipherPark.AngelJacket.Core.Effects.Effect;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class Model
+    public class Model : ITransformable
     {
         private IGameApp _game = null;
        

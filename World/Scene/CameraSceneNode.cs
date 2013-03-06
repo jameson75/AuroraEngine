@@ -23,8 +23,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public SceneNode LockOnTarget { get; set; }
 
-        public CameraSceneNode(Camera camera)
-            : base(camera.Game)
+        public CameraSceneNode(Camera camera, string name = null)
+            : base(camera.Game, name)
         {
             Camera = camera;
         }

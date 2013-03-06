@@ -30,9 +30,8 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         {
             if (Action == AnimationTriggerAction.Start)
             {
-                TransformAnimationController controller = new TransformAnimationController(Animation, Target);
-                context.Simulator.AnimationControllers.Add(controller);
-                controller.Start();
+                TransformAnimationTask task = new TransformAnimationTask(Animation, Target);
+                context.Simulator.AnimationTasks.Add(task);              
             }
         }
     }

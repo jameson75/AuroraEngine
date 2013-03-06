@@ -19,8 +19,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             HitTestable = true;
         }
 
-        public ModelSceneNode(Model model)
-            : base(model.Game)
+        public ModelSceneNode(Model model, string name = null)
+            : base(model.Game, name)
         {
             Model = model;
             HitTestable = true;

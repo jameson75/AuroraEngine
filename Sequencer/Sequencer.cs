@@ -12,12 +12,16 @@ namespace CipherPark.AngelJacket.Core.Sequencer
 {
     public class Sequencer
     {
-        private IGameApp _game = null;     
+        private IGameApp _game = null;
+        private bool _isStarted = false;
+        private long _startTime = 0;
 
         public IGameApp Game { get { return _game; } }
 
         public Sequence Sequence { get; set; }
- 
+
+        public GameAssets Assets { get; set; }
+
         public Sequencer(IGameApp game)
         {
             _game = game;
@@ -25,14 +29,38 @@ namespace CipherPark.AngelJacket.Core.Sequencer
 
         public void Update(long gameTime, SequencerContext context)
         {
+            if (!_isStarted)
+                Start();
 
+            List<Trigger> firedTriggers = new List<Trigger>();
+
+            long elapsedSequencerTime = CalculateElapsedSequencerTime();
+
+            foreach (Trigger trigger in Sequence)
+            {
+                if (trigger.Time <= elapsedSequencerTime)
+                {
+                    trigger.Fire(gameTime, context);
+                    firedTriggers.Add(trigger);
+                }
+            }
+
+            foreach (Trigger firedTrigger in firedTriggers)
+                Sequence.Remove(firedTrigger);
         }
+
+        private void Start()
+        {
+            _startTime = Environment.TickCount;
+            _isStarted = true;
+        }
+
+        private long CalculateElapsedSequencerTime()
+        { return Environment.TickCount - _startTime; }
     }
 
     public class Sequence : List<Trigger>
-    {
-
-    }
+    { }
 
     public abstract class Trigger
     {
