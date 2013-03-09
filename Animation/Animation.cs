@@ -112,6 +112,6 @@ namespace CipherPark.AngelJacket.Core.Animation
         protected static double Lerp(double v0, double v1, float percentage)
         {
             return v0 + (percentage * (v1 - v0));
-        }
+        }        
     }                
 }

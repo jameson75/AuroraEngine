@@ -8,12 +8,21 @@ using CipherPark.AngelJacket.Core;
 using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Animation;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.World
 {
     public class WorldSimulator
     {
-        IGameApp _game = null;       
-        private 
+        IGameApp _game = null;
+        private List<IAnimationController> _animationControllers = new List<IAnimationController>();
+
         public IGameApp Game { get { return _game; } }    
 
         public WorldSimulator(IGameApp game)
@@ -27,6 +36,8 @@ namespace CipherPark.AngelJacket.Core.World
         {
 
         }
+
+        public List<IAnimationController> AnimationControllers { get { return _animationControllers; } }
     }
 
     public class WorldSimulatorSettings
@@ -50,28 +61,5 @@ namespace CipherPark.AngelJacket.Core.World
     {
         public abstract void Step(long GameTime, SimulationContext context);
         public abstract bool IsComplete { get; }
-    }
-
-    public class TransformAnimationTask : SimulatorTask
-    {
-        public ITransformable Target { get; set; }
-
-        public TransformAnimation Animation { get; set; }
-
-        public TransformAnimationTask(TransformAnimation animation, ITransformable target)
-        {
-            Animation = animation;
-            Target = target;
-        }
-
-        public override void Step(long gameTime, SimulationContext context)
-        {
-            Animation.UpdateAnimation(gameTime, Target);
-        }
-
-        public override bool IsComplete
-        {
-            get { return false; }
-        }
     }
 }

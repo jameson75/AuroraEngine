@@ -9,10 +9,23 @@ using SharpDX.Direct3D11;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.Utils
 {
     public static class ContentBuilder
     {
+        public static Mesh BuildTechRings()
+        {
+            return null;
+        }
+
         public static Mesh BuildQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Color color)
         {   
             BasicVertexPositionColor[] verts = new BasicVertexPositionColor[6];

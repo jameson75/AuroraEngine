@@ -8,6 +8,14 @@ using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.UI.Components;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.Sequencer
 {
     public class Sequencer
@@ -83,9 +91,11 @@ namespace CipherPark.AngelJacket.Core.Sequencer
             Scene = scene;
             Simulator = simulator;
             UI = ui;
+            Game = scene.Game;
         } 
         public Scene Scene { get; set; }
         public WorldSimulator Simulator { get; set; }
         public UITree UI { get; set; }
+        public IGameApp Game { get; set; ]
     }
 }

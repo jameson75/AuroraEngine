@@ -18,8 +18,6 @@ namespace CipherPark.AngelJacket.Core.Animation
 {
     public class TransformAnimation : Animation
     {
-        private long? _animationStartTime = null;
-
         public bool SmoothingEnabled { get; set; }
 
         public Transform GetValueAtT(ulong t)
@@ -65,21 +63,6 @@ namespace CipherPark.AngelJacket.Core.Animation
 
                 return new Transform { Rotation = r, Translation = x };
             }
-        }
-
-        public void Start()
-        {
-            _animationStartTime = null;
-        }
-
-        public void UpdateAnimation(long gameTime, ITransformable transformable)
-        {
-            if (_animationStartTime == null)
-                _animationStartTime = gameTime;
-
-            ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
-
-            transformable.Transform = this.GetValueAtT(timeT);
         }
     }
 }

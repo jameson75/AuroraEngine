@@ -7,6 +7,14 @@ using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.World.Scene;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.Sequencer
 {
     public class TransformAnimationTrigger : Trigger
@@ -30,8 +38,8 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         {
             if (Action == AnimationTriggerAction.Start)
             {
-                TransformAnimationTask task = new TransformAnimationTask(Animation, Target);
-                context.Simulator.AnimationTasks.Add(task);              
+                TransformAnimationController controller = new TransformAnimationController(context.Game) { Animation = Animation, Target = Target };
+                context.Simulator.AnimationControllers.Add(controller);
             }
         }
     }

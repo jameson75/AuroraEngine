@@ -16,19 +16,42 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class AnimationController
-    {
-        private IGameApp _game = null;
+    public interface IAnimationController
+    {       
+        public void Start();
+        public void UpdateAnimation(long gameTime);
+    }
 
+    public abstract class AnimationController<TTarget, TAnimation> : IAnimationController
+    {
+        private IGameApp _game = null;        
         public AnimationController(IGameApp game)
         {
             _game = game;
         }
+        public IGameApp Game { get { return _game; } } 
+        public TTarget Target { get; set; }
+        public TAnimation Animation { get; set; }    
+    }
 
-        public void Start(Animation animation)
+    public class TransformAnimationController : AnimationController<ITransformable, TransformAnimation>
+    {
+        private long? _animationStartTime = 0;
+
+        public TransformAnimationController(IGameApp game)
         { }
 
-        public void Stop(Animation animation)
-        { }
+        public void Start()
+        {
+            _animationStartTime = null;
+        }
+
+        public void UpdateAnimation(long gameTime)
+        {
+            if (_animationStartTime == null)
+                _animationStartTime = gameTime;
+            ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
+            Target.Transform = Animation.GetValueAtT(timeT);
+        }
     }
 }

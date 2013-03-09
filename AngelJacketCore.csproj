@@ -164,6 +164,7 @@
     <Compile Include="World\Geometry\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
+    <Compile Include="World\Geometry\RiggedModel.cs" />
     <Compile Include="World\Geometry\SkySphere.cs" />
     <Compile Include="World\ParticleSystem\Emitter.cs" />
     <Compile Include="World\ParticleSystem\Plexic.cs" />
