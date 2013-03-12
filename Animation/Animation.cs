@@ -24,6 +24,22 @@ namespace CipherPark.AngelJacket.Core.Animation
         private AnimationKeyFrames _keyFrames = new AnimationKeyFrames();
 
         /// <summary>
+        /// Constructs an Animation object with an empty list of key frames.
+        /// </summary>
+        protected Animation()
+        { }
+
+        /// <summary>
+        /// Constructs an Animation object and initializes it with the specified keyframes.
+        /// </summary>
+        /// <param name="keyFrames">Set of key frames used to initialize this object.</param>
+        protected Animation(IEnumerable<AnimationKeyFrame> keyFrames)
+        {
+            foreach (AnimationKeyFrame keyFrame in keyFrames)
+                _keyFrames.Add(keyFrame.Time, keyFrame);
+        }
+
+        /// <summary>
         /// Gets the nearest key frame whose time is less than or equal to timeT.
         /// </summary>       
         /// <param name="timeT">The time in which the key frame is active.</param>
@@ -81,6 +97,17 @@ namespace CipherPark.AngelJacket.Core.Animation
                 _keyFrames[keyFrame.Time] = keyFrame;
             else
                 _keyFrames.Add(keyFrame.Time, keyFrame);
+        }
+
+        /// <summary>
+        /// Adds or replaces key frames at the specified times in the time line.
+        /// </summary>
+        /// <param name="keyFrame">The key frames to be added or replaced in the time line.</param>
+        /// <remarks>The AnimationKeyFrame.Time is used to determine where each key frame will be placed.</remarks>
+        public void SetKeyFrames(IEnumerable<AnimationKeyFrame> keyFrames)
+        {
+            foreach (AnimationKeyFrame keyFrame in keyFrames)
+                SetKeyFrame(keyFrame);
         }
 
         /// <summary>
