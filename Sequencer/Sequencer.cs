@@ -40,21 +40,21 @@ namespace CipherPark.AngelJacket.Core.Sequencer
             if (!_isStarted)
                 Start();
 
-            List<Trigger> firedTriggers = new List<Trigger>();
+            List<SequenceEvent> executedSequenceEvents = new List<SequenceEvent>();
 
             long elapsedSequencerTime = CalculateElapsedSequencerTime();
 
-            foreach (Trigger trigger in Sequence)
+            foreach (SequenceEvent sequenceEvent in Sequence)
             {
-                if (trigger.Time <= elapsedSequencerTime)
+                if (sequenceEvent.Time <= elapsedSequencerTime)
                 {
-                    trigger.Fire(gameTime, context);
-                    firedTriggers.Add(trigger);
+                    sequenceEvent.Execute(gameTime, this, context);
+                    executedSequenceEvents.Add(sequenceEvent);
                 }
             }
 
-            foreach (Trigger firedTrigger in firedTriggers)
-                Sequence.Remove(firedTrigger);
+            foreach (SequenceEvent executedSequenceEvent in executedSequenceEvents)
+                Sequence.Remove(executedSequenceEvent);
         }
 
         private void Start()
@@ -67,35 +67,29 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         { return Environment.TickCount - _startTime; }
     }
 
-    public class Sequence : List<Trigger>
+    public class Sequence : List<SequenceEvent>
     { }
 
-    public abstract class Trigger
-    {
+    public abstract class SequenceEvent 
+    { 
         public long Time { get; set; }
-
-        public Trigger() { }
-
-        public Trigger(long time)
-        {
-            Time = time;
-        }
-
-        public abstract void Fire(long gameTime, SequencerContext context);
-    }
+        public abstract void Execute(long gameTime, SequencerContext context);
+    }     
 
     public struct SequencerContext
     {
-        public SequencerContext(Scene scene, WorldSimulator simulator, UITree ui) : this()
+        public SequencerContext(GameAssets assets, Scene scene, WorldSimulator simulator, UITree ui) : this()
         {            
+            Assets = assets;
             Scene = scene;
             Simulator = simulator;
             UI = ui;
             Game = scene.Game;
         } 
-        public Scene Scene { get; set; }
-        public WorldSimulator Simulator { get; set; }
-        public UITree UI { get; set; }
-        public IGameApp Game { get; set; ]
+        public GameAssets Assets { get; private set; }
+        public Scene Scene { get; private set; }
+        public WorldSimulator Simulator { get; private set; }
+        public UITree UI { get; private set; }
+        public IGameApp Game { get; private set; }
     }
 }

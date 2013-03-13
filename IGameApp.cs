@@ -8,8 +8,15 @@ using SharpDX.Direct3D11;
 using SharpDX.XAudio2;
 using SharpDX.DirectInput;
 using SharpDX.DXGI;
-
 using CipherPark.AngelJacket.Core.Services;
+
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.AngelJacket.Core
 {

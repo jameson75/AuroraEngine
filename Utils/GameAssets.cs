@@ -24,11 +24,11 @@ namespace CipherPark.AngelJacket.Core.Utils
     public class GameAssets
     {
         private IGameApp _game = null;
-        private Dictionary<string, Camera> _cameras = new Dictionary<string, Camera>();
-        private Dictionary<string, Model> _models = new Dictionary<string, Model>();
-        private Dictionary<string, Animation.Animation> _animations = new Dictionary<string, Animation.Animation>();
+        private Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
+        private Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();        
         private Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
-        private SceneNodes _sceneNodes = new SceneNodes();
+        private Dictionary<string, Model> _models = new Dictionary<string, Model>();
+        private Dictionary<string, Camera> _cameras = new Dictionary<string, Camera>();
 
         public GameAssets(IGameApp game)
         {
@@ -36,17 +36,15 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
 
         public IGameApp Game { get { return _game; } }
-        
-        public Model Player1 { get; set; }
 
-        public Dictionary<string, Camera> Cameras { get { return _cameras; } }
+        public Dictionary<string, Mesh> Meshes { get { return _meshes; } }
+
+        public Dictionary<string, Texture2D> Textures { get { return _textures; } }
+
+        public Dictionary<string, Effect> Effects { get { return _effects; } }
 
         public Dictionary<string, Model> Models { get { return _models; } }
 
-        public Dictionary<string, Animation.Animation> Animations { get { return _animations; } }
-
-        public SceneNodes SceneNodes { get { return _sceneNodes; } }
-
-        public Dictionary<string, Effect> Effects { get { return _effects; } }
+        public Dictionary<string, Camera> Cameras { get { return _cameras; } }
     }
 }

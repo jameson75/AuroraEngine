@@ -7,6 +7,7 @@ using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.World.Geometry;
 using System.Collections.Specialized;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,6 +39,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public SceneNodes Nodes { get { return _nodes; } }
         
         public Camera Camera { get; set; }
+
+        public Model SkyModel { get; set; }
 
         public void Update(long gameTime)
         {
@@ -139,5 +142,23 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public event EventHandler EndDraw;
         public event EventHandler BeginUpdate;
         public event EventHandler EndUpdate;
+
+        public void Emplace(SceneNode sourceNode, SpatialReference sourceNodeSpatialReference, SceneNode targetNode, SpatialReference targetSpatialReference)
+        {
+            Transform sourceWorldBounds = sourceNode.LocalToWorld(sourceNode.Bounds);
+            Transform targetWorldBounds = targetNode.LocalToWorld(targetNode.Bounds);
+
+            switch(
+        }
+    }
+
+    public enum SpatialReference
+    {
+        BoundingBoxTop,
+        BoundingBoxBottom,
+        BoundingBoxLeft,
+        BoundingBoxRight,
+        BoundingBoxFront,
+        BoundingBoxBack
     }
 }

@@ -56,6 +56,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         
         public virtual Transform Transform { get; set; }
 
+        public virtual BoundingBox Bounds { get { return new BoundingBox(Transform.Translation, Transform.Translation); } }
+
         [Obsolete]
         public ISceneObject SceneObject { get; set; }
 

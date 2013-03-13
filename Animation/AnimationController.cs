@@ -25,9 +25,14 @@ namespace CipherPark.AngelJacket.Core.Animation
     public abstract class AnimationController<TTarget, TAnimation> : IAnimationController
     {
         private IGameApp _game = null;        
-        public AnimationController(IGameApp game)
+        protected AnimationController(IGameApp game)
         {
             _game = game;
+        }
+        protected AnimationController(IGameApp game, TAnimation animation, TTarget target)
+        {
+            Target = target;
+            Animation = animation;
         }
         public IGameApp Game { get { return _game; } } 
         public TTarget Target { get; set; }
@@ -38,8 +43,13 @@ namespace CipherPark.AngelJacket.Core.Animation
     {
         private long? _animationStartTime = 0;
 
-        public TransformAnimationController(IGameApp game)
+        public TransformAnimationController(IGameApp game) : base(game)
         { }
+
+        public TransformAnimationController(IGameApp game, TransformAnimation animation, ITransformable target)
+            : base(game, animation, target)
+        { }
+
 
         public void Start()
         {

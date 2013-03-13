@@ -40,6 +40,14 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public override Transform Transform { get { return Model.Transform; } set { Model.Transform = value; } }
 
+        public override BoundingBox Bounds
+        {
+            get
+            {
+                return Model.Mesh.BoundingBox;
+            }
+        }
+
         public override void Draw(long gameTime)
         {
             if (Model != null)
