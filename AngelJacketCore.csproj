@@ -85,7 +85,9 @@
     <Compile Include="Effects\PostGlowEffect.cs" />
     <Compile Include="Effects\SHLightingEffect.cs" />
     <Compile Include="Sequencer\AnimationTrigger.cs" />
+    <Compile Include="Sequencer\InlineSequence.cs" />
     <Compile Include="Sequencer\PostEffectChainTrigger.cs" />
+    <Compile Include="Sequencer\ScriptSequence.cs" />
     <Compile Include="Utils\GameAssets.cs" />
     <Compile Include="Utils\ContentBuilder.cs" />
     <Compile Include="Utils\MatrixStack.cs" />

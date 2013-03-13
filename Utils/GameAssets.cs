@@ -28,7 +28,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         private Dictionary<string, Model> _models = new Dictionary<string, Model>();
         private Dictionary<string, Animation.Animation> _animations = new Dictionary<string, Animation.Animation>();
         private Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
-        private Dictionary<string, SceneNode> _sceneNodes = new Dictionary<string, SceneNode>();
+        private SceneNodes _sceneNodes = new SceneNodes();
 
         public GameAssets(IGameApp game)
         {
@@ -45,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         public Dictionary<string, Animation.Animation> Animations { get { return _animations; } }
 
-        public Dictionary<string, SceneNode> SceneNodes { get { return _sceneNodes; } }
+        public SceneNodes SceneNodes { get { return _sceneNodes; } }
 
         public Dictionary<string, Effect> Effects { get { return _effects; } }
     }
