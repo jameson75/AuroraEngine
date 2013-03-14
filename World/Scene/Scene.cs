@@ -146,9 +146,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public void Emplace(SceneNode sourceNode, SpatialReference sourceNodeSpatialReference, SceneNode targetNode, SpatialReference targetSpatialReference)
         {
             Transform sourceWorldBounds = sourceNode.LocalToWorld(sourceNode.Bounds);
-            Transform targetWorldBounds = targetNode.LocalToWorld(targetNode.Bounds);
-
-            switch(
+            Transform targetWorldBounds = targetNode.LocalToWorld(targetNode.Bounds);            
         }
     }
 
