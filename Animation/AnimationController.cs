@@ -5,6 +5,7 @@ using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
+using CipherPark.AngelJacket.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -63,5 +64,12 @@ namespace CipherPark.AngelJacket.Core.Animation
             ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
             Target.Transform = Animation.GetValueAtT(timeT);
         }
+    }
+
+    public class BoneAnimationController : AnimationController<RiggedModel, BoneAnimation>
+    {
+        public BoneAnimationController(IGameApp game, BoneAnimation animation, RiggedModel target)
+            : base(game, animation, target)
+        { }
     }
 }

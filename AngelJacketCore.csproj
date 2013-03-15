@@ -65,6 +65,7 @@
     <Compile Include="Animation\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />
     <Compile Include="Animation\AnimationKeyFrame.cs" />
+    <Compile Include="Animation\BoneAnimation.cs" />
     <Compile Include="Animation\BooleanAnimation.cs" />
     <Compile Include="Animation\DrawingPointAnimation.cs" />
     <Compile Include="Animation\DrawingSizeAnimation.cs" />
