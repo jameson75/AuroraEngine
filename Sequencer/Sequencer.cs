@@ -48,7 +48,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
             {
                 if (sequenceEvent.Time <= elapsedSequencerTime)
                 {
-                    sequenceEvent.Execute(gameTime, this, context);
+                    sequenceEvent.Execute(gameTime, context);
                     executedSequenceEvents.Add(sequenceEvent);
                 }
             }

@@ -30,8 +30,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     {        
         private IGameApp _game = null;
         private SceneNode _parent = null;
-        private SceneNodes _children = null;        
-        
+        private SceneNodes _children = null;
+        private Scene _scene = null;
+
         public SceneNode(IGameApp game)
         {
             _game = game;
@@ -48,7 +49,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public virtual string Name { get; set; }
 
-        public Scene Scene { get; set; }
+        public Scene Scene { get { return _scene; } set { _scene = value; OnSceneChanged(); } }
 
         public SceneNode Parent { get { return _parent; } set { _parent = value; } }
 
@@ -126,6 +127,12 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         protected void OnChildReset()
         { }
+
+        protected void OnSceneChanged()
+        {
+            foreach (SceneNode child in Children)
+                child.Scene = this._scene;
+        }
     }
      
     public class SceneNodes :  ObservableCollection<SceneNode>
@@ -146,7 +153,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 for (int i = 0; i < this.Count; i++)
                     if (this[i].Name == name)
                         return this[i];
-                return null;
+                throw new IndexOutOfRangeException();
             }
         }
     }  

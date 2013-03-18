@@ -19,8 +19,8 @@ namespace CipherPark.AngelJacket.Core.Animation
 {
     public interface IAnimationController
     {       
-        public void Start();
-        public void UpdateAnimation(long gameTime);
+        void Start();
+        void UpdateAnimation(long gameTime);
     }
 
     public abstract class AnimationController<TTarget, TAnimation> : IAnimationController
@@ -32,17 +32,20 @@ namespace CipherPark.AngelJacket.Core.Animation
         }
         protected AnimationController(IGameApp game, TAnimation animation, TTarget target)
         {
+            _game = game;
             Target = target;
             Animation = animation;
         }
         public IGameApp Game { get { return _game; } } 
         public TTarget Target { get; set; }
-        public TAnimation Animation { get; set; }    
+        public TAnimation Animation { get; set; }
+        public abstract void Start();
+        public abstract void UpdateAnimation(long gameTime);
     }
 
     public class TransformAnimationController : AnimationController<ITransformable, TransformAnimation>
     {
-        private long? _animationStartTime = 0;
+        private long? _animationStartTime = null;
 
         public TransformAnimationController(IGameApp game) : base(game)
         { }
@@ -51,13 +54,12 @@ namespace CipherPark.AngelJacket.Core.Animation
             : base(game, animation, target)
         { }
 
-
-        public void Start()
+        public override void Start()
         {
             _animationStartTime = null;
         }
 
-        public void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
@@ -71,5 +73,15 @@ namespace CipherPark.AngelJacket.Core.Animation
         public BoneAnimationController(IGameApp game, BoneAnimation animation, RiggedModel target)
             : base(game, animation, target)
         { }
+
+        public override void Start()
+        {
+            
+        }
+
+        public override void UpdateAnimation(long gameTime)
+        {
+           
+        }
     }
 }

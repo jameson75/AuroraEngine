@@ -9,5 +9,10 @@ namespace CipherPark.AngelJacket.Core.Sequencer
     public class ScriptSequenceEvent : SequenceEvent
     {
         public string Script { get; set; }
+
+        public override void Execute(long gameTime, SequencerContext context)
+        {
+            
+        }
     }
 }

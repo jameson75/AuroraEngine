@@ -34,7 +34,10 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Update(long gameTime, SimulationContext context)
         {
-
+            foreach (IAnimationController controller in _animationControllers)
+            {
+                controller.UpdateAnimation(gameTime);
+            }
         }
 
         public List<IAnimationController> AnimationControllers { get { return _animationControllers; } }

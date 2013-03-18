@@ -18,6 +18,12 @@ namespace CipherPark.AngelJacket.Core.Animation
 {
     public class TransformAnimation : Animation
     {
+        public TransformAnimation()
+        { }
+
+        public TransformAnimation(IEnumerable<AnimationKeyFrame> keyFrames) : base(keyFrames)
+        { }
+
         public bool SmoothingEnabled { get; set; }
 
         public Transform GetValueAtT(ulong t)
