@@ -170,6 +170,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
+        
         private static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
         {
             //short[] indices = {0, 1, 2, 2, 3, 0};

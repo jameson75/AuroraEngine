@@ -73,5 +73,5 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public InputLayout VertexLayout { get; set; }
         public PrimitiveTopology Topology { get; set; }
         public BoundingBox BoundingBox { get; set; }
-    }   
+    }
 }

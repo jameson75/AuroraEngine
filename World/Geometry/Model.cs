@@ -21,13 +21,13 @@ using CoreEffect = CipherPark.AngelJacket.Core.Effects.Effect;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class Model : ITransformable
+    public abstract class BaseModel : ITransformable
     {
         private IGameApp _game = null;
-       
-        public Model(IGameApp game)
+
+        public BaseModel(IGameApp game)
         {
-            _game = game;           
+            _game = game;
             //Transform = Matrix.Identity;
         }
 
@@ -38,6 +38,20 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public Mesh Mesh { get; set; }
 
         public Transform Transform { get; set; }
+        
+        //public Camera Camera { get; set; }
+
+        //public Matrix Transform { get; set; }
+
+        public abstract void Draw(long gameTime);
+    }
+
+    public class Model : BaseModel
+    { 
+        public Model(IGameApp game) : base(game)
+        {
+           
+        }     
        
         //public BasicEffect Effect { get; set; }
 
@@ -45,16 +59,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public CoreEffect Effect { get; set; }
 
-        //public Camera Camera { get; set; }
-
-        //public Matrix Transform { get; set; }
-
         //public void ApplyEffect()
         //{
         //    _effect.Apply(_effectParameters);
         //}
 
-        public virtual void Draw(long gameTime)
+        public override void Draw(long gameTime)
         {
             //if (Effect != null)
             //{
@@ -69,5 +79,17 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         } 
     }
 
-   
+    public class CompositeModel : BaseModel
+    {
+        private List<CompositeModel> _childModels = new List<CompositeModel>();
+        private CoreEffect _effect = null;
+
+        public List<CompositeModel> ChildModels { get { return _childModels; } }
+
+        public CompositeModel Parent { get; set; }
+
+        public CompositeModel(IGameApp app)
+            : base(app)
+        { }
+    }
 }
