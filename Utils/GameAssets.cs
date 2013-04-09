@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         private Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
         private Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();        
         private Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
-        private Dictionary<string, Model> _models = new Dictionary<string, Model>();
+        private Dictionary<string, Model> _models = new Dictionary<string, BasicModel>();
         private Dictionary<string, Camera> _cameras = new Dictionary<string, Camera>();
 
         public GameAssets(IGameApp game)

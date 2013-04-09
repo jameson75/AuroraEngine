@@ -11,7 +11,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class RiggedModel : Model
+    public class RiggedModel : BasicModel
     {
         private Bones _bones = new Bones();
 

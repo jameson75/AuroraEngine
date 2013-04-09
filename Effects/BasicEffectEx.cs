@@ -72,6 +72,11 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
         }
 
+        public void EnableDefaultLighting()
+        {
+            _effect.EnableDefaultLighting();
+        }
+
         public override void Apply()
         {
             _effect.Apply();

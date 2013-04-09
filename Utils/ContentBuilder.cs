@@ -170,7 +170,69 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
-        
+        public static Mesh[] CreateSkyBoxQuads(IGameApp game, byte[] shaderByteCode, float distanceFromCenter)
+        {
+            BasicVertexPositionTexture[] front = new BasicVertexPositionTexture[4];
+            BasicVertexPositionTexture[] back = new BasicVertexPositionTexture[4];
+            BasicVertexPositionTexture[] left = new BasicVertexPositionTexture[4];
+            BasicVertexPositionTexture[] right = new BasicVertexPositionTexture[4];
+            BasicVertexPositionTexture[] top = new BasicVertexPositionTexture[4];
+            BasicVertexPositionTexture[] bottom = new BasicVertexPositionTexture[4];
+            Vector2[] _textureCoords = new Vector2[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1) };
+            
+            //front quad...
+            front[0] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, distanceFromCenter, -distanceFromCenter), _textureCoords[0]);
+            front[1] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, distanceFromCenter, -distanceFromCenter), _textureCoords[1]);
+            front[2] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, -distanceFromCenter, -distanceFromCenter), _textureCoords[2]);
+            front[3] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, -distanceFromCenter, -distanceFromCenter), _textureCoords[3]);
+            
+            //back quad...
+            back[0] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, distanceFromCenter, distanceFromCenter), _textureCoords[0]);
+            back[1] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, distanceFromCenter, distanceFromCenter), _textureCoords[1]);
+            back[2] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, -distanceFromCenter, distanceFromCenter), _textureCoords[2]);
+            back[3] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, -distanceFromCenter, distanceFromCenter), _textureCoords[3]);
+            
+            //left quad...
+            left[0] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, distanceFromCenter, distanceFromCenter), _textureCoords[0]);
+            left[1] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, distanceFromCenter, -distanceFromCenter), _textureCoords[1]);
+            left[2] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, -distanceFromCenter, -distanceFromCenter), _textureCoords[2]);
+            left[3] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, -distanceFromCenter, distanceFromCenter), _textureCoords[3]);
+            
+            //right quad...
+            right[0] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, distanceFromCenter, -distanceFromCenter), _textureCoords[0]);
+            right[1] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, distanceFromCenter, distanceFromCenter), _textureCoords[1]);
+            right[2] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, -distanceFromCenter, distanceFromCenter), _textureCoords[2]);
+            right[3] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, -distanceFromCenter, -distanceFromCenter), _textureCoords[3]);
+            
+            //top quad...
+            top[0] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, distanceFromCenter, -distanceFromCenter), _textureCoords[0]);
+            top[1] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, distanceFromCenter, -distanceFromCenter), _textureCoords[1]);
+            top[2] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, distanceFromCenter, distanceFromCenter), _textureCoords[2]);
+            top[3] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, distanceFromCenter, distanceFromCenter), _textureCoords[3]);
+            
+            //bottom quad...
+            bottom[0] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, -distanceFromCenter, -distanceFromCenter), _textureCoords[0]);
+            bottom[1] = new BasicVertexPositionTexture(new Vector3(-distanceFromCenter, -distanceFromCenter, distanceFromCenter), _textureCoords[1]);
+            bottom[2] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, -distanceFromCenter, distanceFromCenter), _textureCoords[2]);
+            bottom[3] = new BasicVertexPositionTexture(new Vector3(distanceFromCenter, -distanceFromCenter, -distanceFromCenter), _textureCoords[3]);
+
+            BoundingBox boundingBox = new BoundingBox(new Vector3(-distanceFromCenter, -distanceFromCenter, -distanceFromCenter), new Vector3(distanceFromCenter, distanceFromCenter, distanceFromCenter));
+            short[] indices = new short[] { 0, 1, 2, 0, 2, 3 };
+            Mesh frontQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, front, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            Mesh backQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, back, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            Mesh leftQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, left, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            Mesh rightQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, right, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            Mesh topQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, top, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            Mesh bottomQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, bottom, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+
+            return new Mesh[] { frontQuad, backQuad, leftQuad, rightQuad, topQuad, bottomQuad };
+        }
+
+        private static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, short[] indices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
+        {
+            return BuildMesh<T>(game, shaderByteCode, verts, null, inputElements, vertexSize, boundingBox);
+        }
+
         private static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
         {
             //short[] indices = {0, 1, 2, 2, 3, 0};

@@ -162,7 +162,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {          
                 Vector3 dir = far - near;
                 Ray ray = new Ray(near, dir);
-                World.Geometry.Model model = ((ModelSceneNode)node).Model;
+                World.Geometry.BasicModel model = ((ModelSceneNode)node).Model;
                 BoundingBox wBoundingBox = BoundingBoxExtension.Transform(model.Mesh.BoundingBox, node.LocalToWorld(node.Transform).ToMatrix());
                 if (wBoundingBox.Intersects(ref ray))
                     return true;                

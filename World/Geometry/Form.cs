@@ -10,7 +10,7 @@ using System.Collections.Specialized;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public abstract class Form : Model
+    public abstract class Form : BasicModel
     {
         private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();            
 

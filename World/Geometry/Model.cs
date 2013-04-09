@@ -21,11 +21,11 @@ using CoreEffect = CipherPark.AngelJacket.Core.Effects.Effect;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public abstract class BaseModel : ITransformable
+    public abstract class Model : ITransformable
     {
         private IGameApp _game = null;
 
-        public BaseModel(IGameApp game)
+        public Model(IGameApp game)
         {
             _game = game;
             //Transform = Matrix.Identity;
@@ -43,16 +43,6 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         //public Matrix Transform { get; set; }
 
-        public abstract void Draw(long gameTime);
-    }
-
-    public class Model : BaseModel
-    { 
-        public Model(IGameApp game) : base(game)
-        {
-           
-        }     
-       
         //public BasicEffect Effect { get; set; }
 
         //public BasicEffectEx Effect { get; set; }
@@ -64,22 +54,27 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         //    _effect.Apply(_effectParameters);
         //}
 
+        public abstract void Draw(long gameTime);
+    }
+
+    public class BasicModel : Model
+    { 
+        public BasicModel(IGameApp game) : base(game)
+        {
+           
+        }   
+
         public override void Draw(long gameTime)
         {
-            //if (Effect != null)
-            //{
-            //    Effect.SetWorld(Transform);
-            //    Effect.SetView(Camera.ViewMatrix);
-            //    Effect.SetProjection(Camera.ProjectionMatrix);
-            //    Effect.Apply();
-            //}
-            //Effect.Apply();
+            if(Effect != null)
+                Effect.Apply();
+            
             if (Mesh != null)
                 Mesh.Draw(gameTime);
         } 
     }
 
-    public class CompositeModel : BaseModel
+    public class CompositeModel : Model
     {
         private List<CompositeModel> _childModels = new List<CompositeModel>();
         private CoreEffect _effect = null;
@@ -91,5 +86,53 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public CompositeModel(IGameApp app)
             : base(app)
         { }
+
+        public CoreEffect Effect { get; set; }
+
+        public override void Draw(long gameTime)
+        {
+            if (Effect != null)
+                Effect.Apply();
+
+            if (Mesh != null)
+                Mesh.Draw(gameTime);
+
+            foreach (CompositeModel childModel in _childModels)
+            {
+                if (Effect != null)
+                {
+                    childModel.Effect.World = childModel.LocalToWorld(childModel.Transform.ToMatrix());
+                    childModel.Effect.View = Effect.View;
+                    childModel.Effect.Projection = Effect.Projection;
+                }
+                childModel.Draw(gameTime);
+            }
+        }
+
+        public Matrix LocalToWorld(Matrix localTransform)
+        {
+            MatrixStack stack = new MatrixStack();
+            stack.Push(localTransform);
+            CompositeModel model = this.Parent;
+            while (model != null)
+            {
+                stack.Push(model.Transform.ToMatrix());
+                model = model.Parent;
+            }
+            return stack.Transform;
+        }
+
+        public Transform LocalToWorld(Transform localTransform)
+        {
+            TransformStack stack = new TransformStack();
+            stack.Push(localTransform);
+            CompositeModel model = this.Parent;
+            while (model != null)
+            {
+                stack.Push(model.Transform);
+                model = model.Parent;
+            }
+            return stack.Transform;
+        } 
     }
 }
