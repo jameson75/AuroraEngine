@@ -86,5 +86,10 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             return _effect.SelectShaderByteCode();
         }
+
+        public void SetTexture(ShaderResourceView texture)
+        {
+            _effect.SetTexture(texture);
+        }
     }
 }

@@ -77,7 +77,6 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class CompositeModel : Model
     {
         private List<CompositeModel> _childModels = new List<CompositeModel>();
-        private CoreEffect _effect = null;
 
         public List<CompositeModel> ChildModels { get { return _childModels; } }
 
@@ -85,9 +84,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public CompositeModel(IGameApp app)
             : base(app)
-        { }
-
-        public CoreEffect Effect { get; set; }
+        { }      
 
         public override void Draw(long gameTime)
         {
