@@ -167,6 +167,8 @@
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
     <Compile Include="World\Geometry\RiggedModel.cs" />
+    <Compile Include="World\Geometry\TerrainForm.cs" />
+    <Compile Include="World\Geometry\TurbineForm.cs" />
     <Compile Include="World\ParticleSystem\Emitter.cs" />
     <Compile Include="World\ParticleSystem\Plexic.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
