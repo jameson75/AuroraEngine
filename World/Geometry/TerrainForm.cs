@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class TerrainForm : Form
-    {
-    }
+    //public class TerrainForm : Form
+    //{
+    //}
 }

@@ -139,11 +139,14 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
         }
 
-        public static Mesh ImportFBX(Device graphicsDevice, string fileName)
+        public static Model ImportFBX(IGameApp app, string fileName)
         {
-            Mesh result = null;
+            Model result = null;
             FBXMeshThunk fbxMeshThunk;
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
+
+            result = ContentBuilder.BuildMesh<BasicVertexPositionNormalTexture>(app, shaderByteCode, 
+            fbxMeshThunk.Dispose();
             return result;
         }
     }

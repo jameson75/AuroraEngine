@@ -228,12 +228,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new Mesh[] { frontQuad, backQuad, leftQuad, rightQuad, topQuad, bottomQuad };
         }
 
-        private static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
+        public static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
         {
             return BuildMesh<T>(game, shaderByteCode, verts, null, inputElements, vertexSize, boundingBox);
         }
 
-        private static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, short[] indices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
+        public static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, short[] indices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
         {
             //short[] indices = {0, 1, 2, 2, 3, 0};
             MeshDescription meshDesc = new MeshDescription();
