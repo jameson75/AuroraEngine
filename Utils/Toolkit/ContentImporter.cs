@@ -87,7 +87,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         //    return model;
         //}
 
-        public static VoiceData LoadVoiceDataFromWav(string filePath)
+        private static VoiceData LoadVoiceDataFromWav(string filePath)
         {
             VoiceDataThunk vdt = new VoiceDataThunk();
             VoiceData voiceData = new VoiceData();
@@ -148,9 +148,13 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         }
     }
 
-    public struct FBXMeshThunk
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct FBXMeshThunk : IDisposable
     {
-
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public struct VoiceData
