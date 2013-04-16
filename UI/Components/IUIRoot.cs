@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SharpDX;
 using CipherPark.AngelJacket.Core.UI.Controls;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,5 +32,6 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         event EventHandler LoadComplete;
 
         FocusManager FocusManager { get; }
+     
     }
 }
