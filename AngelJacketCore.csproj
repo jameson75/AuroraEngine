@@ -88,6 +88,7 @@
     <Compile Include="Effects\SHLightingEffect.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
+    <Compile Include="UI\Controls\PropertyGrid.cs" />
     <Compile Include="Utils\GameAssets.cs" />
     <Compile Include="Utils\ContentBuilder.cs" />
     <Compile Include="Utils\MatrixStack.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
     <Compile Include="World\Geometry\RiggedModel.cs" />
+    <Compile Include="World\Geometry\RingForm.cs" />
     <Compile Include="World\Geometry\TerrainForm.cs" />
     <Compile Include="World\Geometry\TurbineForm.cs" />
     <Compile Include="World\ParticleSystem\Emitter.cs" />

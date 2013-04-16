@@ -65,7 +65,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ICustomFocusManager CustomFocusManager { get; set; }
 
-        public Guid DivContainerId { get; set; }
+        public Guid Id { get; set; }
 
         public DrawingPointF Position
         {

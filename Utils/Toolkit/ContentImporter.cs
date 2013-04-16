@@ -145,7 +145,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             FBXMeshThunk fbxMeshThunk;
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
 
-            result = ContentBuilder.BuildMesh<BasicVertexPositionNormalTexture>(app, shaderByteCode, 
+            //result = ContentBuilder.BuildMesh<BasicVertexPositionNormalTexture>(app, shaderByteCode, 
             fbxMeshThunk.Dispose();
             return result;
         }

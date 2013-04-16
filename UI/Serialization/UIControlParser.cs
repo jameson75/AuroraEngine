@@ -66,7 +66,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                 Guid result = Guid.Empty;
                 if (!Guid.TryParse(element.Attribute(DivContainerIdAttributeName).Value, out result))
                     throw new InvalidDataException("Property value not equal to Guid.");
-                control.DivContainerId = result;
+                control.Id = result;
             }
         }
 

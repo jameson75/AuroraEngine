@@ -34,24 +34,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
             
             _textBox = new TextBox(this.VisualRoot, null, tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Yellow);
-            _textBox.DivContainerId = Guid.NewGuid();
+            _textBox.Id = Guid.NewGuid();
             _textBox.CustomFocusManager = this;
             Children.Add(_textBox);
             
             _listControl = new ListControl(this.VisualRoot);
-            _listControl.DivContainerId = Guid.NewGuid();
+            _listControl.Id = Guid.NewGuid();
             _listControl.CustomFocusManager = this;            
              Children.Add(_listControl);
             
             _button = new Button(this.VisualRoot, "?", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Blue);
-            _button.DivContainerId = Guid.NewGuid();
+            _button.Id = Guid.NewGuid();
             _button.CustomFocusManager = this;
             Children.Add(_button);
 
             DivLayoutManager divLayoutManager = new DivLayoutManager(this);
-            divLayoutManager.Divs.Add(new LayoutDiv(_textBox.DivContainerId, 0, LayoutDivUnits.Span, 20, LayoutDivUnits.Pixels));
-            divLayoutManager.Divs.Add(new LayoutDiv(_button.DivContainerId, 20, 20));
-            divLayoutManager.Divs.Add(new LayoutDiv(_listControl.DivContainerId, 100, LayoutDivUnits.Percentage, 0, LayoutDivUnits.Span));
+            divLayoutManager.Divs.Add(new LayoutDiv(_textBox.Id, 0, LayoutDivUnits.Span, 20, LayoutDivUnits.Pixels));
+            divLayoutManager.Divs.Add(new LayoutDiv(_button.Id, 20, 20));
+            divLayoutManager.Divs.Add(new LayoutDiv(_listControl.Id, 100, LayoutDivUnits.Percentage, 0, LayoutDivUnits.Span));
             _layoutManager = divLayoutManager;
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);                      
         }

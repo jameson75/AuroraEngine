@@ -171,7 +171,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             float newHeight = 0f;
             foreach (UIControl child in _container.Children)
             {
-                if (child.DivContainerId == div.Id)
+                if (child.Id == div.Id)
                 {                   
                     newPositionX = divBounds.Left + div.Padding.X + child.Margin.Width;
                     newWidth = divBounds.Width - (div.Padding.X * 2f);                  
