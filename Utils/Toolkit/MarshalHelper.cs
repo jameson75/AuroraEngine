@@ -14,11 +14,11 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public static IntPtr StructuresToPtr<T>(IEnumerable<T> structures, int length) where T : struct
         {
             int sizeOfTypeT = Marshal.SizeOf(typeof(T));
-            IntPtr ptr = Marshal.AllocHGlobal(sizeOfTypeT * length);
+            IntPtr ptr = Marshal.AllocHGlobal(sizeOfTypeT * length);            
             int i = 0;
             foreach (T structure in structures)
             {
-                IntPtr cursor = new IntPtr(ptr.ToInt64() + (i * sizeOfTypeT));
+                IntPtr cursor = IntPtr.Add(ptr, i * sizeOfTypeT);
                 Marshal.StructureToPtr(structure, cursor, false);
                 i++;
             }
@@ -31,7 +31,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             int sizeofTypeT = Marshal.SizeOf(typeof(T));
             for (int i = 0; i < length; i++)
             {
-                IntPtr cursor = new IntPtr(ptr.ToInt64() + (i * sizeofTypeT));
+                IntPtr cursor = IntPtr.Add(ptr, i * sizeofTypeT);
                 Marshal.PtrToStructure(ptr, structures[i]);
             }
             return structures;

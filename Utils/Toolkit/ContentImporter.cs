@@ -18,6 +18,14 @@ using CipherPark.AngelJacket.Core.Effects;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
 using System.Text.RegularExpressions;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 {
     public static class ContentImporter
@@ -142,9 +150,8 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public static Model ImportFBX(IGameApp app, string fileName)
         {
             Model result = null;
-            FBXMeshThunk fbxMeshThunk;
+            FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
-
             //result = ContentBuilder.BuildMesh<BasicVertexPositionNormalTexture>(app, shaderByteCode, 
             fbxMeshThunk.Dispose();
             return result;
@@ -154,9 +161,41 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
     [StructLayout(LayoutKind.Sequential)]
     internal struct FBXMeshThunk : IDisposable
     {
+        public readonly float[] m = new float[16];
+        public IntPtr Vertices;
+        public int VertexCount;
+        public IntPtr Indices;
+        public int IndexCount;
+        public IntPtr Children;
+        public int ChildCount;
+
         public void Dispose()
         {
-            throw new NotImplementedException();
+            FBXMeshThunk.DisposeMeshTree(ref this);
+        }
+
+        private static void DisposeMeshTree(ref FBXMeshThunk parent)
+        {
+            FBXMeshThunk[] children = parent.MarshalChildren();
+            if (children != null)
+            {
+                for (int i = 0; i < children.Length; i++)
+                    FBXMeshThunk.DisposeMeshTree(ref children[i]);
+            }
+            Marshal.FreeHGlobal(parent.Vertices);
+            parent.Vertices = IntPtr.Zero;           
+            Marshal.FreeHGlobal(parent.Indices);
+            parent.Indices = IntPtr.Zero;           
+            Marshal.FreeHGlobal(parent.Children);
+            parent.Children = IntPtr.Zero;           
+        }
+
+        public FBXMeshThunk[] MarshalChildren()
+        {
+            if (Children == IntPtr.Zero)
+                return null;
+            else
+                return MarshalHelper.PtrToStructures<FBXMeshThunk>(Children, ChildCount);
         }
     }
 
