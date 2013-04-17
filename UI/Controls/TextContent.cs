@@ -24,6 +24,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public string Text { get; set; }
+
+        public string Format { get; set; }
         
         public SpriteFont Font { get; set; }
         
@@ -43,8 +45,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (!HasDrawParameters)
                 Container.ControlSpriteBatch.Begin();
             else
-                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);           
-            Container.ControlSpriteBatch.DrawString(Font, Text == null ? string.Empty : Text, contentSurfacePosition.ToVector2(), FontColor);
+                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);
+            string outputString = string.IsNullOrEmpty(Text) ? string.Empty : string.IsNullOrEmpty(Format) ? Text : string.Format(Format, Text);
+            Container.ControlSpriteBatch.DrawString(Font, outputString, contentSurfacePosition.ToVector2(), FontColor);
             Container.ControlSpriteBatch.End();                        
         }
 

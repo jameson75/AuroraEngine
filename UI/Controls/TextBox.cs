@@ -40,7 +40,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _textContent.Container = this;
         }
 
-        public TextContent Text 
+        public TextContent Content 
         { 
             get { return _textContent; }
             //set
@@ -51,7 +51,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             //    if (_content != null)
             //        _content.Container = this;
             //}
-        }
+        }       
 
         public ColorContent BackgroundColor
         {

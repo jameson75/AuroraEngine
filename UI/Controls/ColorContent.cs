@@ -64,6 +64,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected virtual void OnColorChanged()
         {
+            //TODO: Refactor this content class so that changing the color 
+            //doesn't destroy the texture... (ie: tint a texture that's always white, insted).
             DestroyTextureResources();
         }
 
