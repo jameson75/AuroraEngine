@@ -15,10 +15,22 @@ using CipherPark.AngelJacket.Core.UI.Components;
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public abstract class ContainerControl : UIControl
-    {         
+    {
+        private IControlLayoutManager _layoutManager = null;
+
         protected ContainerControl(IUIRoot root)
             : base(root)
-        { }
+        {
+            _layoutManager = new ContainerControlLayoutManager(this);
+        }
+
+        protected override IControlLayoutManager LayoutManager
+        {
+            get
+            {
+                return _layoutManager;
+            }
+        }
 
         public override void Draw(long gameTime)
         {

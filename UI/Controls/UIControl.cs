@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private UIControlCollection _children = null;
         private DrawingSizeF _size = DrawingSizeFExtension.Zero;
         private DrawingPointF _position = DrawingPointFExtension.Zero;
-        private IControlLayoutManager _layoutManager = null;
+       
         #endregion
 
         #region Constructors
@@ -43,8 +43,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Visible = true;
             _spriteBatch = new SpriteBatch(visualRoot.Game.GraphicsDeviceContext);
             _children = new UIControlCollection();
-            _children.CollectionChanged += Children_CollectionChanged;
-            _layoutManager = new ContainerControlLayoutManager(this);
+            _children.CollectionChanged += Children_CollectionChanged;            _
         }       
         #endregion
 
@@ -61,7 +60,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public IUIRoot VisualRoot { get { return _visualRoot; } }
 
-        protected virtual IControlLayoutManager LayoutManager { get { return _layoutManager; } }
+        protected virtual IControlLayoutManager LayoutManager { get { return null; } }
 
         public ICustomFocusManager CustomFocusManager { get; set; }
 
@@ -318,7 +317,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected void UpdateLayout(LayoutUpdateReason reason)
         {
-            LayoutManager.UpdateLayout(reason);
+            if(LayoutManager != null)
+                LayoutManager.UpdateLayout(reason);
             OnLayoutChanged();
         }
 
