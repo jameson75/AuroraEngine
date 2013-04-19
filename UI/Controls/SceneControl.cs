@@ -132,6 +132,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         System.Diagnostics.Trace.WriteLine(mousePointNear);
                         System.Diagnostics.Trace.WriteLine(mousePointFar);
                         _selectedNode = SceneControl.PickNode(Scene.Nodes, mousePointNear, mousePointFar);
+                        OnSelectedNodesChanged(null, new[] { _selectedNode });
                     }
                     break;
             }
@@ -255,6 +256,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
                     break;
             }
-        }     
-    }
+        }
+
+        public void OnSelectedNodesChanged(IEnumerable<SceneNode> oldNodes, IEnumerable<SceneNode> newNodes)
+        {
+            
+        }
+    } 
 }

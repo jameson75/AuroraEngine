@@ -109,9 +109,9 @@ namespace CipherPark.AngelJacket.Core.Utils
                    key == Key.Capital);
         }
 
-        public static WritableInput[] ConvertToWritableInput(Key[] keys, WritableInputConversionFlags flags)
+        public static AsciiCharacterInfo[] ConvertToAsciiCharacters(Key[] keys, AsciiCharacterConversionFlags flags)
         {
-            List<WritableInput> input = new List<WritableInput>();
+            List<AsciiCharacterInfo> input = new List<AsciiCharacterInfo>();
             bool applyShift = keys.Any(k => k == Key.LeftShift || k == Key.RightShift);
             bool applyCaps = (applyShift && keys.All(k => k != Key.Capital)) ||
                               (!applyShift && keys.Any(k => k == Key.Capital));
@@ -197,12 +197,12 @@ namespace CipherPark.AngelJacket.Core.Utils
                     ascii = (char)32;
                 else if (key == Key.Return)
                 {
-                    if (!flags.HasFlag(WritableInputConversionFlags.IgnoreNewLine))
+                    if (!flags.HasFlag(AsciiCharacterConversionFlags.IgnoreNewLine))
                         ascii = '\n';
                 }
                 else if (key == Key.Tab)
                 {
-                    if (!flags.HasFlag(WritableInputConversionFlags.IgnoreTab))
+                    if (!flags.HasFlag(AsciiCharacterConversionFlags.IgnoreTab))
                         ascii = '\t';
                 }
                 else if (key == Key.Semicolon)
@@ -228,9 +228,9 @@ namespace CipherPark.AngelJacket.Core.Utils
                 else if (key == Key.Comma)
                     ascii = applyShift ? (char)60 : (char)44; // < or ,
 
-                WritableInput wi = new WritableInput();
+                AsciiCharacterInfo wi = new AsciiCharacterInfo();
                 wi.Ascii = ascii;
-                wi.KeyType = (ascii == char.MinValue) ? WritableInputType.Special : WritableInputType.Printable;
+                wi.KeyType = (ascii == char.MinValue) ? AsciiCharacterType.Special : AsciiCharacterType.Printable;
                 wi.IsAlt = keys.Any(k => k == Key.LeftAlt || k == Key.RightAlt);
                 wi.IsCtrl = keys.Any(k => k == Key.LeftControl || k == Key.RightControl);
                 wi.Key = key;
@@ -357,23 +357,23 @@ namespace CipherPark.AngelJacket.Core.Utils
         */
     }
 
-    public struct WritableInput
+    public struct AsciiCharacterInfo
     {
         public Key Key;
-        public WritableInputType KeyType;
+        public AsciiCharacterType KeyType;
         public char Ascii;
         public bool IsAlt;
         public bool IsCtrl;
     }
 
-    public enum WritableInputType
+    public enum AsciiCharacterType
     {
         Printable,
         Special
     }
 
     [Flags]
-    public enum WritableInputConversionFlags
+    public enum AsciiCharacterConversionFlags
     {
         IgnoreNewLine,
         IgnoreTab

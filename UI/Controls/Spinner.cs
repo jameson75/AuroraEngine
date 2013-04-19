@@ -26,13 +26,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private Button _upButton = null;
         private Button _downButton = null;
 
-        public Spinner(IUIRoot visualRoot)
+        public Spinner(IUIRoot visualRoot, SpriteFont font, Color fontColor, Color backgroundColor)
             : base(visualRoot)
         { 
-            _textBox = new TextBox(visualRoot, new TextContent(string.Empty, font, fontColor);
+            _textBox = new TextBox(visualRoot, string.Empty, font, fontColor, backgroundColor);
+            _textBox.EditComplete+= TextBox_EditComplete;
             _upButton = new Button(visualRoot);      
-            _downButton = new Button(visualRoot);
-            _downButton.Content
+            _downButton = new Button(visualRoot);           
             Children.Add(_textBox);
             Children.Add(_upButton);
             Children.Add(_downButton);
@@ -62,6 +62,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             set
             {
                 _textBox.Content.Text = value.ToString();
+                OnValueChanged(Value);
             }                    
         }
 
@@ -84,5 +85,28 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _downButton.Position = new DrawingPointF(this.Size.Width - 5.0f, 5.0f);
             _downButton.Size = new DrawingSizeF(this.Size.Width - 5.0f, this.Size.Height);
         }
+
+        protected virtual void OnValueChanged(float value)
+        {
+            EventHandler handler = ValueChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        private void TextBox_EditComplete(object sender, EventArgs args)
+        {
+            OnValueChanged(Value);
+        }
+
+        public event EventHandler ValueChanged;
     }
+
+    //public class FieldValueChangedEventArgs<T> : EventArgs
+    //{
+    //    private object _value = 0.0f;
+    //    public FieldValueChangedEventArgs(object value) { _value = value; }
+    //    public object Value { get { return _value; } }
+    //}
+
+    //public delegate void FieldValueChangedHandler<T>(object sender, FieldValueChangedEventArgs<T> args);
 }

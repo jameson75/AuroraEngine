@@ -14,6 +14,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //private ControlInputState cim = null;
         private ContentControl _caret = null;
         private long _lastCaretUpdateTime = 0;
+        private bool _textEdited = false;
 
         public TextBox(IUIRoot visualRoot)
             : base(visualRoot)
@@ -58,6 +59,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             get { return _backgroundContent; }
         }
 
+        public override void Initialize()
+        {
+            VisualRoot.FocusManager.ControlLostFocus += FocusManager_ControlLostFocus;
+        }
+
         public override void Update(long gameTime)
         {
             if (_caret == null)
@@ -68,15 +74,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 Services.InputService inputServices = (Services.InputService)Game.Services.GetService(typeof(Services.InputService));
                 if (inputServices == null)
                     throw new InvalidOperationException("Input services not available.");
-                ControlInputState cim = inputServices.GetControlInputState();       
+                ControlInputState cim = inputServices.GetControlInputState();                
                 //cim.UpdateState(gameTime);
                 if (cim.IsKeyReleased(Key.Return))
                     OnEnterKey();
                 else if (cim.GetKeysDown().Length > 0)
                 {
-                    WritableInput[] cis = ControlInputState.ConvertToWritableInput(cim.GetKeysDown(), WritableInputConversionFlags.IgnoreNewLine | WritableInputConversionFlags.IgnoreTab);
-                    foreach (WritableInput ci in cis)
-                        if (ci.KeyType == WritableInputType.Printable)
+                    AsciiCharacterInfo[] cis = ControlInputState.ConvertToAsciiCharacters(cim.GetKeysDown(), AsciiCharacterConversionFlags.IgnoreNewLine | AsciiCharacterConversionFlags.IgnoreTab);                                           
+                    foreach (AsciiCharacterInfo ci in cis)
+                        if (ci.KeyType == AsciiCharacterType.Printable)
                             this._textContent.Text += ci.Ascii.ToString();
                         else
                         {
@@ -85,6 +91,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                     this._textContent.Text = this._textContent.Text.Substring(0, this._textContent.Text.Length - 1);
                         }
                     UpdateCaretPosition();
+                    _textEdited = true;
                 }
             }            
 
@@ -132,7 +139,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         //****************************************************************
         // NOTE: As of XNA 4.0 There is no more fixed-function clipping!! *
-        // It has to be implemented as shader                             *
+        // It has to be implemented as/into shader                        *
         //****************************************************************
         //RasterizerState preClippingState = null;
         //
@@ -157,8 +164,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             //*****************************************************************************************************
             //NOTE: Implementing the caret as a child control is over-kill but, currently, I have no other
             //easy way of doing it. Right now, the only simple way I have of rendering a texture is 
-            //by using ImageContent or ColorConent and, as of now, contents do have a shape/size of their own -
-            //they assume the same of their container [controls].
+            //by using ImageContent or ColorConent and, as of now, contents do not have a shape/size of their own -
+            //they assume the same of their container (control).
             //TODO: Implement the caret a simple texture.
             //****************************************************************************************************
             _caret = new ContentControl(this.VisualRoot, new ColorContent(Color.White));    
@@ -174,11 +181,35 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _caret.Position = new DrawingPointF(_textContent.GetTextLength(0, _textContent.Text.Length), _caret.Position.Y);
         }
 
-        protected void OnEnterKey()
+        protected virtual void OnEnterKey()
         {
             EventHandler handler = EnterKeyEvent;
             if (handler != null)
                 handler(this, EventArgs.Empty);
         }
+
+        protected virtual void OnFocusLost()
+        {
+            if (_textEdited)
+            {
+                OnEditComplete();
+                _textEdited = false;
+            }
+        }
+
+        protected virtual void OnEditComplete()
+        {
+            EventHandler handler = EditComplete;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        private void FocusManager_ControlLostFocus(object sender, FocusChangedEventArgs args)
+        {
+            if (args.Control == this)
+                OnFocusLost();
+        }
+
+        public event EventHandler EditComplete;
     }
 }

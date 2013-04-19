@@ -60,20 +60,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Color checkContentColor = (IsChecked) ? Color.Gray : Color.Blue;
             ((ColorContent)checkContent).Color = checkContentColor;
-            CheckChangedHandler handler = CheckChanged;
+            EventHandler handler = CheckChanged;
             if (handler != null)
-                handler(this, new CheckedChangedEventArgs(_isChecked));
+                handler(this, EventArgs.Empty);
         }
 
-        public event CheckChangedHandler CheckChanged;
+        public event EventHandler CheckChanged;
     }
 
-    public class CheckedChangedEventArgs : EventArgs
-    {
-        bool _isChecked = false;
-        public CheckedChangedEventArgs(bool isChecked) { _isChecked = isChecked; }
-        public bool IsChecked { get { return _isChecked; } }
-    }
+    //public class CheckedChangedEventArgs : EventArgs
+    //{
+    //    bool _isChecked = false;
+    //    public CheckedChangedEventArgs(bool isChecked) { _isChecked = isChecked; }
+    //    public bool IsChecked { get { return _isChecked; } }
+    //}
 
-    public delegate void CheckChangedHandler(object sender, CheckedChangedEventArgs args);
+    //public delegate void CheckChangedHandler(object sender, CheckedChangedEventArgs args);
 }
