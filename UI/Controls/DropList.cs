@@ -40,7 +40,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             
             _listControl = new ListControl(this.VisualRoot);
             _listControl.Id = Guid.NewGuid();
-            _listControl.CustomFocusManager = this;            
+            _listControl.CustomFocusManager = this;
+            _listControl.SelectionChanged += ListControl_SelectionChanged;
              Children.Add(_listControl);
             
             _button = new Button(this.VisualRoot, "?", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Blue);
@@ -178,7 +179,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 handler(this, EventArgs.Empty);
         }
 
+        private void ListControl_SelectionChanged(object sender, SelectionChangedEventArgs args)
+        {
+            SelectionChangedHandler handler = SelectionChanged;
+            if (handler != null)
+                handler(this, args);
+        }
+
         public event EventHandler ListClosed;
+
+        public event SelectionChangedHandler SelectionChanged;
     }
 
     public enum DropListState

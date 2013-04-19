@@ -151,6 +151,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         {
             Model result = null;
             FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();
+            fbxMeshThunk.m = new float[16];
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
             //result = ContentBuilder.BuildMesh<BasicVertexPositionNormalTexture>(app, shaderByteCode, 
             fbxMeshThunk.Dispose();
@@ -161,7 +162,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
     [StructLayout(LayoutKind.Sequential)]
     internal struct FBXMeshThunk : IDisposable
     {
-        public readonly float[] m = new float[16];
+        public float[] m;
         public IntPtr Vertices;
         public int VertexCount;
         public IntPtr Indices;

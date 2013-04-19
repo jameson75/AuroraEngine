@@ -14,8 +14,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {   
     public abstract class ItemsControl : UIControl, ICommandDispatcher
     {
-        private UIItemControlCollection _items = null;
-       
+        private UIItemControlCollection _items = null;       
       
         public UIItemControlCollection Items { get { return _items; } }       
         
@@ -63,9 +62,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if( Children.Count > 0)
                 Children.Clear();
             UpdateLayout(LayoutUpdateReason.ChildCountChanged);
-        }                     
-
-        public event ControlCommandHandler ControlCommand;
+        }                             
 
         protected virtual void OnCommand(string commandName)
         {
@@ -73,6 +70,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (handler != null)
                 handler(this, new ControlCommandArgs(commandName));        
         }
+        
+        public event ControlCommandHandler ControlCommand;
     }
 
     public class UIItemControlCollection : System.Collections.ObjectModel.ObservableCollection<ItemControl>

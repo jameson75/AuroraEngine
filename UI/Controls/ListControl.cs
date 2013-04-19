@@ -41,34 +41,38 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             switch (args.Action)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    foreach (ItemControl item in args.NewItems)
-                        OnSelectedItemAdded(item);
-                    break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (ItemControl item in args.OldItems)
                         OnSelectedItemRemoved(item);
                     break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    foreach (ItemControl item in args.NewItems)
+                        OnSelectedItemAdded(item);
+                    break;               
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     OnSelectedItemsReset();
                     break;
-            }
+            }            
         }
 
         protected virtual void OnSelectedItemAdded(ItemControl item)
         {
-           
+             SelectionChangedHandler handler = SelectionChanged;
+             if (handler != null)
+                 handler(this, new SelectionChangedEventArgs(item, true));
         }
 
         protected virtual void OnSelectedItemRemoved(ItemControl item)
         {
-           
+            SelectionChangedHandler handler = SelectionChanged;
+            if (handler != null)
+                handler(this, new SelectionChangedEventArgs(item, false));
         }
 
         protected virtual void OnSelectedItemsReset()
         {
            
-        }        
+        }               
 
         public UIListItemControlCollection SelectedItems { get { return _selectedItems; } }
 
@@ -87,8 +91,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             List<ItemControl> auxList = new List<ItemControl>(items);
             foreach (ListControlItem item in auxList)
                 _selectedItems.Remove(item);
-        }            
+        }
+
+        public event SelectionChangedHandler SelectionChanged;
     }
+
+    public class SelectionChangedEventArgs : EventArgs 
+    { 
+        private ItemControl _item = null;
+        private bool _isSelected = false;        
+
+        public ItemControl Item { get { return _item; } }
+        public bool IsSelected { get { return _isSelected; } }
+
+        public SelectionChangedEventArgs(ItemControl item, bool isSelected)
+        {
+            _isSelected = isSelected;
+            _item = item;
+        }
+    }
+
+    public delegate void SelectionChangedHandler(object sender, SelectionChangedEventArgs args);
 
     public class ListControl : MultiSelectControl
     {       

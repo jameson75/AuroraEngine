@@ -25,7 +25,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         bool _isChecked = false;
         ContentControl checkContentControl = null;
         UIContent checkContent = null;
-       
+
         public CheckBox(IUIRoot visualRoot)
             : base(visualRoot)
         {
@@ -57,9 +57,23 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         protected virtual void OnIsCheckedChanged()
-        {           
+        {
             Color checkContentColor = (IsChecked) ? Color.Gray : Color.Blue;
-            ((ColorContent)checkContent).Color = checkContentColor;        
+            ((ColorContent)checkContent).Color = checkContentColor;
+            CheckChangedHandler handler = CheckChanged;
+            if (handler != null)
+                handler(this, new CheckedChangedEventArgs(_isChecked));
         }
+
+        public event CheckChangedHandler CheckChanged;
     }
+
+    public class CheckedChangedEventArgs : EventArgs
+    {
+        bool _isChecked = false;
+        public CheckedChangedEventArgs(bool isChecked) { _isChecked = isChecked; }
+        public bool IsChecked { get { return _isChecked; } }
+    }
+
+    public delegate void CheckChangedHandler(object sender, CheckedChangedEventArgs args);
 }
