@@ -58,14 +58,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void Update(long gameTime)
         {
-            foreach (ListControlItem item in this.Items)
+            foreach (ItemControl item in this.Items)
                 item.Update(gameTime);
             base.Update(gameTime);
         }
 
         public override void Draw(long gameTime)
         {
-            foreach (ListControlItem item in this.Items)
+            foreach (ItemControl item in this.Items)
                 item.Draw(gameTime);
             base.Draw(gameTime);
         }
@@ -110,7 +110,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             childLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             childLabel.Size = new DrawingSizeF(100.0f, 1.0f);
             this.Children.Add(childLabel);
-            this.Children.Add(control);            
+            this.Children.Add(control);
+            _wireUp = new CommandControlWireUp(this);
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }
 
@@ -126,7 +127,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 if (child != childLabel)
                 {
-                    child.Position = new DrawingPointF(child.Size.Width, 0.0f);
+                    child.Position = new DrawingPointF(childLabel.Size.Width, 0.0f);
                     child.Size = new DrawingSizeF(this.Size.Width - child.Size.Width, this.Size.Height);
                 }
             }

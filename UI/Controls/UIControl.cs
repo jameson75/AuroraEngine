@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Visible = true;
             _spriteBatch = new SpriteBatch(visualRoot.Game.GraphicsDeviceContext);
             _children = new UIControlCollection();
-            _children.CollectionChanged += Children_CollectionChanged;            _
+            _children.CollectionChanged += Children_CollectionChanged;            
         }       
         #endregion
 

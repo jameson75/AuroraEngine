@@ -192,8 +192,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             if (_textEdited)
             {
-                OnEditComplete();
                 _textEdited = false;
+                OnEditComplete();                
             }
         }
 

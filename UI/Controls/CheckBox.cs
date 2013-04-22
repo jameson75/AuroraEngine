@@ -63,9 +63,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             EventHandler handler = CheckChanged;
             if (handler != null)
                 handler(this, EventArgs.Empty);
+            OnCommand(this.CommandName);
         }
 
         public event EventHandler CheckChanged;
+
+        public string CommandName { get; set; }
+
+        public event ControlCommandHandler ControlCommand;
+
+        protected virtual void OnCommand(string commandName)
+        {
+            ControlCommandHandler handler = ControlCommand;
+            if (handler != null)
+                handler(this, new ControlCommandArgs(commandName));
+        }
     }
 
     //public class CheckedChangedEventArgs : EventArgs

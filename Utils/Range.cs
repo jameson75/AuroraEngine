@@ -18,7 +18,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static Range Empty = new Range();
         public float Min { get; set; }
         public float Max { get; set; }
-        public Range(float min, float max)
+        public Range(float min, float max) : this()
         {
             Min = min;
             Max = max;

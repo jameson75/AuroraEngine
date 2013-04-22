@@ -33,6 +33,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             _textContent = content;
             _textContent.Container = this;
+            _backgroundContent = new ColorContent();
+            _backgroundContent.Container = this;
         }
             
         public Label(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor) : base(visualRoot)

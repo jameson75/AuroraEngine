@@ -107,7 +107,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnLayoutChanged();
         }
 
-        private class DockPanelContainer : UIControl
+        public override void Update(long gameTime)
+        {
+            foreach (UIControl control in this.Children)
+                control.Update(gameTime);
+            base.Update(gameTime);
+        }
+
+        public override void Draw(long gameTime)
+        {
+            foreach (UIControl control in this.Children)
+                control.Draw(gameTime);
+            base.Draw(gameTime);
+        }
+
+        private class DockPanelContainer : ContainerControl
         {
             public DockSide Side { get; set; }
 
