@@ -17,16 +17,7 @@ using System.Xml.Linq;
 namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public abstract class UIStyle
-    {
-        IGameApp _game = null;
-
-        public UIStyle(IGameApp game)
-        {
-            _game = game;
-        }
-
-        public IGameApp Game { get { return _game; } }
-
+    {  
         public string Name { get; set; }
 
         public abstract UIContent GenerateContent();

@@ -68,9 +68,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             return Font.MeasureString(subText).Width;
         }
 
-        public override void ApplyTemplate(Components.UIContentTemplate template)
+        public override void ApplyStyle(Components.UIStyle style)
         {
-            Components.TextContentTemplate textTemplate = template as Components.TextContentTemplate;
+            Components.TextStyle textTemplate = style as Components.TextStyle;
+            
             if (textTemplate == null)
                 throw new ArgumentException("Template is not of type TextContentTemplate", "textTemplate");
 
@@ -83,7 +84,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (textTemplate.FontColor != null)
                 this.FontColor = textTemplate.FontColor.Value;
 
-            base.ApplyTemplate(template);
+            base.ApplyStyle(style);
         }
     }   
 }

@@ -55,6 +55,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         //TODO: Deprecate this method.
+        [Obsolete]
         public virtual void Load(string path)
         {
 
@@ -64,9 +65,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public abstract Rectangle CalculateSmallestBoundingRect();
 
-        public virtual void ApplyTemplate(Components.UIContentTemplate template)
-        {
-
-        }
+        public virtual void ApplyStyle(Components.UIStyle style)
+        { }
     }
 }

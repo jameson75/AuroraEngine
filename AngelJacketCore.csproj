@@ -89,6 +89,8 @@
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
     <Compile Include="UI\Controls\CheckBox.cs" />
+    <Compile Include="UI\Controls\Design\DefaultStyles.cs" />
+    <Compile Include="UI\Controls\Design\DefaultTemplates.cs" />
     <Compile Include="UI\Controls\PropertyGrid.cs" />
     <Compile Include="UI\Controls\Spinner.cs" />
     <Compile Include="Utils\GameAssets.cs" />
@@ -107,7 +109,7 @@
     <Compile Include="Services\ServiceTable.cs" />
     <Compile Include="UI\Controls\Design\AliasResource.cs" />
     <Compile Include="UI\Controls\Design\ColorStyle.cs" />
-    <Compile Include="UI\Templates\ControlStyleTemplate.cs" />
+    <Compile Include="UI\Controls\Design\UIControlTemplate.cs" />
     <Compile Include="UI\Components\FocusManager.cs" />
     <Compile Include="UI\Components\IUIRoot.cs" />
     <Compile Include="UI\Controls\Design\PathResource.cs" />

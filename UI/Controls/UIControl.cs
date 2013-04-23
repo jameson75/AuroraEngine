@@ -211,6 +211,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public virtual void ApplyTemplate(UIControlTemplate template)
         {
+            if (template.Size != null)
+                this.Size = template.Size.Value;
+
             OnStyleChanged();
         }
 

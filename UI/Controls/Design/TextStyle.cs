@@ -20,16 +20,15 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public class TextStyle : ColorStyle
     {
-        public TextStyle(IGameApp game) : base(game)
-        { }
+        public string Text { get; set; }
 
         public SpriteFont Font { get; set; }
 
-        public Color4 FontColor { get; set; }
+        public Color4? FontColor { get; set; }
 
         public override UIContent GenerateContent()
         {
-            TextContent content = new TextContent(null, Font, FontColor);
+            TextContent content = new TextContent(Text, Font, FontColor.HasValue ? FontColor.Value : SharpDX.Color.Transparent);
             return content;
         }
     }
