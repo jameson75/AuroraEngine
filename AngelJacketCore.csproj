@@ -89,8 +89,8 @@
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
     <Compile Include="UI\Controls\CheckBox.cs" />
-    <Compile Include="UI\Controls\Design\DefaultStyles.cs" />
     <Compile Include="UI\Controls\Design\DefaultTemplates.cs" />
+    <Compile Include="UI\Controls\Design\ImageStyle.cs" />
     <Compile Include="UI\Controls\PropertyGrid.cs" />
     <Compile Include="UI\Controls\Spinner.cs" />
     <Compile Include="Utils\GameAssets.cs" />

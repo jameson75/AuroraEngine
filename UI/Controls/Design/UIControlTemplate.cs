@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 using SharpDX;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public abstract class UIControlTemplate
@@ -34,20 +42,20 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public LabelTemplate(ColorStyle backgroundColor, TextStyle text)
         {
             BackgroundColor = backgroundColor;
-            Text = text;
+            CaptionStyle = text;
         }
 
         public LabelTemplate(string caption, SpriteFont font, Color4? fontColor, Color4? backgroundColor)
         {
             if (caption != null || font != null || fontColor != null)
-                Text = new TextStyle() { Text = caption, Font = font, FontColor = fontColor.HasValue ? fontColor.Value : Color.Transparent };
+                CaptionStyle = new TextStyle() { Text = caption, Font = font, FontColor = fontColor.HasValue ? fontColor.Value : Color.Transparent };
         
             if (backgroundColor != null)
                 BackgroundColor = new ColorStyle() { Color = backgroundColor.Value };
         }
 
         public ColorStyle BackgroundColor{ get; set; }
-        public TextStyle Text { get; set; }
+        public TextStyle CaptionStyle { get; set; }
     }
 
    // public abstract class UIContentTemplate
@@ -97,5 +105,44 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         }
     }
 
-    public class CheckBoxTemplate
+    public class CheckBoxTemplate : UIControlTemplate
+    {
+        
+    }
+
+    public class ContentControlTemplate : UIControlTemplate
+    {
+        public UIStyle ContentStyle { get; set; }
+    }
+
+    public class ImageControlTemplate : UIControlTemplate
+    {
+        public ImageStyle ImageStyle { get; set; }
+
+        public ImageControlTemplate(SharpDX.Direct3D11.Texture2D texture)
+        {
+            if (texture != null)
+                ImageStyle = new ImageStyle() { Texture = texture };
+        }
+    }
+
+    public class PanelControlTemplate : UIControlTemplate
+    {
+
+    }
+
+    public class SliderControlTemplate : UIControlTemplate
+    {
+
+    }
+
+    public class SpinnerControlTemplate : UIControlTemplate
+    {
+
+    }
+
+    public class TextBoxTemplate : UIControlTemplate
+    {
+
+    }
 }

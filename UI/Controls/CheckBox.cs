@@ -23,15 +23,30 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class CheckBox : UIControl, ICommandControl
     {
         bool _isChecked = false;
-        ContentControl checkContentControl = null;
-        UIContent checkContent = null;
+        ContentControl _checkContentControl = null;
+        ContentControl _uncheckedContentControl = null;
+
+        //UIContent checkContent = null;
+        Label _label = null;
 
         public CheckBox(IUIRoot visualRoot)
             : base(visualRoot)
         {
-            checkContent = new ColorContent(Color.Gray);
-            checkContentControl = new ContentControl(visualRoot, checkContent);
+            //checkContent = new ColorContent(Color.Gray);
+            //_checkContentControl = new ContentControl(visualRoot, checkContent);
+            //_checkContentControl.Size = new DrawingSizeF(10.0f, 10.0f);
+            //_label = new Label(visualRoot);
+            //Size = DefaultTemplates.CheckBox.Size.Value;
+            _checkContentControl = new ContentControl(visualRoot);
+            _uncheckedContentControl = new ContentControl(visualRoot);
+            ApplyTemplate(DefaultTemplates.CheckBox);
             UpdateLayout(LayoutUpdateReason.ChildCountChanged);
+        }
+
+        public CheckBox(IUIRoot visualRoot, string caption)
+            : this(visualRoot)
+        {
+            this.Caption = caption;
         }
 
         public bool IsChecked
@@ -46,20 +61,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void Draw(long gameTime)
         {
-            checkContentControl.Draw(gameTime);
+            if (IsChecked)
+                _checkContentControl.Draw(gameTime);
+            else
+                _uncheckedContentControl.Draw(gameTime);
             base.Draw(gameTime);
         }
 
         protected override void OnLayoutChanged()
         {
-            checkContentControl.Position = new DrawingPointF(this.Size.Width - 10.0f, 0.0f);
-            checkContentControl.Size = new DrawingSizeF(10.0f, 10.0f);
+            _label.Position = new DrawingPointF(0, this.Bounds.Bottom - _label.Size.Height);
+            _checkContentControl.Position = new DrawingPointF(this.Bounds.Left - this.Size.Width, this.Bounds.Bottom - _checkContentControl.Size.Height);
+            _uncheckedContentControl.Position = _checkContentControl.Position;
         }
 
         protected virtual void OnIsCheckedChanged()
         {
-            Color checkContentColor = (IsChecked) ? Color.Gray : Color.Blue;
-            ((ColorContent)checkContent).Color = checkContentColor;
             EventHandler handler = CheckChanged;
             if (handler != null)
                 handler(this, EventArgs.Empty);
@@ -77,6 +94,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             ControlCommandHandler handler = ControlCommand;
             if (handler != null)
                 handler(this, new ControlCommandArgs(commandName));
+        }
+
+        public string Caption
+        {
+            get { return _label.Content.Text; }
+            set
+            {
+                _label.Content.Text = value;
+                _label.SizeToContent();
+            }
+        }
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            CheckBoxTemplate checkboxTemplate = (CheckBoxTemplate)template;
+            if( checkboxTemplate.CheckedContentTemplate != null )
+
+            base.ApplyTemplate(template);
         }
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SharpDX;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.AngelJacket.Core.UI.Components;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -22,10 +23,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Label(Components.IUIRoot visualRoot)
             : base(visualRoot)
         {
-            _textContent = new TextContent();
+            _textContent = (TextContent)DefaultTemplates.Label.CaptionStyle.GenerateContent();
             _textContent.Container = this;
             _backgroundContent = new ColorContent();
             _backgroundContent.Container = this;
+            this.Size = DefaultTemplates.Label.Size.Value;
         }
 
         public Label(Components.IUIRoot visualRoot, TextContent content)
@@ -35,6 +37,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _textContent.Container = this;
             _backgroundContent = new ColorContent();
             _backgroundContent.Container = this;
+            this.Size = DefaultTemplates.Label.Size.Value;
         }
             
         public Label(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor) : base(visualRoot)
@@ -43,16 +46,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _textContent.Container = this;
             _backgroundContent = new ColorContent(backgroundColor);
             _backgroundContent.Container = this;
+            this.Size = DefaultTemplates.Label.Size.Value;
         }
  
-        public TextContent Text { get { return _textContent; } }
+        public TextContent Content { get { return _textContent; } }
 
         public ColorContent BackgroundColor { get { return _backgroundContent; } }
 
         public override void Draw(long gameTime)
         {
             BackgroundColor.Draw(gameTime);
-            Text.Draw(gameTime);
+            Content.Draw(gameTime);
             base.Draw(gameTime);
         }
 
@@ -62,13 +66,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (labelTemplate == null)
                 throw new ArgumentException("template was not of type LabelTemplate");
 
-            if (labelTemplate.Text != null)
-                Text.ApplyTemplate(labelTemplate.Text);
+            if (labelTemplate.CaptionStyle != null)
+                Content.ApplyStyle(labelTemplate.CaptionStyle);
 
             if (labelTemplate.BackgroundColor != null)
-                BackgroundColor.ApplyTemplate(labelTemplate.BackgroundColor);
+                BackgroundColor.ApplyStyle(labelTemplate.BackgroundColor);
 
             base.ApplyTemplate(template);
+        }
+
+        public void SizeToContent()
+        {
+            Rectangle smallestBounds = Content.CalculateSmallestBoundingRect();
+            Vector2 smallestSize = smallestBounds.Size();
+            this.Size = new DrawingSizeF(smallestSize.X, smallestSize.Y);
         }
     }
 }

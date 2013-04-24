@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CipherPark.AngelJacket.Core.UI.Components;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +18,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ImageControl(Components.IUIRoot visualRoot) : base(visualRoot)
         {
-            Content = new ImageContent();            
+            Content = (ImageContent)DefaultTemplates.ImageControl.ImageStyle.GenerateContent();           
         }       
 
         public ImageContent Content 

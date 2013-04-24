@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CipherPark.AngelJacket.Core.UI.Components;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,14 +17,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class ContentControl : UIControl
     {        
         private UIContent _content = null;
-        
-        public ContentControl(Components.IUIRoot visualRoot, UIContent content)
+
+        public ContentControl(IUIRoot visualRoot) : base(visualRoot)
+        {
+            this.ApplyTemplate(DefaultTemplates.ContentControl);
+        }
+
+        public ContentControl(IUIRoot visualRoot, UIContent content)
             : base(visualRoot)
         {
-            if( content == null)
-                throw new ArgumentNullException("content");
-            _content = content;
-            _content.Container = this;
+            //if( content == null)
+            //    throw new ArgumentNullException("content");
+            Content = content;
+            base.ApplyTemplate(DefaultTemplates.ContentControl);
         }
 
         public override void Draw(long gameTime)
@@ -32,6 +38,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.Draw(gameTime);
         }
 
-        public UIContent Content { get { return _content; } }
+        public UIContent Content
+        { 
+            get 
+            { 
+                return _content; 
+            }
+            set
+            {
+                if (_content != null)
+                    _content.Container = null;
+                _content = value;
+                _content.Container = this;
+            }
+        }
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            ContentControlTemplate contentControlTemplate = (ContentControlTemplate)template;
+            if (contentControlTemplate.ContentStyle != null)
+                Content = contentControlTemplate.ContentStyle.GenerateContent();
+            base.ApplyTemplate(template);
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Content = new TextContent(text, font, fontColor);
             BackgroundContent = new ColorContent(bgColor);
-            Size = DefaultTemplates.Button.Size.Value
+            Size = DefaultTemplates.Button.Size.Value;
         }
 
         public Button(IUIRoot visualRoot, Texture2D texture)
