@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
+using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -107,7 +108,20 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
     public class CheckBoxTemplate : UIControlTemplate
     {
-        
+        public ContentControlTemplate CheckContentTemplate { get; set; }
+        public ContentControlTemplate UncheckContentTemplate { get; set; }
+
+        public CheckBoxTemplate()
+        { }
+
+        public CheckBoxTemplate(Texture2D checkTexture, Texture2D uncheckTexture)
+        {
+            if (checkTexture != null)
+                CheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = checkTexture } };
+
+            if (uncheckTexture != null)
+                UncheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = uncheckTexture } };
+        }
     }
 
     public class ContentControlTemplate : UIControlTemplate

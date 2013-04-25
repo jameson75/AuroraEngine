@@ -35,7 +35,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             {
                 if (_checkbox == null)
                 {
-                    _checkbox = new CheckBoxTemplate();
+                    _checkbox = new CheckBoxTemplate(DefaultCheckTexture, DefaultUncheckTexture);
                     _checkbox.Size = new DrawingSizeF(30, 10);
                 }
                 return _checkbox;

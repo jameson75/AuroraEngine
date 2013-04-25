@@ -20,16 +20,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ContentControl(IUIRoot visualRoot) : base(visualRoot)
         {
-            this.ApplyTemplate(DefaultTemplates.ContentControl);
+            _content = DefaultTemplates.ContentControl.ContentStyle.GenerateContent();
+            Size = DefaultTemplates.ContentControl.Size.Value;
         }
 
         public ContentControl(IUIRoot visualRoot, UIContent content)
             : base(visualRoot)
-        {
-            //if( content == null)
-            //    throw new ArgumentNullException("content");
+        {            
             Content = content;
-            base.ApplyTemplate(DefaultTemplates.ContentControl);
+            Size = DefaultTemplates.ContentControl.Size.Value;
         }
 
         public override void Draw(long gameTime)
@@ -48,8 +47,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 if (_content != null)
                     _content.Container = null;
+                
                 _content = value;
-                _content.Container = this;
+                
+                if (_content != null)
+                    _content.Container = this;
             }
         }
 

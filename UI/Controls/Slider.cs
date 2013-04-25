@@ -25,7 +25,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(visualRoot)
         {
             trackContentControl = new ContentControl(VisualRoot);
-            trackContentControl.Content = DefaultTemplates.Slider.TrackStyle.GenerateContent(); //new ColorContent(SharpDX.Color.Red)
+            trackContentControl.ApplyTemplate(DefaultTemplates.Slider //new ColorContent(SharpDX.Color.Red)
             TrackTemplate.Size = new DrawingSizeF(0, 3);           
             HandleTemplate = new ContentControl(VisualRoot, new ColorContent(SharpDX.Color.Blue));
             HandleTemplate.Size = new DrawingSizeF(5, 0);

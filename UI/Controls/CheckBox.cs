@@ -31,16 +31,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public CheckBox(IUIRoot visualRoot)
             : base(visualRoot)
-        {
-            //checkContent = new ColorContent(Color.Gray);
-            //_checkContentControl = new ContentControl(visualRoot, checkContent);
-            //_checkContentControl.Size = new DrawingSizeF(10.0f, 10.0f);
-            //_label = new Label(visualRoot);
-            //Size = DefaultTemplates.CheckBox.Size.Value;
+        {           
             _checkContentControl = new ContentControl(visualRoot);
+            _checkContentControl.ApplyTemplate(DefaultTemplates.CheckBox.CheckContentTemplate);
+            Children.Add(_checkContentControl);
+
             _uncheckedContentControl = new ContentControl(visualRoot);
-            ApplyTemplate(DefaultTemplates.CheckBox);
-            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
+            _uncheckedContentControl.ApplyTemplate(DefaultTemplates.CheckBox.UncheckContentTemplate);
+            Children.Add(_uncheckedContentControl);
+            
+            Size = DefaultTemplates.CheckBox.Size.Value;           
         }
 
         public CheckBox(IUIRoot visualRoot, string caption)
@@ -108,8 +108,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void ApplyTemplate(UIControlTemplate template)
         {
-            CheckBoxTemplate checkboxTemplate = (CheckBoxTemplate)template;
-            if( checkboxTemplate.CheckedContentTemplate != null )
+            CheckBoxTemplate cbTemplate = (CheckBoxTemplate)template;
+            
+            if (cbTemplate.CheckContentTemplate != null)
+                _checkContentControl.ApplyTemplate(cbTemplate.CheckContentTemplate);
+
+            if (cbTemplate.UncheckContentTemplate != null)
+                _uncheckedContentControl.ApplyTemplate(cbTemplate.UncheckContentTemplate);
 
             base.ApplyTemplate(template);
         }

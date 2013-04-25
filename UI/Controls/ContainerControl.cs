@@ -46,6 +46,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.Update(gameTime);
         }
 
+        public override void ApplyTemplate(UIControlTemplate template)
+        {          
+            base.ApplyTemplate(template);
+        }
+
         [Obsolete]
         public override UIControl _GetNextFocusableChild(UIControl fromControl)
         {

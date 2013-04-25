@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Content = DefaultTemplates.Button.ForegroundStyle.GenerateContent();
             BackgroundContent = DefaultTemplates.Button.BackgroundStyle.GenerateContent();
-            Size = DefaultTemplates.Button.Size.Value;
+            Size = DefaultTemplates.Button.Size.Value;            
         }
 
         public Button(IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 bgColor)
