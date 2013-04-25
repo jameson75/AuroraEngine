@@ -32,8 +32,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private void CreateChildControls()
         {
             Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
-            
-            _textBox = new TextBox(this.VisualRoot, null, tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Yellow);
+
+            _textBox = new TextBox(this.VisualRoot);
             _textBox.Id = Guid.NewGuid();
             _textBox.CustomFocusManager = this;
             Children.Add(_textBox);

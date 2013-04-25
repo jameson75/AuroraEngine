@@ -66,6 +66,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Guid Id { get; set; }
 
+        public Guid LayoutId { get; set; }
+
         public DrawingPointF Position
         {
             get
