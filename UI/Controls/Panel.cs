@@ -20,4 +20,23 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(visualRoot)
         { }
     }
+
+    public class SplitterPanel : Panel
+    {
+        public SplitterContainerLayoutManger _layoutManager = null;
+
+        public SplitterPanel(IUIRoot visualRoot)
+            : base(visualRoot)
+        {
+            _layoutManager = new SplitterContainerLayoutManger(this);
+        }
+
+        protected override IControlLayoutManager LayoutManager
+        {
+            get
+            {
+                return _layoutManager;
+            }
+        }
+    }
 }

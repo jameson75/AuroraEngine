@@ -101,7 +101,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     child.Size = new DrawingSizeF(width, height);
                 }
             }
-        }      
+        }    
     }
 
     public enum LayoutUpdateReason
@@ -125,10 +125,23 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         ChildCountChanged     
     }
 
-    public class SplitterLayoutManger : IControlLayoutManager
+    public class SplitterContainerLayoutManger : IControlLayoutManager
     {
         #region IControlLayoutManager Members
         private SplitterLayoutSectionCollection _splitterLayoutSectionCollection = new SplitterLayoutSectionCollection();
+        private UIControl _container = null;
+        private RectangleF _cachedBounds = RectangleF.Empty;
+
+        public SplitterContainerLayoutManger(UIControl container)
+        {
+            _container = container;
+            _container.SizeChanging += Container_SizeChanging;
+        }
+
+        private void Container_SizeChanging(object sender, EventArgs args)
+        {
+            _cachedBounds = _container.Bounds;
+        }
 
         public void UpdateLayout(LayoutUpdateReason reason)
         {
@@ -136,25 +149,83 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             //{
                
             //}
-            foreach(UIContent control in this
+            foreach (UIControl child in this._container.Children)
+            {
+                RectangleF childControlCell = GetCellFromId(child.LayoutId);
+                float? newPositionX = null;
+                float? newPositionY = null;
+                float? newWidth = null;
+                float? newHeight = null;
+
+                switch(child.HorizontalAlignment)
+                {
+                    case HorizontalAlignment.Center:
+                        newPositionX = (int)((float)_container.Bounds.Width / 2.0f) - (int)((float)child.Bounds.Width / 2.0f);                       
+                        break;
+                    case HorizontalAlignment.Left:
+                        //No need to do anything since child's x position is relative to Left side of container.
+                        break;
+                    case HorizontalAlignment.Right:
+                        if (reason == LayoutUpdateReason.SizeChanged)
+                        {
+                            float xOffset = _container.Bounds.Width - _cachedBounds.Width;
+                            newPositionX = child.Position.X + xOffset;
+                        }
+                        break;
+                    case HorizontalAlignment.Stretch:
+                        newPositionX = _container.Padding.Width + child.Margin.Width;
+                        newWidth = _container.Bounds.Width - (int)(_container.Padding.Width * 2);
+                        break;
+                }
+                
+                switch(child.VerticalAlignment)
+                {
+                    case VerticalAlignment.Center:
+                         newPositionY = (_container.Bounds.Height / 2.0f) - (child.Bounds.Height / 2.0f);
+                        break;
+                    case VerticalAlignment.Top:
+                        //No need to do anything since child's y position is relative to Top side of container.
+                        break;
+                    case VerticalAlignment.Bottom:
+                        if (reason == LayoutUpdateReason.SizeChanged)
+                        {
+                            float yOffset = _container.Bounds.Height - _cachedBounds.Height;
+                            newPositionY = child.Position.Y + yOffset;
+                        }
+                        break;
+                    case VerticalAlignment.Stretch:
+                        newPositionY = _container.Padding.Height + child.Margin.Height;                       
+                        newHeight = _container.Bounds.Height - (_container.Padding.Width * 2);
+                        break;
+                }
+
+                if (newPositionX.HasValue || newPositionY.HasValue)
+                {
+                    float positionX = newPositionX.HasValue ? newPositionX.Value : child.Position.X;
+                    float positionY = newPositionY.HasValue ? newPositionY.Value : child.Position.Y;
+                    child.Position = new DrawingPointF(positionX, positionY);
+                }
+
+                if (newWidth.HasValue || newHeight.HasValue)
+                {
+                    float width = newWidth.HasValue ? newWidth.Value : child.Bounds.Width;
+                    float height = newHeight.HasValue ? newHeight.Value : child.Bounds.Height;
+                    child.Size = new DrawingSizeF(width, height);
+                }
+            }            
         }
 
         public SplitterLayoutSectionCollection LayoutDivisions { get { return _splitterLayoutSectionCollection; } }
         #endregion
     }
 
-    public class SplitterLayoutSection
-    {
-        SplitterLayoutDivisionCollection _divisions = new SplitterLayoutDivisionCollection();
-        SplitterLayoutDivisionCollection Divisions { get { return _divisions; } }
-        public SplitterOrientation Orientation { get; set; }
-        public RectangleF Bounds { get; set; }
-    }
-
     public class SplitterLayoutDivision
     {
+        private Guid _divisionId;
         public float Distance { get; set; }
-        public SplitterLayoutFixedSide FixedSide { get; set; }            
+        public SplitterLayoutFixedSide FixedSide { get; set; }
+        public Guid DivisionId { get { return _divisionId; } }
+        public SplitterLayoutDivision(Guid id) { _divisionId = id; }
     }
 
     public enum SplitterLayoutFixedSide

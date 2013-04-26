@@ -18,8 +18,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         TextBox _textBox = null;
         ListControl _listControl = null;
         Button _button = null;
-        DropListState _dropListState = DropListState.Closed;
-        IControlLayoutManager _layoutManager = null;
+        SplitterPanel _childSplitter = null;
+        SplitterPanel _parentSplitter = null;        
+        DropListState _dropListState = DropListState.Closed;        
 
         public DropList(Components.IUIRoot root)
             : base(root)
@@ -33,8 +34,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
 
+            parentSplitter = new SplitterPanel(this.VisualRoot);
+            parentSplitter.Hor
             _textBox = new TextBox(this.VisualRoot);
-            _textBox.Id = Guid.NewGuid();
+            //_textBox.Id = Guid.NewGuid();
             _textBox.CustomFocusManager = this;
             Children.Add(_textBox);
             
@@ -58,15 +61,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public ListControl List { get { return _listControl; } }
-
-        protected override IControlLayoutManager LayoutManager
-        {
-            get
-            {
-                return _layoutManager;
-            }
-        }
-
+     
+        
         public override bool CanFocus
         {
             get
