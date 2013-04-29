@@ -25,40 +25,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(visualRoot)
         {
             trackContentControl = new ContentControl(VisualRoot);
-            trackContentControl.ApplyTemplate(DefaultTemplates.Slider //new ColorContent(SharpDX.Color.Red)
-            TrackTemplate.Size = new DrawingSizeF(0, 3);           
-            HandleTemplate = new ContentControl(VisualRoot, new ColorContent(SharpDX.Color.Blue));
-            HandleTemplate.Size = new DrawingSizeF(5, 0);
-            HandleTemplate.VerticalAlignment = VerticalAlignment.Stretch;
-            HandleTemplate.Margin = DrawingSizeFExtension.Zero;
+            trackContentControl.ApplyTemplate(DefaultTemplates.Slider.TrackContent); //new ColorContent(SharpDX.Color.Red)                   
+            handleContentControl = new ContentControl(VisualRoot); //, new ColorContent(SharpDX.Color.Blue));
+            handleContentControl.ApplyTemplate(DefaultTemplates.Slider.HandleContent);
+            this.Children.Add(trackContentControl);
+            this.Children.Add(handleContentControl);
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
-        }
-
-        //public UIControl TrackTemplate
-        //{
-        //    get
-        //    {
-        //        return trackContentControl;
-        //    }
-        //    set
-        //    {
-        //        trackContentControl = value;
-        //        this.Children.Add(trackContentControl);               
-        //    }
-        //}
-
-        //public UIControl HandleTemplate
-        //{
-        //    get
-        //    {
-        //        return handleContentControl;
-        //    }
-        //    set
-        //    {
-        //        handleContentControl = value;
-        //        this.Children.Add(handleContentControl);
-        //    }
-        //}         
+        }       
 
         protected virtual void OnRangeChanged()
         {
@@ -92,8 +65,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void Draw(long gameTime)
         {
-            TrackTemplate.Draw(gameTime);
-            HandleTemplate.Draw(gameTime);
+            trackContentControl.Draw(gameTime);
+            handleContentControl.Draw(gameTime);
         }
     }
 }

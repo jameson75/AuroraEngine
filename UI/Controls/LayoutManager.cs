@@ -128,7 +128,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class SplitterContainerLayoutManger : IControlLayoutManager
     {
         #region IControlLayoutManager Members
-        private SplitterLayoutSectionCollection _splitterLayoutSectionCollection = new SplitterLayoutSectionCollection();
+        private SplitterLayoutDivisionCollection _splitterLayoutSectionCollection = new SplitterLayoutDivisionCollection();
         private UIControl _container = null;
         private RectangleF _cachedBounds = RectangleF.Empty;
 
@@ -215,7 +215,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }            
         }
 
-        public SplitterLayoutSectionCollection LayoutDivisions { get { return _splitterLayoutSectionCollection; } }
+        public SplitterLayoutDivisionCollection LayoutDivisions { get { return _splitterLayoutSectionCollection; } }
         #endregion
     }
 
@@ -244,10 +244,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class SplitterLayoutDivisionCollection : List<SplitterLayoutDivision>
     { }
-
-    public class SplitterLayoutSectionCollection : List<SplitterLayoutSection>
-    { }
-
+   
     //public class DivLayoutManager : IControlLayoutManager
     //{
     //    private LayoutDivCollection _divs = null;

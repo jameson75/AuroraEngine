@@ -119,16 +119,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public override void ApplyTemplate(Components.UIContentTemplate template)
+        public override void ApplyStyle(Components.UIStyle style)
         {
-            Components.ColorContentTemplate colorTemplate = template as Components.ColorContentTemplate;
-            if (colorTemplate == null)
+            Components.ColorStyle colorStyle = style as Components.ColorStyle;
+            if (colorStyle == null)
                 throw new ArgumentException("Template was not of type ColorContentTemplate", "template");
 
-            if (colorTemplate.Color != null)
-                this.Color = colorTemplate.Color.Value;
+            if (colorStyle.Color != null)
+                this.Color = colorStyle.Color.Value;
 
-            base.ApplyTemplate(template);
+            base.ApplyStyle(style);
         }
     }
 }

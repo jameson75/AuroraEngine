@@ -15,53 +15,77 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class DropList : UIControl, ICustomFocusManager
     {
+        SplitterPanel _childPanel = null;
+        SplitterPanel _parentPanel = null; 
         TextBox _textBox = null;
         ListControl _listControl = null;
-        Button _button = null;
-        SplitterPanel _childSplitter = null;
-        SplitterPanel _parentSplitter = null;        
-        DropListState _dropListState = DropListState.Closed;        
+        Button _button = null;               
+        DropListState _dropListState = DropListState.Closed;
+        ContainerControlLayoutManager _layoutManager = null;
 
         public DropList(Components.IUIRoot root)
             : base(root)
         {
-            _dropListState = DropListState.Closed;  
-            CreateChildControls();
+            _dropListState = DropListState.Closed;             
             root.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
-        }
+            _layoutManager = new ContainerControlLayoutManager(this);
 
-        private void CreateChildControls()
-        {
-            Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
+            this.Size = DefaultTemplates.DropList.Size.Value;
 
-            parentSplitter = new SplitterPanel(this.VisualRoot);
-            parentSplitter.Hor
-            _textBox = new TextBox(this.VisualRoot);
-            //_textBox.Id = Guid.NewGuid();
+            //Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
+            Guid parentSplitterPanel2Guid = Guid.NewGuid();
+            _parentPanel = new SplitterPanel(this.VisualRoot);
+            _parentPanel.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            _parentPanel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            _parentPanel.Orientation = SplitterOrientation.Verticle;
+            _parentPanel.Splitters.Add(new SplitterLayoutDivision(parentSplitterPanel2Guid));
+            _parentPanel.Offset = DefaultTemplates.TextBox.Size.Value.Height;
+            _parentPanel.Splitters[0].FixedSide = SplitterLayoutFixedSide.One;
+            this.Children.Add(_parentPanel);
+
+            Guid childSplitterPanel2Guid = Guid.NewGuid();
+            _childPanel = new SplitterPanel(this.VisualRoot);
+            _childPanel.Orientation = SplitterOrientation.Horizontal;
+            _childPanel.Splitters.Add(new SplitterLayoutDivision(childSplitterPanel2Guid));
+            _childPanel.Offset = _childPanel.Size.Width - DefaultTemplates.DropDownButton.Size.Value.Width;
             _textBox.CustomFocusManager = this;
-            Children.Add(_textBox);
+            _childPanel.Splitters[0].FixedSide = SplitterLayoutFixedSide.Two;
+            //NOTE: Since no layoutId was specified, childSplitterpanel will get added
+            //the parentSplitterpanel's first sub-panel.
+            _parentPanel.Children.Add(_childPanel);           
+
+            _textBox = new TextBox(this.VisualRoot);
+            _childPanel.Children.Add(_textBox);
             
+            _button = new Button(this.VisualRoot); //new Button(this.VisualRoot, "?", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Blue);
+            _button.ApplyTemplate(DefaultTemplates.DropDownButton); 
+            _button.LayoutId = childSplitterPanel2Guid;
+            _button.CustomFocusManager = this;
+            _childPanel.Children.Add(_button);
+                        
             _listControl = new ListControl(this.VisualRoot);
-            _listControl.Id = Guid.NewGuid();
+            _listControl.LayoutId = parentSplitterPanel2Guid;
             _listControl.CustomFocusManager = this;
             _listControl.SelectionChanged += ListControl_SelectionChanged;
-             Children.Add(_listControl);
-            
-            _button = new Button(this.VisualRoot, "?", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Blue);
-            _button.Id = Guid.NewGuid();
-            _button.CustomFocusManager = this;
-            Children.Add(_button);
+             _parentPanel.Children.Add(_listControl);        
 
-            DivLayoutManager divLayoutManager = new DivLayoutManager(this);
-            divLayoutManager.Divs.Add(new LayoutDiv(_textBox.Id, 0, LayoutDivUnits.Span, 20, LayoutDivUnits.Pixels));
-            divLayoutManager.Divs.Add(new LayoutDiv(_button.Id, 20, 20));
-            divLayoutManager.Divs.Add(new LayoutDiv(_listControl.Id, 100, LayoutDivUnits.Percentage, 0, LayoutDivUnits.Span));
-            _layoutManager = divLayoutManager;
+            //DivLayoutManager divLayoutManager = new DivLayoutManager(this);
+            //divLayoutManager.Divs.Add(new LayoutDiv(_textBox.Id, 0, LayoutDivUnits.Span, 20, LayoutDivUnits.Pixels));
+            //divLayoutManager.Divs.Add(new LayoutDiv(_button.Id, 20, 20));
+            //divLayoutManager.Divs.Add(new LayoutDiv(_listControl.Id, 100, LayoutDivUnits.Percentage, 0, LayoutDivUnits.Span));
+            
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);                      
         }
 
-        public ListControl List { get { return _listControl; } }
-     
+        protected override IControlLayoutManager LayoutManager
+        {
+            get
+            {
+                return _layoutManager;
+            }
+        }
+
+        public ListControl List { get { return _listControl; } }     
         
         public override bool CanFocus
         {
@@ -85,6 +109,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     _listControl.Draw(gameTime);
                     break;
             }
+
+            base.Draw(gameTime);
         }
 
         public override void Update(long gameTime)
@@ -180,7 +206,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             SelectionChangedHandler handler = SelectionChanged;
             if (handler != null)
                 handler(this, args);
-        }
+        }        
 
         public event EventHandler ListClosed;
 

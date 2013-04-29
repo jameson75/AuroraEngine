@@ -23,11 +23,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             Color = SharpDX.Color.Transparent;
         }
 
-        public Color4 Color { get; set; }
+        public Color4? Color { get; set; }
 
         public override UIContent GenerateContent()
         {
-            ColorContent content = new ColorContent(Color);
+            ColorContent content = new ColorContent(Color.Value);
             return content;
         }
     }
