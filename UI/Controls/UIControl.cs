@@ -187,12 +187,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //    }
         //    return BoundingBox.CreateFromPoints(transformedCorners);
         //}      
-#endregion
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>Bounds will always represent dimensions the control is rendered at. See UIControl.NativeBounds property.</remarks>
+#endregion       
         public RectangleF Bounds { get { return RectangleFExtension.CreateLTWH(Position.X, Position.Y, this.Size.Width, this.Size.Height); } }
+        public virtual RectangleF ClientRectangle { get { return new RectangleF(0, 0, this.Size.Width, this.Size.Height); } }
         public DrawingSizeF Padding { get; set; }
         public DrawingSizeF Margin { get; set; }
         public UIControl Parent { get; set; }

@@ -128,14 +128,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class SplitterContainerLayoutManger : IControlLayoutManager
     {
         #region IControlLayoutManager Members
-        private SplitterLayoutDivisionCollection _splitterLayoutSectionCollection = new SplitterLayoutDivisionCollection();
+        private SplitterLayoutDivisions _splitterDivisions = new SplitterLayoutDivisions();
         private UIControl _container = null;
         private RectangleF _cachedBounds = RectangleF.Empty;
+        public SplitterLayoutOrientation Orientation { get; set; } 
 
         public SplitterContainerLayoutManger(UIControl container)
         {
             _container = container;
             _container.SizeChanging += Container_SizeChanging;
+            _container.SizeChanged += Container_SizeChanged;
         }
 
         private void Container_SizeChanging(object sender, EventArgs args)
@@ -143,15 +145,60 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _cachedBounds = _container.Bounds;
         }
 
-        public void UpdateLayout(LayoutUpdateReason reason)
+        private void Container_SizeChanged(object sender, EventArgs args)
         {
-            //foreach (SplitterLayoutSection section in _splitterLayoutSectionCollection)
-            //{
-               
-            //}
+
+        }
+
+        private RectangleF GetCellFromId(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                if (_splitterDivisions.Count == 0)
+                    return _container.ClientRectangle;
+                else
+                {
+                    RectangleF cellRect = _container.ClientRectangle;
+                    if (Orientation == SplitterLayoutOrientation.Horizontal)
+                        cellRect.Bottom = _splitterDivisions[0].Distance;
+                    else
+                        cellRect.Right = _splitterDivisions[0].Distance;
+                    return cellRect;
+                }
+            }
+            else
+            {
+                foreach (SplitterLayoutDivision division in _splitterDivisions)
+                {
+                    if (division.DivisionId == id)
+                    {
+                        int i = _splitterDivisions.IndexOf(division);
+                        RectangleF cellRect = _container.ClientRectangle;
+                        if (Orientation == SplitterLayoutOrientation.Horizontal)
+                        {
+                            cellRect.Top = division.Distance;
+                            if (i != _splitterDivisions.Count - 1)
+                                cellRect.Bottom = _splitterDivisions[i + 1].Distance;
+                        }
+                        else
+                        {
+                            cellRect.Left = division.Distance;
+                            if (i != _splitterDivisions.Count - 1)
+                                cellRect.Right = _splitterDivisions[i + 1].Distance;
+                        }
+                        return cellRect;
+                    }
+                }
+
+                throw new InvalidOperationException("No layout splitter found with specified guid.");
+            }
+        }
+
+        public void UpdateLayout(LayoutUpdateReason reason)
+        {          
             foreach (UIControl child in this._container.Children)
             {
-                RectangleF childControlCell = GetCellFromId(child.LayoutId);
+                RectangleF cellRectangle = GetCellFromId(child.LayoutId);
                 float? newPositionX = null;
                 float? newPositionY = null;
                 float? newWidth = null;
@@ -160,7 +207,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 switch(child.HorizontalAlignment)
                 {
                     case HorizontalAlignment.Center:
-                        newPositionX = (int)((float)_container.Bounds.Width / 2.0f) - (int)((float)child.Bounds.Width / 2.0f);                       
+                        newPositionX = (int)((float)cellRectangle.Width / 2.0f) - (int)((float)child.Bounds.Width / 2.0f);                       
                         break;
                     case HorizontalAlignment.Left:
                         //No need to do anything since child's x position is relative to Left side of container.
@@ -173,8 +220,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         }
                         break;
                     case HorizontalAlignment.Stretch:
-                        newPositionX = _container.Padding.Width + child.Margin.Width;
-                        newWidth = _container.Bounds.Width - (int)(_container.Padding.Width * 2);
+                        newPositionX = cellRectangle.Left + child.Margin.Width;
+                        newWidth = cellRectangle.Width;
                         break;
                 }
                 
@@ -194,7 +241,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         }
                         break;
                     case VerticalAlignment.Stretch:
-                        newPositionY = _container.Padding.Height + child.Margin.Height;                       
+                        newPositionY = cellRectangle.Top + child.Margin.Height;                       
                         newHeight = _container.Bounds.Height - (_container.Padding.Width * 2);
                         break;
                 }
@@ -215,7 +262,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }            
         }
 
-        public SplitterLayoutDivisionCollection LayoutDivisions { get { return _splitterLayoutSectionCollection; } }
+        public SplitterLayoutDivisions LayoutDivisions { get { return _splitterDivisions; } }
         #endregion
     }
 
@@ -235,14 +282,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         Two
     }
 
-    public enum SplitterOrientation
+    public enum SplitterLayoutOrientation
     {
         None,
         Verticle = None,
         Horizontal
     }
 
-    public class SplitterLayoutDivisionCollection : List<SplitterLayoutDivision>
+    public class SplitterLayoutDivisions : List<SplitterLayoutDivision>
     { }
    
     //public class DivLayoutManager : IControlLayoutManager

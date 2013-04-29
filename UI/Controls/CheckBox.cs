@@ -33,14 +33,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(visualRoot)
         {           
             _checkContentControl = new ContentControl(visualRoot);
-            _checkContentControl.ApplyTemplate(DefaultTemplates.CheckBox.CheckContentTemplate);
+            _checkContentControl.ApplyTemplate(DefaultTheme.CheckBox.CheckContentTemplate);
             Children.Add(_checkContentControl);
 
             _uncheckedContentControl = new ContentControl(visualRoot);
-            _uncheckedContentControl.ApplyTemplate(DefaultTemplates.CheckBox.UncheckContentTemplate);
+            _uncheckedContentControl.ApplyTemplate(DefaultTheme.CheckBox.UncheckContentTemplate);
             Children.Add(_uncheckedContentControl);
             
-            Size = DefaultTemplates.CheckBox.Size.Value;           
+            Size = DefaultTheme.CheckBox.Size.Value;           
         }
 
         public CheckBox(IUIRoot visualRoot, string caption)

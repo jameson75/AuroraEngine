@@ -25,9 +25,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(visualRoot)
         {
             trackContentControl = new ContentControl(VisualRoot);
-            trackContentControl.ApplyTemplate(DefaultTemplates.Slider.TrackContent); //new ColorContent(SharpDX.Color.Red)                   
+            trackContentControl.ApplyTemplate(DefaultTheme.Slider.TrackContent); //new ColorContent(SharpDX.Color.Red)                   
             handleContentControl = new ContentControl(VisualRoot); //, new ColorContent(SharpDX.Color.Blue));
-            handleContentControl.ApplyTemplate(DefaultTemplates.Slider.HandleContent);
+            handleContentControl.ApplyTemplate(DefaultTheme.Slider.HandleContent);
             this.Children.Add(trackContentControl);
             this.Children.Add(handleContentControl);
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);

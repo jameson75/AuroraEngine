@@ -20,15 +20,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ContentControl(IUIRoot visualRoot) : base(visualRoot)
         {
-            _content = DefaultTemplates.ContentControl.ContentStyle.GenerateContent();
-            Size = DefaultTemplates.ContentControl.Size.Value;
+            _content = DefaultTheme.ContentControl.ContentStyle.GenerateContent();
+            Size = DefaultTheme.ContentControl.Size.Value;
         }
 
         public ContentControl(IUIRoot visualRoot, UIContent content)
             : base(visualRoot)
         {            
             Content = content;
-            Size = DefaultTemplates.ContentControl.Size.Value;
+            Size = DefaultTheme.ContentControl.Size.Value;
         }
 
         public override void Draw(long gameTime)

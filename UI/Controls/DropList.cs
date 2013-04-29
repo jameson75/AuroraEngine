@@ -30,24 +30,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             root.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
             _layoutManager = new ContainerControlLayoutManager(this);
 
-            this.Size = DefaultTemplates.DropList.Size.Value;
+            this.Size = DefaultTheme.DropList.Size.Value;
 
             //Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
             Guid parentSplitterPanel2Guid = Guid.NewGuid();
             _parentPanel = new SplitterPanel(this.VisualRoot);
             _parentPanel.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             _parentPanel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
-            _parentPanel.Orientation = SplitterOrientation.Verticle;
+            _parentPanel.Orientation = SplitterLayoutOrientation.Verticle;
             _parentPanel.Splitters.Add(new SplitterLayoutDivision(parentSplitterPanel2Guid));
-            _parentPanel.Offset = DefaultTemplates.TextBox.Size.Value.Height;
+            _parentPanel.Offset = DefaultTheme.TextBox.Size.Value.Height;
             _parentPanel.Splitters[0].FixedSide = SplitterLayoutFixedSide.One;
             this.Children.Add(_parentPanel);
 
             Guid childSplitterPanel2Guid = Guid.NewGuid();
             _childPanel = new SplitterPanel(this.VisualRoot);
-            _childPanel.Orientation = SplitterOrientation.Horizontal;
+            _childPanel.Orientation = SplitterLayoutOrientation.Horizontal;
             _childPanel.Splitters.Add(new SplitterLayoutDivision(childSplitterPanel2Guid));
-            _childPanel.Offset = _childPanel.Size.Width - DefaultTemplates.DropDownButton.Size.Value.Width;
+            _childPanel.Offset = _childPanel.Size.Width - DefaultTheme.DropDownButton.Size.Value.Width;
             _textBox.CustomFocusManager = this;
             _childPanel.Splitters[0].FixedSide = SplitterLayoutFixedSide.Two;
             //NOTE: Since no layoutId was specified, childSplitterpanel will get added
@@ -58,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _childPanel.Children.Add(_textBox);
             
             _button = new Button(this.VisualRoot); //new Button(this.VisualRoot, "?", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Blue);
-            _button.ApplyTemplate(DefaultTemplates.DropDownButton); 
+            _button.ApplyTemplate(DefaultTheme.DropDownButton); 
             _button.LayoutId = childSplitterPanel2Guid;
             _button.CustomFocusManager = this;
             _childPanel.Children.Add(_button);

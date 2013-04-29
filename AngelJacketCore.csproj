@@ -89,8 +89,9 @@
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
     <Compile Include="UI\Controls\CheckBox.cs" />
-    <Compile Include="UI\Controls\Design\DefaultTemplates.cs" />
+    <Compile Include="UI\Controls\Design\DefaultTheme.cs" />
     <Compile Include="UI\Controls\Design\ImageStyle.cs" />
+    <Compile Include="UI\Controls\Design\IUITheme.cs" />
     <Compile Include="UI\Controls\PropertyGrid.cs" />
     <Compile Include="UI\Controls\Spinner.cs" />
     <Compile Include="Utils\GameAssets.cs" />
@@ -189,7 +190,9 @@
     <Compile Include="Sandbox\TestEffect.cs" />
     <Compile Include="World\WorldSimulator.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Properties\Resources\DefaultTheme\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

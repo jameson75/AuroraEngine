@@ -23,11 +23,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Label(Components.IUIRoot visualRoot)
             : base(visualRoot)
         {
-            _textContent = (TextContent)DefaultTemplates.Label.CaptionStyle.GenerateContent();
+            _textContent = (TextContent)DefaultTheme.Label.CaptionStyle.GenerateContent();
             _textContent.Container = this;
             _backgroundContent = new ColorContent();
             _backgroundContent.Container = this;
-            this.Size = DefaultTemplates.Label.Size.Value;
+            this.Size = DefaultTheme.Label.Size.Value;
         }
 
         public Label(Components.IUIRoot visualRoot, TextContent content)
@@ -37,7 +37,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _textContent.Container = this;
             _backgroundContent = new ColorContent();
             _backgroundContent.Container = this;
-            this.Size = DefaultTemplates.Label.Size.Value;
+            this.Size = DefaultTheme.Label.Size.Value;
         }
             
         public Label(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor) : base(visualRoot)
@@ -46,7 +46,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _textContent.Container = this;
             _backgroundContent = new ColorContent(backgroundColor);
             _backgroundContent.Container = this;
-            this.Size = DefaultTemplates.Label.Size.Value;
+            this.Size = DefaultTheme.Label.Size.Value;
         }
  
         public TextContent Content { get { return _textContent; } }
