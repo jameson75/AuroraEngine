@@ -87,7 +87,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 UIStyleParser parser = this.GetRegisteredStyleParser(element.Name.LocalName);
                 if (parser == null)
                     throw new System.IO.InvalidDataException("Style parser not found.");
-                UIStyle style = parser.CreateStyle(this.Game);
+                UIStyle style = parser.CreateStyle();
                 parser.Parse(this, element, style);
                 styles.Add(style);
             }

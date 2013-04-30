@@ -32,6 +32,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         event EventHandler LoadComplete;
 
         FocusManager FocusManager { get; }
-     
+
+        IUITheme Theme { get; }     
     }
 }

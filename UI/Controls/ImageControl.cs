@@ -18,8 +18,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ImageControl(Components.IUIRoot visualRoot) : base(visualRoot)
         {
-            Content = (ImageContent)DefaultTheme.ImageControl.ImageStyle.GenerateContent();
-            Size = DefaultTheme.ImageControl.Size.Value;
+            Content = (ImageContent)visualRoot.Theme.ImageControl.ImageStyle.GenerateContent();
+            Size = visualRoot.Theme.ImageControl.Size.Value;
         }       
 
         public ImageContent Content 

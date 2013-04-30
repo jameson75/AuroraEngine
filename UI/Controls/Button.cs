@@ -27,9 +27,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Button(IUIRoot visualRoot)
             : base(visualRoot)
         {
-            Content = DefaultTheme.Button.ForegroundStyle.GenerateContent();
-            BackgroundContent = DefaultTheme.Button.BackgroundStyle.GenerateContent();
-            Size = DefaultTheme.Button.Size.Value;            
+            Content = visualRoot.Theme.Button.ForegroundStyle.GenerateContent();
+            BackgroundContent = visualRoot.Theme.Button.BackgroundStyle.GenerateContent();
+            Size = visualRoot.Theme.Button.Size.Value;            
         }
 
         public Button(IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 bgColor)
@@ -37,14 +37,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Content = new TextContent(text, font, fontColor);
             BackgroundContent = new ColorContent(bgColor);
-            Size = DefaultTheme.Button.Size.Value;
+            Size = visualRoot.Theme.Button.Size.Value;
         }
 
         public Button(IUIRoot visualRoot, Texture2D texture)
             : base(visualRoot)
         {
             BackgroundContent = new ImageContent(texture);
-            Size = DefaultTheme.Button.Size.Value;
+            Size = visualRoot.Theme.Button.Size.Value;
         }
 
         public UIContent Content

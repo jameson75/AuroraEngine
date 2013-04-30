@@ -29,9 +29,9 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             base.Parse(tree, element, style);
         }
 
-        public override UIStyle CreateStyle(IGameApp game)
+        public override UIStyle CreateStyle()
         {
-            return new ColorStyle(game);
+            return new ColorStyle();
         }
     }
 }

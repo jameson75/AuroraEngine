@@ -145,9 +145,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
     }
 
-    public class SliderControlTemplate : UIControlTemplate
+    public class SliderTemplate : UIControlTemplate
     {
-
+        public ContentControlTemplate TrackContent { get; set; }
+        public ContentControlTemplate HandleContent { get; set; }
     }
 
     public class SpinnerControlTemplate : UIControlTemplate
@@ -158,5 +159,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
     public class TextBoxTemplate : UIControlTemplate
     {
 
+    }
+
+    public class DropListTemplate : UIControlTemplate
+    {
+        public ButtonTemplate DropDownButton { get; set; }
     }
 }

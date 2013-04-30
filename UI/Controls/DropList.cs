@@ -30,7 +30,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             root.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
             _layoutManager = new ContainerControlLayoutManager(this);
 
-            this.Size = DefaultTheme.DropList.Size.Value;
+            this.Size = this.VisualRoot.Theme.DropList.Size.Value;
 
             //Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
             Guid parentSplitterPanel2Guid = Guid.NewGuid();
@@ -39,7 +39,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _parentPanel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             _parentPanel.Orientation = SplitterLayoutOrientation.Verticle;
             _parentPanel.Splitters.Add(new SplitterLayoutDivision(parentSplitterPanel2Guid));
-            _parentPanel.Offset = DefaultTheme.TextBox.Size.Value.Height;
+            _parentPanel.Splitters[0].Distance = root.Theme.TextBox.Size.Value.Height;
             _parentPanel.Splitters[0].FixedSide = SplitterLayoutFixedSide.One;
             this.Children.Add(_parentPanel);
 
@@ -47,9 +47,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _childPanel = new SplitterPanel(this.VisualRoot);
             _childPanel.Orientation = SplitterLayoutOrientation.Horizontal;
             _childPanel.Splitters.Add(new SplitterLayoutDivision(childSplitterPanel2Guid));
-            _childPanel.Offset = _childPanel.Size.Width - DefaultTheme.DropDownButton.Size.Value.Width;
-            _textBox.CustomFocusManager = this;
+            _childPanel.Splitters[0].Distance = _childPanel.Size.Width - this.VisualRoot.Theme.DropList.DropDownButton.Size.Value.Width;            
             _childPanel.Splitters[0].FixedSide = SplitterLayoutFixedSide.Two;
+            _textBox.CustomFocusManager = this;
             //NOTE: Since no layoutId was specified, childSplitterpanel will get added
             //the parentSplitterpanel's first sub-panel.
             _parentPanel.Children.Add(_childPanel);           
@@ -58,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _childPanel.Children.Add(_textBox);
             
             _button = new Button(this.VisualRoot); //new Button(this.VisualRoot, "?", tempSpriteFont, SharpDX.Color.White, SharpDX.Color.Blue);
-            _button.ApplyTemplate(DefaultTheme.DropDownButton); 
+            _button.ApplyTemplate(this.VisualRoot.Theme.DropList.DropDownButton); 
             _button.LayoutId = childSplitterPanel2Guid;
             _button.CustomFocusManager = this;
             _childPanel.Children.Add(_button);

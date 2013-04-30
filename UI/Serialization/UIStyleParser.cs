@@ -26,6 +26,6 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                 style.Name = element.Attribute(NameAttributeName).Value;
         }
 
-        public abstract UIStyle CreateStyle(IGameApp game);
+        public abstract UIStyle CreateStyle();
     }
 }
