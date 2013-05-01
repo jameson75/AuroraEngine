@@ -110,14 +110,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnUpdate(long gameTime)
         {
             foreach (UIControl control in this.Children)
-                control.OnUpdate(gameTime);
+                control.Update(gameTime);
             base.OnUpdate(gameTime);
         }
 
         protected override void OnDraw(long gameTime)
         {
             foreach (UIControl control in this.Children)
-                control.OnDraw(gameTime);
+                control.Draw(gameTime);
             base.OnDraw(gameTime);
         }
 

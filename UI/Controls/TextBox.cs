@@ -130,7 +130,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _textContent.Draw(gameTime);
            
             if( this.HasFocus && _caret.Visible )
-                _caret.OnDraw(gameTime);
+                _caret.Draw(gameTime);
            
             base.OnDraw(gameTime);
         }

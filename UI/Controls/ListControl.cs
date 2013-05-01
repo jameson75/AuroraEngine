@@ -283,9 +283,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Name = text;
             CommandName = text;
-            Label content = visualRoot.Theme.ListControlItem.Label;
-            LabelTemplate itemTemplate = visualRoot.Theme.ListControlItem.ItemTemplate;
-            LabelTemplate selectTemplate = visualRoot.Theme.ListControlItem.SelectTemplate;
+            //*******************************************************************************************************
+            //TODO: FIX THIS CHEAT... 
+            //I instanciated a Label to avoid having to implement UIControlTemplate.CreateControl(), which
+            //would have required new constructors for almost every control.
+            //I put it off until I have the mental energy to make such a change
+            //*******************************************************************************************************
+            UIControl content = new Label(visualRoot); // visualRoot.Theme.ListControlItem.Content.CreateControl(visualRoot);
+            UIControlTemplate itemTemplate = visualRoot.Theme.ListControlItem.ItemTemplate;
+            UIControlTemplate selectTemplate = visualRoot.Theme.ListControlItem.SelectTemplate;
             SetContent(content, itemTemplate, selectTemplate);
         }
 
@@ -298,6 +304,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnUnselected()
         {
+            //*******************************************************************************************
+            //TODO: Fix flaw - a condition exists where if a SelectItem template is specified but
+            //a ItemTemplate wasn't specified, this control's display state would be stuck
+            //in a "selected state".
+            //*******************************************************************************************
             if (ItemTemplate != null && Children.Count != 0)
                 Children[0].ApplyTemplate(ItemTemplate);
             base.OnUnselected();

@@ -65,7 +65,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 SelectPreviousItem();
 
             if (ActiveScreen != null)
-                ActiveScreen.OnUpdate(gameTime);
+                ActiveScreen.Update(gameTime);
             
             base.OnUpdate(gameTime);
         }
@@ -73,7 +73,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnDraw(long gameTime)
         {
             if( ActiveScreen != null )
-                ActiveScreen.OnDraw(gameTime);
+                ActiveScreen.Draw(gameTime);
             base.OnDraw(gameTime);
         }
 

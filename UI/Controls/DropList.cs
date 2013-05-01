@@ -100,13 +100,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             switch (_dropListState)
             {
                 case DropListState.Closed:
-                    _textBox.OnDraw(gameTime);
-                    _button.OnDraw(gameTime);
+                    _textBox.Draw(gameTime);
+                    _button.Draw(gameTime);
                     break;
                 case DropListState.Open:
-                    _textBox.OnDraw(gameTime);
-                    _button.OnDraw(gameTime);
-                    _listControl.OnDraw(gameTime);
+                    _textBox.Draw(gameTime);
+                    _button.Draw(gameTime);
+                    _listControl.Draw(gameTime);
                     break;
             }
 
@@ -150,14 +150,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             switch (_dropListState)
             {
                 case DropListState.Closed:
-                    _textBox.OnUpdate(gameTime);
-                    _button.OnUpdate(gameTime);
+                    _textBox.Update(gameTime);
+                    _button.Update(gameTime);
                     break;
 
                 case DropListState.Open:
-                    _textBox.OnUpdate(gameTime);
-                    _button.OnUpdate(gameTime);
-                    _listControl.OnUpdate(gameTime);
+                    _textBox.Update(gameTime);
+                    _button.Update(gameTime);
+                    _listControl.Update(gameTime);
                     break;
             }
 

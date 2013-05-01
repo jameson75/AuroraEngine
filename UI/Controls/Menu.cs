@@ -151,7 +151,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnDraw(long gameTime)
         {
             foreach (MenuItem item in Items)
-                item.OnDraw(gameTime);           
+                item.Draw(gameTime);           
             base.OnDraw(gameTime);
         }
 
@@ -185,7 +185,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
 
             foreach (MenuItem item in this.Items)
-                item.OnUpdate(gameTime);
+                item.Update(gameTime);
 
             base.OnUpdate(gameTime);
         }

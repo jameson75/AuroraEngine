@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.AngelJacket.Core.UI.Controls;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -19,20 +20,21 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public abstract class UIControlTemplate
     {
-       public DrawingSizeF? Size { get; set; }    
+        public DrawingSizeF? Size { get; set; }    
+        //**************************************************************************************
+        //TODO: Implement so that controls with abstract children can create themselves from 
+        //a theme... (ie: see ListControlItem() constructor).
+        //****************************************************************************************
+        //public abstract UIControl CreateControl(IUIRoot visualRoot);
     }
 
     public class ListControlItemTemplate : UIControlTemplate
-    {
+    {       
         public ListControlItemTemplate()
         { }
-
-        public ListControlItemTemplate(UIControlTemplate childTemplate)
-        {
-            ChildTemplate = childTemplate;
-        }
-
-        UIControlTemplate ChildTemplate { get; set; }
+        public UIControlTemplate Content { get; set; }
+        public UIControlTemplate ItemTemplate { get; set; }
+        public UIControlTemplate SelectTemplate { get; set; }
     }
 
     public class LabelTemplate : UIControlTemplate
@@ -104,6 +106,12 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             if (bgColor != null)
                 BackgroundStyle = new ColorStyle() { Color = bgColor.Value };
         }
+
+        public ButtonTemplate(Texture2D image)
+        {
+            if (image != null)
+                ForegroundStyle = new ImageStyle() { Texture = image };
+        }
     }
 
     public class CheckBoxTemplate : UIControlTemplate
@@ -158,7 +166,18 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
     public class TextBoxTemplate : UIControlTemplate
     {
+        public TextStyle TextStyle { get; set; }
 
+        public TextBoxTemplate(string text, SpriteFont font, Color? fontColor, Color? backgroundColor)
+        {
+            TextStyle = new Components.TextStyle() 
+            { 
+                Text = text,
+                Font = font,
+                FontColor = fontColor,
+                Color = backgroundColor
+            };
+        }
     }
 
     public class DropListTemplate : UIControlTemplate

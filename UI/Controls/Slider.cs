@@ -65,8 +65,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnDraw(long gameTime)
         {
-            trackContentControl.OnDraw(gameTime);
-            handleContentControl.OnDraw(gameTime);
+            trackContentControl.Draw(gameTime);
+            handleContentControl.Draw(gameTime);
         }
     }
 }

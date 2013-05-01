@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
+using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
@@ -17,6 +18,23 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private ImageControlTemplate _imageControl = null;
         private LabelTemplate _label = null;
         private DropListTemplate _dropList = null;
+        private TextBoxTemplate _textBox = null;
+        private SliderTemplate _slider = null;
+        private ListControlItemTemplate _listControlItem = null;
+        private ListControlTemplate _listControl = null;
+
+        public Color ControlColor { get; set; }
+        public SpriteFont ControlFont { get; set; }
+        public Color ControlFontColor { get; set; }
+        public Color ControlFontHightlightColor { get; set; }
+        public Color ButtonColor { get; set; }
+        public Texture2D DefaultCheckTexture { get; set; }
+        public Texture2D DefaultUncheckTexture { get; set; }
+        public Texture2D EmptyImageTexture { get; set; }
+        public Texture2D DropDownImageTexture { get; set; }
+        public SpriteFont EditorFont { get; set; }
+        public Color EditorFontColor { get; set; }
+        public Color EditorColor { get; set; }
 
         public ButtonTemplate Button
         {
@@ -24,7 +42,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             {
                 if (_button == null)
                 {
-                    _button = new ButtonTemplate(null, DefaultControlFont, DefaultControlFontColor, DefaultButtonColor);
+                    _button = new ButtonTemplate(null, ControlFont, ControlFontColor, ButtonColor);
                     _button.Size = new DrawingSizeF(30, 10);
                 }
                 return _button;                
@@ -63,7 +81,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             {
                 if (_imageControl == null)
                 {
-                    _imageControl = new ImageControlTemplate(DefaultImage);
+                    _imageControl = new ImageControlTemplate(EmptyImageTexture);
                     _imageControl.Size = new DrawingSizeF(20, 20);
                 }
                 return _imageControl;
@@ -76,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             {
                 if (_label == null)
                 {
-                    _label = new LabelTemplate(null, DefaultControlFont, DefaultControlFontColor, null);
+                    _label = new LabelTemplate(null, ControlFont, ControlFontColor, null);
                     _label.Size = new DrawingSizeF(30, 10);
                 }
                 return _label;
@@ -91,11 +109,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 {
                     _dropList = new DropListTemplate()
                     {
-                        DropDownButton = new ButtonTemplate(null, DefaultDropDownImage),
-                        TextBox = new TextBoxTemplate(null, DefaultEditorFont, DefaultEditorFontColor, null),
-                        ListControl = new ListControlTemplate(DefaultControlColor)
+                        DropDownButton = new ButtonTemplate(DropDownImageTexture),
+                        TextBox = new TextBoxTemplate(null, EditorFont, EditorFontColor, EditorColor),
+                        ListControl = new ListControlTemplate(ControlColor)
                     };
-                    _dropList.Size = new DrawingSizeF(40, 20);
+                    _dropList.Size = new DrawingSizeF(50, 20);
                 }
                 return _dropList;
             }
@@ -103,17 +121,65 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public TextBoxTemplate TextBox
         {
-
+            get 
+            {
+                if(_textBox == null)
+                {
+                    _textBox = new TextBoxTemplate(null, EditorFont, EditorFontColor, EditorColor)
+                    {
+                       Size = new DrawingSizeF(40, 20)
+                    };                    
+                }
+                return _textBox;
+            }
         }
 
         public SliderTemplate Slider
         {
-
+            get
+            {
+                if (_slider == null)
+                {
+                    _slider = new SliderTemplate()
+                    {
+                    };
+                    _slider.Size = new DrawingSizeF(30, 20);
+                }
+                return _slider;
+            }
         }
 
         public ListControlItemTemplate ListControlItem
         {
+            get
+            {
+                if (_listControlItem == null)
+                {
+                    _listControlItem = new ListControlItemTemplate()
+                    {
+                        Content = new LabelTemplate(null, ControlFont, ControlFontColor, null),
+                        ItemTemplate = new LabelTemplate(null, ControlFont, ControlFontColor, null),
+                        SelectTemplate = new LabelTemplate(null, ControlFont, ControlFontHightlightColor, null)
+                    };
+                    _listControlItem.Size = new DrawingSizeF(30, 20);
+                }
+                return _listControlItem;
+            }
+        }
 
+        public ListControlTemplate ListControl
+        {
+            get
+            {
+                if (_listControl == null)
+                {
+                    _listControl = new ListControlTemplate(ControlColor)
+                    {
+                    };
+                    _listControl.Size = new DrawingSizeF(30, 20);
+                }
+                return _listControl;
+            }
         }
     }
 }
