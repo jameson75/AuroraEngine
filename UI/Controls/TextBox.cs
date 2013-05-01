@@ -64,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             VisualRoot.FocusManager.ControlLostFocus += FocusManager_ControlLostFocus;
         }
 
-        public override void Update(long gameTime)
+        protected override void OnUpdate(long gameTime)
         {
             if (_caret == null)
                 BeginCaret();
@@ -102,7 +102,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             if (this.Size == DrawingSizeFExtension.Zero)
                 return;
@@ -130,9 +130,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _textContent.Draw(gameTime);
            
             if( this.HasFocus && _caret.Visible )
-                _caret.Draw(gameTime);
+                _caret.OnDraw(gameTime);
            
-            base.Draw(gameTime);
+            base.OnDraw(gameTime);
         }
 
         public event EventHandler EnterKeyEvent;

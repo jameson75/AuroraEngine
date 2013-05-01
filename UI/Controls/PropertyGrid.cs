@@ -56,18 +56,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }                    
         }      
 
-        public override void Update(long gameTime)
+        protected override void OnUpdate(long gameTime)
         {
             foreach (ItemControl item in this.Items)
-                item.Update(gameTime);
-            base.Update(gameTime);
+                item.OnUpdate(gameTime);
+            base.OnUpdate(gameTime);
         }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             foreach (ItemControl item in this.Items)
-                item.Draw(gameTime);
-            base.Draw(gameTime);
+                item.OnDraw(gameTime);
+            base.OnDraw(gameTime);
         }
 
         protected override void OnLayoutChanged()

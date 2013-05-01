@@ -31,10 +31,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Size = visualRoot.Theme.ContentControl.Size.Value;
         }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             _content.Draw(gameTime);
-            base.Draw(gameTime);
+            base.OnDraw(gameTime);
         }
 
         public UIContent Content

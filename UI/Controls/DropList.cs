@@ -95,25 +95,25 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             switch (_dropListState)
             {
                 case DropListState.Closed:
-                    _textBox.Draw(gameTime);
-                    _button.Draw(gameTime);
+                    _textBox.OnDraw(gameTime);
+                    _button.OnDraw(gameTime);
                     break;
                 case DropListState.Open:
-                    _textBox.Draw(gameTime);
-                    _button.Draw(gameTime);
-                    _listControl.Draw(gameTime);
+                    _textBox.OnDraw(gameTime);
+                    _button.OnDraw(gameTime);
+                    _listControl.OnDraw(gameTime);
                     break;
             }
 
-            base.Draw(gameTime);
+            base.OnDraw(gameTime);
         }
 
-        public override void Update(long gameTime)
+        protected override void OnUpdate(long gameTime)
         {
             if (this._textBox.HasFocus)
             {
@@ -150,18 +150,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             switch (_dropListState)
             {
                 case DropListState.Closed:
-                    _textBox.Update(gameTime);
-                    _button.Update(gameTime);
+                    _textBox.OnUpdate(gameTime);
+                    _button.OnUpdate(gameTime);
                     break;
 
                 case DropListState.Open:
-                    _textBox.Update(gameTime);
-                    _button.Update(gameTime);
-                    _listControl.Update(gameTime);
+                    _textBox.OnUpdate(gameTime);
+                    _button.OnUpdate(gameTime);
+                    _listControl.OnUpdate(gameTime);
                     break;
             }
 
-            base.Update(gameTime);
+            base.OnUpdate(gameTime);
         }
         
 

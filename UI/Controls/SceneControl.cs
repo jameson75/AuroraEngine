@@ -71,10 +71,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //    get { return (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Width / (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Height; }
         //}
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             Scene.Draw(gameTime);
-            base.Draw(gameTime);
+            base.OnDraw(gameTime);
         }        
 
         protected override void OnSizeChanged()
@@ -84,7 +84,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnSizeChanged();
         }     
 
-        public override void Update(long gameTime)
+        protected override void OnUpdate(long gameTime)
         {
             InputService inputServices = (InputService)Game.Services.GetService(typeof(InputService));
             InputState inputState = inputServices.GetInputState();

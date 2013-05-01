@@ -81,21 +81,39 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 }
                 return _label;
             }
-        } 
-        
+        }
+
         public DropListTemplate DropList
         {
-            get 
+            get
             {
-                if(_dropList == null)
+                if (_dropList == null)
                 {
-                    _dropList = new DropListTemplate() 
+                    _dropList = new DropListTemplate()
                     {
                         DropDownButton = new ButtonTemplate(null, DefaultDropDownImage),
                         TextBox = new TextBoxTemplate(null, DefaultEditorFont, DefaultEditorFontColor, null),
-                        ListBox = new ListBoxTemplate(
+                        ListControl = new ListControlTemplate(DefaultControlColor)
+                    };
+                    _dropList.Size = new DrawingSizeF(40, 20);
+                }
+                return _dropList;
+            }
+        }
 
+        public TextBoxTemplate TextBox
+        {
 
-                        
+        }
+
+        public SliderTemplate Slider
+        {
+
+        }
+
+        public ListControlItemTemplate ListControlItem
+        {
+
+        }
     }
 }

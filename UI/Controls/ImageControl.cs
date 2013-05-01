@@ -35,11 +35,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             if(_content != null)
                 _content.Draw(gameTime);
-            base.Draw(gameTime);
+            base.OnDraw(gameTime);
         }         
     }
 }

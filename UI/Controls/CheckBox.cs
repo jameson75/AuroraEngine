@@ -59,13 +59,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             if (IsChecked)
                 _checkContentControl.Draw(gameTime);
             else
                 _uncheckedContentControl.Draw(gameTime);
-            base.Draw(gameTime);
+            base.OnDraw(gameTime);
         }
 
         protected override void OnLayoutChanged()

@@ -85,7 +85,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             if (BackgroundContent != null)
                 BackgroundContent.Draw(gameTime);
@@ -93,10 +93,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (Content != null)
                 Content.Draw(gameTime);
 
-            base.Draw(gameTime);
+            base.OnDraw(gameTime);
         }     
 
-        public override void Update(long gameTime)
+        protected override void OnUpdate(long gameTime)
         {
             if (this.HasFocus)
             {
@@ -112,7 +112,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         this.OnCommand(this.CommandName);
                 }
             }
-            base.Update(gameTime);
+            base.OnUpdate(gameTime);
         }
 
         protected virtual void OnClick()

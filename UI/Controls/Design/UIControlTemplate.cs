@@ -164,5 +164,17 @@ namespace CipherPark.AngelJacket.Core.UI.Components
     public class DropListTemplate : UIControlTemplate
     {
         public ButtonTemplate DropDownButton { get; set; }
+        public TextBoxTemplate TextBox { get; set; }
+        public ListControlTemplate ListControl { get; set; }
+    }
+
+    public class ListControlTemplate : UIControlTemplate
+    {
+        public UIStyle BackgroundStyle { get; set; }
+
+        public ListControlTemplate(Color4 backgroundColor)
+        {
+            BackgroundStyle = new ColorStyle(backgroundColor);
+        }
     }
 }

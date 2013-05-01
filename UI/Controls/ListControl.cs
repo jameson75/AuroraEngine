@@ -115,9 +115,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class ListControl : MultiSelectControl
     {       
-        public const int SizeInfinite = -1;
-      
+        public const int SizeInfinite = -1;      
         private int _maxRowSize = ListControl.SizeInfinite;
+        private UIContent _backgroundContent= null;
+
+        public UIContent BackgroundContent
+        {
+            get { return _backgroundContent; }
+            set
+            {
+                if (_backgroundContent != null)
+                    _backgroundContent.Container = null;
+                
+                if (value != null)
+                    value.Container = this;
+                
+                _backgroundContent = value;
+            }                
+        }
 
         public override bool CanFocus
         {
@@ -145,18 +160,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ListColumnDirection ColumnDirection { get; set; }
 
-        public override void Update(long gameTime)
+        protected override void OnUpdate(long gameTime)
         {
             foreach (ListControlItem item in this.Items)
                 item.Update(gameTime);
-            base.Update(gameTime);
+            base.OnUpdate(gameTime);
         }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
+            if (_backgroundContent != null)
+                _backgroundContent.Draw(gameTime);
+
             foreach (ListControlItem item in this.Items)
                 item.Draw(gameTime);
-            base.Draw(gameTime);
+
+            base.OnDraw(gameTime);
         }
 
         protected override void OnLayoutChanged()
@@ -205,6 +224,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 }
             }
         }
+
+        public void AddListItem(ListControlItem item)
+        {
+            this.Items.Add(item);
+        }
+
+        public void AddListItem(string text)
+        {
+            ListControlItem item = new ListControlItem(this.VisualRoot, text);      
+            this.Items.Add(item);
+        }
     }
 
     public enum ListColumnDirection
@@ -228,7 +258,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ListControlItem(UIControl control) : base(control.VisualRoot)
         {
-            this.Children.Add(control);
+            SetContent(control);
             _wireUp = new CommandControlWireUp(this);
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }
@@ -238,17 +268,25 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Name = name;
             CommandName = name;
-            ItemTemplate = new LabelTemplate(text, font, fontColor, backgroundColor);
+            UIControlTemplate itemTemplate = new LabelTemplate(text, font, fontColor, backgroundColor);
+            UIControlTemplate selectTemplate = null;
             if (selectFontColor != null)
-                SelectTemplate = new LabelTemplate(text, font, selectFontColor, backgroundColor);
+                selectTemplate = new LabelTemplate(text, font, selectFontColor, backgroundColor);
             Label childLabel = new Label(visualRoot);
-            childLabel.ApplyTemplate(ItemTemplate);
-            childLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
-            childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
-            Children.Add(childLabel);
-            Size = font.MeasureString(text).Add(DefaultItemTextMargin);
+            childLabel.Size = font.MeasureString(text).Add(DefaultItemTextMargin);
+            SetContent(childLabel, itemTemplate, selectTemplate);
             _wireUp = new CommandControlWireUp(this);
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
+        }
+
+        public ListControlItem(IUIRoot visualRoot, string text) : base(visualRoot)
+        {
+            Name = text;
+            CommandName = text;
+            Label content = visualRoot.Theme.ListControlItem.Label;
+            LabelTemplate itemTemplate = visualRoot.Theme.ListControlItem.ItemTemplate;
+            LabelTemplate selectTemplate = visualRoot.Theme.ListControlItem.SelectTemplate;
+            SetContent(content, itemTemplate, selectTemplate);
         }
 
         protected override void OnSelected()
@@ -265,9 +303,28 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnUnselected();
         }
 
-        public UIControlTemplate ItemTemplate { get; set; }
+        public void SetContent(UIControl content, UIControlTemplate itemTemplate = null, UIControlTemplate selectTemplate = null)
+        {
+            if (content == null)
+                throw new ArgumentNullException("content");
 
-        public UIControlTemplate SelectTemplate { get; set; }
+            if (itemTemplate != null)
+                content.ApplyTemplate(itemTemplate);
+
+            content.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            content.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            Size = content.Size;
+
+            Children.Add(content);
+            ItemTemplate = itemTemplate;
+            SelectTemplate = selectTemplate;     
+        }
+
+        public UIControlTemplate ItemTemplate { get; private set; }
+
+        public UIControlTemplate SelectTemplate { get; private set; }
+
+        public UIControl Content { get; private set; } 
 
         private void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
         {

@@ -148,14 +148,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public bool AutoSize { get; set; }
         
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             foreach (MenuItem item in Items)
-                item.Draw(gameTime);           
-            base.Draw(gameTime);
+                item.OnDraw(gameTime);           
+            base.OnDraw(gameTime);
         }
 
-        public override void Update(long gameTime)
+        protected override void OnUpdate(long gameTime)
         {
             if (this.HasFocus)
             {
@@ -185,9 +185,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
 
             foreach (MenuItem item in this.Items)
-                item.Update(gameTime);
+                item.OnUpdate(gameTime);
 
-            base.Update(gameTime);
+            base.OnUpdate(gameTime);
         }
 
         protected virtual void OnOrientationChanged()

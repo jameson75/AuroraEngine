@@ -53,11 +53,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ColorContent BackgroundColor { get { return _backgroundContent; } }
 
-        public override void Draw(long gameTime)
+        protected override void OnDraw(long gameTime)
         {
             BackgroundColor.Draw(gameTime);
             Content.Draw(gameTime);
-            base.Draw(gameTime);
+            base.OnDraw(gameTime);
         }
 
         public override void ApplyTemplate(Components.UIControlTemplate template)
