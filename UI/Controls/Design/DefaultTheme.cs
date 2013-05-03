@@ -142,8 +142,15 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 {
                     _slider = new SliderTemplate()
                     {
+                        TrackContent = new ContentControlTemplate() 
+                        { 
+                            ContentStyle = new ColorStyle(Color.Gray),
+                            Size = new DrawingSizeF(50, 20),
+                            VerticleAlignment =           
+                        },
+                        HandleContent = new ContentControlTemplate() { ContentStyle = new ColorStyle(Color.LightGray) }
                     };
-                    _slider.Size = new DrawingSizeF(30, 20);
+                    _slider.Size = new DrawingSizeF(50, 20);
                 }
                 return _slider;
             }

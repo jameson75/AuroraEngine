@@ -27,24 +27,38 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Button(IUIRoot visualRoot)
             : base(visualRoot)
         {
-            Content = visualRoot.Theme.Button.ForegroundStyle.GenerateContent();
-            BackgroundContent = visualRoot.Theme.Button.BackgroundStyle.GenerateContent();
-            Size = visualRoot.Theme.Button.Size.Value;            
-        }
+                  }
 
         public Button(IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 bgColor)
             : base(visualRoot)
         {
             Content = new TextContent(text, font, fontColor);
             BackgroundContent = new ColorContent(bgColor);
-            Size = visualRoot.Theme.Button.Size.Value;
         }
 
-        public Button(IUIRoot visualRoot, Texture2D texture)
+        public Button(IUIRoot visualRoot, TextContent text, ColorContent bgColor) : base(visualRoot)
+        {
+            Content = text;
+            BackgroundContent = bgColor;
+        }
+
+        public Button(IUIRoot visualRoot, Texture2D image)
             : base(visualRoot)
         {
-            BackgroundContent = new ImageContent(texture);
-            Size = visualRoot.Theme.Button.Size.Value;
+            BackgroundContent = new ImageContent(image);
+        }
+
+        public Button(IUIRoot visualRoot, ImageContent image) 
+            : base(visualRoot)
+        {
+            BackgroundContent = image;
+        }
+
+        public static Button FromTemplate(IUIRoot visualRoot, ButtonTemplate template)
+        {
+            Button button = new Button(visualRoot);
+            button.ApplyTemplate(template);
+            return button;
         }
 
         public UIContent Content

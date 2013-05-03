@@ -26,13 +26,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private Button _upButton = null;
         private Button _downButton = null;
 
-        public Spinner(IUIRoot visualRoot, SpriteFont font, Color fontColor, Color backgroundColor)
+        public Spinner(IUIRoot visualRoot, SpriteFont font, Color fontColor, Color editorBgColor, ImageContent upButtonRendering, ImageContent downButtonRendering)
             : base(visualRoot)
         { 
-            _textBox = new TextBox(visualRoot, string.Empty, font, fontColor, backgroundColor);
+            _textBox = new TextBox(visualRoot, string.Empty, font, fontColor, editorBgColor);
             _textBox.EditComplete+= TextBox_EditComplete;
-            _upButton = new Button(visualRoot);      
-            _downButton = new Button(visualRoot);           
+            _upButton = new Button(visualRoot, upButtonRendering);      
+            _downButton = new Button(visualRoot, downButtonRendering);           
             Children.Add(_textBox);
             Children.Add(_upButton);
             Children.Add(_downButton);

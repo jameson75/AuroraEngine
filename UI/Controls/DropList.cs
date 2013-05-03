@@ -28,9 +28,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             _dropListState = DropListState.Closed;             
             root.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
-            _layoutManager = new ContainerControlLayoutManager(this);
-
-            this.Size = this.VisualRoot.Theme.DropList.Size.Value;
+            _layoutManager = new ContainerControlLayoutManager(this);           
 
             //Utils.Toolkit.SpriteFont tempSpriteFont = Utils.Toolkit.ContentImporter.LoadFont(Game.GraphicsDevice, "Content\\Fonts\\StartMenuFont.spritefont");
             Guid parentSplitterPanel2Guid = Guid.NewGuid();

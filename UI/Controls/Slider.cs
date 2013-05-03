@@ -21,17 +21,45 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         Range _range = Range.Empty;
         float _interval = 0.0f;
 
-        public Slider(IUIRoot visualRoot)
-            : base(visualRoot)
+        private Slider(IUIRoot visualRoot) 
+           : base(visualRoot)
         {
             trackContentControl = new ContentControl(VisualRoot);
-            trackContentControl.ApplyTemplate(visualRoot.Theme.Slider.TrackContent); //new ColorContent(SharpDX.Color.Red)                   
-            handleContentControl = new ContentControl(VisualRoot); //, new ColorContent(SharpDX.Color.Blue));
-            handleContentControl.ApplyTemplate(this.VisualRoot.Theme.Slider.HandleContent);
-            this.Children.Add(trackContentControl);
-            this.Children.Add(handleContentControl);
+            handleContentControl = new ContentControl(VisualRoot);
+            Children.Add(trackContentControl);
+            Children.Add(handleContentControl);
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
-        }       
+        }
+
+        public Slider(IUIRoot visualRoot, UIContent trackRendering, float trackWidth, UIContent handleRendering, float handleWidth)
+            : base(visualRoot)
+        {
+            trackContentControl = new ContentControl(VisualRoot, trackRendering);            
+            handleContentControl = new ContentControl(VisualRoot, handleRendering); 
+            Children.Add(trackContentControl);
+            Children.Add(handleContentControl);
+            UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
+        }
+
+        public static Slider FromTemplate(IUIRoot visualRoot, SliderTemplate template)
+        {
+            Slider slider = new Slider(visualRoot);
+            slider.ApplyTemplate(template);
+            return slider;
+        }
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            SliderTemplate sliderTemplate = (SliderTemplate)template;
+            
+            if (sliderTemplate.TrackContent != null)
+                trackContentControl.ApplyTemplate(sliderTemplate.TrackContent);
+
+            if (sliderTemplate.HandleContent != null)
+                handleContentControl.ApplyTemplate(sliderTemplate.HandleContent);
+
+            base.ApplyTemplate(template);
+        }
 
         protected virtual void OnRangeChanged()
         {

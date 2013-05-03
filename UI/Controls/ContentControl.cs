@@ -19,21 +19,26 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private UIContent _content = null;
 
         public ContentControl(IUIRoot visualRoot) : base(visualRoot)
-        {
-            _content = visualRoot.Theme.ContentControl.ContentStyle.GenerateContent();
-            Size = visualRoot.Theme.ContentControl.Size.Value;
+        {           
         }
 
         public ContentControl(IUIRoot visualRoot, UIContent content)
             : base(visualRoot)
         {            
-            Content = content;
-            Size = visualRoot.Theme.ContentControl.Size.Value;
+            Content = content;           
+        }
+
+        public static ContentControl FromTemplate(IUIRoot visualRoot, ContentControlTemplate template)
+        {
+            ContentControl contentControl = new ContentControl(visualRoot);
+            contentControl.ApplyTemplate(template);
+            return contentControl;
         }
 
         protected override void OnDraw(long gameTime)
         {
-            _content.Draw(gameTime);
+            if(_content != null )
+                _content.Draw(gameTime);
             base.OnDraw(gameTime);
         }
 

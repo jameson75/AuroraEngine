@@ -20,12 +20,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public abstract class UIControlTemplate
     {
-        public DrawingSizeF? Size { get; set; }    
-        //**************************************************************************************
-        //TODO: Implement so that controls with abstract children can create themselves from 
-        //a theme... (ie: see ListControlItem() constructor).
-        //****************************************************************************************
-        //public abstract UIControl CreateControl(IUIRoot visualRoot);
+        public DrawingSizeF? Size { get; set; }
+        public VerticalAlignment? VerticalAlignment { get; set; }
+        public HorizontalAlignment? HorizontalAlignment { get; set; }
+        public abstract UIControl CreateControl(IUIRoot visualRoot);
     }
 
     public class ListControlItemTemplate : UIControlTemplate
@@ -116,19 +114,33 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
     public class CheckBoxTemplate : UIControlTemplate
     {
+        public LabelTemplate CaptionTemplate { get; set; }
         public ContentControlTemplate CheckContentTemplate { get; set; }
         public ContentControlTemplate UncheckContentTemplate { get; set; }
 
         public CheckBoxTemplate()
         { }
 
-        public CheckBoxTemplate(Texture2D checkTexture, Texture2D uncheckTexture)
+        public CheckBoxTemplate(string caption, SpriteFont font, Color? fontColor, Texture2D checkTexture, Texture2D uncheckTexture)
         {
+            if (caption != null || font != null || fontColor != null)
+            {
+                CaptionTemplate = new LabelTemplate(caption, font, fontColor, null);
+                if (caption != null && font != null)
+                    CaptionTemplate.Size = font.MeasureString(caption);
+            }
+               
             if (checkTexture != null)
+            {
                 CheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = checkTexture } };
+                CheckContentTemplate.Size = new DrawingSizeF(checkTexture.Description.Width, checkTexture.Description.Height);
+            }
 
             if (uncheckTexture != null)
+            {
                 UncheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = uncheckTexture } };
+                UncheckContentTemplate.Size = new DrawingSizeF(uncheckTexture.Description.Width, uncheckTexture.Description.Height);
+            }
         }
     }
 

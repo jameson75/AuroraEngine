@@ -23,11 +23,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Label(Components.IUIRoot visualRoot)
             : base(visualRoot)
         {
-            _textContent = (TextContent)visualRoot.Theme.Label.CaptionStyle.GenerateContent();
+            _textContent = new TextContent();
             _textContent.Container = this;
-            _backgroundContent = new ColorContent();
-            _backgroundContent.Container = this;
-            this.Size = visualRoot.Theme.Label.Size.Value;
+        }
+
+        //public Label(Components.IUIRoot visualRoot, TextContent content)
+        //    : base(visualRoot)
+        //{
+        //    _textContent = content;
+        //    _textContent.Container = this;
+        //    _backgroundContent = new ColorContent();
+        //    _backgroundContent.Container = this;
+        //    this.Size = visualRoot.Theme.Label.Size.Value;
+        //}
+
+        public Label(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor)
+            : base(visualRoot)
+        {
+            _textContent = new TextContent(text, font, fontColor);
+            _textContent.Container = this;
+            _backgroundContent = new ColorContent(backgroundColor);
+            _backgroundContent.Container = this;           
         }
 
         public Label(Components.IUIRoot visualRoot, TextContent content)
@@ -35,18 +51,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             _textContent = content;
             _textContent.Container = this;
-            _backgroundContent = new ColorContent();
-            _backgroundContent.Container = this;
-            this.Size = visualRoot.Theme.Label.Size.Value;
         }
-            
-        public Label(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor) : base(visualRoot)
+
+        public static Label FromTemplate(IUIRoot visualRoot, LabelTemplate template)
         {
-            _textContent = new TextContent(text, font, fontColor);
-            _textContent.Container = this;
-            _backgroundContent = new ColorContent(backgroundColor);
-            _backgroundContent.Container = this;
-            this.Size = visualRoot.Theme.Label.Size.Value;
+            Label label = new Label(visualRoot);
+            label.ApplyTemplate(template);
+            return label;
         }
  
         public TextContent Content { get { return _textContent; } }

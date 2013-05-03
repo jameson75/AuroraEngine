@@ -25,28 +25,43 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         bool _isChecked = false;
         ContentControl _checkContentControl = null;
         ContentControl _uncheckedContentControl = null;
-
-        //UIContent checkContent = null;
         Label _label = null;
 
-        public CheckBox(IUIRoot visualRoot)
+        private CheckBox(IUIRoot visualRoot)
             : base(visualRoot)
-        {           
+        {
             _checkContentControl = new ContentControl(visualRoot);
-            _checkContentControl.ApplyTemplate(visualRoot.Theme.CheckBox.CheckContentTemplate);
-            Children.Add(_checkContentControl);
-
             _uncheckedContentControl = new ContentControl(visualRoot);
-            _uncheckedContentControl.ApplyTemplate(visualRoot.Theme.CheckBox.UncheckContentTemplate);
+            _label = new Label(visualRoot);
+            Children.Add(_checkContentControl);
             Children.Add(_uncheckedContentControl);
-
-            Size = visualRoot.Theme.CheckBox.Size.Value;           
+            Children.Add(_label);
+            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
+        }
+        
+        public CheckBox(IUIRoot visualRoot, UIContent checkedRendering, UIContent uncheckedRendering)
+            : base(visualRoot)
+        {   
+            _checkContentControl = new ContentControl(visualRoot, checkedRendering);
+            _uncheckedContentControl = new ContentControl(visualRoot, uncheckedRendering);
+            _label = new Label(visualRoot);
+            Children.Add(_checkContentControl);
+            Children.Add(_uncheckedContentControl);
+            Children.Add(_label);
+            UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }
 
-        public CheckBox(IUIRoot visualRoot, string caption)
-            : this(visualRoot)
+        public CheckBox(IUIRoot visualRoot, string caption, UIContent checkedRendering, UIContent uncheckedRendering)
+            : this(visualRoot, checkedRendering, uncheckedRendering)
         {
             this.Caption = caption;
+        }
+
+        public static CheckBox FromTemplate(IUIRoot visualRoot, CheckBoxTemplate template)
+        {
+            CheckBox checkBox = new CheckBox(visualRoot);
+            checkBox.ApplyTemplate(template);
+            return checkBox;
         }
 
         public bool IsChecked
@@ -109,6 +124,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public override void ApplyTemplate(UIControlTemplate template)
         {
             CheckBoxTemplate cbTemplate = (CheckBoxTemplate)template;
+
+            if (cbTemplate.CaptionTemplate != null)
+                _label.ApplyTemplate(cbTemplate.CaptionTemplate);
             
             if (cbTemplate.CheckContentTemplate != null)
                 _checkContentControl.ApplyTemplate(cbTemplate.CheckContentTemplate);

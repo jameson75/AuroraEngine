@@ -230,11 +230,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Items.Add(item);
         }
 
-        public void AddListItem(string text)
+        public void AddListItem(string text, string name = null, SpriteFont font = null, Color? fontColor = null, Color? bgColor = null)
         {
-            ListControlItem item = new ListControlItem(this.VisualRoot, text);      
-            this.Items.Add(item);
-        }
+            LabelTemplate currentUILabelTemplate = this.VisualRoot.Theme.Label;
+            ListControlItem item = new ListControlItem(this.VisualRoot,
+                                                       name,
+                                                       text,
+                                                       font != null ? font : currentUILabelTemplate.CaptionStyle.Font,
+                                                       fontColor != null ? fontColor.Value : currentUILabelTemplate.CaptionStyle.FontColor.Value,
+                                                       bgColor != null ? bgColor.Value : currentUILabelTemplate.CaptionStyle.FontColor.Value);
+            AddListItem(item);
+        }      
     }
 
     public enum ListColumnDirection
@@ -256,9 +262,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }       
 
-        public ListControlItem(UIControl control) : base(control.VisualRoot)
+        public ListControlItem(UIControl content) : base(content.VisualRoot)
         {
-            SetContent(control);
+            SetContent(content);
             _wireUp = new CommandControlWireUp(this);
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }
@@ -279,20 +285,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }
 
-        public ListControlItem(IUIRoot visualRoot, string text) : base(visualRoot)
+        public static ListControlItem FromTemplate(IUIRoot visualRoot, ListControlItemTemplate template)
         {
-            Name = text;
-            CommandName = text;
-            //*******************************************************************************************************
-            //TODO: FIX THIS CHEAT... 
-            //I instanciated a Label to avoid having to implement UIControlTemplate.CreateControl(), which
-            //would have required new constructors for almost every control.
-            //I put it off until I have the mental energy to make such a change
-            //*******************************************************************************************************
-            UIControl content = new Label(visualRoot); // visualRoot.Theme.ListControlItem.Content.CreateControl(visualRoot);
-            UIControlTemplate itemTemplate = visualRoot.Theme.ListControlItem.ItemTemplate;
-            UIControlTemplate selectTemplate = visualRoot.Theme.ListControlItem.SelectTemplate;
-            SetContent(content, itemTemplate, selectTemplate);
+            ListControlItem item = new ListControlItem(visualRoot);
+            item.ApplyTemplate(template);
+            return item;
         }
 
         protected override void OnSelected()
@@ -313,29 +310,54 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 Children[0].ApplyTemplate(ItemTemplate);
             base.OnUnselected();
         }
+     
+        public void SetContent(TextContent content, LabelTemplate itemTemplate = null, LabelTemplate selectTemplate = null)
+        {
+            Label label = new Label(VisualRoot, content);
+            SetContent(label, itemTemplate, selectTemplate);
+        }           
 
         public void SetContent(UIControl content, UIControlTemplate itemTemplate = null, UIControlTemplate selectTemplate = null)
         {
-            if (content == null)
-                throw new ArgumentNullException("content");
+            if (content != null)
+            {
+                Children.Clear();
+                if (itemTemplate != null)
+                    content.ApplyTemplate(itemTemplate);
+                content.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+                content.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+                Size = content.Size;
+                Children.Add(content);
+            }
 
-            if (itemTemplate != null)
-                content.ApplyTemplate(itemTemplate);
+            if(itemTemplate != null)
+                ItemTemplate = itemTemplate;
 
-            content.VerticalAlignment = Controls.VerticalAlignment.Stretch;
-            content.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
-            Size = content.Size;
+            if (selectTemplate != null)
+                SelectTemplate = selectTemplate;     
+        }
 
-            Children.Add(content);
-            ItemTemplate = itemTemplate;
-            SelectTemplate = selectTemplate;     
+        public void ClearContent()
+        {
+            Children.Clear();
+            ItemTemplate = null;
+            SelectTemplate = null;
         }
 
         public UIControlTemplate ItemTemplate { get; private set; }
 
         public UIControlTemplate SelectTemplate { get; private set; }
 
-        public UIControl Content { get; private set; } 
+        public UIControl Content { get; private set; }
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            ListControlItemTemplate listControlTemplate = (ListControlItemTemplate)template;
+            SetContent(listControlTemplate.Content.CreateControl(this.VisualRoot), 
+                       listControlTemplate.ItemTemplate, 
+                       listControlTemplate.SelectTemplate);
+            base.ApplyTemplate(template);
+        }
 
         private void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
         {
