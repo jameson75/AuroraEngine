@@ -70,6 +70,40 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    public struct XMFLOAT3
+    {
+        public float X;
+        public float Y;
+        public float Z;
+
+        public XMFLOAT3(float x, float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        public XMFLOAT3(Vector3 v)
+        {
+            X = v.X;
+            Y = v.Y;
+            Z = v.Z;
+        }
+
+        static XMFLOAT3()
+        {
+            _zero = new XMFLOAT3(0, 0, 0);
+            _unit = new XMFLOAT3(1, 1, 1);
+        }
+
+        private static XMFLOAT3 _zero;
+        private static XMFLOAT3 _unit;
+
+        public static XMFLOAT3 Zero { get { return _zero; } }
+        public static XMFLOAT3 Unit { get { return _unit; } }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     public struct XVECTOR4
     {
         public float C1;

@@ -16,6 +16,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public abstract class UIContent
     {
+        private UIControl _container = null;
+
         public UIContent()
         {
             
@@ -61,11 +63,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         }
 
-        public UIControl Container { get; set; }
+        public UIControl Container
+        {
+            get { return _container; }
+            set 
+            {
+                _container = value;
+                OnContainerChanged();
+            }
+        }
 
         public abstract Rectangle CalculateSmallestBoundingRect();
 
         public virtual void ApplyStyle(Components.UIStyle style)
+        { }
+
+        protected virtual void OnContainerChanged()
         { }
     }
 }

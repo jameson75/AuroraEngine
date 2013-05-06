@@ -33,6 +33,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public UIControlTemplate Content { get; set; }
         public UIControlTemplate ItemTemplate { get; set; }
         public UIControlTemplate SelectTemplate { get; set; }
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return ListControlItem.FromTemplate(visualRoot, this);
+        }
     }
 
     public class LabelTemplate : UIControlTemplate
@@ -57,6 +61,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public ColorStyle BackgroundColor{ get; set; }
         public TextStyle CaptionStyle { get; set; }
+
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return Label.FromTemplate(visualRoot, this);
+        }
     }
 
    // public abstract class UIContentTemplate
@@ -110,6 +119,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             if (image != null)
                 ForegroundStyle = new ImageStyle() { Texture = image };
         }
+
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return Button.FromTemplate(visualRoot, this);
+        }
     }
 
     public class CheckBoxTemplate : UIControlTemplate
@@ -142,11 +156,20 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 UncheckContentTemplate.Size = new DrawingSizeF(uncheckTexture.Description.Width, uncheckTexture.Description.Height);
             }
         }
+
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return CheckBox.FromTemplate(visualRoot, this);
+        }
     }
 
     public class ContentControlTemplate : UIControlTemplate
     {
         public UIStyle ContentStyle { get; set; }
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return ContentControl.FromTemplate(visualRoot, this);
+        }
     }
 
     public class ImageControlTemplate : UIControlTemplate
@@ -158,22 +181,29 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             if (texture != null)
                 ImageStyle = new ImageStyle() { Texture = texture };
         }
+
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return ImageControl.FromTemplate(visualRoot, this);
+        }
     }
-
-    public class PanelControlTemplate : UIControlTemplate
-    {
-
-    }
-
+   
     public class SliderTemplate : UIControlTemplate
     {
         public ContentControlTemplate TrackContent { get; set; }
         public ContentControlTemplate HandleContent { get; set; }
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return Slider.FromTemplate(visualRoot, this);
+        }
     }
 
-    public class SpinnerControlTemplate : UIControlTemplate
+    public class SpinnerTemplate : UIControlTemplate
     {
-
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return Spinner.FromTemplate(visualRoot, this);
+        }
     }
 
     public class TextBoxTemplate : UIControlTemplate
@@ -190,6 +220,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 Color = backgroundColor
             };
         }
+
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return TextBox.FromTemplate(visualRoot, this);
+        }
     }
 
     public class DropListTemplate : UIControlTemplate
@@ -197,6 +232,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public ButtonTemplate DropDownButton { get; set; }
         public TextBoxTemplate TextBox { get; set; }
         public ListControlTemplate ListControl { get; set; }
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return DropList.FromTemplate(visualRoot, this);
+        }
     }
 
     public class ListControlTemplate : UIControlTemplate
@@ -206,6 +245,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public ListControlTemplate(Color4 backgroundColor)
         {
             BackgroundStyle = new ColorStyle(backgroundColor);
+        }
+
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return ListControl.FromTemplate(visualRoot, this);
         }
     }
 }

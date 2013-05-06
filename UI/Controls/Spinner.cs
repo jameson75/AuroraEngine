@@ -24,7 +24,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         private TextBox _textBox = null;        
         private Button _upButton = null;
-        private Button _downButton = null;        
+        private Button _downButton = null;
+
+        private Spinner(IUIRoot visualRoot)
+            : base(visualRoot)
+        { }
 
         public Spinner(IUIRoot visualRoot, SpriteFont font, Color fontColor, Color editorBgColor, ImageContent upButtonRendering, ImageContent downButtonRendering)
             : base(visualRoot)
@@ -129,6 +133,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public event EventHandler ValueChanged;
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            base.ApplyTemplate(template);
+        }
+
+        public static Spinner FromTemplate(IUIRoot visualRoot, SpinnerTemplate template)
+        {
+            Spinner spinner = new Spinner(visualRoot);
+            spinner.ApplyTemplate(template);
+            return spinner;
+        }
     }
 
     //public class FieldValueChangedEventArgs<T> : EventArgs

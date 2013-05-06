@@ -240,7 +240,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                                        fontColor != null ? fontColor.Value : currentUILabelTemplate.CaptionStyle.FontColor.Value,
                                                        bgColor != null ? bgColor.Value : currentUILabelTemplate.CaptionStyle.FontColor.Value);
             AddListItem(item);
-        }      
+        }
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            base.ApplyTemplate(template);
+        }
+
+        public static ListControl FromTemplate(IUIRoot visualRoot, ListControlTemplate template)
+        {
+            ListControl listControl = new ListControl(visualRoot);
+            listControl.ApplyTemplate(template);
+            return listControl;
+        }
     }
 
     public enum ListColumnDirection

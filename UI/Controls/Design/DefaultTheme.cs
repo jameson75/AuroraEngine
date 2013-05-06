@@ -55,8 +55,13 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             {
                 if (_checkbox == null)
                 {
-                    _checkbox = new CheckBoxTemplate(DefaultCheckTexture, DefaultUncheckTexture);
-                    _checkbox.Size = new DrawingSizeF(30, 10);
+                    _checkbox = new CheckBoxTemplate()
+                    {
+                        CaptionTemplate = this.Label,
+                        CheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = DefaultCheckTexture } },
+                        UncheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = DefaultUncheckTexture } },
+                        Size = new DrawingSizeF(30, 10)
+                    };       
                 }
                 return _checkbox;
             }
@@ -145,12 +150,16 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                         TrackContent = new ContentControlTemplate() 
                         { 
                             ContentStyle = new ColorStyle(Color.Gray),
-                            Size = new DrawingSizeF(50, 20),
-                            VerticleAlignment =           
+                            Size = new DrawingSizeF(50, 20)                                    
                         },
-                        HandleContent = new ContentControlTemplate() { ContentStyle = new ColorStyle(Color.LightGray) }
+                        HandleContent = new ContentControlTemplate()
+                        { 
+                            ContentStyle = new ColorStyle(Color.LightGray),
+                            Size = new DrawingSizeF(20, 20)
+                        },
+                        Size = new DrawingSizeF(50, 20)
                     };
-                    _slider.Size = new DrawingSizeF(50, 20);
+                    
                 }
                 return _slider;
             }

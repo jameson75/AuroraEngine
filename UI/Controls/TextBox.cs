@@ -211,5 +211,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public event EventHandler EditComplete;
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            base.ApplyTemplate(template);
+        }
+
+        public static TextBox FromTemplate(IUIRoot visualRoot, TextBoxTemplate template)
+        {
+            TextBox textBox = new TextBox(visualRoot);
+            textBox.ApplyTemplate(template);
+            return textBox;
+        }
     }
 }

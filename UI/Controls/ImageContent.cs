@@ -38,10 +38,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 }
 
                 _texture = value;
-
-                if( _texture != null )                
-                    _textureView = new ShaderResourceView(Container.Game.GraphicsDevice, _texture);                
-            }
+             }
         }
        
         public ImageContent()
@@ -55,20 +52,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public override void Draw(long gameTime)
         {
             if (this.Container == null)
-                throw new InvalidOperationException("Container is null");
+                throw new InvalidOperationException("Container is null. Container must be specified before calling Draw method.");
 
-            if (_textureView != null)
+            if (_texture != null)
             {
+                if (_textureView == null)
+                    _textureView = new ShaderResourceView(Container.Game.GraphicsDevice, _texture);                
+
                 if (!HasDrawParameters)
                     Container.ControlSpriteBatch.Begin();
                 else
-                    Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);
+                    Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);                
+                
                 Container.ControlSpriteBatch.Draw(_textureView, Container.PositionToSurface(Container.Position).ToVector2(), SharpDX.Color.White);              
                 Container.ControlSpriteBatch.End();
             }
 
             base.Draw(gameTime);
-        }
+        }       
 
         public override Rectangle CalculateSmallestBoundingRect()
         {

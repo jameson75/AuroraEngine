@@ -200,6 +200,13 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FBXKeyFrame
+    {
+        public XVECTOR4 Transform;
+        public XVECTOR4 Rotation;
+    }       
+
     public struct VoiceData
     {
         public WaveFormatEx Format;

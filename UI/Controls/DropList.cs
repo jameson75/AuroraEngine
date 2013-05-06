@@ -209,6 +209,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public event EventHandler ListClosed;
 
         public event SelectionChangedHandler SelectionChanged;
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            base.ApplyTemplate(template);
+        }
+
+        public static UIControl FromTemplate(IUIRoot visualRoot, DropListTemplate template)
+        {
+            DropList dropList = new DropList(visualRoot);
+            dropList.ApplyTemplate(template);
+            return dropList;
+        }
     }
 
     public enum DropListState
