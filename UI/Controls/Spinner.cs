@@ -22,17 +22,32 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class Spinner : UIControl
     {
-        private TextBox _textBox = null;
+        private TextBox _textBox = null;        
         private Button _upButton = null;
-        private Button _downButton = null;
+        private Button _downButton = null;        
 
         public Spinner(IUIRoot visualRoot, SpriteFont font, Color fontColor, Color editorBgColor, ImageContent upButtonRendering, ImageContent downButtonRendering)
             : base(visualRoot)
-        { 
+        {
+            //SplitterPanel splitterPanel1 = new SplitterPanel(visualRoot);
+            //splitterPanel1.Orientation = SplitterLayoutOrientation.Verticle;                     
+            //Guid splitter1Guid = Guid.NewGuid();
+            //SplitterLayoutDivision splitter1 = new SplitterLayoutDivision(splitter1Guid);
+            //splitter1.FixedSide = SplitterLayoutFixedSide.Two;
+            //splitterPanel1.Splitters.Add(splitter1);
+
+            //SplitterPanel splitterPanel2 = new SplitterPanel(visualRoot);
+            //splitterPanel2.Orientation = SplitterLayoutOrientation.Horizontal;
+            //Guid splitter2Guid = Guid.NewGuid();
+            //SplitterLayoutDivision splitter2 = new SplitterLayoutDivision(splitter2Guid);
+            //splitterPanel2.Splitters.Add(splitter2);
+
             _textBox = new TextBox(visualRoot, string.Empty, font, fontColor, editorBgColor);
             _textBox.EditComplete+= TextBox_EditComplete;
-            _upButton = new Button(visualRoot, upButtonRendering);      
-            _downButton = new Button(visualRoot, downButtonRendering);           
+            _upButton = new Button(visualRoot, upButtonRendering);
+            _upButton.Click += UpButton_Click;
+            _downButton = new Button(visualRoot, downButtonRendering);
+            _downButton.Click += DownButton_Click;
             Children.Add(_textBox);
             Children.Add(_upButton);
             Children.Add(_downButton);
@@ -44,7 +59,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             get { return _textBox.Content.Format; }
             set { _textBox.Content.Format = value; }
         }
-
+  
         public float Increment { get; set; }
 
         public Range Range { get; set; }
@@ -96,6 +111,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private void TextBox_EditComplete(object sender, EventArgs args)
         {
             OnValueChanged(Value);
+        }
+
+        private void DownButton_Click(object sender, EventArgs args)
+        {
+            IncrementValue(-Increment);
+        }
+
+        private void UpButton_Click(object sender, EventArgs args)
+        {
+            IncrementValue(Increment);
+        }
+
+        private void IncrementValue(float increment)
+        {
+            Value += increment;
         }
 
         public event EventHandler ValueChanged;
