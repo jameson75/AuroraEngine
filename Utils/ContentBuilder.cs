@@ -59,16 +59,16 @@ namespace CipherPark.AngelJacket.Core.Utils
         {
             Rectangle dimension = new Rectangle(-1, 1, 1, -1);
             Vector2[] textureCoords = { new Vector2( 0, 0 ), new Vector2( 1, 0 ), new Vector2( 1, 1 ), new Vector2( 0, 1 ) };
-            ScreenVertexPositionTexture[] verts = new ScreenVertexPositionTexture[6];            
-            verts[0] = new ScreenVertexPositionTexture(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
-            verts[1] = new ScreenVertexPositionTexture(new Vector2(dimension.Right, dimension.Top), textureCoords[1]);
-            verts[2] = new ScreenVertexPositionTexture(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
-            verts[3] = new ScreenVertexPositionTexture(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
-            verts[4] = new ScreenVertexPositionTexture(new Vector2(dimension.Left, dimension.Bottom), textureCoords[3]);
-            verts[5] = new ScreenVertexPositionTexture(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
+            BasicVertexScreenTexture[] verts = new BasicVertexScreenTexture[6];            
+            verts[0] = new BasicVertexScreenTexture(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
+            verts[1] = new BasicVertexScreenTexture(new Vector2(dimension.Right, dimension.Top), textureCoords[1]);
+            verts[2] = new BasicVertexScreenTexture(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
+            verts[3] = new BasicVertexScreenTexture(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
+            verts[4] = new BasicVertexScreenTexture(new Vector2(dimension.Left, dimension.Bottom), textureCoords[3]);
+            verts[5] = new BasicVertexScreenTexture(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
             Vector3[] positions = (from v in verts select new Vector3(v.Position.X, v.Position.Y, 0)).ToArray();
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);         
-            return BuildMesh<ScreenVertexPositionTexture>(game, shaderByteCode, verts, ScreenVertexPositionTexture.InputElements, ScreenVertexPositionTexture.ElementSize, boundingBox);
+            return BuildMesh<BasicVertexScreenTexture>(game, shaderByteCode, verts, BasicVertexScreenTexture.InputElements, BasicVertexScreenTexture.ElementSize, boundingBox);
         }
         
         //Constructs an equilateral triangle.

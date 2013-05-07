@@ -147,21 +147,55 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
         }
 
-        public static Model ImportFBX(IGameApp app, string fileName)
+        public static Model ImportFBX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
         {
             Model result = null;
             FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();
             fbxMeshThunk.m = new float[16];
-            ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
-            //result = ContentBuilder.BuildMesh<BasicVertexPositionNormalTexture>(app, shaderByteCode, 
+            ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);            
+            Mesh mesh = null;
+            XMFLOAT3[] vertices = MarshalHelper.PtrToStructures<XMFLOAT3>(fbxMeshThunk.Vertices, fbxMeshThunk.VertexCount);
+            int[] indices = new int[fbxMeshThunk.IndexCount];
+            Marshal.Copy(fbxMeshThunk.Indices, indices, 0, fbxMeshThunk.IndexCount);
             fbxMeshThunk.Dispose();
+            short[] _indices = Array.ConvertAll<int, short>(indices, e => (short)e);
+            //NOTE: We only support specific channel combinations. We throw an exception for an unsupported combination.
+            switch (channels)
+            {
+                case MeshImportChannel.PositionColor:
+                    BasicVertexPositionColor[] _vertices = vertices.Select(e => new BasicVertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.White.ToVector4() }).ToArray();
+                    mesh = ContentBuilder.BuildMesh<BasicVertexPositionColor>(app, shaderByteCode, _vertices, _indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+                    result = new BasicModel(app);
+                    result.Mesh = mesh;
+                    break;
+                default:
+                    throw new ArgumentException("Specified channel combination is unsupported.", "channels");
+            }                        
             return result;
         }
+    }
+
+    [Flags]
+    public enum MeshImportChannel
+    {
+        Default = Position | Color,
+        Position = 0x01,
+        Normal = 0x02,
+        Color = 0x04,
+        Texture0 = 0x08,
+        Texture1 = 0x10,
+        PositionColor = Position | Color,
+        PositionTexture = Position | Texture0,
+        PositionNormalColor = Position | Normal | Color,
+        PositionNormalTexture = Position | Normal | Texture0,
+        PositionMultiTexture = Position | Texture0 | Texture1,
+        PositionNormalMultiTexture  = Position | Normal | Texture0 | Texture1
     }
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct FBXMeshThunk : IDisposable
     {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
         public float[] m;
         public IntPtr Vertices;
         public int VertexCount;
@@ -176,19 +210,27 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         }
 
         private static void DisposeMeshTree(ref FBXMeshThunk parent)
-        {
-            FBXMeshThunk[] children = parent.MarshalChildren();
-            if (children != null)
+        {            
+            if (parent.Children != IntPtr.Zero)
             {
+                FBXMeshThunk[] children = parent.MarshalChildren();
                 for (int i = 0; i < children.Length; i++)
-                    FBXMeshThunk.DisposeMeshTree(ref children[i]);
+                    FBXMeshThunk.DisposeMeshTree(ref children[i]);                
+                Marshal.FreeHGlobal(parent.Children);
+                parent.Children = IntPtr.Zero;
             }
-            Marshal.FreeHGlobal(parent.Vertices);
-            parent.Vertices = IntPtr.Zero;           
-            Marshal.FreeHGlobal(parent.Indices);
-            parent.Indices = IntPtr.Zero;           
-            Marshal.FreeHGlobal(parent.Children);
-            parent.Children = IntPtr.Zero;           
+            
+            if (parent.Vertices != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(parent.Vertices);
+                parent.Vertices = IntPtr.Zero;
+            }
+            
+            if (parent.Indices != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(parent.Indices);
+                parent.Indices = IntPtr.Zero;
+            }          
         }
 
         public FBXMeshThunk[] MarshalChildren()

@@ -7,6 +7,14 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Direct3D;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     /// <summary>
@@ -84,7 +92,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct ScreenVertexPositionTexture
+    public struct BasicVertexScreenTexture
     {
         public Vector2 Position;
         public Vector2 TextureCoord;
@@ -94,7 +102,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
         
-        static ScreenVertexPositionTexture()
+        static BasicVertexScreenTexture()
         {
             _inputElements = new InputElement[]
              {
@@ -104,13 +112,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementSize = 16;
         }
         
-        public ScreenVertexPositionTexture(Vector2 position)
+        public BasicVertexScreenTexture(Vector2 position)
         {
             Position = position;
             TextureCoord = Vector2.Zero;
         }
         
-        public ScreenVertexPositionTexture(Vector2 position, Vector2 textureCoord)
+        public BasicVertexScreenTexture(Vector2 position, Vector2 textureCoord)
         {
             Position = position;
             TextureCoord = textureCoord;
