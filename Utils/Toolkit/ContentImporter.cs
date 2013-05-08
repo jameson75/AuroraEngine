@@ -150,15 +150,21 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public static Model ImportFBX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
         {
             Model result = null;
-            FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();
+            FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();            
             fbxMeshThunk.m = new float[16];
-            ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);            
+            ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
+            //TODO: Remove need for tempThunk.
+            FBXMeshThunk tempThunk = fbxMeshThunk;
+            fbxMeshThunk = tempThunk.MarshalChildren()[0];
             Mesh mesh = null;
             XMFLOAT3[] vertices = MarshalHelper.PtrToStructures<XMFLOAT3>(fbxMeshThunk.Vertices, fbxMeshThunk.VertexCount);
             int[] indices = new int[fbxMeshThunk.IndexCount];
             Marshal.Copy(fbxMeshThunk.Indices, indices, 0, fbxMeshThunk.IndexCount);
+            //TODO: Remove need for tempThunk
+            fbxMeshThunk = tempThunk;
             fbxMeshThunk.Dispose();
             short[] _indices = Array.ConvertAll<int, short>(indices, e => (short)e);
+            BoundingBox boundingBox = BoundingBox.FromPoints(vertices.Select(v => new Vector3(v.X, v.Y, v.Z)).ToArray());
             //NOTE: We only support specific channel combinations. We throw an exception for an unsupported combination.
             switch (channels)
             {
@@ -238,7 +244,18 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             if (Children == IntPtr.Zero)
                 return null;
             else
+            {
+                //FBXMeshThunk[] structures = new FBXMeshThunk[ChildCount];
+                //int sizeofTypeT = Marshal.SizeOf(typeof(FBXMeshThunk));
+                //for (int i = 0; i < ChildCount; i++)
+                //{
+                //    IntPtr cursor = IntPtr.Add(Children, i * sizeofTypeT);
+                //    //structures[i].m = new float[16];
+                //    structures[i] = (FBXMeshThunk)Marshal.PtrToStructure(cursor, typeof(FBXMeshThunk));
+                //}
+                //return structures;
                 return MarshalHelper.PtrToStructures<FBXMeshThunk>(Children, ChildCount);
+            }
         }
     }
 

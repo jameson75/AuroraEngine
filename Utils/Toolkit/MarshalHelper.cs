@@ -32,7 +32,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             for (int i = 0; i < length; i++)
             {
                 IntPtr cursor = IntPtr.Add(ptr, i * sizeofTypeT);
-                Marshal.PtrToStructure(ptr, structures[i]);
+                structures[i] = (T)Marshal.PtrToStructure(cursor, typeof(T));
             }
             return structures;
         }

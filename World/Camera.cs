@@ -34,6 +34,7 @@ namespace CipherPark.AngelJacket.Core.World
         public Camera(IGameApp game, Matrix viewMatrix, Matrix projectionMatrix)
         {
             _game = game;
+            _postEffectChain = PostEffectChain.Create(game);
             ViewMatrix = viewMatrix;
             ProjectionMatrix = projectionMatrix;
         }

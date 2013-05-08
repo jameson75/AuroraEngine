@@ -201,6 +201,6 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new BoundingBox(new Vector3(vMin.X, vMin.Y, vMin.Z), new Vector3(vMax.X, vMax.Y, vMax.Z));
         }
 
-        public static BoundingBox Empty { get { return _empty; } }
+        public static BoundingBox Empty { get { return _empty; } }    
     }
 }
