@@ -146,7 +146,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
             public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
         }
-
+       
         public static Model ImportFBX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
         {
             Model result = null;
@@ -178,7 +178,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     throw new ArgumentException("Specified channel combination is unsupported.", "channels");
             }                        
             return result;
-        }
+        }      
     }
 
     [Flags]
