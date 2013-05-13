@@ -23,13 +23,12 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         private IGameApp _game = null;
         private bool _isStarted = false;
         private long _startTime = 0;
+        private Sequence _sequence = new Sequence();
 
         public IGameApp Game { get { return _game; } }
 
-        public Sequence Sequence { get; set; }
-
-        public GameAssets Assets { get; set; }
-
+        public Sequence Sequence { get { return _sequence; } }
+ 
         public Sequencer(IGameApp game)
         {
             _game = game;

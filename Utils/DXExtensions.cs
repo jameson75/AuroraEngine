@@ -201,6 +201,21 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new BoundingBox(new Vector3(vMin.X, vMin.Y, vMin.Z), new Vector3(vMax.X, vMax.Y, vMax.Z));
         }
 
+        public static float GetLengthX(this BoundingBox boundingBox)
+        {
+            return boundingBox.Maximum.X - boundingBox.Minimum.X;
+        }
+
+        public static float GetLengthY(this BoundingBox boundingBox)
+        {
+            return boundingBox.Maximum.Y - boundingBox.Minimum.Y;
+        }
+
+        public static float GetLengthZ(this BoundingBox boundingBox)
+        {
+            return boundingBox.Maximum.Z - boundingBox.Minimum.Z;
+        }
+
         public static BoundingBox Empty { get { return _empty; } }    
     }
 }

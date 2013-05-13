@@ -24,6 +24,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public abstract class Model : ITransformable
     {
         private IGameApp _game = null;
+        private Mesh _mesh = null;
 
         public Model(IGameApp game)
         {
@@ -35,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public IGameApp Game { get { return _game; } }
 
-        public Mesh Mesh { get; set; }
+        public Mesh Mesh { get { return _mesh; } set { _mesh = value; OnMeshChanged(); } }
 
         public Transform Transform { get; set; }
         
@@ -55,6 +56,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         //}
 
         public abstract void Draw(long gameTime);
+
+        protected virtual void OnMeshChanged()
+        { }
     }
 
     public class BasicModel : Model

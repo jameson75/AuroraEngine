@@ -23,14 +23,12 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     public class Scene
     {
         private IGameApp _game = null;
-        private SceneNodes _nodes = null;
-        private MatrixStack _worldTransformStack = null;
+        private SceneNodes _nodes = null;      
 
         public Scene(IGameApp game)
         {
             _game = game;
-            _nodes = new SceneNodes();
-            _worldTransformStack = new MatrixStack();
+            _nodes = new SceneNodes();            
             _nodes.CollectionChanged += OnCollectionChanged;
         }
 
@@ -38,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         
         public SceneNodes Nodes { get { return _nodes; } }
         
-        public Camera Camera { get; set; }
+        public CameraSceneNode CameraNode { get; set; }
 
         public Model SkyModel { get; set; }
 
@@ -52,12 +50,12 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public void Draw(long gameTime)
         {
-            Camera.PostEffectChain.Begin(gameTime);
+            CameraNode.Camera.PostEffectChain.Begin(gameTime);
             OnBeginDraw();
             foreach (SceneNode node in Nodes)
                 _DrawNodeHierarchy(gameTime, node);
             OnEndDraw();
-            Camera.PostEffectChain.End(gameTime);
+            CameraNode.Camera.PostEffectChain.End(gameTime);
         }
         
         private void _UpdateNodeHierarchy(long gameTime, SceneNode node)

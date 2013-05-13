@@ -63,7 +63,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Camera CurrentCamera
         {
-            get { return Scene.Camera; }
+            get { return Scene.CameraNode.Camera; }
         }
 
         //private float DeviceAspectRatio

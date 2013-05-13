@@ -53,8 +53,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             if (Model != null)
             {
                 Model.Effect.World = LocalToWorld(this.Transform.ToMatrix());
-                Model.Effect.View = Scene.Camera.ViewMatrix;
-                Model.Effect.Projection = Scene.Camera.ProjectionMatrix;                
+                Model.Effect.View = Camera.TransformToView(Scene.CameraNode.LocalToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
+                Model.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;                
                 Model.Draw(gameTime);
             }
         }

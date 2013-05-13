@@ -90,7 +90,20 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 node = node.Parent;
             }
             return stack.Transform;
-        } 
+        }
+
+        public Transform WorldToLocal(Transform worldTransform)
+        {
+            TransformStack stack = new TransformStack();
+            stack.Push(worldTransform);
+            SceneNode node = this.Parent;
+            while (node != null)
+            {
+                stack.Push(Animation.Transform.Invert(node.Transform));
+                node = node.Parent;
+            }
+            return stack.ReverseTransform;
+        }
 
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
         {

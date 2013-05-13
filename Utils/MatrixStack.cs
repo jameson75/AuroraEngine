@@ -30,6 +30,17 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
 
+        public Matrix ReverseTransform
+        {
+            get
+            {
+                Matrix t = Matrix.Identity;
+                for (int i = _innerList.Count - 1; i < 0; i--)
+                    t *= _innerList[i];
+                return t;
+            }         
+        }
+
         public void Push(Matrix m)
         {
             _innerList.Add(m);

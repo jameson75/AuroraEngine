@@ -25,11 +25,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public CameraSceneNode(IGameApp game)
             : base(game)
-        {
-
-        }
-
-        public SceneNode LockOnTarget { get; set; }
+        { }       
 
         public CameraSceneNode(Camera camera, string name = null)
             : base(camera.Game, name)
@@ -37,43 +33,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             Camera = camera;
         }
 
-        public Camera Camera { get; set; }
+        public SceneNode LockOnTarget { get; set; }
 
-        public override void Update(long gameTime)
-        {
-            if (Camera != null)
-            {
-                ////TODO: Figure out how to use
-                //if (this.LockOnTarget != null)
-                //{
-                //    Matrix targetTransform = LockOnTarget.LocalToWorld(LockOnTarget.Transform.ToMatrix());
-                //    Matrix cameraTransform = LocalToWorld(this.Transform.ToMatrix());
-                //    Vector3 worldViewFrom = -(Camera.ViewMatrix * Matrix.Invert(Camera.ViewMatrix * Matrix.Translation(-Camera.ViewMatrix.TranslationVector))).TranslationVector + cameraTransform.TranslationVector;
-                //    Vector3 targetWorldPosition = (targetTransform * Matrix.Invert(targetTransform * Matrix.Translation(-targetTransform.TranslationVector))).TranslationVector;
-                //    Camera.ViewMatrix = Matrix.LookAtLH(worldViewFrom, targetWorldPosition, Vector3.UnitY);
-                //}
-                //else 
-                //    Camera.ViewMatrix = Matrix.Translation(-LocalToWorld(Transform.ToMatrix()).TranslationVector) * _cachedViewMatrix;
-
-                //if (this.LockOnTarget != null)
-                //{   
-                //    //Determine look at vector.
-                //    Vector3 lookAt = LockOnTarget.LocalToWorld(LockOnTarget.Transform).Translation;
-                //    //Determine look at 
-                //    Vector3 location = LocalToWorld(this.Transform).Translation;
-                //    Vector3 up = DetermineUpVector(location, lookAt);                  
-                //    //Mat
-                //    //-(Camera.ViewMatrix * Matrix.Invert(Camera.ViewMatrix * Matrix.Translation(-Camera.ViewMatrix.TranslationVector)))
-                //    //Vector3 worldViewFrom = -(Camera.ViewMatrix * Matrix.Invert(Camera.ViewMatrix * Matrix.Translation(-Camera.ViewMatrix.TranslationVector))).TranslationVector + location.TranslationVector;
-                //    //Vector3 targetWorldPosition = (lookAt * Matrix.Invert(lookAt * Matrix.Translation(-lookAt.TranslationVector))).TranslationVector;
-                //    Camera.ViewMatrix = Matrix.LookAtLH(location, lookAt, up);
-                //}
-
-                //else
-                //    Camera.ViewMatrix = Matrix.Translation(-LocalToWorld(Transform.ToMatrix()).TranslationVector) * _cachedViewMatrix;
-
-            }
-        }
+        public Camera Camera { get; set; }  
 
         public override Transform Transform
         {
@@ -83,16 +45,31 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
             set
             {
+                //***************************************************************************************
+                //Commented out because it sets the camera's view matrix in world-space... 
+                //we want the Transform to represent the view matrix the camera's local-space, instead.
+                //****************************************************************************************
+                //if (LockOnTarget != null)
+                //{
+                //    Matrix specifiedNewView = Camera.TransformToView(value);
+                //    Vector3 up = new Vector3(specifiedNewView.Column2.ToArray().Take(3).ToArray());
+                //    Vector3 lookAt = LockOnTarget.LocalToWorld(LockOnTarget.Transform).Translation;
+                //    Vector3 eye = LocalToWorld(value).Translation;
+                //    Camera.ViewMatrix = Matrix.LookAtLH(eye, lookAt, up);
+                //}
+                //else
+                //    Camera.ViewMatrix = Camera.TransformToView(LocalToWorld(value));
+
                 if (LockOnTarget != null)
                 {
                     Matrix specifiedNewView = Camera.TransformToView(value);
                     Vector3 up = new Vector3(specifiedNewView.Column2.ToArray().Take(3).ToArray());
-                    Vector3 lookAt = LockOnTarget.LocalToWorld(LockOnTarget.Transform).Translation;
-                    Vector3 eye = LocalToWorld(value).Translation;
+                    Vector3 lookAt = WorldToLocal(LockOnTarget.LocalToWorld(LockOnTarget.Transform)).Translation;
+                    Vector3 eye = value.Translation;
                     Camera.ViewMatrix = Matrix.LookAtLH(eye, lookAt, up);
                 }
                 else
-                    Camera.ViewMatrix = Camera.TransformToView(LocalToWorld(value));
+                    Camera.ViewMatrix = Camera.TransformToView(value);
             }
         }
     }

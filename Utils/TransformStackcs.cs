@@ -32,6 +32,20 @@ public class TransformStack
         }
     }
 
+    public Transform ReverseTransform
+    {
+        get
+        {
+            Transform t = Transform.Identity;
+            for (int i = _innerList.Count - 1; i < 0; i--)
+            {
+                t.Rotation *= _innerList[i].Rotation;
+                t.Translation += _innerList[i].Translation;
+            }       
+            return t;
+        }
+    }
+
     public void Push(Transform t)
     {
         _innerList.Add(t);
@@ -59,9 +73,4 @@ public class TransformStack
         }
     }
 }
-namespace CipherPark.AngelJacket.Core.Utils
-{
-    class TransformStackcs
-    {
-    }
-}
+

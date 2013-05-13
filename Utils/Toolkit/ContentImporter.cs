@@ -169,7 +169,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             switch (channels)
             {
                 case MeshImportChannel.PositionColor:
-                    BasicVertexPositionColor[] _vertices = vertices.Select(e => new BasicVertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.White.ToVector4() }).ToArray();
+                    BasicVertexPositionColor[] _vertices = vertices.Select(e => new BasicVertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.Red.ToVector4() }).ToArray();
                     mesh = ContentBuilder.BuildMesh<BasicVertexPositionColor>(app, shaderByteCode, _vertices, _indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
                     result = new BasicModel(app);
                     result.Mesh = mesh;
