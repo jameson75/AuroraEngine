@@ -71,11 +71,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //    get { return (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Width / (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Height; }
         //}
 
-        protected override void OnDraw(long gameTime)
-        {
-            Scene.Draw(gameTime);
-            base.OnDraw(gameTime);
-        }        
+        //protected override void OnDraw(long gameTime)
+        //{
+        //    Scene.Draw(gameTime);
+        //    base.OnDraw(gameTime);
+        //}        
 
         protected override void OnSizeChanged()
         {

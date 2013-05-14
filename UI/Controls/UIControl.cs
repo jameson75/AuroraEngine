@@ -213,7 +213,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public void Draw(long gameTime)
         {
-            OnDraw(gameTime);
+            if(Visible)
+                OnDraw(gameTime);
         }
 
         protected virtual void OnDraw(long gameTime) { }

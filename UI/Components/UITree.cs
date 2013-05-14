@@ -53,7 +53,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public FocusManager FocusManager { get { return focusManager; } }
 
-        public IUITheme Theme { get { return theme; } }
+        //public IUITheme Theme { get { return theme; } }
 
         public void Initialize(string markupFileName)
         {
