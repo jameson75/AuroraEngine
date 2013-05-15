@@ -152,6 +152,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }                    
         }
 
+        public LabelTemplate DefaultItemTemplate { get; set; }
+
         public ListControl(IUIRoot root)
             : base(root)
         {            
@@ -230,20 +232,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Items.Add(item);
         }
 
-        public void AddListItem(string text, string name = null, SpriteFont font = null, Color? fontColor = null, Color? bgColor = null)
+        public void AddListItem(string text, string name = null, SpriteFont font = null, Color? fontColor = null, Color? bgColor = null, Color? selectColor = null)
         {
-            LabelTemplate currentUILabelTemplate = this.VisualRoot.Theme.Label;
+            LabelTemplate currentUILabelTemplate = this.DefaultItemTemplate != null ? this.DefaultItemTemplate : DefaultTheme.Instance.Label;
             ListControlItem item = new ListControlItem(this.VisualRoot,
                                                        name,
                                                        text,
                                                        font != null ? font : currentUILabelTemplate.CaptionStyle.Font,
                                                        fontColor != null ? fontColor.Value : currentUILabelTemplate.CaptionStyle.FontColor.Value,
-                                                       bgColor != null ? bgColor.Value : currentUILabelTemplate.CaptionStyle.FontColor.Value);
+                                                       bgColor != null ? bgColor.Value : currentUILabelTemplate.CaptionStyle.Color.Value,
+                                                       selectColor);
             AddListItem(item);
         }
 
         public override void ApplyTemplate(UIControlTemplate template)
-        {
+        {          
             base.ApplyTemplate(template);
         }
 

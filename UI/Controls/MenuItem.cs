@@ -92,5 +92,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 ActiveContent.Draw(gameTime);
             base.OnDraw(gameTime);
         }
+
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            MenuItemTemplate menuItemTemplte = (MenuItemTemplate)template;
+            base.ApplyTemplate(template);
+        }
+
+        public static UIControl FromTemplate(IUIRoot visualRoot, MenuItemTemplate menuItemTemplate)
+        {
+            MenuItem menuItem = new MenuItem(visualRoot);
+            menuItem.ApplyTemplate(menuItemTemplate);
+            return menuItem;
+        }
     }
 }

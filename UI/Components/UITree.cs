@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private UIStyleCollection styles = null;
         private UIResourceCollection resources = null;
         private FocusManager focusManager = null;
-        private IUITheme theme = null;
+        //private IUITheme theme = null;
 
         private Dictionary<string, UIControlParser> _controlParsers = new Dictionary<string, UIControlParser>();
         private Dictionary<string, UIStyleParser> _styleParsers = new Dictionary<string, UIStyleParser>();
@@ -40,7 +40,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             styles = new UIStyleCollection();
             resources = new UIResourceCollection();
             focusManager = new FocusManager(this);
-            theme = new DefaultTheme();    
+            //theme = new DefaultTheme();    
         }     
 
         public IGameApp Game { get { return _game; } }

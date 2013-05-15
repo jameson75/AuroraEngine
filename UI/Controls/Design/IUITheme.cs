@@ -9,10 +9,12 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         ContentControlTemplate ContentControl { get; }
         ImageControlTemplate ImageControl { get; }
         LabelTemplate Label { get; }
-        DropListTemplate DropList { get; }
+        //DropListTemplate DropList { get; }
         SliderTemplate Slider { get; }
         TextBoxTemplate TextBox { get; }
         ListControlItemTemplate ListControlItem { get; }
-        ListControlTemplate ListControl { get; }         
+        ListControlTemplate ListControl { get; }
+        MenuTemplate Menu { get; }
+        MenuItemTemplate MenuItem { get; }
     }
 }

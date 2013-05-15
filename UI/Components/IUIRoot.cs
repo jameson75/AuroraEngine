@@ -33,6 +33,6 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         FocusManager FocusManager { get; }
 
-        IUITheme Theme { get; }     
+        //IUITheme Theme { get; }     
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using SharpDX;
 using SharpDX.DirectInput;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -148,6 +150,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public bool AutoSize { get; set; }
         
+        public LabelTemplate DefaultItemTemplate { get; set; }
+
         protected override void OnDraw(long gameTime)
         {
             foreach (MenuItem item in Items)
@@ -262,6 +266,37 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }      
 
         public event ItemClickedEventHandler ItemClicked = null;
+
+        public override void ApplyTemplate(Components.UIControlTemplate template)
+        {
+            MenuTemplate menuTemplate = (MenuTemplate)template;
+
+            base.ApplyTemplate(template);
+        }
+
+        public static UIControl FromTemplate(Components.IUIRoot visualRoot, Components.MenuTemplate menuTemplate)
+        {
+            Menu menu = new Menu(visualRoot);
+            menu.ApplyTemplate(menuTemplate);
+            return menu;
+        }
+
+        public void AddMenuItem(MenuItem item)
+        {
+            this.Items.Add(item);
+        }
+
+        public void AddMenuItem(string text, string name = null, SpriteFont font = null, Color? fontColor = null, Color? bgColor = null, Color? selectColor = null )                     
+        {
+            LabelTemplate itemTemplate = this.DefaultItemTemplate != null ? this.DefaultItemTemplate : DefaultTheme.Instance.Label;
+            MenuItem item = new MenuItem(this.VisualRoot,
+                                                       name,
+                                                       text,
+                                                       font != null ? font : itemTemplate.CaptionStyle.Font,
+                                                       fontColor != null ? fontColor.Value : itemTemplate.CaptionStyle.FontColor.Value,                                                       
+                                                       selectColor != null ? selectColor.Value : fontColor != null ? fontColor.Value : itemTemplate.CaptionStyle.FontColor.Value);
+            AddMenuItem(item);
+        }
     } 
 
     public enum MenuOrientation

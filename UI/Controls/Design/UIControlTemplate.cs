@@ -227,16 +227,16 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         }
     }
 
-    public class DropListTemplate : UIControlTemplate
-    {
-        public ButtonTemplate DropDownButton { get; set; }
-        public TextBoxTemplate TextBox { get; set; }
-        public ListControlTemplate ListControl { get; set; }
-        public override UIControl CreateControl(IUIRoot visualRoot)
-        {
-            return DropList.FromTemplate(visualRoot, this);
-        }
-    }
+    //public class DropListTemplate : UIControlTemplate
+    //{
+    //    public ButtonTemplate DropDownButton { get; set; }
+    //    public TextBoxTemplate TextBox { get; set; }
+    //    public ListControlTemplate ListControl { get; set; }
+    //    public override UIControl CreateControl(IUIRoot visualRoot)
+    //    {
+    //        return DropList.FromTemplate(visualRoot, this);
+    //    }
+    //}
 
     public class ListControlTemplate : UIControlTemplate
     {
@@ -250,6 +250,22 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public override UIControl CreateControl(IUIRoot visualRoot)
         {
             return ListControl.FromTemplate(visualRoot, this);
+        }
+    }
+
+    public class MenuTemplate : UIControlTemplate
+    {
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return Menu.FromTemplate(visualRoot, this);
+        }
+    }
+
+    public class MenuItemTemplate : UIControlTemplate
+    {
+        public override UIControl CreateControl(IUIRoot visualRoot)
+        {
+            return MenuItem.FromTemplate(visualRoot, this);
         }
     }
 }

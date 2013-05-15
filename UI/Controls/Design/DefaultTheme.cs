@@ -12,16 +12,38 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 {  
     public class DefaultTheme : IUITheme
     {
+        private static DefaultTheme _instance = null;
+        private static readonly object _instanceLock = new object();
+
         private ButtonTemplate _button = null;
         private CheckBoxTemplate _checkbox = null;
         private ContentControlTemplate _contentControl = null;
         private ImageControlTemplate _imageControl = null;
         private LabelTemplate _label = null;
-        private DropListTemplate _dropList = null;
+        //private DropListTemplate _dropList = null;
         private TextBoxTemplate _textBox = null;
         private SliderTemplate _slider = null;
         private ListControlItemTemplate _listControlItem = null;
         private ListControlTemplate _listControl = null;
+        private MenuTemplate _menu = null;
+        private MenuItemTemplate _menuItem = null;
+
+        private DefaultTheme()
+        {
+        }
+
+        public static DefaultTheme Instance
+        {
+            get
+            {
+                lock (_instanceLock)
+                {
+                    if (_instance == null)
+                        _instance = new DefaultTheme();
+                }
+                return _instance;
+            }
+        }
 
         public Color ControlColor { get; set; }
         public SpriteFont ControlFont { get; set; }
@@ -106,23 +128,23 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             }
         }
 
-        public DropListTemplate DropList
-        {
-            get
-            {
-                if (_dropList == null)
-                {
-                    _dropList = new DropListTemplate()
-                    {
-                        DropDownButton = new ButtonTemplate(DropDownImageTexture),
-                        TextBox = new TextBoxTemplate(null, EditorFont, EditorFontColor, EditorColor),
-                        ListControl = new ListControlTemplate(ControlColor)
-                    };
-                    _dropList.Size = new DrawingSizeF(50, 20);
-                }
-                return _dropList;
-            }
-        }
+        //public DropListTemplate DropList
+        //{
+        //    get
+        //    {
+        //        if (_dropList == null)
+        //        {
+        //            _dropList = new DropListTemplate()
+        //            {
+        //                DropDownButton = new ButtonTemplate(DropDownImageTexture),
+        //                TextBox = new TextBoxTemplate(null, EditorFont, EditorFontColor, EditorColor),
+        //                ListControl = new ListControlTemplate(ControlColor)
+        //            };
+        //            _dropList.Size = new DrawingSizeF(50, 20);
+        //        }
+        //        return _dropList;
+        //    }
+        //}
 
         public TextBoxTemplate TextBox
         {
@@ -195,6 +217,35 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     _listControl.Size = new DrawingSizeF(30, 20);
                 }
                 return _listControl;
+            }
+        }
+
+        public MenuTemplate Menu
+        {
+            get
+            {
+                if (_menu == null)
+                {
+                    _menu = new MenuTemplate();                    {
+                    };
+                    _menu.Size = new DrawingSizeF(30, 20);
+                }
+                return _menu;
+            }
+        }
+
+        public MenuItemTemplate MenuItem
+        {
+            get
+            {
+                if (_menuItem == null)
+                {
+                    _menuItem = new MenuItemTemplate();
+                    {
+                    };
+                    _menuItem.Size = new DrawingSizeF(30, 20);
+                }
+                return _menuItem;
             }
         }
     }
