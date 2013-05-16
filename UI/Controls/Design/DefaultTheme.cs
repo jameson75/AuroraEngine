@@ -27,9 +27,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private ListControlTemplate _listControl = null;
         private MenuTemplate _menu = null;
         private MenuItemTemplate _menuItem = null;
+        private bool isInitialized = false;
 
         private DefaultTheme()
         {
+            
         }
 
         public static DefaultTheme Instance
@@ -62,6 +64,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_button == null)
                 {
                     _button = new ButtonTemplate(null, ControlFont, ControlFontColor, ButtonColor);
@@ -75,6 +80,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_checkbox == null)
                 {
                     _checkbox = new CheckBoxTemplate()
@@ -93,6 +101,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_contentControl == null)
                 {
                     _contentControl = new ContentControlTemplate();
@@ -106,6 +117,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_imageControl == null)
                 {
                     _imageControl = new ImageControlTemplate(EmptyImageTexture);
@@ -119,6 +133,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_label == null)
                 {
                     _label = new LabelTemplate(null, ControlFont, ControlFontColor, null);
@@ -150,6 +167,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get 
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if(_textBox == null)
                 {
                     _textBox = new TextBoxTemplate(null, EditorFont, EditorFontColor, EditorColor)
@@ -165,6 +185,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_slider == null)
                 {
                     _slider = new SliderTemplate()
@@ -191,6 +214,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_listControlItem == null)
                 {
                     _listControlItem = new ListControlItemTemplate()
@@ -209,6 +235,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_listControl == null)
                 {
                     _listControl = new ListControlTemplate(ControlColor)
@@ -224,9 +253,13 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_menu == null)
                 {
-                    _menu = new MenuTemplate();                    {
+                    _menu = new MenuTemplate();                    
+                    {
                     };
                     _menu.Size = new DrawingSizeF(30, 20);
                 }
@@ -238,6 +271,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             get
             {
+                if (!isInitialized)
+                    throw new InvalidOperationException("Theme not initialized.");
+
                 if (_menuItem == null)
                 {
                     _menuItem = new MenuItemTemplate();
@@ -246,6 +282,27 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     _menuItem.Size = new DrawingSizeF(30, 20);
                 }
                 return _menuItem;
+            }
+        }
+
+        public void Initialize(Device graphicsDevice, string configFilePath)
+        {
+            if (configFilePath != null)
+            {
+
+            }
+            else
+            {
+                this.ControlColor = Color.DarkGray;
+                this.ControlFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\ControlFont.font");
+                this.ControlFontColor = Color.White;
+                this.ControlFontHightlightColor = Color.Orange;
+                this.ButtonColor = Color.Gray;
+                this.DefaultCheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Contnet\UI\DefaultTheme\Check.png");
+                this.DefaultUncheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Content\UI\DefaultTheme\Uncheck.png");
+                this.EditorColor = Color.White;
+                this.EditorFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\EditorFont.png");
+                this.EditorFontColor = Color.DarkGray;
             }
         }
     }

@@ -47,7 +47,7 @@ namespace CipherPark.AngelJacket.Core
 
         public void Run(Form form)
         {
-            InitializeDirectXResources(form);
+            InitializeDirectXResources(form);           
 
             Initialize();
 
