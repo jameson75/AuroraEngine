@@ -294,16 +294,17 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             else
             {
                 this.ControlColor = Color.DarkGray;
-                this.ControlFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\ControlFont.font");
+                this.ControlFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\ControlFont10.font");
                 this.ControlFontColor = Color.White;
                 this.ControlFontHightlightColor = Color.Orange;
                 this.ButtonColor = Color.Gray;
                 this.DefaultCheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Contnet\UI\DefaultTheme\Check.png");
                 this.DefaultUncheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Content\UI\DefaultTheme\Uncheck.png");
                 this.EditorColor = Color.White;
-                this.EditorFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\EditorFont.png");
+                this.EditorFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\EditorFont10.font");
                 this.EditorFontColor = Color.DarkGray;
             }
+            isInitialized = true;
         }
     }
 }
