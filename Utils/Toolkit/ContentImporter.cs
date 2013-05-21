@@ -209,6 +209,8 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public int IndexCount;
         public IntPtr Children;
         public int ChildCount;
+        public IntPtr AnimationTakes;
+        public int TakeCount;
 
         public void Dispose()
         {
