@@ -109,6 +109,7 @@
     <Compile Include="Utils\MatrixStack.cs" />
     <Compile Include="Utils\Toolkit\BasicEffect.cs" />
     <Compile Include="Utils\TransformStackcs.cs" />
+    <Compile Include="Utils\XFileDocument.cs" />
     <Compile Include="World\Camera.cs" />
     <Compile Include="Module\GameModule.cs" />
     <Compile Include="IGameApp.cs" />
