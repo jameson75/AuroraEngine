@@ -284,7 +284,6 @@ namespace CipherPark.AngelJacket.Core.Utils
             return buttonsInState.ToArray();
         }      
 
-
         public class StateWindow<TState, TPressable>
         {       
             private Dictionary<TPressable, long> _pressTime = null;
@@ -346,7 +345,6 @@ namespace CipherPark.AngelJacket.Core.Utils
 
             return new DrawingPoint(point.X, point.Y);            
         }
-
         
         private static class UnsafeNativeMethods
         {

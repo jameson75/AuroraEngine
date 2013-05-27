@@ -170,8 +170,8 @@
     <Compile Include="Utils\ColorParser.cs" />
     <Compile Include="Utils\ControlInputState.cs" />
     <Compile Include="Utils\InputState.cs" />
-    <Compile Include="Utils\Toolkit\ContentImporter.cs" />
-    <Compile Include="Utils\Toolkit\MarshalHelper.cs" />
+    <Compile Include="Utils\ContentImporter.cs" />
+    <Compile Include="Utils\MarshalHelper.cs" />
     <Compile Include="Utils\Toolkit\SpriteBatch.cs" />
     <Compile Include="Utils\Toolkit\SpriteFont.cs" />
     <Compile Include="Utils\ObservableDictionary.cs" />

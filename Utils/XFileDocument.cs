@@ -6,32 +6,362 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.Utils
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class XFileDocument
-    {
-        public List<XFileDataObjects> dataObjects = new List<XFileDataObjects>();
-        
+    {        
+        private List<XFileDataObject> dataObjects = new List<XFileDataObject>();
+
         public XFileHeader Header { get; private set; }
-        
-        public XFileDataObjects dataObjects = 
-        public void Load(Stream stream)
-        {
-            StreamReader reader = new StreamReader(stream);
-            SeekForwardToHeader(reader);
-            Header = ReadHeader(reader);
 
+        public List<XFileDataObject> DataObjects { get { return dataObjects; } }
+
+        public void Load(string textFileContent)
+        {
+            //TODO: Strip comments from file content here.
+
+            string headerContent = ReadHeader(textFileContent);
+            Header = ParseHeader(headerContent);
+
+            XFileDataObject nextDataObject = null;
+            int readPosition = 0;
+            while (readPosition > textFileContent.Length)
+            {
+                readPosition = ReadNextDataObject(textFileContent, readPosition, out nextDataObject);
+                if (nextDataObject != null)
+                    dataObjects.Add(nextDataObject);
+            }
         }
 
-        private void SeekForwardToHeader(StreamReader reader)
+        private int ReadNextDataObject(string content, int startPosition, out XFileDataObject dataObject)
         {
-            
+            dataObject = null;
+            Regex regEx = new Regex(content);
+            string dataObjectPattern = @"(?<!template\s*)\b(?<data>(?<type>[^{}\s;]+)\s+(?:(?<!template\s*)\b(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
+            Match match = regEx.Match(dataObjectPattern, startPosition);
+            if (match.Success)
+            {
+                switch (match.Groups["type"].Value)
+                {
+                    case XFileMaterialObject.TemplateName:
+                        dataObject = ParseMaterialObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        break;
+                    case XFileFrameObject.TemplateName:
+                        dataObject = ParseFrameObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        break;
+                    case XFileMeshObject.TemplateName:
+                        dataObject = ParseMeshObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        break;
+                }
+                return startPosition + match.Length;
+            }
+            else
+                return content.Length;
         }
 
-        private XFileHeader ReadHeader(StreamReader reader)
-        {           
+        public XFileFrameObject ParseFrameObject(string frameContent, string name)
+        {
+            XFileFrameObject frame = new XFileFrameObject();
+            frame.Name = name;
+            string childObjectPattern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
+            Regex regEx = new Regex(frameContent);
+            MatchCollection collection = regEx.Matches(childObjectPattern);            
+            foreach (Match match in collection)
+            {
+                XFileDataObject childObject = null;
+                switch (match.Groups["type"].Value)
+                {
+                    case XFileFrameObject.TemplateName:
+                        childObject = ParseFrameObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        frame.ChildFrames.Add((XFileFrameObject)childObject);
+                        break;
+                    case XFileMeshObject.TemplateName:
+                        childObject = ParseMeshObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        frame.Meshes.Add((XFileMeshObject)childObject);
+                        break;
+                    case  XFileAnimationObject.TemplateName:
+                        childObject = ParseAnimationObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        frame.Animations.Add((XFileAnimationObject)childObject);
+                        break;
+                    case XFileAnimationSetObject.TemplateName:
+                        childObject = ParseAnimationSetObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        frame.AnimationSets.Add((XFileAnimationSetObject)childObject);
+                        break;
+                }
+            }            
+            return frame;
+        }
+
+        private XFileDataObject ParseAnimationSetObject(string p1, string p2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private XFileAnimationObject ParseAnimationObject(string animationContent, string name)
+        {
+            XFileAnimationObject animation = new XFileAnimationObject();
+            animation.Name = name;
+            string childObjectPatern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
+            MatchCollection collection = Regex.Matches(animationContent, childObjectPatern);
+            foreach (Match match in collection)
+            {
+                XFileDataObject childObject = null;
+                switch (match.Groups["type"].Value)
+                {
+                    case XFileAnimationKeyObject.TemplateName:
+                        childObject = ParseAnimationKeyObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        animation.Keys.Add((XFileAnimationKeyObject)childObject);
+                        break;
+                }
+            }
+            return animation;
+        }
+
+        private XFileAnimationKeyObject ParseAnimationKeyObject(string animationKeyContent, string name)
+        {
+            XFileAnimationKeyObject animationKey = new XFileAnimationKeyObject();
+            animationKey.Name = name;
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
+            MatchCollection matches = Regex.Matches(animationKeyContent, valuesPattern);
+            animationKey.KeyType = (KeyType)int.Parse(matches[0].Value);
+            animationKey.NKeys = int.Parse(matches[1].Value);
+            const int tfkOffset = 2;
+            animationKey.TimedFloatKeys = new XFileTimedFloatKey[animationKey.NKeys];
+            for (int i = 0; i < animationKey.NKeys; i++)
+            {
+                XFileTimedFloatKey timedFloatKey = new XFileTimedFloatKey();
+                timedFloatKey.Time = int.Parse(matches[i + tfkOffset].Value);
+                timedFloatKey.NValues = int.Parse(matches[i + tfkOffset + 1].Value);
+                timedFloatKey.Values = new float[timedFloatKey.NValues];
+                for (int j = 0; j < timedFloatKey.NValues; j++)
+                {
+                    timedFloatKey.Values[j] = float.Parse(matches[i + tfkOffset + j].Value);
+                }
+                //animationKey.
+            }
+           
+            return animationKey;
+        }
+
+        private XFileMeshObject ParseMeshObject(string meshContent, string name)
+        {
+            XFileMeshObject mesh = new XFileMeshObject();
+            mesh.Name = name;
+            string childObjectPattern = @"(?<=(?:\{\s*)|(\}\s*)|(;;\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
+            string childLessMeshContent = Regex.Replace(meshContent, childObjectPattern, string.Empty);
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
+            Regex regEx = new Regex(childLessMeshContent);
+            MatchCollection matches = regEx.Matches(valuesPattern);
+            mesh.NVertices = int.Parse(matches[0].Value);
+            int verticesOffset = 1;
+            const int nVertexComponents = 3;
+            mesh.Vertices = new XFileVector[mesh.NVertices];
+            for (int i = 0; i < mesh.NVertices * nVertexComponents; i+=nVertexComponents)
+            {
+                mesh.Vertices[i] = new XFileVector()
+                {
+                    X = float.Parse(matches[verticesOffset + i].Value),
+                    Y = float.Parse(matches[verticesOffset + i + 1].Value),
+                    Z = float.Parse(matches[verticesOffset + i + 2].Value)
+                };                   
+            }
+            mesh.NFaces = int.Parse(matches[verticesOffset + (mesh.NVertices * nVertexComponents)].Value);
+            int facesOffset = verticesOffset + (mesh.NVertices * nVertexComponents) + 1;
+            mesh.Faces = new XFileMeshFaceObject[mesh.NFaces];
+            //************************************************
+            //NOTE: We always assume faces are triangular    *
+            //************************************************
+            const int nComponentsPerFace = 4;
+            int nTotalFaceComponents = mesh.NFaces * nComponentsPerFace;
+            for (int i = 0; i < nTotalFaceComponents; i += nComponentsPerFace)
+            {
+                //NOTE: Assuming triangular faces, we expect this value to always be '3'.
+                int nFaceIndices = int.Parse(matches[facesOffset + i].Value);
+                mesh.Faces[i] = new XFileMeshFaceObject()
+                {
+                    NFaceVertexIndices = nFaceIndices,
+                    FaceVertexIndices = new int[] { 
+                        int.Parse(matches[facesOffset + i + 1].Value),
+                        int.Parse(matches[facesOffset + i + 2].Value),
+                        int.Parse(matches[facesOffset + i + 3].Value) }
+                };
+            }
+
+            regEx = new Regex(meshContent);
+            MatchCollection collection = regEx.Matches(childObjectPattern);            
+            foreach (Match match in collection)
+            {
+                XFileDataObject childObject = null;
+                switch (match.Groups["type"].Value)
+                {
+                    case XFileMeshMaterialListObject.TemplateName:
+                        childObject = ParseMeshMaterialListObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        mesh.MeshMaterialList = (XFileMeshMaterialListObject)childObject;
+                        break;
+                    case XFileDeclDataObject.TemplateName:
+                        childObject = ParseDeclDataObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        mesh.DeclData = (XFileDeclDataObject)childObject;
+                        break;
+                    case XFileSkinWeightsObject.TemplateName:
+                        childObject = ParseSkinWeightsObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        mesh.SkinWeightsCollection.Add((XFileSkinWeightsObject)childObject);
+                        break;
+                }
+            }
+
+            return mesh;
+        }
+
+        private XFileSkinWeightsObject ParseSkinWeightsObject(string skinWeightsContent, string name)
+        {
+            XFileSkinWeightsObject skinWeights = new XFileSkinWeightsObject();
+            skinWeights.Name = name;
+            string boneReferencePattern = @"""(?<bone>[^""]+)""";
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
+            string childLessSkinWeightsContent = Regex.Replace(skinWeightsContent, boneReferencePattern, string.Empty);
+            MatchCollection matches = Regex.Matches(childLessSkinWeightsContent, valuesPattern);
+            skinWeights.NWeights = int.Parse(matches[0].Value);
+            skinWeights.VertexIndices = new int[skinWeights.NWeights];
+            int vertexIndicesOffset = 1;
+            for (int i = 0; i < skinWeights.NWeights; i++)
+                skinWeights.VertexIndices[i] = int.Parse(matches[i + vertexIndicesOffset].Value);
+            int weightsOffset = vertexIndicesOffset + skinWeights.NWeights;
+            skinWeights.Weights = new float[skinWeights.NWeights];
+            for (int i = 0; i < skinWeights.NWeights; i++)
+                skinWeights.Weights[i] = float.Parse(matches[i + weightsOffset].Value);
+            return skinWeights;
+        }
+
+        private XFileDeclDataObject ParseDeclDataObject(string declDataContent, string name)
+        {
+            XFileDeclDataObject declData = new XFileDeclDataObject();
+            declData.Name = name;
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
+            MatchCollection matches = Regex.Matches(declDataContent, valuesPattern);
+            declData.NVertexElements = int.Parse(matches[0].Value);
+            int vertexElementsOffset = 1;
+            declData.VertexElements = new XFileVertexElement[declData.NVertexElements];
+            const int nComponentsPerVertexElement = 4;
+            int nTotalVertexElementComponents = declData.NVertexElements * nComponentsPerVertexElement;
+            for (int i = 0; i < nTotalVertexElementComponents; i += nComponentsPerVertexElement)
+            {
+                declData.VertexElements[i] = new XFileVertexElement()
+                {
+                    Type = (VertexElementType)int.Parse(matches[i + vertexElementsOffset].Value),
+                    Method = (VertexElementMethod)int.Parse(matches[i + vertexElementsOffset + 1].Value),
+                    Usage = (VertexElementUsage)int.Parse(matches[i + vertexElementsOffset + 2].Value),
+                    UsageIndex = (VertexElementUsage)int.Parse(matches[i + vertexElementsOffset + 3].Value)
+                };
+            }
+            declData.NData = int.Parse(matches[vertexElementsOffset + nTotalVertexElementComponents].Value);
+            int dataOffset = vertexElementsOffset + nTotalVertexElementComponents + 1;
+            declData.Data = new int[declData.NData];
+            for( int i = 0; i < declData.NData; i++)
+            {
+                declData.Data[i] = int.Parse(matches[i + dataOffset].Value);
+            }
+            return declData;
+        }
+
+        private XFileMeshMaterialListObject ParseMeshMaterialListObject(string meshMaterialListContent, string name)
+        {
+            XFileMeshMaterialListObject meshMaterialList = new XFileMeshMaterialListObject();
+            meshMaterialList.Name = name;
+            string materialReferencesPattern = @"(?<! MeshMaterialList\s*){\s*(?<material>[^\s]*\s*)}";
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
+            string childLessContent = Regex.Replace(meshMaterialListContent, materialReferencesPattern, string.Empty);
+            MatchCollection matches = Regex.Matches(childLessContent, valuesPattern);
+            meshMaterialList.NMaterials = int.Parse(matches[0].Value);
+            meshMaterialList.NFaceIndices = int.Parse(matches[1].Value);
+            int faceIndicesOffset = 2;
+            meshMaterialList.FaceIndices = new int[meshMaterialList.NFaceIndices];
+            for( int i = 0; i < meshMaterialList.NFaceIndices; i++ )
+            {
+                meshMaterialList.FaceIndices[i] = int.Parse(matches[faceIndicesOffset + i].Value);
+            }
+            if(meshMaterialList.NMaterials > 0)
+            {
+                meshMaterialList.Materials = new string[meshMaterialList.NMaterials];
+                MatchCollection collection = Regex.Matches(meshMaterialListContent, materialReferencesPattern);
+                for (int i = 0; i < meshMaterialList.NMaterials; i++)
+                    meshMaterialList.Materials[i] = collection[i].Groups["material"].Value;
+            }
+            return meshMaterialList;
+        }
+
+        private XFileMaterialObject ParseMaterialObject(string materialContent, string name)
+        {
+            XFileMaterialObject material = new XFileMaterialObject();
+            material.Name = name;
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?"; //@"(\d+.\d+)\s*";
+            Regex regEx = new Regex(materialContent);
+            MatchCollection matches = regEx.Matches(valuesPattern);
+            material.FaceColor = ParseColorRGBA(string.Format("{0};{1};{2};{3};", matches[0].Groups[0].Value, matches[1].Groups[0].Value, matches[2].Groups[0], matches[3].Groups[0]));
+            material.Power = float.Parse(matches[4].Groups[0].Value);
+            material.SpecularColor = ParseColorRGB(string.Format("{0};{1};{2};", matches[5].Groups[0].Value, matches[6].Groups[0].Value, matches[7].Groups[0].Value));
+            material.EmissiveColor = ParseColorRGB(string.Format("{0};{1};{2};", matches[8].Groups[0].Value, matches[9].Groups[0].Value, matches[10].Groups[0].Value));
+
+            string textureFileNameExpression = @"TextureFilename\s*{\s*""(?<texturename>[^""]+)";
+            Match match = regEx.Match(textureFileNameExpression);
+            if( match.Success)            
+                material.TextureFilename = match.Groups["TextureFilename"].Value;
+
+            return material;
+        }       
+
+        private XFileColorRGBA ParseColorRGBA(string rgbaContent)
+        {
+            Regex regEx = new Regex(rgbaContent);
+            string valuesPattern = @"(?<value>(?![^\{]+\{)\d+(?:\.\d+)?);";
+            MatchCollection collection = regEx.Matches(valuesPattern);
+            return new XFileColorRGBA()
+            {
+                Red = float.Parse(collection[0].Groups["value"].Value),
+                Green = float.Parse(collection[1].Groups["value"].Value),
+                Blue = float.Parse(collection[2].Groups["value"].Value),
+                Alpha = float.Parse(collection[3].Groups["value"].Value)
+            };
+        }
+
+        private XFileColorRGB ParseColorRGB(string rgbContent)
+        {
+            Regex regEx = new Regex(rgbContent);
+            string valuesPattern = @"(?<value>(?![^\{]+\{)\d+(?:\.\d+)?);";
+            MatchCollection collection = regEx.Matches(valuesPattern);
+            return new XFileColorRGB()
+            {
+                Red = float.Parse(collection[0].Groups["value"].Value),
+                Green = float.Parse(collection[1].Groups["value"].Value),
+                Blue = float.Parse(collection[2].Groups["value"].Value)               
+            };
+        }
+
+        private string ReadHeader(string textFileContent)
+        {
+            string result = null;
+            Regex regEx = new Regex(textFileContent);
+            Match match = regEx.Match(@"xof");
+            if (match.Index >= 0)
+                result = textFileContent.Substring(match.Index, 16);
+            return result;
+        }
+
+        private XFileHeader ParseHeader(string headerContent)
+        {
             XFileHeader header = new XFileHeader();
-            
+            StringReader reader = new StringReader(headerContent);
+
             char[] magicNumber = new char[4];
             reader.Read(magicNumber, 0, magicNumber.Length);
             header.MagicNumber = new string(magicNumber);
@@ -56,7 +386,6 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
-
     public class XFileHeader
     {
         public string MagicNumber { get; set; }
@@ -64,5 +393,218 @@ namespace CipherPark.AngelJacket.Core.Utils
         public short MinorNumber { get; set; }
         public string FormatType { get; set; }
         public int FloatSize { get; set; }
+    }
+
+    public class XFileDataObject
+    {
+        public string Name { get; set; }
+    }
+
+    public class XFileMaterialObject : XFileDataObject
+    {
+        public const string TemplateName = "Material";
+        public XFileColorRGBA FaceColor { get; set; }
+        public float Power { get; set; }
+        public XFileColorRGB SpecularColor { get; set; }
+        public XFileColorRGB EmissiveColor { get; set; }
+        public string TextureFilename { get; set; }
+    }
+
+    public class XFileFrameObject : XFileDataObject
+    {
+        public const string TemplateName = "Frame";
+        private List<XFileMeshObject> _meshes = new List<XFileMeshObject>();
+        private List<XFileFrameObject> _childFrames = new List<XFileFrameObject>();
+        private List<XFileAnimationObject> _animations = new List<XFileAnimationObject>();
+        private List<XFileAnimationSetObject> _animationSets = new List<XFileAnimationSetObject>();
+
+        public XFileMatrix FrameTransformMatrix { get; set; }        
+        public List<XFileMeshObject> Meshes { get { return _meshes; } }
+        public List<XFileFrameObject> ChildFrames { get { return _childFrames; } }
+        public List<XFileAnimationObject> Animations { get { return _animations; } }
+        public List<XFileAnimationSetObject> AnimationSets { get { return _animationSets; } }
+    }
+
+    public class XFileMeshObject : XFileDataObject
+    {
+        public const string TemplateName = "Mesh";
+        private List<XFileSkinWeightsObject> _skinWeightsCollection = new List<XFileSkinWeightsObject>();
+        public int NVertices { get; set; }
+        public XFileVector[] Vertices { get; set; }
+        public int NFaces { get; set; }
+        public XFileMeshFaceObject[] Faces { get; set; }
+        public XFileMeshMaterialListObject MeshMaterialList { get; set; }
+        public XFileDeclDataObject DeclData { get; set; }
+        public List<XFileSkinWeightsObject> SkinWeightsCollection { get { return _skinWeightsCollection; } }
+    }
+
+    public class XFileMeshFaceObject : XFileDataObject
+    {
+        public int NFaceVertexIndices { get; set; }
+        public int[] FaceVertexIndices { get; set; }
+    }
+
+    public class XFileMeshMaterialListObject : XFileDataObject
+    {
+        public const string TemplateName = "MeshMaterialList";
+        public int NMaterials { get; set; }
+        public int NFaceIndices { get; set; }
+        public int[] FaceIndices { get; set; }
+        public string[] Materials { get; set; }
+    }
+
+    public class XFileDeclDataObject : XFileDataObject
+    {
+        public const string TemplateName = "DeclData";
+        public int NVertexElements { get; set; }
+        public XFileVertexElement[] VertexElements { get; set; }
+        public int NData { get; set; }
+        public int[] Data { get; set; }
+    }
+
+    public class XFileSkinWeightsObject : XFileDataObject
+    {
+        public const string TemplateName = "SkinWeights";
+        public string TransformNodeName { get; set; }
+        public int NWeights { get; set; }
+        public int[] VertexIndices { get; set; }
+        public float[] Weights { get; set; }
+        public XFileMatrix MatrixOffset { get; set; }
+    }
+
+    public class XFileAnimationObject : XFileDataObject
+    {
+        public const string TemplateName = "Animation";
+        private List<XFileAnimationKeyObject> _keys = new List<XFileAnimationKeyObject>();
+        public XFileAnimationOptions? Options { get; set; }
+        public List<XFileAnimationKeyObject> Keys { get { return _keys; } }
+    }
+
+    public class XFileAnimationSetObject : XFileDataObject
+    {
+        public const string TemplateName = "AnimationSet";
+        private List<XFileAnimationObject> _animations = new List<XFileAnimationObject>();
+        public List<XFileAnimationObject> Animations { get { return _animations; } }
+    }
+
+    public class XFileAnimationKeyObject : XFileDataObject
+    {
+        public const string TemplateName = "AnimationKey";
+        public KeyType KeyType { get; set; }
+        public int NKeys { get; set; }
+        public XFileTimedFloatKey[] TimedFloatKeys { get; set; }
+    }
+
+    public enum PositionQuality
+    {
+        Spline = 0,
+        Linear = 1
+    }
+
+    public enum KeyType
+    {
+        Rotation = 0,
+        Scale = 1,
+        Position = 2,
+        Matrix = 3
+    }
+
+    public enum VertexElementType
+    {
+        Float1 = 0,
+        Float2 = 1,
+        Float3 = 2,
+        Float4 = 3,
+        Color = 4,
+        UByte4 = 5,
+        Short2 = 6,
+        Short4 = 7,
+        UByte4N = 8,
+        Short2N = 9,
+        Short4N = 10,
+        UShort2N = 11,
+        UShort4N = 12,
+        UDec3 = 13,
+        Dec3N = 14,
+        Float16_2 = 15,
+        Float16_4 = 16,
+        Unused = 17
+    }
+
+    public enum VertexElementMethod
+    {
+        Default = 0,
+        PartialU = 1,
+        PartialL = 2,
+        CrossUV = 3,
+        UV = 4,
+        LookUp = 5,
+        LookUpResampled = 6
+    }
+
+    public enum VertexElementUsage
+    {
+        Position = 0,
+        BlendWeight = 1,
+        BlendIndices = 2,
+        Normal = 3,
+        PSize = 4,
+        TexCoord = 5,
+        Tangent = 6,
+        Binormal = 7,
+        TessFactor = 8,
+        PositionT = 9,
+        Color = 10,
+        Fog = 11,
+        Depth = 12,
+        Sample = 13
+    }
+
+    public struct XFileVertexElement
+    {
+        public VertexElementType Type { get; set; }
+        public VertexElementMethod Method { get; set; }
+        public VertexElementUsage Usage { get; set; }
+        public VertexElementUsage UsageIndex { get; set; }
+    }
+
+    public struct XFileTimedFloatKey
+    {
+        public int Time;
+        public int NValues;
+        public float[] Values;
+    }
+    
+    public struct XFileAnimationOptions
+    {
+        public bool OpenClosed;
+        public PositionQuality PositionQuality;
+    }
+
+    public struct XFileColorRGBA
+    {
+        public float Red;
+        public float Green;
+        public float Blue;
+        public float Alpha;
+    }
+
+    public struct XFileColorRGB
+    {
+        public float Red;
+        public float Green;
+        public float Blue;
+    }
+
+    public struct XFileMatrix
+    {
+        public float[] Matrix;
+    }
+
+    public struct XFileVector
+    {
+        public float X;
+        public float Y;
+        public float Z;
     }
 }
