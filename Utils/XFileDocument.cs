@@ -36,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
             XFileDataObject nextDataObject = null;
             int readPosition = 0;
-            while (readPosition > textFileContent.Length)
+            while (readPosition < textFileContent.Length)
             {
                 readPosition = ReadNextDataObject(textFileContent, readPosition, out nextDataObject);
                 if (nextDataObject != null)
@@ -46,10 +46,10 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         private int ReadNextDataObject(string content, int startPosition, out XFileDataObject dataObject)
         {
-            dataObject = null;
-            Regex regEx = new Regex(content);
+            dataObject = null;           
             string dataObjectPattern = @"(?<!template\s*)\b(?<data>(?<type>[^{}\s;]+)\s+(?:(?<!template\s*)\b(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
-            Match match = regEx.Match(dataObjectPattern, startPosition);
+            Regex regEx = new Regex(dataObjectPattern);
+            Match match = regEx.Match(content, startPosition);
             if (match.Success)
             {
                 switch (match.Groups["type"].Value)
@@ -63,8 +63,8 @@ namespace CipherPark.AngelJacket.Core.Utils
                     case XFileMeshObject.TemplateName:
                         dataObject = ParseMeshObject(match.Groups["data"].Value, match.Groups["name"].Value);
                         break;
-                }
-                return startPosition + match.Length;
+                }               
+                return match.Index + match.Length;
             }
             else
                 return content.Length;
@@ -75,8 +75,8 @@ namespace CipherPark.AngelJacket.Core.Utils
             XFileFrameObject frame = new XFileFrameObject();
             frame.Name = name;
             string childObjectPattern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
-            Regex regEx = new Regex(frameContent);
-            MatchCollection collection = regEx.Matches(childObjectPattern);            
+            Regex regEx = new Regex(childObjectPattern);
+            MatchCollection collection = regEx.Matches(frameContent);            
             foreach (Match match in collection)
             {
                 XFileDataObject childObject = null;
@@ -137,8 +137,8 @@ namespace CipherPark.AngelJacket.Core.Utils
             animationKey.KeyType = (KeyType)int.Parse(matches[0].Value);
             animationKey.NKeys = int.Parse(matches[1].Value);
             const int tfkOffset = 2;
-            animationKey.TimedFloatKeys = new XFileTimedFloatKey[animationKey.NKeys];
-            for (int i = 0; i < animationKey.NKeys; i++)
+            animationKey.TimedFloatKeys = new XFileTimedFloatKey[animationKey.NKeys];            
+            for (int i = 0; i < animationKey.NKeys * 18; i+=18)
             {
                 XFileTimedFloatKey timedFloatKey = new XFileTimedFloatKey();
                 timedFloatKey.Time = int.Parse(matches[i + tfkOffset].Value);
@@ -156,50 +156,49 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         private XFileMeshObject ParseMeshObject(string meshContent, string name)
         {
+            const int nVertexComponents = 3;
+            const int nFaceComponents = 4;
             XFileMeshObject mesh = new XFileMeshObject();
             mesh.Name = name;
             string childObjectPattern = @"(?<=(?:\{\s*)|(\}\s*)|(;;\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
             string childLessMeshContent = Regex.Replace(meshContent, childObjectPattern, string.Empty);
-            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            Regex regEx = new Regex(childLessMeshContent);
-            MatchCollection matches = regEx.Matches(valuesPattern);
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";            
+            MatchCollection matches = Regex.Matches(childLessMeshContent, valuesPattern);
             mesh.NVertices = int.Parse(matches[0].Value);
-            int verticesOffset = 1;
-            const int nVertexComponents = 3;
+            int verticesOffset = 1;           
             mesh.Vertices = new XFileVector[mesh.NVertices];
-            for (int i = 0; i < mesh.NVertices * nVertexComponents; i+=nVertexComponents)
+            for (int i = 0; i < mesh.NVertices; i++)
             {
+                int j = verticesOffset + i * nVertexComponents;
                 mesh.Vertices[i] = new XFileVector()
                 {
-                    X = float.Parse(matches[verticesOffset + i].Value),
-                    Y = float.Parse(matches[verticesOffset + i + 1].Value),
-                    Z = float.Parse(matches[verticesOffset + i + 2].Value)
-                };                   
+                    X = float.Parse(matches[j].Value),
+                    Y = float.Parse(matches[j + 1].Value),
+                    Z = float.Parse(matches[j + 2].Value)
+                };
             }
             mesh.NFaces = int.Parse(matches[verticesOffset + (mesh.NVertices * nVertexComponents)].Value);
             int facesOffset = verticesOffset + (mesh.NVertices * nVertexComponents) + 1;
             mesh.Faces = new XFileMeshFaceObject[mesh.NFaces];
             //************************************************
             //NOTE: We always assume faces are triangular    *
-            //************************************************
-            const int nComponentsPerFace = 4;
-            int nTotalFaceComponents = mesh.NFaces * nComponentsPerFace;
-            for (int i = 0; i < nTotalFaceComponents; i += nComponentsPerFace)
+            //************************************************            
+            for (int i = 0; i < mesh.NFaces; i ++)
             {
+                int j = i * nFaceComponents + facesOffset;
                 //NOTE: Assuming triangular faces, we expect this value to always be '3'.
-                int nFaceIndices = int.Parse(matches[facesOffset + i].Value);
+                int nFaceIndices = int.Parse(matches[j].Value);
                 mesh.Faces[i] = new XFileMeshFaceObject()
                 {
                     NFaceVertexIndices = nFaceIndices,
                     FaceVertexIndices = new int[] { 
-                        int.Parse(matches[facesOffset + i + 1].Value),
-                        int.Parse(matches[facesOffset + i + 2].Value),
-                        int.Parse(matches[facesOffset + i + 3].Value) }
+                        int.Parse(matches[j + 1].Value),
+                        int.Parse(matches[j + 2].Value),
+                        int.Parse(matches[j + 3].Value) }
                 };
             }
-
-            regEx = new Regex(meshContent);
-            MatchCollection collection = regEx.Matches(childObjectPattern);            
+            
+            MatchCollection collection = Regex.Matches(meshContent, childObjectPattern);            
             foreach (Match match in collection)
             {
                 XFileDataObject childObject = null;
@@ -304,16 +303,16 @@ namespace CipherPark.AngelJacket.Core.Utils
         {
             XFileMaterialObject material = new XFileMaterialObject();
             material.Name = name;
-            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?"; //@"(\d+.\d+)\s*";
-            Regex regEx = new Regex(materialContent);
-            MatchCollection matches = regEx.Matches(valuesPattern);
-            material.FaceColor = ParseColorRGBA(string.Format("{0};{1};{2};{3};", matches[0].Groups[0].Value, matches[1].Groups[0].Value, matches[2].Groups[0], matches[3].Groups[0]));
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?"; //@"(\d+.\d+)\s*";   
+            string textureFileNameExpression = @"TextureFilename\s*{\s*""(?<texturename>[^""]+)""\s*;\s*}";
+            string childLessMaterialContent = Regex.Replace(materialContent, textureFileNameExpression, string.Empty);
+            MatchCollection matches = Regex.Matches(childLessMaterialContent, valuesPattern);
+            material.FaceColor = ParseColorRGBA(string.Format("{0};{1};{2};{3};", matches[0].Groups[0].Value, matches[1].Groups[0].Value, matches[2].Groups[0].Value, matches[3].Groups[0].Value));
             material.Power = float.Parse(matches[4].Groups[0].Value);
             material.SpecularColor = ParseColorRGB(string.Format("{0};{1};{2};", matches[5].Groups[0].Value, matches[6].Groups[0].Value, matches[7].Groups[0].Value));
             material.EmissiveColor = ParseColorRGB(string.Format("{0};{1};{2};", matches[8].Groups[0].Value, matches[9].Groups[0].Value, matches[10].Groups[0].Value));
-
-            string textureFileNameExpression = @"TextureFilename\s*{\s*""(?<texturename>[^""]+)";
-            Match match = regEx.Match(textureFileNameExpression);
+            
+            Match match = Regex.Match(materialContent, textureFileNameExpression);
             if( match.Success)            
                 material.TextureFilename = match.Groups["TextureFilename"].Value;
 
@@ -321,10 +320,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }       
 
         private XFileColorRGBA ParseColorRGBA(string rgbaContent)
-        {
-            Regex regEx = new Regex(rgbaContent);
+        {          
             string valuesPattern = @"(?<value>(?![^\{]+\{)\d+(?:\.\d+)?);";
-            MatchCollection collection = regEx.Matches(valuesPattern);
+            MatchCollection collection = Regex.Matches(rgbaContent, valuesPattern);
             return new XFileColorRGBA()
             {
                 Red = float.Parse(collection[0].Groups["value"].Value),
@@ -335,10 +333,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
 
         private XFileColorRGB ParseColorRGB(string rgbContent)
-        {
-            Regex regEx = new Regex(rgbContent);
+        {            
             string valuesPattern = @"(?<value>(?![^\{]+\{)\d+(?:\.\d+)?);";
-            MatchCollection collection = regEx.Matches(valuesPattern);
+            MatchCollection collection = Regex.Matches(rgbContent, valuesPattern);
             return new XFileColorRGB()
             {
                 Red = float.Parse(collection[0].Groups["value"].Value),
@@ -350,8 +347,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         private string ReadHeader(string textFileContent)
         {
             string result = null;
-            Regex regEx = new Regex(textFileContent);
-            Match match = regEx.Match(@"xof");
+            Match match = Regex.Match(textFileContent, @"xof");         
             if (match.Index >= 0)
                 result = textFileContent.Substring(match.Index, 16);
             return result;

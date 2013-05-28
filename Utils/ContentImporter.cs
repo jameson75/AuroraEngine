@@ -178,9 +178,18 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     throw new ArgumentException("Specified channel combination is unsupported.", "channels");
             }                        
             return result;
-        }      
+        }
+
+        public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
+        {
+            Model result = null;
+            XFileDocument doc = new XFileDocument();
+            doc.Load(System.IO.File.ReadAllText(fileName));
+            return result;
+        }
     }
 
+  
     [Flags]
     public enum MeshImportChannel
     {
