@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    class RingForm
+    public class RingForm
     {
+
     }
 }

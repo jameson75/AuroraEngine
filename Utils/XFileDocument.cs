@@ -138,25 +138,46 @@ namespace CipherPark.AngelJacket.Core.Utils
             animationKey.NKeys = int.Parse(matches[1].Value);
             const int tfkOffset = 2;
             animationKey.TimedFloatKeys = new XFileTimedFloatKey[animationKey.NKeys];            
-            for (int i = 0; i < animationKey.NKeys * 18; i+=18)
+            int nAnimationKeyComponents = 0;
+            switch (animationKey.KeyType)
             {
-                XFileTimedFloatKey timedFloatKey = new XFileTimedFloatKey();
-                timedFloatKey.Time = int.Parse(matches[i + tfkOffset].Value);
-                timedFloatKey.NValues = int.Parse(matches[i + tfkOffset + 1].Value);
-                timedFloatKey.Values = new float[timedFloatKey.NValues];
-                for (int j = 0; j < timedFloatKey.NValues; j++)
-                {
-                    timedFloatKey.Values[j] = float.Parse(matches[i + tfkOffset + j].Value);
-                }
-                //animationKey.
+                case KeyType.Matrix:
+                    nAnimationKeyComponents = 18; //1 (time) + 1 (nvalues) + 16 (matrix)
+                    break;
+                case KeyType.Position:
+                    nAnimationKeyComponents = 5;  //1 (time) + 1 (nvalues) + 3 (translation vector)
+                    break;
+                case KeyType.Scale:
+                    nAnimationKeyComponents = 5; //1 (time) + 1 (nvalues) + 3 (scale vector)
+                    break;
+                case KeyType.Rotation:
+                    nAnimationKeyComponents = 6; //1 (time) + 1 (nvalues) + 4 (rotation quaternion)
+                    break;
             }
-           
+            for (int i = 0; i < animationKey.NKeys; i++)
+            {
+                int j = i * nAnimationKeyComponents + tfkOffset;
+                XFileTimedFloatKey timedFloatKey = new XFileTimedFloatKey();
+                timedFloatKey.Time = int.Parse(matches[j].Value);
+                timedFloatKey.NValues = int.Parse(matches[j + 1].Value);
+                timedFloatKey.Values = new float[timedFloatKey.NValues];
+                const int valuesOffset = 2;
+                for (int k = 0; k < timedFloatKey.NValues; k++)
+                {
+                    int m = j + k + valuesOffset;
+                    timedFloatKey.Values[k] = float.Parse(matches[m].Value);
+                }
+                animationKey.TimedFloatKeys[i] = timedFloatKey;
+            }           
             return animationKey;
         }
 
         private XFileMeshObject ParseMeshObject(string meshContent, string name)
         {
             const int nVertexComponents = 3;
+            //************************************************
+            //NOTE: We always assume faces are triangular    *
+            //************************************************     
             const int nFaceComponents = 4;
             XFileMeshObject mesh = new XFileMeshObject();
             mesh.Name = name;
@@ -180,9 +201,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             mesh.NFaces = int.Parse(matches[verticesOffset + (mesh.NVertices * nVertexComponents)].Value);
             int facesOffset = verticesOffset + (mesh.NVertices * nVertexComponents) + 1;
             mesh.Faces = new XFileMeshFaceObject[mesh.NFaces];
-            //************************************************
-            //NOTE: We always assume faces are triangular    *
-            //************************************************            
+       
             for (int i = 0; i < mesh.NFaces; i ++)
             {
                 int j = i * nFaceComponents + facesOffset;
@@ -244,23 +263,24 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         private XFileDeclDataObject ParseDeclDataObject(string declDataContent, string name)
         {
+            const int nComponentsPerVertexElement = 4;
             XFileDeclDataObject declData = new XFileDeclDataObject();
             declData.Name = name;
             string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
             MatchCollection matches = Regex.Matches(declDataContent, valuesPattern);
             declData.NVertexElements = int.Parse(matches[0].Value);
             int vertexElementsOffset = 1;
-            declData.VertexElements = new XFileVertexElement[declData.NVertexElements];
-            const int nComponentsPerVertexElement = 4;
+            declData.VertexElements = new XFileVertexElement[declData.NVertexElements];            
             int nTotalVertexElementComponents = declData.NVertexElements * nComponentsPerVertexElement;
-            for (int i = 0; i < nTotalVertexElementComponents; i += nComponentsPerVertexElement)
+            for (int i = 0; i < declData.NVertexElements; i++)
             {
+                int j = i * nTotalVertexElementComponents + vertexElementsOffset;
                 declData.VertexElements[i] = new XFileVertexElement()
                 {
-                    Type = (VertexElementType)int.Parse(matches[i + vertexElementsOffset].Value),
-                    Method = (VertexElementMethod)int.Parse(matches[i + vertexElementsOffset + 1].Value),
-                    Usage = (VertexElementUsage)int.Parse(matches[i + vertexElementsOffset + 2].Value),
-                    UsageIndex = (VertexElementUsage)int.Parse(matches[i + vertexElementsOffset + 3].Value)
+                    Type = (VertexElementType)int.Parse(matches[j].Value),
+                    Method = (VertexElementMethod)int.Parse(matches[j + 1].Value),
+                    Usage = (VertexElementUsage)int.Parse(matches[j + 2].Value),
+                    UsageIndex = (VertexElementUsage)int.Parse(matches[j + 3].Value)
                 };
             }
             declData.NData = int.Parse(matches[vertexElementsOffset + nTotalVertexElementComponents].Value);
@@ -456,6 +476,37 @@ namespace CipherPark.AngelJacket.Core.Utils
         public XFileVertexElement[] VertexElements { get; set; }
         public int NData { get; set; }
         public int[] Data { get; set; }
+        public T[] GetVertexDataStream<T>(int dataStreamIndex)
+        {
+            //NOTE: While we make ensure the dataStreamIndex is in range,
+            //we, implicitly, ensure that NVertexElements is not equalt to 0.
+            if (dataStreamIndex >= NVertexElements || dataStreamIndex < 0)
+                throw new ArgumentOutOfRangeException("Stream not available.");    
+         
+            T[] results = new T[NData / NVertexElements];
+            for (int i = 0; i < results.Length; i++)
+            {
+                int j = i * NVertexElements + dataStreamIndex;
+                results[i] = (T)Convert.ChangeType(Data[j], typeof(T));
+            }
+
+            return results;
+        }
+        public T[] GetVertexDataStream<T>(VertexElementUsage usage, int usageInstanceIndex)
+        {
+            int usageInstancesFound = 0;
+            for (int i = 0; i < NVertexElements; i++)
+            {
+                if (VertexElements[i].Usage == usage)
+                {
+                    if (usageInstanceIndex == usageInstancesFound)
+                        return GetVertexDataStream<T>(i);
+                    else
+                        usageInstancesFound++;
+                }
+            }
+            return null;
+        }
     }
 
     public class XFileSkinWeightsObject : XFileDataObject
