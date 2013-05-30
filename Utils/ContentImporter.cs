@@ -183,12 +183,16 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
         {
             Model result = null;
-            XFileDocument doc = new XFileDocument();
+            XFileDocument doc = new XFileDocument();          
             doc.Load(System.IO.File.ReadAllText(fileName));
+            result = new RiggedModel(app);           
+            result.Mesh = new Mesh(app, meshDescription);
+            result.Bones = new BoneHierarchy(app);
+            result.Animations.Add(modelAnimations);
+
             return result;
         }
     }
-
   
     [Flags]
     public enum MeshImportChannel

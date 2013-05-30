@@ -96,6 +96,7 @@
     <Compile Include="Effects\PostEffectChain.cs" />
     <Compile Include="Effects\PostGlowEffect.cs" />
     <Compile Include="Effects\SHLightingEffect.cs" />
+    <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
     <Compile Include="UI\Controls\CheckBox.cs" />

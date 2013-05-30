@@ -14,10 +14,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
     {
         private IntPtr _nativeObject = IntPtr.Zero;
         private Device _device = null;
-        private Matrix _world = Matrix.Zero;
-        private Matrix _view = Matrix.Zero;
-        private Matrix _projection = Matrix.Zero;
-
+      
         public IntPtr NativeObject
         {
             get { return _nativeObject; }
