@@ -23,14 +23,14 @@ namespace CipherPark.AngelJacket.Core.Animation
         void UpdateAnimation(long gameTime);
     }
 
-    public abstract class AnimationController<TTarget, TAnimation> : IAnimationController
+    public abstract class KeyframeAnimationController<TTarget, TAnimation> : IAnimationController
     {
         private IGameApp _game = null;        
-        protected AnimationController(IGameApp game)
+        protected KeyframeAnimationController(IGameApp game)
         {
             _game = game;
         }
-        protected AnimationController(IGameApp game, TAnimation animation, TTarget target)
+        protected KeyframeAnimationController(IGameApp game, TAnimation animation, TTarget target)
         {
             _game = game;
             Target = target;
@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         public abstract void UpdateAnimation(long gameTime);
     }
 
-    public class TransformAnimationController : AnimationController<ITransformable, TransformAnimation>
+    public class TransformAnimationController : KeyframeAnimationController<ITransformable, TransformAnimation>
     {
         private long? _animationStartTime = null;
 
@@ -66,22 +66,5 @@ namespace CipherPark.AngelJacket.Core.Animation
             ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
             Target.Transform = Animation.GetValueAtT(timeT);
         }
-    }
-
-    public class BoneAnimationController : AnimationController<RiggedModel, BoneAnimation>
-    {
-        public BoneAnimationController(IGameApp game, BoneAnimation animation, RiggedModel target)
-            : base(game, animation, target)
-        { }
-
-        public override void Start()
-        {
-            
-        }
-
-        public override void UpdateAnimation(long gameTime)
-        {
-           
-        }
-    }
+    }   
 }

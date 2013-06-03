@@ -11,27 +11,59 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class RiggedModel : BasicModel
     {
         private Bones _bones = new Bones();
+        private List<TransformAnimationController> _animationControllers = new List<TransformAnimationController>();
 
-        private Bones Bones { get { return _bones; } }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="game"></param>
         public RiggedModel(IGameApp game)
             : base(game)
-        { }
-
-        public void Pose(string keyFrameName)
+        { }    
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public Bones Bones { get { return _bones; } }
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<TransformAnimationController> Animation
+        { get { return _animationControllers; } } 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="startKeyFrame"></param>
+        /// <returns></returns>
+        public List<TransformAnimationController> GetAnimationClip(int startTime, int? endTime = null)
         {
-
+            List<TransformAnimationController> clip = new List<TransformAnimationController>();
+            return clip;
         }
     }
 
-    public class Bone
+    /// <summary>
+    /// 
+    /// </summary>
+    public class Bone : ITransformable
     {
-        public string Name { get; set; }
+        private Bones _children = new Bones();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Name { get; set; }
         public Transform Transform { get; set; }
+        public Bone Parent { get; set; }
+        public Bones Children { get { return _children; } }
     }
 
     public class Bones :  ObservableCollection<Bone>

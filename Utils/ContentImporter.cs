@@ -189,7 +189,6 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             result.Mesh = new Mesh(app, meshDescription);
             result.Bones = new BoneHierarchy(app);
             result.Animations.Add(modelAnimations);
-
             return result;
         }
     }
