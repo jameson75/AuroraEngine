@@ -66,5 +66,22 @@ namespace CipherPark.AngelJacket.Core.Animation
             ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
             Target.Transform = Animation.GetValueAtT(timeT);
         }
-    }   
+    }
+
+    public class EmitterAnimationController : IAnimationController
+    {        
+        #region IAnimationController Members
+
+        public void Start()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateAnimation(long gameTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
 }

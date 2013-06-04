@@ -189,6 +189,7 @@
     <Compile Include="World\Geometry\TerrainForm.cs" />
     <Compile Include="World\Geometry\TurbineForm.cs" />
     <Compile Include="World\ParticleSystem\Emitter.cs" />
+    <Compile Include="World\ParticleSystem\ForceField.cs" />
     <Compile Include="World\ParticleSystem\Plexic.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />

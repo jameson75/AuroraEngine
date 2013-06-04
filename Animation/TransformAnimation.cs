@@ -35,11 +35,11 @@ namespace CipherPark.AngelJacket.Core.Animation
             if (f1 == null)
                 return frameVal0;
             else
-            {
+            {                
                 float pctT = (float)(t - f0.Time) / (float)(f1.Time - f0.Time);
-                float pctStep = 0;
+                float pctStep = 0;                          
                 if (f0.EaseOutTangent != null || f1.EaseInTangent != null)
-                {
+                {                   
                     Vector2 eoTangent = (f0.EaseOutTangent != null) ? f0.EaseOutTangent.Value : new Vector2(1, 1);
                     Vector2 eiTangent = (f1.EaseInTangent != null) ? f1.EaseInTangent.Value : new Vector2(-1, -1);
                     Vector2 p1 = new Vector2(0, 0);
