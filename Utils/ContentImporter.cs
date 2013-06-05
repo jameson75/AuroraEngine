@@ -184,11 +184,15 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         {
             Model result = null;
             XFileDocument doc = new XFileDocument();          
-            doc.Load(System.IO.File.ReadAllText(fileName));
-            result = new RiggedModel(app);           
-            result.Mesh = new Mesh(app, meshDescription);
-            result.Bones = new BoneHierarchy(app);
-            result.Animations.Add(modelAnimations);
+            doc.Load(System.IO.File.ReadAllText(fileName));            
+            result = new RiggedModel(app);
+            XFileVector[] vertices = ((XFileFrameObject)doc.DataObjects[4]).Meshes[0].Vertices;
+            BoundingBox boundingBox = BoundingBox.FromPoints(vertices.Select(v => new Vector3(v.X, v.Y, v.Z)).ToArray());
+            SkinnedVertexTexture[] _vertices = vertices.Select(e => new SkinnedVertexTexture() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f) }).ToArray();
+            result.Mesh = ContentBuilder.BuildMesh<SkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, SkinnedVertexTexture.InputElements, SkinnedVertexTexture.ElementSize, boundingBox);
+            //result.Mesh = new Mesh(app, meshDescription);
+            //result.Bones = new BoneHierarchy(app);
+            //result.Animations.Add(modelAnimations);
             return result;
         }
     }

@@ -71,7 +71,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animation\AnimationBuilder.cs" />
     <Compile Include="Animation\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />
     <Compile Include="Animation\AnimationKeyFrame.cs" />

@@ -24,6 +24,10 @@ namespace CipherPark.AngelJacket.Core.Effects
         private BasicSkinnedEffect _effect = null;
         private int _weightsPerVertex = 0;
 
+        public SkinnedEffectEx(Device graphicsDevice)
+            : base(graphicsDevice)
+        { }
+
         public Matrix[] BoneTransforms { get; set; }
 
         public int WeightsPerVertex

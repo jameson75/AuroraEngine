@@ -274,7 +274,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             int nTotalVertexElementComponents = declData.NVertexElements * nComponentsPerVertexElement;
             for (int i = 0; i < declData.NVertexElements; i++)
             {
-                int j = i * nTotalVertexElementComponents + vertexElementsOffset;
+                int j = i * nComponentsPerVertexElement + vertexElementsOffset;
                 declData.VertexElements[i] = new XFileVertexElement()
                 {
                     Type = (VertexElementType)int.Parse(matches[j].Value),
@@ -285,10 +285,10 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
             declData.NData = int.Parse(matches[vertexElementsOffset + nTotalVertexElementComponents].Value);
             int dataOffset = vertexElementsOffset + nTotalVertexElementComponents + 1;
-            declData.Data = new int[declData.NData];
+            declData.Data = new long[declData.NData];
             for( int i = 0; i < declData.NData; i++)
             {
-                declData.Data[i] = int.Parse(matches[i + dataOffset].Value);
+                declData.Data[i] = long.Parse(matches[i + dataOffset].Value);
             }
             return declData;
         }
@@ -298,8 +298,9 @@ namespace CipherPark.AngelJacket.Core.Utils
             XFileMeshMaterialListObject meshMaterialList = new XFileMeshMaterialListObject();
             meshMaterialList.Name = name;
             string materialReferencesPattern = @"(?<! MeshMaterialList\s*){\s*(?<material>[^\s]*\s*)}";
+            string inlineMaterialsPattern = @"(?<!MeshMaterialList\s*)Material\s*{\s*(?<material>[^}]*\s*)}";
             string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            string childLessContent = Regex.Replace(meshMaterialListContent, materialReferencesPattern, string.Empty);
+            string childLessContent = Regex.Replace(Regex.Replace(meshMaterialListContent, materialReferencesPattern, string.Empty), inlineMaterialsPattern, string.Empty);
             MatchCollection matches = Regex.Matches(childLessContent, valuesPattern);
             meshMaterialList.NMaterials = int.Parse(matches[0].Value);
             meshMaterialList.NFaceIndices = int.Parse(matches[1].Value);
@@ -310,11 +311,23 @@ namespace CipherPark.AngelJacket.Core.Utils
                 meshMaterialList.FaceIndices[i] = int.Parse(matches[faceIndicesOffset + i].Value);
             }
             if(meshMaterialList.NMaterials > 0)
-            {
-                meshMaterialList.Materials = new string[meshMaterialList.NMaterials];
+            {                
                 MatchCollection collection = Regex.Matches(meshMaterialListContent, materialReferencesPattern);
-                for (int i = 0; i < meshMaterialList.NMaterials; i++)
-                    meshMaterialList.Materials[i] = collection[i].Groups["material"].Value;
+                //NOTE: We're assuming that either all child materials are references or that all child materials
+                //are inline.
+                if (collection.Count != 0)
+                {
+                    meshMaterialList.MaterialRefs = new string[meshMaterialList.NMaterials];
+                    for (int i = 0; i < meshMaterialList.NMaterials; i++)
+                        meshMaterialList.MaterialRefs[i] = collection[i].Groups["material"].Value;
+                }
+                else
+                {
+                    collection = Regex.Matches(meshMaterialListContent, inlineMaterialsPattern);
+                    meshMaterialList.Materials = new XFileMaterialObject[meshMaterialList.NMaterials];
+                    for (int i = 0; i < meshMaterialList.NMaterials; i++)
+                        meshMaterialList.Materials[i] = ParseMaterialObject(collection[i].Groups["material"].Value, null);
+                }
             }
             return meshMaterialList;
         }
@@ -466,7 +479,8 @@ namespace CipherPark.AngelJacket.Core.Utils
         public int NMaterials { get; set; }
         public int NFaceIndices { get; set; }
         public int[] FaceIndices { get; set; }
-        public string[] Materials { get; set; }
+        public string[] MaterialRefs { get; set; }
+        public XFileMaterialObject[] Materials { get; set; }
     }
 
     public class XFileDeclDataObject : XFileDataObject
@@ -475,7 +489,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         public int NVertexElements { get; set; }
         public XFileVertexElement[] VertexElements { get; set; }
         public int NData { get; set; }
-        public int[] Data { get; set; }
+        public long[] Data { get; set; }
         public T[] GetVertexDataStream<T>(int dataStreamIndex)
         {
             //NOTE: While we make ensure the dataStreamIndex is in range,
