@@ -6,6 +6,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Direct3D;
+using Float4 = SharpDX.Vector4;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -153,6 +154,43 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Position = new Vector4(position, 1.0f);
             Normal = normal;
             TextureCoord = textureCoord;          
+        }
+    }
+
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct BasicSkinnedVertexTexture
+    {
+        public Vector4 Position;
+        public Vector3 Normal;
+        public Vector2 TextureCoord;
+        public Int4 BoneIndices;
+        public Float4 Weights;
+       
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }        
+
+        static BasicSkinnedVertexTexture()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 28, 0),
+                 new InputElement("BLENDINDICES", 0, Format.R32G32B32A32_UInt, 36, 0),
+                 new InputElement("BLENDWEIGHT", 0, Format.R32G32B32A32_Float, 52, 0)
+             };
+            _elementSize = 68;
+        }
+
+        public BasicSkinnedVertexTexture(Vector3 position, Vector3 normal, Vector2 textureCoord, float[] weights, int[] boneIndices)
+        {
+            Position = new Vector4(position, 1.0f);
+            Normal = normal;
+            TextureCoord = textureCoord;
+            Weights = new Float4(weights);
+            BoneIndices = new Int4(boneIndices);
         }
     }
 }

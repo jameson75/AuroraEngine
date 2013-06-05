@@ -14,7 +14,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// 
     /// </summary>
-    public class RiggedModel : BasicModel
+    public class SkinnedModel : BasicModel
     {
         private Bones _bones = new Bones();
         private List<TransformAnimationController> _animationControllers = new List<TransformAnimationController>();
@@ -23,7 +23,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// 
         /// </summary>
         /// <param name="game"></param>
-        public RiggedModel(IGameApp game)
+        public SkinnedModel(IGameApp game)
             : base(game)
         { }    
         

@@ -184,12 +184,81 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         {
             Model result = null;
             XFileDocument doc = new XFileDocument();          
+            
+            //Read X-File Data
+            //----------------
             doc.Load(System.IO.File.ReadAllText(fileName));            
-            result = new RiggedModel(app);
-            XFileVector[] vertices = ((XFileFrameObject)doc.DataObjects[4]).Meshes[0].Vertices;
-            BoundingBox boundingBox = BoundingBox.FromPoints(vertices.Select(v => new Vector3(v.X, v.Y, v.Z)).ToArray());
-            SkinnedVertexTexture[] _vertices = vertices.Select(e => new SkinnedVertexTexture() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f) }).ToArray();
-            result.Mesh = ContentBuilder.BuildMesh<SkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, SkinnedVertexTexture.InputElements, SkinnedVertexTexture.ElementSize, boundingBox);
+            
+            //Access X-File's first mesh Data and it's frame
+            //----------------------------------------------
+            //TODO: Remove hard coding.
+            XFileFrameObject xMeshFrame = ((XFileFrameObject)doc.DataObjects[4]);
+            XFileMeshObject xMesh = xMeshFrame.Meshes[0];            
+
+            //Calculate mesh bounding box from mesh Data
+            //------------------------------------------
+            BoundingBox boundingBox = BoundingBox.FromPoints(xMesh.Vertices.Select(v => new Vector3(v.X, v.Y, v.Z)).ToArray());            
+
+            //Extract texture coords from mesh data
+            //-------------------------------------
+            float[] texUStream = xMesh.DeclData.GetVertexDataStream<float>(VertexElementUsage.TexCoord, 0);
+            float[] texVStream = xMesh.DeclData.GetVertexDataStream<float>(VertexElementUsage.TexCoord, 1);
+            Vector2[] texCoords = texUStream.Zip(texVStream, (f, s) => new Vector2(f, s)).ToArray();         
+
+            //Construct model vertices from mesh data
+            //---------------------------------------
+            BasicSkinnedVertexTexture[] _vertices = xMesh.Vertices.Zip(texCoords, (e,f) => new BasicSkinnedVertexTexture() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), TextureCoord = f }).ToArray();            
+
+            //Construct model vertex indices from mesh data
+            //----------------------------------------------
+            short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Cast<short>()).ToArray();
+
+            //Construct model skinning information from mesh data
+            //---------------------------------------------------
+            List<float>[] weights = new List<float>[_vertices.Length];
+            List<int>[] boneIndices = new List<int>[_vertices.Length];
+            List<Bone> boneList = new List<Bone>();
+            for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
+            {
+                XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];
+                Animation.Transform boneTransform = new Animation.Transform(new Matrix(xSkinWeights.MatrixOffset.Matrix));
+                boneList.Add(new Bone() { Name = xSkinWeights.TransformNodeName, Transform = boneTransform });
+                for(int j = 0; j < xSkinWeights.NWeights; j++ )
+                {
+                    int k = xSkinWeights.VertexIndices[j];
+                    boneIndices[k].Add(i);
+                    weights[k].Add(xSkinWeights.Weights[j]);                    
+                }
+            }
+            for (int i = 0; i < _vertices.Length; i++)
+            {               
+                float[] weightValues = new float[4] { 0, 0, 0, 0};
+                int[] boneIndicesValues = new int[4] { 0, 0, 0, 0 };
+                Array.Copy(weights, weightValues, weights.Length);
+                Array.Copy(boneIndices, boneIndicesValues, boneIndices.Length);
+                _vertices[i].Weights = new Vector4(weightValues);
+                _vertices[i].BoneIndices = new Int4(boneIndicesValues);
+            }
+            
+            //Construct animation data from frame data
+            //----------------------------------------
+
+            //Access bones frame data
+            //-----------------------
+            XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
+           
+            //Construct bone hierarchy (skeleton) from  frame data
+            //----------------------------------------------------
+            Bones hierarchy = new Bones();
+            XFileFrameObject iterator = xRootBoneFrame;
+            Stack<XFileFrameObject> xBoneFrameLineage = new Stack<XFileFrameObject>();
+            while (iterator != null)
+            {
+                Bone bone = boneList.Find(b => b.Name == iterator.Name);                
+            }
+            
+            result = new SkinnedModel(app);
+            result.Mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
             //result.Mesh = new Mesh(app, meshDescription);
             //result.Bones = new BoneHierarchy(app);
             //result.Animations.Add(modelAnimations);
