@@ -182,7 +182,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
         {
-            Model result = null;
+            SkinnedModel result = null;
             XFileDocument doc = new XFileDocument();          
             
             //Read X-File Data
@@ -243,25 +243,58 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //Construct animation data from frame data
             //----------------------------------------
 
+            //****************************************************
+            //NOTE: From this point, forward, it is assumed that
+            //there is only one bone at the root and, therefore,
+            //one bone-frame at the root level of the X-File
+            //****************************************************
+
             //Access bones frame data
             //-----------------------
             XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
            
             //Construct bone hierarchy (skeleton) from  frame data
-            //----------------------------------------------------
-            Bones hierarchy = new Bones();
-            XFileFrameObject iterator = xRootBoneFrame;
-            Stack<XFileFrameObject> xBoneFrameLineage = new Stack<XFileFrameObject>();
-            while (iterator != null)
+            //----------------------------------------------------           
+            XFileFrameObject currentXBoneFrame = xRootBoneFrame;               
+            XFileFrameObject lastProcessedChild = null;
+            Stack<XFileFrameObject> xBoneFrameLineage = new Stack<XFileFrameObject>();            
+            while (true)
             {
-                Bone bone = boneList.Find(b => b.Name == iterator.Name);                
+                //********************************************************************************
+                //NOTE: This would probably look a lot simpler if it were implemented recursively
+                //but for some strange reason, I felt like implementing this iteratively
+                //********************************************************************************
+
+                XFileFrameObject currentXBoneFrameParent = xBoneFrameLineage.Peek();
+                if (currentXBoneFrameParent != null)
+                {
+                    Bone currentBone = boneList.Find(b => b.Name == currentXBoneFrame.Name);
+                    Bone currentBoneParent = boneList.Find(b => b.Name == currentXBoneFrameParent.Name);
+                    currentBoneParent.Children.Add(currentBone);
+                    currentBone.Parent = currentBoneParent;
+                }
+
+                int lastProcessedChildIndex = (lastProcessedChild == null) ? -1 : currentXBoneFrame.ChildFrames.IndexOf(lastProcessedChild);
+                if (lastProcessedChildIndex < currentXBoneFrame.ChildFrames.Count - 1)
+                {
+                    xBoneFrameLineage.Push(currentXBoneFrame);
+                    currentXBoneFrame = currentXBoneFrame.ChildFrames[lastProcessedChildIndex + 1];
+                    lastProcessedChild = null;
+                }
+                else
+                {
+                    lastProcessedChild = currentXBoneFrame;
+                    currentXBoneFrame = xBoneFrameLineage.Pop();
+                }
+
+                if (currentXBoneFrame == xRootBoneFrame)
+                    break;
             }
             
             result = new SkinnedModel(app);
             result.Mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
-            //result.Mesh = new Mesh(app, meshDescription);
-            //result.Bones = new BoneHierarchy(app);
-            //result.Animations.Add(modelAnimations);
+            result.Bones.AddRange(boneList.Where(b => b.Parent == null));
+            
             return result;
         }
     }
