@@ -6,17 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Xml.XPath;
+using System.Text.RegularExpressions;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
-using System.Xml.XPath;
+using DXBuffer = SharpDX.Direct3D11.Buffer;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.AngelJacket.Core.Animation;
 
-using DXBuffer = SharpDX.Direct3D11.Buffer;
-using System.Text.RegularExpressions;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -221,7 +223,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
             {
                 XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];
-                Animation.Transform boneTransform = new Animation.Transform(new Matrix(xSkinWeights.MatrixOffset.Matrix));
+                Animation.Transform boneTransform = new Animation.Transform(new Matrix(xSkinWeights.MatrixOffset.m));
                 boneList.Add(new Bone() { Name = xSkinWeights.TransformNodeName, Transform = boneTransform });
                 for(int j = 0; j < xSkinWeights.NWeights; j++ )
                 {
@@ -242,6 +244,37 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             
             //Construct animation data from frame data
             //----------------------------------------
+            //TODO: Remove hard coding.
+            XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[6];
+            List<TransformAnimationController> modelAnimationControllers = new List<TransformAnimationController>();
+            for( int i = 0; i < xAnimationSet.Animations.Count; i++)
+            {
+                XFileAnimationObject xAnimation = xAnimationSet.Animations[i];
+                Bone animationTarget = boneList.Find(b => b.Name == xAnimation.FrameRef);
+                if(animationTarget != null)
+                {       
+                    Dictionary<long, Matrix> matrixTransformKeys = new Dictionary<long,Matrix>();
+                    for(int j = 0; j < xAnimation.Keys.Count; j++)
+                    {
+                        XFileAnimationKeyObject xAnimationKey = xAnimation.Keys[j];                        
+                        switch(xAnimationKey.KeyType)
+                        {
+                            case KeyType.Matrix:
+                                for(int k = 0; k < xAnimationKey.NKeys; k++)
+                                {
+                                    matrixTransformKeys.Add(xAnimationKey.TimedFloatKeys[k].Time, 
+                                                            new Matrix(xAnimationKey.TimedFloatKeys[k].Values));
+                                }
+                                break;
+                        }
+                    }                    
+                    TransformAnimation modelAnimation = new TransformAnimation();
+                    foreach(long time in matrixTransformKeys.Keys)                    
+                        modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
+
+                    modelAnimationControllers.Add(new TransformAnimationController(app, modelAnimation, animationTarget));
+                }
+            }
 
             //****************************************************
             //NOTE: From this point, forward, it is assumed that
@@ -251,6 +284,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
             //Access bones frame data
             //-----------------------
+            //TODO: Remove hard coding.
             XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
            
             //Construct bone hierarchy (skeleton) from  frame data
@@ -261,8 +295,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             while (true)
             {
                 //********************************************************************************
-                //NOTE: This would probably look a lot simpler if it were implemented recursively
-                //but for some strange reason, I felt like implementing this iteratively
+                //NOTE: This would probably look a lot simpler if this tree traversal were 
+                //implemented recursively. However, for some strange reason, I felt like 
+                //implementing this iteratively.
                 //********************************************************************************
 
                 XFileFrameObject currentXBoneFrameParent = xBoneFrameLineage.Peek();
@@ -291,10 +326,12 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     break;
             }
             
+            //Create and return model
+            //-----------------------
             result = new SkinnedModel(app);
             result.Mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
             result.Bones.AddRange(boneList.Where(b => b.Parent == null));
-            
+            result.Animation.AddRange(modelAnimationControllers);            
             return result;
         }
     }

@@ -63,6 +63,14 @@ namespace CipherPark.AngelJacket.Core.Utils
                     case XFileMeshObject.TemplateName:
                         dataObject = ParseMeshObject(match.Groups["data"].Value, match.Groups["name"].Value);
                         break;
+                    //case XFileAnimationObject.TemplateName:
+                    //    dataObject = ParseAnimationObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                    //    //frame.Animations.Add((XFileAnimationObject)childObject);
+                    //    break;
+                    case XFileAnimationSetObject.TemplateName:
+                        dataObject = ParseAnimationSetObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        //frame.AnimationSets.Add((XFileAnimationSetObject)childObject);
+                        break;
                 }               
                 return match.Index + match.Length;
             }
@@ -82,6 +90,9 @@ namespace CipherPark.AngelJacket.Core.Utils
                 XFileDataObject childObject = null;
                 switch (match.Groups["type"].Value)
                 {
+                    case "FrameTransformMatrix":
+                        frame.FrameTransformMatrix = ParseFrameTransformMatrix(match.Groups["data"].Value, match.Groups["name"].Value);                        
+                        break;
                     case XFileFrameObject.TemplateName:
                         childObject = ParseFrameObject(match.Groups["data"].Value, match.Groups["name"].Value);
                         frame.ChildFrames.Add((XFileFrameObject)childObject);
@@ -89,30 +100,43 @@ namespace CipherPark.AngelJacket.Core.Utils
                     case XFileMeshObject.TemplateName:
                         childObject = ParseMeshObject(match.Groups["data"].Value, match.Groups["name"].Value);
                         frame.Meshes.Add((XFileMeshObject)childObject);
-                        break;
-                    case  XFileAnimationObject.TemplateName:
-                        childObject = ParseAnimationObject(match.Groups["data"].Value, match.Groups["name"].Value);
-                        frame.Animations.Add((XFileAnimationObject)childObject);
-                        break;
-                    case XFileAnimationSetObject.TemplateName:
-                        childObject = ParseAnimationSetObject(match.Groups["data"].Value, match.Groups["name"].Value);
-                        frame.AnimationSets.Add((XFileAnimationSetObject)childObject);
-                        break;
+                        break;                    
                 }
             }            
             return frame;
         }
 
-        private XFileDataObject ParseAnimationSetObject(string p1, string p2)
+        private XFileDataObject ParseAnimationSetObject(string animationSetContent, string name)
         {
-            throw new NotImplementedException();
+            XFileAnimationSetObject animationSet = new XFileAnimationSetObject();
+            animationSet.Name = name;
+
+            string childObjectPattern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
+            Regex regEx = new Regex(childObjectPattern);
+            MatchCollection collection = regEx.Matches(animationSetContent);
+            foreach (Match match in collection)
+            {
+                XFileAnimationObject childObject = null;
+                switch (match.Groups["type"].Value)
+                {                    
+                    case XFileAnimationObject.TemplateName:
+                        childObject = ParseAnimationObject(match.Groups["data"].Value, match.Groups["name"].Value);
+                        animationSet.Animations.Add(childObject);
+                        break;
+                }
+            }
+
+            return animationSet;
         }
 
         private XFileAnimationObject ParseAnimationObject(string animationContent, string name)
         {
             XFileAnimationObject animation = new XFileAnimationObject();
             animation.Name = name;
-            string childObjectPatern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
+            string childObjectPatern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";             
+            string frameReferencePattern = @"(?<! Animation\s*){\s*(?<frame>[^\s]*\s*)}";
+            Match frameMatch = Regex.Match(animationContent, frameReferencePattern);
+            animation.FrameRef = frameMatch.Groups["frame"].Value;
             MatchCollection collection = Regex.Matches(animationContent, childObjectPatern);
             foreach (Match match in collection)
             {
@@ -350,7 +374,18 @@ namespace CipherPark.AngelJacket.Core.Utils
                 material.TextureFilename = match.Groups["TextureFilename"].Value;
 
             return material;
-        }       
+        }
+
+        private XFileMatrix ParseFrameTransformMatrix(string matrixContent, string name)
+        {
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
+            MatchCollection matches = Regex.Matches(matrixContent, valuesPattern);
+            XFileMatrix matrix = new XFileMatrix();
+            matrix.m = new float[16];
+            for (int i = 0; i < matrix.m.Length; i++)
+                matrix.m[i] = float.Parse(matches[i].Value);
+            return matrix;
+        }
 
         private XFileColorRGBA ParseColorRGBA(string rgbaContent)
         {          
@@ -444,14 +479,14 @@ namespace CipherPark.AngelJacket.Core.Utils
         public const string TemplateName = "Frame";
         private List<XFileMeshObject> _meshes = new List<XFileMeshObject>();
         private List<XFileFrameObject> _childFrames = new List<XFileFrameObject>();
-        private List<XFileAnimationObject> _animations = new List<XFileAnimationObject>();
-        private List<XFileAnimationSetObject> _animationSets = new List<XFileAnimationSetObject>();
+        //private List<XFileAnimationObject> _animations = new List<XFileAnimationObject>();
+        //private List<XFileAnimationSetObject> _animationSets = new List<XFileAnimationSetObject>();
 
         public XFileMatrix FrameTransformMatrix { get; set; }        
         public List<XFileMeshObject> Meshes { get { return _meshes; } }
         public List<XFileFrameObject> ChildFrames { get { return _childFrames; } }
-        public List<XFileAnimationObject> Animations { get { return _animations; } }
-        public List<XFileAnimationSetObject> AnimationSets { get { return _animationSets; } }
+    //    public List<XFileAnimationObject> Animations { get { return _animations; } }
+    //    public List<XFileAnimationSetObject> AnimationSets { get { return _animationSets; } }
     }
 
     public class XFileMeshObject : XFileDataObject
@@ -537,15 +572,17 @@ namespace CipherPark.AngelJacket.Core.Utils
     {
         public const string TemplateName = "Animation";
         private List<XFileAnimationKeyObject> _keys = new List<XFileAnimationKeyObject>();
+        public string FrameRef { get; set; }
         public XFileAnimationOptions? Options { get; set; }
         public List<XFileAnimationKeyObject> Keys { get { return _keys; } }
+        //public KeyType AnimationType { get { return _keys.Count > 0 ? _keys[0].KeyType : KeyType.Unknown; } }
     }
 
     public class XFileAnimationSetObject : XFileDataObject
     {
         public const string TemplateName = "AnimationSet";
         private List<XFileAnimationObject> _animations = new List<XFileAnimationObject>();
-        public List<XFileAnimationObject> Animations { get { return _animations; } }
+        public List<XFileAnimationObject> Animations { get { return _animations; } }        
     }
 
     public class XFileAnimationKeyObject : XFileDataObject
@@ -567,7 +604,8 @@ namespace CipherPark.AngelJacket.Core.Utils
         Rotation = 0,
         Scale = 1,
         Position = 2,
-        Matrix = 3
+        Matrix = 3,
+        Unknown = 4,
     }
 
     public enum VertexElementType
@@ -659,7 +697,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public struct XFileMatrix
     {
-        public float[] Matrix;
+        public float[] m;
     }
 
     public struct XFileVector
