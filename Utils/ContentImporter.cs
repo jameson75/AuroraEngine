@@ -272,7 +272,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     foreach(long time in matrixTransformKeys.Keys)                    
                         modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
 
-                    modelAnimationControllers.Add(new TransformAnimationController(app, modelAnimation, animationTarget));
+                    modelAnimationControllers.Add(new TransformAnimationController(modelAnimation, animationTarget));
                 }
             }
 

@@ -96,6 +96,7 @@
     <Compile Include="Effects\PostGlowEffect.cs" />
     <Compile Include="Effects\SHLightingEffect.cs" />
     <Compile Include="Effects\SkinnedEffectEx.cs" />
+    <Compile Include="Kinetics\Force.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
     <Compile Include="UI\Controls\CheckBox.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="World\Geometry\RingForm.cs" />
     <Compile Include="World\Geometry\TerrainForm.cs" />
     <Compile Include="World\Geometry\TurbineForm.cs" />
+    <Compile Include="Kinetics\IRigidBody.cs" />
     <Compile Include="World\ParticleSystem\Emitter.cs" />
     <Compile Include="World\ParticleSystem\ForceField.cs" />
     <Compile Include="World\ParticleSystem\Plexic.cs" />

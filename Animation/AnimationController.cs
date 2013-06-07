@@ -5,6 +5,7 @@ using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
+using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,39 +24,22 @@ namespace CipherPark.AngelJacket.Core.Animation
         void UpdateAnimation(long gameTime);
     }
 
-    public abstract class KeyframeAnimationController<TTarget, TAnimation> : IAnimationController
-    {
-        private IGameApp _game = null;        
-        protected KeyframeAnimationController(IGameApp game)
-        {
-            _game = game;
-        }
-        protected KeyframeAnimationController(IGameApp game, TAnimation animation, TTarget target)
-        {
-            _game = game;
-            Target = target;
-            Animation = animation;
-        }
-        public IGameApp Game { get { return _game; } } 
-        public TTarget Target { get; set; }
-        public TAnimation Animation { get; set; }
-        public abstract void Start();
-        public abstract void UpdateAnimation(long gameTime);
-    }
-
-    public class TransformAnimationController : KeyframeAnimationController<ITransformable, TransformAnimation>
+    public class TransformAnimationController : IAnimationController
     {
         private long? _animationStartTime = null;
 
-        public TransformAnimationController(IGameApp game) : base(game)
+        public TransformAnimationController() : base()
         { }
 
-        public TransformAnimationController(IGameApp game, TransformAnimation animation, ITransformable target)
-            : base(game, animation, target)
-        { }
+        public TransformAnimationController(TransformAnimation animation, ITransformable target)           
+        {   
+            Target = target;
+            Animation = animation;
+        }
 
         public override void Start()
         {
+         
             _animationStartTime = null;
         }
 
@@ -66,6 +50,10 @@ namespace CipherPark.AngelJacket.Core.Animation
             ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
             Target.Transform = Animation.GetValueAtT(timeT);
         }
+
+        public ITransformable Target { get; set; }
+
+        public TransformAnimation Animation { get; set; }
     }
 
     public class EmitterAnimationController : IAnimationController
@@ -80,6 +68,36 @@ namespace CipherPark.AngelJacket.Core.Animation
         public void UpdateAnimation(long gameTime)
         {
             throw new NotImplementedException();
+        }
+
+        #endregion
+    }
+
+    public class RigidBodyAnimationController : IAnimationController
+    {
+        #region IAnimationController Members     
+
+        public Motion Motion { get; set; } 
+
+        public IRigidBody Target { get; set; }
+        
+        public RigidBodyAnimationController()
+        { }
+       
+        public RigidBodyAnimationController(Motion motion, IRigidBody rigidBody)
+        {
+            Motion = motion;
+            Target = rigidBody;
+        }     
+
+        public void Start()
+        {
+           
+        }
+
+        public void UpdateAnimation(long gameTime)
+        {
+           
         }
 
         #endregion

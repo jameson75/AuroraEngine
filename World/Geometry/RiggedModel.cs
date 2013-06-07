@@ -36,18 +36,33 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// 
         /// </summary>
         public List<TransformAnimationController> Animation
-        { get { return _animationControllers; } } 
-        
+        { get { return _animationControllers; } }
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="startKeyFrame"></param>
+        /// <param name="poseTime"></param>
         /// <returns></returns>
-        public List<TransformAnimationController> GetAnimationClip(int startTime, int? endTime = null)
-        {
-            List<TransformAnimationController> clip = new List<TransformAnimationController>();
-            return clip;
-        }
+        public List<TransformAnimationController> CreatePose(ulong poseKeyTime, ulong transitionTimeSpan = 0)
+        {           
+            List<TransformAnimationController> result = new List<TransformAnimationController>();
+            List<Bone> boneList = Bones.CollapseHierarchy();
+            foreach (Bone bone in boneList)
+            {
+                TransformAnimation transitionAnimation = new TransformAnimation();
+                if (transitionTimeSpan > 0)
+                {
+                    AnimationKeyFrame startPoseKeyFrame = new AnimationKeyFrame(0, bone.Transform);
+                    transitionAnimation.SetKeyFrame(startPoseKeyFrame);
+                }
+                Transform endPoseTransform = (Transform)Animation.Find(c => c.Target == bone).Animation.GetActiveKeyFrameAtT(poseKeyTime).Value;
+                AnimationKeyFrame endPoseKeyFrame = new AnimationKeyFrame(transitionTimeSpan, endPoseTransform);             
+                transitionAnimation.SetKeyFrame(endPoseKeyFrame);
+                TransformAnimationController bonePoseController = new TransformAnimationController(transitionAnimation, bone);
+                result.Add(bonePoseController);
+            }
+            return result;
+        }       
     }
 
     /// <summary>
@@ -86,6 +101,21 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                         return this[i];
                 return null;
             }
+        }
+
+        public List<Bone> CollapseHierarchy()
+        {
+            List<Bone> list = new List<Bone>();
+            foreach (Bone bone in this)
+                BuildList(bone, list);
+            return list;
+        }
+
+        private void BuildList(Bone bone, List<Bone> list)
+        {
+            list.Add(bone);
+            foreach (Bone childBone in bone.Children)
+                BuildList(childBone, list);          
         }
     }  
 }
