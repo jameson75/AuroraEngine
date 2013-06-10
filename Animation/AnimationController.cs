@@ -37,18 +37,18 @@ namespace CipherPark.AngelJacket.Core.Animation
             Animation = animation;
         }
 
-        public override void Start()
-        {
-         
+        public void Start()
+        {         
             _animationStartTime = null;
         }
 
-        public override void UpdateAnimation(long gameTime)
+        public void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
             ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
-            Target.Transform = Animation.GetValueAtT(timeT);
+            if(Target != null && Animation != null)            
+                Target.Transform = Animation.GetValueAtT(timeT);
         }
 
         public ITransformable Target { get; set; }
@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         public TransformAnimation Animation { get; set; }
     }
 
-    public class EmitterAnimationController : IAnimationController
+    public class ParticleSystemAnimationController : IAnimationController
     {        
         #region IAnimationController Members
 
@@ -75,29 +75,38 @@ namespace CipherPark.AngelJacket.Core.Animation
 
     public class RigidBodyAnimationController : IAnimationController
     {
-        #region IAnimationController Members     
-
-        public Motion Motion { get; set; } 
+        private long? _animationStartTime = null;   
+        
+        public NetForce Motion { get; set; } 
 
         public IRigidBody Target { get; set; }
         
         public RigidBodyAnimationController()
         { }
        
-        public RigidBodyAnimationController(Motion motion, IRigidBody rigidBody)
+        public RigidBodyAnimationController(NetForce motion, IRigidBody rigidBody)
         {
             Motion = motion;
             Target = rigidBody;
         }     
 
+        #region IAnimationController Members   
+
         public void Start()
         {
-           
+            _animationStartTime = null;           
         }
 
         public void UpdateAnimation(long gameTime)
         {
-           
+            if (_animationStartTime == null)
+                _animationStartTime = gameTime;
+            ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
+            if (Target != null && Motion != null)
+            {
+                Target.Transform = Transform.Multiply(Target.Transform, Motion.GetTransformDeltaAtT(timeT));
+                Motion.RemoveImpulses();
+            }
         }
 
         #endregion

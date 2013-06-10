@@ -189,7 +189,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             
             //Read X-File Data
             //----------------
-            doc.Load(System.IO.File.ReadAllText(fileName));            
+            doc.Load(System.IO.File.ReadAllText(fileName));           
             
             //Access X-File's first mesh Data and it's frame
             //----------------------------------------------
@@ -213,31 +213,56 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
             //Construct model vertex indices from mesh data
             //----------------------------------------------
-            short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Cast<short>()).ToArray();
 
+            //short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Cast<short>()).ToArray();
+            short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Select( x => (short)x)).ToArray();
+           
             //Construct model skinning information from mesh data
             //---------------------------------------------------
             List<float>[] weights = new List<float>[_vertices.Length];
             List<int>[] boneIndices = new List<int>[_vertices.Length];
-            List<Bone> boneList = new List<Bone>();
+            List<string>[] boneNames = new List<string>[_vertices.Length];
+            List<Bone> boneList = new List<Bone>();          
             for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
-            {
-                XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];
+            {                
+                XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];               
                 Animation.Transform boneTransform = new Animation.Transform(new Matrix(xSkinWeights.MatrixOffset.m));
                 boneList.Add(new Bone() { Name = xSkinWeights.TransformNodeName, Transform = boneTransform });
                 for(int j = 0; j < xSkinWeights.NWeights; j++ )
                 {
                     int k = xSkinWeights.VertexIndices[j];
+                    
+                    if (boneIndices[k] == null) 
+                        boneIndices[k] = new List<int>();
                     boneIndices[k].Add(i);
-                    weights[k].Add(xSkinWeights.Weights[j]);                    
+                   
+                    if (weights[k] == null)
+                        weights[k] = new List<float>();                   
+                    weights[k].Add(xSkinWeights.Weights[j]);
+
+                    if (boneNames[k] == null)
+                        boneNames[k] = new List<string>();
+                    boneNames[k].Add(xSkinWeights.TransformNodeName);                   
                 }
             }
             for (int i = 0; i < _vertices.Length; i++)
             {               
                 float[] weightValues = new float[4] { 0, 0, 0, 0};
                 int[] boneIndicesValues = new int[4] { 0, 0, 0, 0 };
-                Array.Copy(weights, weightValues, weights.Length);
-                Array.Copy(boneIndices, boneIndicesValues, boneIndices.Length);
+                if(weights[i] != null)
+                {
+                    float[] _weights = weights[i].ToArray();
+                    Array.Copy(_weights, weightValues, _weights.Length);
+                }
+                if (boneIndices[i] != null)
+                {
+                    int[] _boneIndices = boneIndices[i].ToArray();
+                    Array.Copy(_boneIndices, boneIndicesValues, _boneIndices.Length);
+                }
+                if (boneNames[i] != null)
+                {
+                    string[] _boneNames = boneNames[i].ToArray();
+                }
                 _vertices[i].Weights = new Vector4(weightValues);
                 _vertices[i].BoneIndices = new Int4(boneIndicesValues);
             }
@@ -245,7 +270,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //Construct animation data from frame data
             //----------------------------------------
             //TODO: Remove hard coding.
-            XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[6];
+            XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[8];
             List<TransformAnimationController> modelAnimationControllers = new List<TransformAnimationController>();
             for( int i = 0; i < xAnimationSet.Animations.Count; i++)
             {
@@ -291,7 +316,8 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //----------------------------------------------------           
             XFileFrameObject currentXBoneFrame = xRootBoneFrame;               
             XFileFrameObject lastProcessedChild = null;
-            Stack<XFileFrameObject> xBoneFrameLineage = new Stack<XFileFrameObject>();            
+            Stack<XFileFrameObject> xBoneFrameLineage = new Stack<XFileFrameObject>();      
+            
             while (true)
             {
                 //********************************************************************************
@@ -300,7 +326,8 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 //implementing this iteratively.
                 //********************************************************************************
 
-                XFileFrameObject currentXBoneFrameParent = xBoneFrameLineage.Peek();
+                XFileFrameObject currentXBoneFrameParent = (xBoneFrameLineage.Count > 0) ? currentXBoneFrameParent = xBoneFrameLineage.Peek() : null;
+
                 if (currentXBoneFrameParent != null)
                 {
                     Bone currentBone = boneList.Find(b => b.Name == currentXBoneFrame.Name);

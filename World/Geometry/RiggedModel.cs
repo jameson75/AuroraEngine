@@ -9,6 +9,14 @@ using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     /// <summary>
@@ -43,10 +51,10 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// </summary>
         /// <param name="poseTime"></param>
         /// <returns></returns>
-        public List<TransformAnimationController> CreatePose(ulong poseKeyTime, ulong transitionTimeSpan = 0)
+        public List<TransformAnimationController> CreatePoseAnimation(ulong poseKeyTime, ulong transitionTimeSpan = 0)
         {           
             List<TransformAnimationController> result = new List<TransformAnimationController>();
-            List<Bone> boneList = Bones.CollapseHierarchy();
+            List<Bone> boneList = Bones.FlattenHierarchy();
             foreach (Bone bone in boneList)
             {
                 TransformAnimation transitionAnimation = new TransformAnimation();
@@ -103,7 +111,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public List<Bone> CollapseHierarchy()
+        public List<Bone> FlattenHierarchy()
         {
             List<Bone> list = new List<Bone>();
             foreach (Bone bone in this)

@@ -67,6 +67,9 @@ namespace CipherPark.AngelJacket.Core.Utils
                     //    dataObject = ParseAnimationObject(match.Groups["data"].Value, match.Groups["name"].Value);
                     //    //frame.Animations.Add((XFileAnimationObject)childObject);
                     //    break;
+                    case XFileAnimationTicksPerSecondObject.TemplateName:
+                        dataObject = ParseAnimationTicksPerSecond(match.Groups["data"].Value, match.Groups["name"].Value);
+                        break;
                     case XFileAnimationSetObject.TemplateName:
                         dataObject = ParseAnimationSetObject(match.Groups["data"].Value, match.Groups["name"].Value);
                         //frame.AnimationSets.Add((XFileAnimationSetObject)childObject);
@@ -76,6 +79,15 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
             else
                 return content.Length;
+        }
+
+        public XFileAnimationTicksPerSecondObject ParseAnimationTicksPerSecond(string content, string name)
+        {
+            string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
+            Match match = Regex.Match(content, valuesPattern);
+            XFileAnimationTicksPerSecondObject result = new XFileAnimationTicksPerSecondObject();
+            result.TicksPerSecond = int.Parse(match.Value);
+            return result;
         }
 
         public XFileFrameObject ParseFrameObject(string frameContent, string name)
@@ -158,7 +170,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             animationKey.Name = name;
             string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
             MatchCollection matches = Regex.Matches(animationKeyContent, valuesPattern);
-            animationKey.KeyType = (KeyType)int.Parse(matches[0].Value);
+            animationKey.KeyType = (KeyType)Math.Min(int.Parse(matches[0].Value), 3); //I've capped this to deal with an apparent bug in an exporter, which writes '4' for matrix keys.
             animationKey.NKeys = int.Parse(matches[1].Value);
             const int tfkOffset = 2;
             animationKey.TimedFloatKeys = new XFileTimedFloatKey[animationKey.NKeys];            
@@ -272,6 +284,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             string boneReferencePattern = @"""(?<bone>[^""]+)""";
             string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
             string childLessSkinWeightsContent = Regex.Replace(skinWeightsContent, boneReferencePattern, string.Empty);
+            skinWeights.TransformNodeName = Regex.Match(skinWeightsContent, boneReferencePattern).Groups["bone"].Value;
             MatchCollection matches = Regex.Matches(childLessSkinWeightsContent, valuesPattern);
             skinWeights.NWeights = int.Parse(matches[0].Value);
             skinWeights.VertexIndices = new int[skinWeights.NWeights];
@@ -282,6 +295,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             skinWeights.Weights = new float[skinWeights.NWeights];
             for (int i = 0; i < skinWeights.NWeights; i++)
                 skinWeights.Weights[i] = float.Parse(matches[i + weightsOffset].Value);
+            int matrixOffset = weightsOffset + skinWeights.NWeights;
+            XFileMatrix matrix = new XFileMatrix();
+            matrix.m = new float[16];
+            for (int i = 0; i < 16; i++)
+                matrix.m[i] = float.Parse(matches[i + matrixOffset].Value);
+            skinWeights.MatrixOffset = matrix;
             return skinWeights;
         }
 
@@ -462,6 +481,12 @@ namespace CipherPark.AngelJacket.Core.Utils
     public class XFileDataObject
     {
         public string Name { get; set; }
+    }
+
+    public class XFileAnimationTicksPerSecondObject : XFileDataObject
+    {
+        public const string TemplateName = "AnimTicksPerSecond";
+        public int TicksPerSecond { get; set; }
     }
 
     public class XFileMaterialObject : XFileDataObject
