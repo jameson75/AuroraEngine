@@ -67,6 +67,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         protected virtual void OnMeshChanged()
         { }
+
+        protected virtual void UpdateEffect(CoreEffect effect)
+        { }
     }
 
     public class BasicModel : Model
@@ -78,8 +81,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public override void Draw(long gameTime)
         {
-            if(Effect != null)
+            if (Effect != null)
+            {
+                UpdateEffect(Effect);
                 Effect.Apply();
+            }
             
             if (Mesh != null)
                 Mesh.Draw(gameTime);

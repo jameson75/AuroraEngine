@@ -18,8 +18,13 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.AngelJacket.Core.Effects
-{   
-    public class SkinnedEffectEx : Effect
+{
+    public interface ISkinEffect
+    {
+        public Matrix[] BoneTransforms { get; set; }
+    }
+
+    public class SkinnedEffectEx : Effect, ISkinEffect
     {
         private BasicSkinnedEffect _effect = null;
         private int _weightsPerVertex = 0;

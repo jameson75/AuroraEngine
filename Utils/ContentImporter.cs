@@ -184,7 +184,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
         {
-            SkinnedModel result = null;
+            RiggedModel result = null;
             XFileDocument doc = new XFileDocument();          
             
             //Read X-File Data
@@ -265,101 +265,74 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 }
                 _vertices[i].Weights = new Vector4(weightValues);
                 _vertices[i].BoneIndices = new Int4(boneIndicesValues);
-            }
-            
+            }                 
+
+            //Construct bone hierarchy (skeleton) from frame data
+            //----------------------------------------------------              
+            //****************************************************
+            //NOTE: It is assumed that
+            //there is only one bone at the root and, therefore,
+            //one bone-frame at the root level of the X-File
+            //****************************************************
+            //TODO: Remove hard coding.
+            XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
+            Frame rootFrame = new Frame() { Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
+            BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, boneList);           
+
             //Construct animation data from frame data
             //----------------------------------------
             //TODO: Remove hard coding.
             XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[8];
             List<TransformAnimationController> modelAnimationControllers = new List<TransformAnimationController>();
-            for( int i = 0; i < xAnimationSet.Animations.Count; i++)
+            List<Frame> frameList = rootFrame.FlattenToList();
+            for (int i = 0; i < xAnimationSet.Animations.Count; i++)
             {
                 XFileAnimationObject xAnimation = xAnimationSet.Animations[i];
-                Bone animationTarget = boneList.Find(b => b.Name == xAnimation.FrameRef);
-                if(animationTarget != null)
-                {       
-                    Dictionary<long, Matrix> matrixTransformKeys = new Dictionary<long,Matrix>();
-                    for(int j = 0; j < xAnimation.Keys.Count; j++)
+                Frame animationTarget = frameList.Find(f => f.Name == xAnimation.FrameRef);
+                if (animationTarget != null)
+                {
+                    Dictionary<long, Matrix> matrixTransformKeys = new Dictionary<long, Matrix>();
+                    for (int j = 0; j < xAnimation.Keys.Count; j++)
                     {
-                        XFileAnimationKeyObject xAnimationKey = xAnimation.Keys[j];                        
-                        switch(xAnimationKey.KeyType)
+                        XFileAnimationKeyObject xAnimationKey = xAnimation.Keys[j];
+                        switch (xAnimationKey.KeyType)
                         {
                             case KeyType.Matrix:
-                                for(int k = 0; k < xAnimationKey.NKeys; k++)
+                                for (int k = 0; k < xAnimationKey.NKeys; k++)
                                 {
-                                    matrixTransformKeys.Add(xAnimationKey.TimedFloatKeys[k].Time, 
+                                    matrixTransformKeys.Add(xAnimationKey.TimedFloatKeys[k].Time,
                                                             new Matrix(xAnimationKey.TimedFloatKeys[k].Values));
                                 }
                                 break;
                         }
-                    }                    
+                    }
                     TransformAnimation modelAnimation = new TransformAnimation();
-                    foreach(long time in matrixTransformKeys.Keys)                    
+                    foreach (long time in matrixTransformKeys.Keys)
                         modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
 
                     modelAnimationControllers.Add(new TransformAnimationController(modelAnimation, animationTarget));
                 }
             }
-
-            //****************************************************
-            //NOTE: From this point, forward, it is assumed that
-            //there is only one bone at the root and, therefore,
-            //one bone-frame at the root level of the X-File
-            //****************************************************
-
-            //Access bones frame data
-            //-----------------------
-            //TODO: Remove hard coding.
-            XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
-           
-            //Construct bone hierarchy (skeleton) from  frame data
-            //----------------------------------------------------           
-            XFileFrameObject currentXBoneFrame = xRootBoneFrame;               
-            XFileFrameObject lastProcessedChild = null;
-            Stack<XFileFrameObject> xBoneFrameLineage = new Stack<XFileFrameObject>();      
-            
-            while (true)
-            {
-                //********************************************************************************
-                //NOTE: This would probably look a lot simpler if this tree traversal were 
-                //implemented recursively. However, for some strange reason, I felt like 
-                //implementing this iteratively.
-                //********************************************************************************
-
-                XFileFrameObject currentXBoneFrameParent = (xBoneFrameLineage.Count > 0) ? currentXBoneFrameParent = xBoneFrameLineage.Peek() : null;
-
-                if (currentXBoneFrameParent != null)
-                {
-                    Bone currentBone = boneList.Find(b => b.Name == currentXBoneFrame.Name);
-                    Bone currentBoneParent = boneList.Find(b => b.Name == currentXBoneFrameParent.Name);
-                    currentBoneParent.Children.Add(currentBone);
-                    currentBone.Parent = currentBoneParent;
-                }
-
-                int lastProcessedChildIndex = (lastProcessedChild == null) ? -1 : currentXBoneFrame.ChildFrames.IndexOf(lastProcessedChild);
-                if (lastProcessedChildIndex < currentXBoneFrame.ChildFrames.Count - 1)
-                {
-                    xBoneFrameLineage.Push(currentXBoneFrame);
-                    currentXBoneFrame = currentXBoneFrame.ChildFrames[lastProcessedChildIndex + 1];
-                    lastProcessedChild = null;
-                }
-                else
-                {
-                    lastProcessedChild = currentXBoneFrame;
-                    currentXBoneFrame = xBoneFrameLineage.Pop();
-                }
-
-                if (currentXBoneFrame == xRootBoneFrame)
-                    break;
-            }
             
             //Create and return model
             //-----------------------
-            result = new SkinnedModel(app);
+            result = new RiggedModel(app);
             result.Mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
-            result.Bones.AddRange(boneList.Where(b => b.Parent == null));
+            result.Bones.AddRange(boneList);
+            result.FrameTree = rootFrame;
             result.Animation.AddRange(modelAnimationControllers);            
             return result;
+        }
+
+        private static void BuildBoneFrameHierarchy(XFileFrameObject xFrame, Frame frame, List<Bone> bones)
+        {
+            foreach (XFileFrameObject childXFrame in xFrame.ChildFrames)
+            {
+                Bone bone = bones.Find(b => b.Name == childXFrame.Name);
+                Frame newChildFrame = new Frame() { Name = bone.Name, Reference = bone };
+                frame.Children.Add(newChildFrame);
+                BuildBoneFrameHierarchy(childXFrame, newChildFrame, bones);
+            }
         }
     }
   

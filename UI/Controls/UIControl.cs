@@ -27,6 +27,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private UIControlCollection _children = null;
         private DrawingSizeF _size = DrawingSizeFExtension.Zero;
         private DrawingPointF _position = DrawingPointFExtension.Zero;
+        private UIControl _parent = null;
        
         #endregion
 
@@ -192,7 +193,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public virtual RectangleF ClientRectangle { get { return new RectangleF(0, 0, this.Size.Width, this.Size.Height); } }
         public DrawingSizeF Padding { get; set; }
         public DrawingSizeF Margin { get; set; }
-        public UIControl Parent { get; set; }
+        public UIControl Parent
+        {
+            get { return _parent; }
+            set
+            {
+                if (_parent != null && _parent.Children.Contains(this))
+                    _parent.Children.Remove(this);
+                _parent = value;
+                if (_parent != null && !_parent.Children.Contains(this))
+                    _parent.Children.Add(this);
+                OnParentChanged();
+            }
+        }
+
         public UIControlCollection Children { get { return _children; } }
         public VerticalAlignment VerticalAlignment { get; set; }
         public HorizontalAlignment HorizontalAlignment { get; set; }
@@ -358,6 +372,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             EventHandler handler = EffectChanged;
             if (handler != null)
                 handler(this, EventArgs.Empty);
+        }     
+
+        protected virtual void OnParentChanged()
+        {
+            EventHandler handler = ParentChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
         }
 
         public event EventHandler LayoutChanged;
@@ -368,6 +389,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public event EventHandler PaddingChanged;
         public event EventHandler MarginChanged;
         public event EventHandler EffectChanged;
+        public event EventHandler ParentChanged;
 
         #endregion
     }

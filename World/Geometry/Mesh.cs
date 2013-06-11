@@ -23,6 +23,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private InputLayout _vertexLayout = null;
         private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;
 
+        public string Name { get; set; }
+
         public BoundingBox BoundingBox { get; private set; }
 
         public Mesh(IGameApp app, MeshDescription meshDescription)
