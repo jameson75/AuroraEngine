@@ -15,6 +15,26 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         private IntPtr _nativeObject = IntPtr.Zero;
         private Device _device = null;
 
+        public BasicSkinnedEffect(Device device)
+        {
+            _device = device;
+            _nativeObject = UnsafeNativeMethods.New(device.NativePointer);
+        }
+
+        ~BasicSkinnedEffect()
+        {
+            Delete();
+        }
+
+        private void Delete()
+        {
+            if (_nativeObject != IntPtr.Zero)
+            {
+                UnsafeNativeMethods.Delete(_nativeObject);
+                _nativeObject = IntPtr.Zero;
+            }
+        }
+
         public IntPtr NativeObject
         {
             get { return _nativeObject; }
@@ -147,12 +167,12 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public void SetBoneTransforms(Matrix[] bones)
         {
             IntPtr _bonesPtr = Marshal.AllocHGlobal(bones.Length * sizeof(float) * 16);
-            for (int i = 0; i < bones.Length; )
+            for (int i = 0; i < bones.Length; i++ )
             {
                 float[] boneValues = bones[i].ToArray();
                 for (int j = 0; j < boneValues.Length; j++)
                 {
-                    byte[] valueBytes = BitConverter.GetBytes(boneValues[i]);
+                    byte[] valueBytes = BitConverter.GetBytes(boneValues[j]);
                     for (int k = 0; k < valueBytes.Length; k++)
                     {
                         //**********************************************************************************

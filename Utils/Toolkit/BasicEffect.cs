@@ -25,8 +25,13 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             _device = device;
             _nativeObject = UnsafeNativeMethods.New(device.NativePointer);           
         }
-       
-        public  void Delete()
+
+        ~BasicEffect()
+        {
+            Delete();
+        }
+
+        private void Delete()
         {
             if (_nativeObject != IntPtr.Zero)
             {

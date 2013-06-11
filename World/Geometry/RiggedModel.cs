@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using SharpDX;
+using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
-
+using CipherPark.AngelJacket.Core.Effects;
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
 // Company: Cipher Park
@@ -79,11 +81,26 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 }
             }
             return result;
-        }
+        }      
 
-        public override void Draw(long gameTime)
+        protected override void UpdateEffect(Effect effect)
         {
-            base.Draw(gameTime);
+            ISkinEffect skinEffect = effect as ISkinEffect;
+            if (skinEffect != null)
+            {
+                if (FrameTree != null)
+                {
+                    List<Frame> frameList = this.FrameTree.FlattenToList();
+                    Matrix[] boneMatrices = new Matrix[Bones.Count];
+                    for (int i = 0; i < Bones.Count; i++ )
+                    {
+                        Frame frame = frameList.Find( f => f.Reference == Bones[i] );
+                        boneMatrices[i] = Transform.Multiply(Bones[i].Transform, frame.LocalToWorld(frame.Transform)).ToMatrix();
+                    }
+                    skinEffect.BoneTransforms = boneMatrices;     
+                }
+            }
+            base.UpdateEffect(effect);
         }
     }
 
@@ -116,8 +133,14 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class Frame : ITransformable
     {
         private Frames _children = null;
-        private Frame _parent = null;        
-       
+        private Frame _parent = null;
+
+        public Frame()
+        {
+            _children = new Frames();
+            Transform = Transform.Identity;
+        }
+
         public string Name { get; set; }
         
         public object Reference { get; set; }
@@ -152,6 +175,32 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             List<Frame> results = new List<Frame>();
             _BuildFlattenedTree(this, results);
             return results;
+        }
+
+        public Transform LocalToWorld(Transform localTransform)
+        {
+            TransformStack stack = new TransformStack();
+            stack.Push(localTransform);
+            Frame frame = this.Parent;
+            while (frame != null)
+            {
+                stack.Push(frame.Transform);
+                frame = frame.Parent;
+            }
+            return stack.Transform;
+        }
+
+        public Transform WorldToLocal(Transform worldTransform)
+        {
+            TransformStack stack = new TransformStack();
+            stack.Push(worldTransform);
+            Frame frame = this.Parent;
+            while (frame != null)
+            {
+                stack.Push(Animation.Transform.Invert(frame.Transform));
+                frame = frame.Parent;
+            }
+            return stack.ReverseTransform;
         }
 
         private static void _BuildFlattenedTree(Frame frame, List<Frame> results)

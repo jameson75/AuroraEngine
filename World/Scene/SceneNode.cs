@@ -66,18 +66,18 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public virtual void Update(long gameTime) { }
 
-        public Matrix LocalToWorld(Matrix localTransform)
-        {
-            MatrixStack stack = new MatrixStack();
-            stack.Push(localTransform);
-            SceneNode node = this.Parent;
-            while (node != null)
-            {
-                stack.Push(node.Transform.ToMatrix());
-                node = node.Parent;
-            }
-            return stack.Transform;
-        }
+        //public Matrix LocalToWorld(Matrix localTransform)
+        //{
+        //    MatrixStack stack = new MatrixStack();
+        //    stack.Push(localTransform);
+        //    SceneNode node = this.Parent;
+        //    while (node != null)
+        //    {
+        //        stack.Push(node.Transform.ToMatrix());
+        //        node = node.Parent;
+        //    }
+        //    return stack.Transform;
+        //}
 
         public Transform LocalToWorld(Transform localTransform)
         {

@@ -146,7 +146,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             XFileAnimationObject animation = new XFileAnimationObject();
             animation.Name = name;
             string childObjectPatern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";             
-            string frameReferencePattern = @"(?<! Animation\s*){\s*(?<frame>[^\s]*\s*)}";
+            string frameReferencePattern = @"(?<! Animation\s*){\s*(?<frame>[^\s]*)\s*}";
             Match frameMatch = Regex.Match(animationContent, frameReferencePattern);
             animation.FrameRef = frameMatch.Groups["frame"].Value;
             MatchCollection collection = Regex.Matches(animationContent, childObjectPatern);

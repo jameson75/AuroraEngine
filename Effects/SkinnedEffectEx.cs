@@ -21,7 +21,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 {
     public interface ISkinEffect
     {
-        public Matrix[] BoneTransforms { get; set; }
+        Matrix[] BoneTransforms { get; set; }
     }
 
     public class SkinnedEffectEx : Effect, ISkinEffect
@@ -31,7 +31,9 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public SkinnedEffectEx(Device graphicsDevice)
             : base(graphicsDevice)
-        { }
+        {
+            _effect = new BasicSkinnedEffect(graphicsDevice);
+        }
 
         public Matrix[] BoneTransforms { get; set; }
 
@@ -48,6 +50,16 @@ namespace CipherPark.AngelJacket.Core.Effects
                 _effect.SetWeightsPerVertex(value);
                 _weightsPerVertex = value;
             }
+        }
+
+        public void EnableDefaultLighting()
+        {
+            _effect.EnableDefaultLighting();
+        }
+
+        public override byte[] SelectShaderByteCode()
+        {
+            return _effect.SelectShaderByteCode();
         }
 
         public override void Apply()

@@ -276,7 +276,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //****************************************************
             //TODO: Remove hard coding.
             XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
-            Frame rootFrame = new Frame() { Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
+            Frame rootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
             BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, boneList);           
 
             //Construct animation data from frame data
@@ -329,7 +329,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             foreach (XFileFrameObject childXFrame in xFrame.ChildFrames)
             {
                 Bone bone = bones.Find(b => b.Name == childXFrame.Name);
-                Frame newChildFrame = new Frame() { Name = bone.Name, Reference = bone };
+                Frame newChildFrame = new Frame() { Name = childXFrame.Name, Transform = new Transform(new Matrix(childXFrame.FrameTransformMatrix.m)) };
+                if (bone != null)
+                    newChildFrame.Reference = bone;
                 frame.Children.Add(newChildFrame);
                 BuildBoneFrameHierarchy(childXFrame, newChildFrame, bones);
             }
