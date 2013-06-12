@@ -18,7 +18,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 {
     /// <summary>
     /// 
-    /// </summary>
+    /// </summary>    
     public class XFileDocument
     {        
         private List<XFileDataObject> dataObjects = new List<XFileDataObject>();
