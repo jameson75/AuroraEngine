@@ -21,6 +21,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class ModelSceneNode : SceneNode
     {
+        Transform _cachedTransform = Transform.Identity;
+        Model _model = null;
+
         public ModelSceneNode(IGameApp game)
             : base(game)
         {
@@ -38,7 +41,23 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public bool HitTestable { get; set; }
 
-        public override Transform Transform { get { return Model.Transform; } set { Model.Transform = value; } }
+        public override Transform Transform 
+        { 
+            get 
+            {
+                if (Model != null)
+                    return Model.Transform;
+                else
+                    return Transform.Identity;
+            }
+            set 
+            {
+                if (Model != null)
+                    Model.Transform = value;
+                else
+                    _cachedTransform = value;
+            }
+        }
 
         public override BoundingBox Bounds
         {

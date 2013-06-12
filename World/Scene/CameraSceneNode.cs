@@ -21,7 +21,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class CameraSceneNode : SceneNode
     {
-        private Matrix _cachedViewMatrix = Matrix.Zero;
+        private Transform _cachedTransform = Transform.Identity;
+   
 
         public CameraSceneNode(IGameApp game)
             : base(game)
@@ -35,41 +36,53 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public SceneNode LockOnTarget { get; set; }
 
-        public Camera Camera { get; set; }  
+        public Camera Camera
+        {
+            get;
+            set;
+        }
 
         public override Transform Transform
         {
             get
             {
-                return Camera.ViewToTransform(Camera.ViewMatrix);
+                if (Camera != null)
+                    return Camera.ViewToTransform(Camera.ViewMatrix);
+                else
+                    return _cachedTransform;
             }
             set
             {
-                //***************************************************************************************
-                //Commented out because it sets the camera's view matrix in world-space... 
-                //we want the Transform to represent the view matrix the camera's local-space, instead.
-                //****************************************************************************************
-                //if (LockOnTarget != null)
-                //{
-                //    Matrix specifiedNewView = Camera.TransformToView(value);
-                //    Vector3 up = new Vector3(specifiedNewView.Column2.ToArray().Take(3).ToArray());
-                //    Vector3 lookAt = LockOnTarget.LocalToWorld(LockOnTarget.Transform).Translation;
-                //    Vector3 eye = LocalToWorld(value).Translation;
-                //    Camera.ViewMatrix = Matrix.LookAtLH(eye, lookAt, up);
-                //}
-                //else
-                //    Camera.ViewMatrix = Camera.TransformToView(LocalToWorld(value));
-
-                if (LockOnTarget != null)
+                if (Camera != null)
                 {
-                    Matrix specifiedNewView = Camera.TransformToView(value);
-                    Vector3 up = new Vector3(specifiedNewView.Column2.ToArray().Take(3).ToArray());
-                    Vector3 lookAt = WorldToLocal(LockOnTarget.LocalToWorld(LockOnTarget.Transform)).Translation;
-                    Vector3 eye = value.Translation;
-                    Camera.ViewMatrix = Matrix.LookAtLH(eye, lookAt, up);
+                    //***************************************************************************************
+                    //Commented out because it sets the camera's view matrix in world-space... 
+                    //we want the Transform to represent the view matrix the camera's local-space, instead.
+                    //****************************************************************************************
+                    //if (LockOnTarget != null)
+                    //{
+                    //    Matrix specifiedNewView = Camera.TransformToView(value);
+                    //    Vector3 up = new Vector3(specifiedNewView.Column2.ToArray().Take(3).ToArray());
+                    //    Vector3 lookAt = LockOnTarget.LocalToWorld(LockOnTarget.Transform).Translation;
+                    //    Vector3 eye = LocalToWorld(value).Translation;
+                    //    Camera.ViewMatrix = Matrix.LookAtLH(eye, lookAt, up);
+                    //}
+                    //else
+                    //    Camera.ViewMatrix = Camera.TransformToView(LocalToWorld(value));
+
+                    if (LockOnTarget != null)
+                    {
+                        Matrix specifiedNewView = Camera.TransformToView(value);
+                        Vector3 up = new Vector3(specifiedNewView.Column2.ToArray().Take(3).ToArray());
+                        Vector3 lookAt = WorldToLocal(LockOnTarget.LocalToWorld(LockOnTarget.Transform)).Translation;
+                        Vector3 eye = value.Translation;
+                        Camera.ViewMatrix = Matrix.LookAtLH(eye, lookAt, up);
+                    }
+                    else
+                        Camera.ViewMatrix = Camera.TransformToView(value);
                 }
                 else
-                    Camera.ViewMatrix = Camera.TransformToView(value);
+                    _cachedTransform = value;
             }
         }
     }

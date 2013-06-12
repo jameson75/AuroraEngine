@@ -38,7 +38,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             _game = game;
             _children = new SceneNodes();
             _children.CollectionChanged += Children_CollectionChanged;
-           // Transform = Transform.Identity;
+            Transform = Transform.Identity;
         }
 
         public SceneNode(IGameApp game, string name)
