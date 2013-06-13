@@ -28,7 +28,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {
         private Bones _bones = new Bones();
        
-        private List<TransformAnimationController> _animationControllers = new List<TransformAnimationController>();
+        private List<KeyframeAnimationController> _animationControllers = new List<KeyframeAnimationController>();
 
         /// <summary>
         /// 
@@ -51,7 +51,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// <summary>
         /// 
         /// </summary>
-        public List<TransformAnimationController> Animation
+        public List<KeyframeAnimationController> Animation
         { get { return _animationControllers; } }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// </summary>
         /// <param name="poseTime"></param>
         /// <returns></returns>
-        public List<TransformAnimationController> CreatePoseAnimation(ulong poseKeyTime, ulong transitionTimeSpan = 0)
+        public List<KeyframeAnimationController> CreatePoseAnimation(ulong poseKeyTime, ulong transitionTimeSpan = 0)
         {           
-            List<TransformAnimationController> result = new List<TransformAnimationController>();
+            List<KeyframeAnimationController> result = new List<KeyframeAnimationController>();
             if (FrameTree != null)
             {
                 List<Frame> frameList = FrameTree.FlattenToList();
@@ -76,7 +76,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     Transform endPoseTransform = (Transform)Animation.Find(a => a.Target == frame).Animation.GetActiveKeyFrameAtT(poseKeyTime).Value;
                     AnimationKeyFrame endPoseKeyFrame = new AnimationKeyFrame(transitionTimeSpan, endPoseTransform);
                     transitionAnimation.SetKeyFrame(endPoseKeyFrame);
-                    TransformAnimationController bonePoseController = new TransformAnimationController(transitionAnimation, frame);
+                    KeyframeAnimationController bonePoseController = new KeyframeAnimationController(transitionAnimation, frame);
                     result.Add(bonePoseController);
                 }
             }

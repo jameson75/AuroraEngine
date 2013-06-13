@@ -283,7 +283,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //----------------------------------------
             //TODO: Remove hard coding.
             XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[8];
-            List<TransformAnimationController> modelAnimationControllers = new List<TransformAnimationController>();
+            List<KeyframeAnimationController> modelAnimationControllers = new List<KeyframeAnimationController>();
             List<Frame> frameList = rootFrame.FlattenToList();
             for (int i = 0; i < xAnimationSet.Animations.Count; i++)
             {
@@ -310,7 +310,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     foreach (long time in matrixTransformKeys.Keys)
                         modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
 
-                    modelAnimationControllers.Add(new TransformAnimationController(modelAnimation, animationTarget));
+                    modelAnimationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
                 }
             }
             

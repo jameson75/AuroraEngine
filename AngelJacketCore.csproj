@@ -180,6 +180,7 @@
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="Animation\Animation.cs" />
+    <Compile Include="World\Geometry\Edge.cs" />
     <Compile Include="World\Geometry\Form.cs" />
     <Compile Include="World\Geometry\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />

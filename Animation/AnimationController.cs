@@ -24,14 +24,14 @@ namespace CipherPark.AngelJacket.Core.Animation
         void UpdateAnimation(long gameTime);
     }
 
-    public class TransformAnimationController : IAnimationController
+    public class KeyframeAnimationController : IAnimationController
     {
         private long? _animationStartTime = null;
 
-        public TransformAnimationController() : base()
+        public KeyframeAnimationController() : base()
         { }
 
-        public TransformAnimationController(TransformAnimation animation, ITransformable target)           
+        public KeyframeAnimationController(TransformAnimation animation, ITransformable target)           
         {   
             Target = target;
             Animation = animation;
