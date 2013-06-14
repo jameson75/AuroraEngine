@@ -10,14 +10,12 @@ using System.Collections.Specialized;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public abstract class Form : BasicModel
+    public abstract class Form : Model
     {
         private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();            
 
         public Form(IGameApp game) : base(game)
-        {
-            
-        }
+        { }
 
         public override void Draw(long gameTime)
         {
