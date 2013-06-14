@@ -21,8 +21,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class ModelSceneNode : SceneNode
     {
-        Transform _cachedTransform = Transform.Identity;
-        Model _model = null;
+        Transform _cachedTransform = Transform.Identity;       
 
         public ModelSceneNode(IGameApp game)
             : base(game)

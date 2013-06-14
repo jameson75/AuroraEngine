@@ -14,13 +14,22 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {
         public Vector3 P1;
         public Vector3 P2;
-
-        public Edge(Vector3 p1, Vector3 p2)
-        {
-            P1 = p1;
-            P2 = p2;
-        }
     }
 
-    public class Edges : List<Edge> { }
+    public class Edges
+    {       
+        private List<Vector3> _data = new List<Vector3>();
+        private EdgeDataLayout _layout;
+        public Edges(EdgeDataLayout layout)
+        {
+            _layout = layout;
+        }
+        public List<Vector3> Data { get { return _data; } }        
+    }
+
+    public enum EdgeDataLayout
+    {
+        List,
+        Strip
+    }
 }
