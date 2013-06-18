@@ -16,7 +16,7 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class TransformAnimation : Animation
+    public class TransformAnimation : KeyframeAnimation
     {
         public TransformAnimation()
         { }

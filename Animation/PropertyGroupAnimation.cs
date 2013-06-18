@@ -45,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             return Animations[propertyName].GetPreviousKeyFrame(keyFrame);
         }
 
-        protected void AddPropertyAnimation(string propertyName, Animation animation)
+        protected void AddPropertyAnimation(string propertyName, KeyframeAnimation animation)
         {
             if (TargetPropertyExists(propertyName))
                 throw new InvalidOperationException("The target property already exists for this effect");
@@ -108,7 +108,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             return (Animations.ContainsKey(propertyName));
         }
 
-        private class PropertyAnimations : SortedList<string, Animation>
+        private class PropertyAnimations : SortedList<string, KeyframeAnimation>
         { }
     }
 }

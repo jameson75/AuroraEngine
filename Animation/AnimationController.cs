@@ -58,6 +58,7 @@ namespace CipherPark.AngelJacket.Core.Animation
 
     public class ParticleSystemAnimationController : IAnimationController
     {        
+        private long? _animationStartTime = null;
         #region IAnimationController Members
 
         public void Start()
@@ -67,7 +68,16 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public void UpdateAnimation(long gameTime)
         {
-            throw new NotImplementedException();
+            if (_animationStartTime == null)
+                _animationStartTime = gameTime;
+
+            foreach (Emission emission in this.Emissions)
+            {
+                if (!emission.Emitted && emission.EmitTime >= _animationStartTime)
+                {
+                    
+                }
+            }                
         }
 
         #endregion

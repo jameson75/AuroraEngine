@@ -9,7 +9,7 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class DrawingSizeAnimation : Animation
+    public class DrawingSizeAnimation : KeyframeAnimation
     {
         public DrawingSizeF GetValueAtT(ulong t)
         {

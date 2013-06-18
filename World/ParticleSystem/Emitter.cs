@@ -34,19 +34,22 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         
         public ParticleDescription ParticleDescription { get; set; }        
        
-        public void Emit()
+        public Particle Emit()
         {
-            Particle p = Spawn(ParticleDescription);
+            return Emit(ParticleDescription);
+        }
+
+        public Particle Emit(ParticleDescription pd)
+        {
+            Particle p = Spawn(pd);
             _particles.Add(p);
+            return p;
         }
 
-        public void Update(long gameTime)
+        public virtual void Update(long gameTime)
         {
-            if (ParticleDescription.BirthRate != 0)
-            {
-
-            }
-        }
+          
+        }   
 
         private static Particle Spawn(ParticleDescription description)
         {
@@ -73,9 +76,38 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         public Texture2D Texture { get; set; }
     }
 
-    public class Particle
+    public class Particle : ITransformable
+    {
+        #region ITransformable Members
+
+        public Transform Transform
+        {
+            get;
+            set;
+        }
+
+        #endregion
+    }
+
+    public interface IParticleSystemSolver
     {
 
     }
+
+    public class VaccumSolver : IParticleSystemSolver
+    {
+
+    }
+
+    public class KeyframeSolver : IParticleSystemSolver
+    {
+
+    }
+
+    public class FluidSolver : IParticleSystemSolver 
+    {
+
+    }
+
 }
     

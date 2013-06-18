@@ -19,21 +19,21 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// <summary>
     /// Provides base functionality for all animation types.
     /// </summary>
-    public abstract class Animation
+    public abstract class KeyframeAnimation
     {
         private AnimationKeyFrames _keyFrames = new AnimationKeyFrames();
 
         /// <summary>
         /// Constructs an Animation object with an empty list of key frames.
         /// </summary>
-        protected Animation()
+        protected KeyframeAnimation()
         { }
 
         /// <summary>
         /// Constructs an Animation object and initializes it with the specified keyframes.
         /// </summary>
         /// <param name="keyFrames">Set of key frames used to initialize this object.</param>
-        protected Animation(IEnumerable<AnimationKeyFrame> keyFrames)
+        protected KeyframeAnimation(IEnumerable<AnimationKeyFrame> keyFrames)
         {
             foreach (AnimationKeyFrame keyFrame in keyFrames)
                 _keyFrames.Add(keyFrame.Time, keyFrame);

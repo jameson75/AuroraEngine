@@ -8,7 +8,7 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class FloatAnimation : Animation
+    public class FloatAnimation : KeyframeAnimation
     {
         public float GetValueAtT(ulong t)
         {

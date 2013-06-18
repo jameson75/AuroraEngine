@@ -8,7 +8,7 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class StringAnimation : Animation
+    public class StringAnimation : KeyframeAnimation
     {
         public string GetValueAtT(ulong t)
         {

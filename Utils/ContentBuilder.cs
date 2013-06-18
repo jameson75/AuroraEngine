@@ -66,14 +66,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             verts[3] = new BasicVertexPositionNormalTexture(positions[3], Vector3.UnitY, _textureCoords[2]);                 
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
-        }
-
-        public static Edges BuildQuadEdges(Rectangle dimension)
-        {
-            Edges edges = new Edges(EdgeDataLayout.Strip);
-            edges.Data.AddRange(CreateQuadPoints(dimension));
-            return edges;
-        }
+        }       
 
         private static Vector3[] CreateQuadPoints(Rectangle dimension)
         {
@@ -137,14 +130,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             verts[2] = new BasicVertexPositionNormalTexture(positions[2], Vector3.UnitY, _textureCoords[2]);           
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
-        }
-
-        public static Edges BuildTriangleEdges(Rectangle dimensions)
-        {
-            Edges edges = new Edges(EdgeDataLayout.Strip);
-            edges.Data.AddRange(CreateTrianglePoints(dimensions));
-            return edges;
-        }
+        }       
 
         private static Vector3[] CreateTrianglePoints(Rectangle dimension)
         {
@@ -201,13 +187,6 @@ namespace CipherPark.AngelJacket.Core.Utils
             verts[5] = new BasicVertexPositionNormalTexture(positions[5], Vector3.UnitY, _textureCoords[5]);           
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
-        }
-
-        public static Edges BuildHexagonEdges(Rectangle dimension)
-        {
-            Edges edges = new Edges(EdgeDataLayout.Strip);
-            edges.Data.AddRange(CreateHexagonPoints(dimension));
-            return edges;
         }
 
         private static Vector3[] CreateHexagonPoints(Rectangle dimension)

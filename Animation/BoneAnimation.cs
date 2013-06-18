@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class BoneAnimation : Animation
+    public class BoneAnimation : KeyframeAnimation
     {
         public BoneAnimation()
         { }
