@@ -23,6 +23,7 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
     public class Emitter
     {
         private List<Particle> _particles = new List<Particle>();
+        private List<ParticleLink> _links = new List<ParticleLink>();
 
         public Transform Transform { get; set; } 
         
@@ -32,11 +33,15 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         
         public float EmissionRangeYaw { get; set; }
         
-        public ParticleDescription ParticleDescription { get; set; }        
-       
+        public ParticleDescription DefaultParticleDescription { get; set; }
+
+        public List<Particle> Particles { get { return _particles; } }
+
+        public List<ParticleLink> Links { get { return _links; } }
+
         public Particle Emit()
         {
-            return Emit(ParticleDescription);
+            return Emit(DefaultParticleDescription);
         }
 
         public Particle Emit(ParticleDescription pd)
@@ -46,17 +51,18 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
             return p;
         }
 
-        public virtual void Update(long gameTime)
-        {
-          
-        }   
-
         private static Particle Spawn(ParticleDescription description)
         {
             Particle p = new Particle();
             return p;
-        }
-    }
+        }  
+    } 
+
+    public class ParticleLink
+    {
+        Particle P1 { get; set; }
+        Particle P2 { get; set; }
+    }    
 
     public class ParticleDescription
     {
@@ -88,26 +94,5 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
 
         #endregion
     }
-
-    public interface IParticleSystemSolver
-    {
-
-    }
-
-    public class VaccumSolver : IParticleSystemSolver
-    {
-
-    }
-
-    public class KeyframeSolver : IParticleSystemSolver
-    {
-
-    }
-
-    public class FluidSolver : IParticleSystemSolver 
-    {
-
-    }
-
 }
     

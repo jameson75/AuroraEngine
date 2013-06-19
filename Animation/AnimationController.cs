@@ -18,12 +18,18 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IAnimationController
     {       
         void Start();
         void UpdateAnimation(long gameTime);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class KeyframeAnimationController : IAnimationController
     {
         private long? _animationStartTime = null;
@@ -56,33 +62,31 @@ namespace CipherPark.AngelJacket.Core.Animation
         public TransformAnimation Animation { get; set; }
     }
 
-    public class ParticleSystemAnimationController : IAnimationController
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ParticleAnimationController : IAnimationController
     {        
         private long? _animationStartTime = null;
         #region IAnimationController Members
 
         public void Start()
         {
-            throw new NotImplementedException();
+            
         }
 
         public void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
-                _animationStartTime = gameTime;
-
-            foreach (Emission emission in this.Emissions)
-            {
-                if (!emission.Emitted && emission.EmitTime >= _animationStartTime)
-                {
-                    
-                }
-            }                
+                _animationStartTime = gameTime;        
         }
 
         #endregion
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RigidBodyAnimationController : IAnimationController
     {
         private long? _animationStartTime = null;   
@@ -107,7 +111,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             _animationStartTime = null;           
         }
 
-        public void UpdateAnimation(long gameTime)
+        public virtual void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;

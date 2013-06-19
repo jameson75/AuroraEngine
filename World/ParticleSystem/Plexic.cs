@@ -20,22 +20,6 @@ using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.ParticleSystem
 {
-    public class PlexicEmitter : Emitter
-    {
-        public List<PlexicLink> _links = new List<PlexicLink>();
-
-        public override void Update(long gameTime)
-        {
-            
-        }
-    }
-
-    public class PlexicLink
-    {
-        Particle P1 { get; set; }
-        Particle P2 { get; set; }
-    }    
-
     //public class PlexicEmitter
     //{        
     //    private List<Vector3> _litVertices = new List<Vector3>();
