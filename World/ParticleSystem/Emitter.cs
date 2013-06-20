@@ -51,17 +51,29 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
             return p;
         }
 
+        public void KillAll()
+        {
+            _particles.Clear();
+            _links.Clear();
+        }
+
+        public void Kill(Particle p)
+        {
+            _particles.Remove(p);
+            _links.RemoveAll(e => e.P1 == p || e.P2 == p);
+        }
+
         private static Particle Spawn(ParticleDescription description)
         {
             Particle p = new Particle();
             return p;
-        }  
+        }   
     } 
 
     public class ParticleLink
     {
-        Particle P1 { get; set; }
-        Particle P2 { get; set; }
+        public Particle P1 { get; set; }
+        public Particle P2 { get; set; }
     }    
 
     public class ParticleDescription
@@ -93,6 +105,24 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         }
 
         #endregion
+    }
+
+    public class Emission
+    {
+        public ulong Time { get; set; }        
+        public ParticleDescription EmitParticleDescription { get; set; }
+        public Particle Particle1 { get; set; }
+        public Particle Particle2 { get; set; }
+        [Flags]
+        public enum EmissionTask
+        {
+            Emit =          0x01,
+            EmitDefault =   0x02,
+            Kill =          0x04,
+            KillAll =       0x08,
+            Link =          0x10
+        }
+        public EmissionTask Tasks { get; set; }
     }
 }
     

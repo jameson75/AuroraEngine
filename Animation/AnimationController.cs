@@ -7,6 +7,7 @@ using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.AngelJacket.Core.World.ParticleSystem;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -60,6 +61,31 @@ namespace CipherPark.AngelJacket.Core.Animation
         public ITransformable Target { get; set; }
 
         public TransformAnimation Animation { get; set; }
+    }
+
+    public class EmitterAnimationController : IAnimationController
+    {
+        public Emitter Target { get; set; }
+
+        public void Start()
+        {
+            
+        }
+
+        public void UpdateAnimation(long gameTime)
+        {
+            Emission emission = new Emission();
+            
+            if ((emission.Tasks & Emission.EmissionTask.KillAll) != 0)
+                Target.KillAll();
+            else if ((emission.Tasks & Emission.EmissionTask.Kill) != 0)
+                Target.Kill(emission.Particle1);
+
+            if ((emission.Tasks & Emission.EmissionTask.Emit) != 0)
+                Target.Emit();
+
+            if ((emission.Tasks & Emission.EmissionTask.
+        }
     }
 
     /// <summary>
