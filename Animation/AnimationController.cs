@@ -63,8 +63,13 @@ namespace CipherPark.AngelJacket.Core.Animation
         public TransformAnimation Animation { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class EmitterAnimationController : IAnimationController
     {
+        private long? _animationStartTime = null;
+
         public Emitter Target { get; set; }
 
         public void Start()
@@ -74,17 +79,25 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public void UpdateAnimation(long gameTime)
         {
-            Emission emission = new Emission();
-            
-            if ((emission.Tasks & Emission.EmissionTask.KillAll) != 0)
-                Target.KillAll();
-            else if ((emission.Tasks & Emission.EmissionTask.Kill) != 0)
-                Target.Kill(emission.Particle1);
+            foreach(Emission emission in this.Emissions)
+            {
+                if (emission.Time > gameTime - _animationStartTime.Value)
+                {
+                    if ((emission.Tasks & Emission.EmissionTask.KillAll) != 0)
+                        Target.KillAll();
+                    else if ((emission.Tasks & Emission.EmissionTask.Kill) != 0)
+                        Target.Kill(emission.Particle1);
 
-            if ((emission.Tasks & Emission.EmissionTask.Emit) != 0)
-                Target.Emit();
+                    if ((emission.Tasks & Emission.EmissionTask.Emit) != 0)
+                        Target.Emit();
 
-            if ((emission.Tasks & Emission.EmissionTask.
+                    if ((emission.Tasks & Emission.EmissionTask.EmitParticle) != 0)
+                        Target.Emit(emission.EmissionDescription);
+
+                    if ((emission.Tasks & Emission.EmissionTask.Link) != 0)
+                        Target.Link(emission.Particle1, emission.Particle2);
+                }
+            }
         }
     }
 
@@ -95,6 +108,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     {        
         private long? _animationStartTime = null;
         #region IAnimationController Members
+        public Emitter Target { get; set; }
 
         public void Start()
         {
@@ -104,7 +118,16 @@ namespace CipherPark.AngelJacket.Core.Animation
         public void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
-                _animationStartTime = gameTime;        
+                _animationStartTime = gameTime;
+            foreach (Particle p in Target.Particles)
+            {
+                if (p.Age > p.Life)
+                    Target.Kill(p);
+                else
+                {
+
+                } 
+            }
         }
 
         #endregion

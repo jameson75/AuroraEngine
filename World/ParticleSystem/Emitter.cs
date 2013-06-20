@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.World.Geometry;
@@ -20,6 +21,9 @@ using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.ParticleSystem
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Emitter
     {
         private List<Particle> _particles = new List<Particle>();
@@ -33,18 +37,18 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         
         public float EmissionRangeYaw { get; set; }
         
-        public ParticleDescription DefaultParticleDescription { get; set; }
+        public EmissionDescription DefaultParticleDescription { get; set; }
 
-        public List<Particle> Particles { get { return _particles; } }
+        public ReadOnlyCollection<Particle> Particles { get { return _particles.AsReadOnly(); } }
 
-        public List<ParticleLink> Links { get { return _links; } }
+        public ReadOnlyCollection<ParticleLink> Links { get { return _links.AsReadOnly(); } }
 
         public Particle Emit()
         {
             return Emit(DefaultParticleDescription);
         }
 
-        public Particle Emit(ParticleDescription pd)
+        public Particle Emit(EmissionDescription pd)
         {
             Particle p = Spawn(pd);
             _particles.Add(p);
@@ -60,23 +64,52 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         public void Kill(Particle p)
         {
             _particles.Remove(p);
-            _links.RemoveAll(e => e.P1 == p || e.P2 == p);
+            Unlink(p);
         }
 
-        private static Particle Spawn(ParticleDescription description)
+        private static Particle Spawn(EmissionDescription description)
         {
             Particle p = new Particle();
             return p;
-        }   
+        }
+
+        public void Link(Particle particle1, Particle particle2)
+        {
+            if(!_links.Exists( e=> (e.P1 == particle1 && e.P2 == particle2) || (e.P1 == particle2 && e.P2 == particle2)))
+                _links.Add(new ParticleLink(particle1, particle2));
+        }
+
+        public void Unlink(Particle particle1, Particle particle2)
+        {
+            _links.RemoveAll(e => (e.P1 == particle1 && e.P2 == particle2) || (e.P1 == particle2 && e.P2 == particle2));
+        }
+
+        public void Unlink(Particle p)
+        {
+            _links.RemoveAll(e => e.P1 == p || e.P2 == p);
+        }
     } 
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ParticleLink
     {
+        public ParticleLink()
+        { }
+        public ParticleLink(Particle p1, Particle p2)
+        {
+            P1 = p1;
+            P2 = p2;
+        }
         public Particle P1 { get; set; }
         public Particle P2 { get; set; }
     }    
 
-    public class ParticleDescription
+    /// <summary>
+    /// 
+    /// </summary>
+    public class EmissionDescription
     {
         public int BirthRate { get; set; }
         public int BirthRateRandomness { get; set; }
@@ -94,6 +127,9 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         public Texture2D Texture { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class Particle : ITransformable
     {
         #region ITransformable Members
@@ -107,17 +143,20 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         #endregion
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class Emission
     {
         public ulong Time { get; set; }        
-        public ParticleDescription EmitParticleDescription { get; set; }
+        public EmissionDescription EmissionDescription { get; set; }
         public Particle Particle1 { get; set; }
         public Particle Particle2 { get; set; }
         [Flags]
         public enum EmissionTask
         {
             Emit =          0x01,
-            EmitDefault =   0x02,
+            EmitParticle =   0x02,
             Kill =          0x04,
             KillAll =       0x08,
             Link =          0x10
