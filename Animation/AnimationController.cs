@@ -72,7 +72,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         private long? _lastEmitTime = null;
 
         public Emitter Target { get; set; }
-        public List<Emission> Emissions { get; set; }
+        public List<EmitterAction> Actions { get; set; }
         public ParticleSolver Solver { get; set; }
         public bool ExplicitEmissionsOnly { get; set; }
 
@@ -96,25 +96,25 @@ namespace CipherPark.AngelJacket.Core.Animation
                 if (!ExplicitEmissionsOnly && gameTime - _lastEmitTime > 1000)
                     Target.Emit();
 
-                if( Emissions != null )
+                if (Actions != null)
                 {
-                    foreach(Emission emission in this.Emissions)
+                    foreach (EmitterAction action in this.Actions)
                     {
-                        if (emission.Time > (ulong)(gameTime - _animationStartTime.Value))
+                        if (action.Time > (ulong)(gameTime - _animationStartTime.Value))
                         {
-                            if ((emission.Tasks & Emission.EmissionTask.KillAll) != 0)
+                            if ((action.Tasks & EmitterAction.EmitterTasks.KillAll) != 0)
                                 Target.KillAll();
-                            else if ((emission.Tasks & Emission.EmissionTask.Kill) != 0)
-                                Target.Kill(emission.Particle1);
+                            else if ((action.Tasks & EmitterAction.EmitterTasks.Kill) != 0)
+                                Target.Kill(action.ParticleArg1);
 
-                            if ((emission.Tasks & Emission.EmissionTask.Emit) != 0)
+                            if ((action.Tasks & EmitterAction.EmitterTasks.Emit) != 0)
                                 Target.Emit();
 
-                            if ((emission.Tasks & Emission.EmissionTask.EmitParticle) != 0)
-                                Target.Emit(emission.CustomParticleDescription);
+                            if ((action.Tasks & EmitterAction.EmitterTasks.EmitParticle) != 0)
+                                Target.Emit(action.CustomParticleDescriptionArg);
 
-                            if ((emission.Tasks & Emission.EmissionTask.Link) != 0)
-                                Target.Link(emission.Particle1, emission.Particle2);
+                            if ((action.Tasks & EmitterAction.EmitterTasks.Link) != 0)
+                                Target.Link(action.ParticleArg1, action.ParticleArg2);
                         }
                     }
                 }

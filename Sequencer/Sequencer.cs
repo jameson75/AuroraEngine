@@ -16,7 +16,7 @@ using CipherPark.AngelJacket.Core.UI.Components;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Simulation
+namespace CipherPark.AngelJacket.Core.Sequencer
 {
     public class Sequencer
     {
