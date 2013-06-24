@@ -66,49 +66,15 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// <summary>
     /// 
     /// </summary>
-    public class EmitterAnimationController : IAnimationController
+    public class ParticleSystemController : IAnimationController
     {
         private long? _animationStartTime = null;
+        private long? _lastEmitTime = null;
 
         public Emitter Target { get; set; }
-
-        public void Start()
-        {
-            
-        }
-
-        public void UpdateAnimation(long gameTime)
-        {
-            foreach(Emission emission in this.Emissions)
-            {
-                if (emission.Time > gameTime - _animationStartTime.Value)
-                {
-                    if ((emission.Tasks & Emission.EmissionTask.KillAll) != 0)
-                        Target.KillAll();
-                    else if ((emission.Tasks & Emission.EmissionTask.Kill) != 0)
-                        Target.Kill(emission.Particle1);
-
-                    if ((emission.Tasks & Emission.EmissionTask.Emit) != 0)
-                        Target.Emit();
-
-                    if ((emission.Tasks & Emission.EmissionTask.EmitParticle) != 0)
-                        Target.Emit(emission.EmissionDescription);
-
-                    if ((emission.Tasks & Emission.EmissionTask.Link) != 0)
-                        Target.Link(emission.Particle1, emission.Particle2);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class ParticleAnimationController : IAnimationController
-    {        
-        private long? _animationStartTime = null;
-        #region IAnimationController Members
-        public Emitter Target { get; set; }
+        public List<Emission> Emissions { get; set; }
+        public ParticleSolver Solver { get; set; }
+        public bool ExplicitEmissionsOnly { get; set; }
 
         public void Start()
         {
@@ -119,18 +85,57 @@ namespace CipherPark.AngelJacket.Core.Animation
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
-            foreach (Particle p in Target.Particles)
+            
+            long animationTime = gameTime - _animationStartTime.Value;
+
+            if( Target != null)
             {
-                if (p.Age > p.Life)
-                    Target.Kill(p);
-                else
+                if (_lastEmitTime == null)
+                    _lastEmitTime = gameTime;
+
+                if (!ExplicitEmissionsOnly && gameTime - _lastEmitTime > 1000)
+                    Target.Emit();
+
+                if( Emissions != null )
                 {
+                    foreach(Emission emission in this.Emissions)
+                    {
+                        if (emission.Time > (ulong)(gameTime - _animationStartTime.Value))
+                        {
+                            if ((emission.Tasks & Emission.EmissionTask.KillAll) != 0)
+                                Target.KillAll();
+                            else if ((emission.Tasks & Emission.EmissionTask.Kill) != 0)
+                                Target.Kill(emission.Particle1);
 
-                } 
+                            if ((emission.Tasks & Emission.EmissionTask.Emit) != 0)
+                                Target.Emit();
+
+                            if ((emission.Tasks & Emission.EmissionTask.EmitParticle) != 0)
+                                Target.Emit(emission.CustomParticleDescription);
+
+                            if ((emission.Tasks & Emission.EmissionTask.Link) != 0)
+                                Target.Link(emission.Particle1, emission.Particle2);
+                        }
+                    }
+                }
+           
+                foreach (Particle p in Target.Particles)
+                {
+                    //update particle age.
+                    p.Age = (ulong)animationTime;
+                    if (p.Age > p.Life)
+                        Target.Kill(p);
+                    else
+                    {
+                        float normalizedAge = p.Age / (float)p.Life;
+                        p.Color = p.SharedDescription.ColorOverLife.GetValueAtAge(normalizedAge);
+                        p.Opacity = p.SharedDescription.OpacityOverLife.GetValueAtAge(normalizedAge);
+                        if( Solver != null )
+                            Solver.UpdateParticleTransform((ulong)animationTime, p);
+                    }
+                }
             }
-        }
-
-        #endregion
+        }      
     }
 
     /// <summary>

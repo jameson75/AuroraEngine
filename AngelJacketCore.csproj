@@ -191,9 +191,8 @@
     <Compile Include="World\Geometry\TerrainForm.cs" />
     <Compile Include="World\Geometry\TurbineForm.cs" />
     <Compile Include="Kinetics\IRigidBody.cs" />
-    <Compile Include="World\ParticleSystem\Emitter.cs" />
-    <Compile Include="World\ParticleSystem\ForceField.cs" />
-    <Compile Include="World\ParticleSystem\Plexic.cs" />
+    <Compile Include="Kinetics\Emitter.cs" />
+    <Compile Include="Kinetics\ForceField.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />
     <Compile Include="World\Geometry\ReferenceGrid.cs" />
@@ -208,6 +207,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\Resources\DefaultTheme\" />
+    <Folder Include="World\ParticleSystem\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

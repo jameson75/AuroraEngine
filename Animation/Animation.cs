@@ -63,7 +63,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         {
             int i = _keyFrames.IndexOfValue(keyFrame);
             if (i == -1)
-                throw new ArgumentException("keyFrame is not an element of the specified property's animation", "keyFrame");
+                throw new ArgumentException("key frame does not exist in animation.", "keyFrame");
             else if (i == _keyFrames.Count - 1)
                 return null;
             else
@@ -136,9 +136,9 @@ namespace CipherPark.AngelJacket.Core.Animation
         /// <param name="v1"></param>
         /// <param name="percentage"></param>
         /// <returns></returns>
-        protected static double Lerp(double v0, double v1, float percentage)
+        public static double Lerp(double v0, double v1, float percentage)
         {
             return v0 + (percentage * (v1 - v0));
         }        
-    }                
+    }
 }
