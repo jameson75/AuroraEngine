@@ -26,12 +26,41 @@ namespace CipherPark.AngelJacket.Core.Animation
     {       
         void Start();
         void UpdateAnimation(long gameTime);
+        bool IsAnimationComplete { get; }
+        event EventHandler AnimationComplete;
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public class KeyframeAnimationController : IAnimationController
+    public abstract class AnimationController : IAnimationController
+    {
+        private bool _isAnimationComplete = false;
+        
+        public bool IsAnimationComplete
+        {
+            get { return _isAnimationComplete; }
+        }
+
+        public abstract void Start();
+        
+        public abstract void UpdateAnimation(long gameTime);
+
+        protected  virtual void OnAnimationComplete()
+        {
+            _isAnimationComplete = true;
+            EventHandler handler = AnimationComplete;
+            if (handler != null)
+                AnimationComplete(this, EventArgs.Empty);
+        }
+
+        public event EventHandler AnimationComplete;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class KeyframeAnimationController : AnimationController
     {
         private long? _animationStartTime = null;
 
@@ -44,18 +73,28 @@ namespace CipherPark.AngelJacket.Core.Animation
             Animation = animation;
         }
 
-        public void Start()
+        public override void Start()
         {         
             _animationStartTime = null;
+            _isAnimationComplete = false;
         }
 
-        public void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
+            
             ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
-            if(Target != null && Animation != null)            
+
+            if (Target != null && Animation != null)
+            {
                 Target.Transform = Animation.GetValueAtT(timeT);
+                //signal this animation as complete once we've updated the target with the last key frame.
+                if (timeT >= Animation.RunningTime)
+                    OnAnimationComplete();
+            }
+            else
+                throw new InvalidOperationException("Target or Animation was not initialized.");
         }
 
         public ITransformable Target { get; set; }
@@ -66,7 +105,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// <summary>
     /// 
     /// </summary>
-    public class ParticleSystemController : IAnimationController
+    public class ParticleSystemController : AnimationController
     {
         private long? _animationStartTime = null;
         private long? _lastEmitTime = null;
@@ -76,12 +115,12 @@ namespace CipherPark.AngelJacket.Core.Animation
         public ParticleSolver Solver { get; set; }
         public bool ExplicitEmissionsOnly { get; set; }
 
-        public void Start()
+        public override void Start()
         {
             
         }
 
-        public void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
@@ -141,7 +180,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// <summary>
     /// 
     /// </summary>
-    public class RigidBodyAnimationController : IAnimationController
+    public class RigidBodyAnimationController : AnimationController
     {
         private long? _animationStartTime = null;   
         
@@ -160,12 +199,12 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         #region IAnimationController Members   
 
-        public void Start()
+        public override void Start()
         {
             _animationStartTime = null;           
         }
 
-        public virtual void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;

@@ -127,7 +127,25 @@ namespace CipherPark.AngelJacket.Core.Animation
         public int FrameCount
         {
             get { return _keyFrames.Count; }
-        }      
+        }     
+
+        /// <summary>
+        /// Returns the total length in time it takes to complete the animation,
+        /// which is simply the equivalent of the time value in the final key frame.        
+        /// </summary>
+        /// <remarks>
+        /// If the animation contains no key frames, the running time is 0.
+        /// </remarks>
+        public ulong RunningTime
+        {
+            get
+            {
+                if (FrameCount == 0)
+                    return 0;
+                else
+                    return _keyFrames[_keyFrames.Keys[_keyFrames.Count - 1]].Time;
+            }                    
+        }
 
         /// <summary>
         /// A helper method which allows derived classes to perform simple linear interpolation.
@@ -136,7 +154,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         /// <param name="v1"></param>
         /// <param name="percentage"></param>
         /// <returns></returns>
-        public static double Lerp(double v0, double v1, float percentage)
+        protected static double Lerp(double v0, double v1, float percentage)
         {
             return v0 + (percentage * (v1 - v0));
         }        

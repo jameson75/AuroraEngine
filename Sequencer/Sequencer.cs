@@ -38,22 +38,22 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         {
             if (!_isStarted)
                 Start();
-
-            List<SequenceEvent> executedSequenceEvents = new List<SequenceEvent>();
-
+            
             long elapsedSequencerTime = CalculateElapsedSequencerTime();
-
-            foreach (SequenceEvent sequenceEvent in Sequence)
+            //**************************************************************************
+            //NOTE: We use an auxilary sequence to enumerate through, in the event that
+            //an executed sequence alters this sequencer's Sequence collection.
+            //**************************************************************************
+            Sequence auxSequence = new Sequence();
+            auxSequence.AddRange(this.Sequence);
+            foreach ( SequenceEvent sequenceEvent in auxSequence )
             {
                 if (sequenceEvent.Time <= elapsedSequencerTime)
                 {
                     sequenceEvent.Execute(gameTime, context);
-                    executedSequenceEvents.Add(sequenceEvent);
+                    Sequence.Remove(sequenceEvent);                   
                 }
-            }
-
-            foreach (SequenceEvent executedSequenceEvent in executedSequenceEvents)
-                Sequence.Remove(executedSequenceEvent);
+            }          
         }
 
         private void Start()

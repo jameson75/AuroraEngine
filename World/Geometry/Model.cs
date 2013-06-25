@@ -18,6 +18,7 @@ using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
 using CoreEffect = CipherPark.AngelJacket.Core.Effects.Effect;
+using CipherPark.AngelJacket.Core.Kinetics;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -33,6 +34,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {
         private IGameApp _game = null;
         private Mesh _mesh = null;
+        private Emitter _emitter = null;
 
         public Model(IGameApp game)
         {
@@ -45,6 +47,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public IGameApp Game { get { return _game; } }
 
         public Mesh Mesh { get { return _mesh; } set { _mesh = value; OnMeshChanged(); } }
+
+        public Emitter Emitter { get { return _emitter; } set { _emitter = value; OnEmitterChanged(); } }
 
         public Transform Transform { get; set; }
         
@@ -66,6 +70,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public abstract void Draw(long gameTime);
 
         protected virtual void OnMeshChanged()
+        { }
+
+        protected virtual void OnEmitterChanged()
         { }
 
         protected virtual void OnApplyingEffect()

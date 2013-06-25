@@ -20,31 +20,38 @@ namespace CipherPark.AngelJacket.Core.World
 {
     public class WorldSimulator
     {
-        IGameApp _game = null;
+        private IGameApp _game = null;
         private List<IAnimationController> _animationControllers = new List<IAnimationController>();
 
         public IGameApp Game { get { return _game; } }    
+        public List<IAnimationController> AnimationControllers { get { return _animationControllers; } }
+        public WorldSimulatorSettings Settings { get; set; }
 
         public WorldSimulator(IGameApp game)
         {
             _game = game;
-        }
-
-        public WorldSimulatorSettings Settings { get; set; }
+        }       
 
         public void Update(long gameTime, SimulationContext context)
         {
-            foreach (IAnimationController controller in _animationControllers)
+            //**********************************************************************************
+            //NOTE: We use an auxilary controller collection to enumerate through, in 
+            //the event that an updated controller alters this Simulator's Animation Controllers
+            //collection.
+            //**********************************************************************************
+            List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_animationControllers);
+            foreach (IAnimationController controller in auxAnimationControllers)
             {
                 controller.UpdateAnimation(gameTime);
+                if (controller.IsAnimationComplete)
+                    _animationControllers.Remove(controller);
             }
-        }
-
-        public List<IAnimationController> AnimationControllers { get { return _animationControllers; } }
+        }        
     }
 
     public class WorldSimulatorSettings
     {
+
         
     }
 
