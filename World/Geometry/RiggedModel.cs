@@ -83,9 +83,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             return result;
         }      
 
-        protected override void UpdateEffect(Effect effect)
+        protected override void OnApplyingEffect()
         {
-            ISkinEffect skinEffect = effect as ISkinEffect;
+            ISkinEffect skinEffect = this.Effect as ISkinEffect;
             if (skinEffect != null)
             {
                 if (FrameTree != null)
@@ -100,7 +100,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     skinEffect.BoneTransforms = boneMatrices;     
                 }
             }
-            base.UpdateEffect(effect);
+            base.OnApplyingEffect();
         }
     }
 

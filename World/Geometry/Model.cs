@@ -68,7 +68,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         protected virtual void OnMeshChanged()
         { }
 
-        protected virtual void UpdateEffect(CoreEffect effect)
+        protected virtual void OnApplyingEffect()
         { }
     }
 
@@ -83,7 +83,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         {
             if (Effect != null)
             {
-                UpdateEffect(Effect);
+                OnApplyingEffect();
                 Effect.Apply();
             }
             
