@@ -141,19 +141,27 @@ namespace CipherPark.AngelJacket.Core.Animation
                     {
                         if (action.Time > (ulong)(gameTime - _animationStartTime.Value))
                         {
-                            if ((action.Tasks & EmitterAction.EmitterTasks.KillAll) != 0)
-                                Target.KillAll();
-                            else if ((action.Tasks & EmitterAction.EmitterTasks.Kill) != 0)
-                                Target.Kill(action.ParticleArg1);
-
-                            if ((action.Tasks & EmitterAction.EmitterTasks.Emit) != 0)
-                                Target.Emit();
-
-                            if ((action.Tasks & EmitterAction.EmitterTasks.EmitParticle) != 0)
-                                Target.Emit(action.CustomParticleDescriptionArg);
-
-                            if ((action.Tasks & EmitterAction.EmitterTasks.Link) != 0)
-                                Target.Link(action.ParticleArg1, action.ParticleArg2);
+                            switch (action.Task)
+                            {
+                                case EmitterAction.EmitterTask.KillAll:
+                                    Target.KillAll();
+                                    break;
+                                case EmitterAction.EmitterTask.Kill:
+                                    Target.Kill(action.ParticleArg1);
+                                    break;
+                                case EmitterAction.EmitterTask.Emit:
+                                    Target.Emit();
+                                    break;
+                                case EmitterAction.EmitterTask.EmitCustom:
+                                    Target.Emit(action.CustomParticleDescriptionArg);
+                                    break;
+                                case EmitterAction.EmitterTask.Link:
+                                    Target.Link(action.ParticleArg1, action.ParticleArg2);
+                                    break;
+                                case EmitterAction.EmitterTask.Transform:
+                                    Target.Transform = action.Transform;
+                                    break;
+                            }
                         }
                     }
                 }
@@ -172,6 +180,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                         if( Solver != null )
                             Solver.UpdateParticleTransform((ulong)animationTime, p);
                     }
+
                 }
             }
         }      

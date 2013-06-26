@@ -186,20 +186,26 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// </summary>
     public class EmitterAction
     {
+        public EmitterAction() { }
+        public EmitterAction(ulong time, EmitterTask task) { Time = time; Task = task; }
+        public EmitterAction(ulong time, ParticleDescription customParticleDescription, EmitterTask task = EmitterTask.EmitCustom) { Time = time; CustomParticleDescriptionArg = customParticleDescription; Task = task; }
+        public EmitterAction(ulong time, Particle particle1, Particle particle2, EmitterTask task) { Time = time; ParticleArg1 = particle1; ParticleArg2 = particle2; Task = task; }
+        public EmitterAction(ulong time, Transform transform, EmitterTask task = EmitterTask.Transform) { Time = time; Transform = transform; Task = task; }
         public ulong Time { get; set; }
         public ParticleDescription CustomParticleDescriptionArg { get; set; }
         public Particle ParticleArg1 { get; set; }
         public Particle ParticleArg2 { get; set; }
-        [Flags]
-        public enum EmitterTasks
+        public Transform Transform { get; set; }
+        public enum EmitterTask
         {
-            Emit = 0x01,
-            EmitParticle = 0x02,
-            Kill = 0x04,
-            KillAll = 0x08,
-            Link = 0x10
+            Emit,
+            EmitCustom,
+            Kill,
+            KillAll,
+            Link,
+            Transform
         }
-        public EmitterTasks Tasks { get; set; }
+        public EmitterTask Task { get; set; }
     }
 
     /// <summary>

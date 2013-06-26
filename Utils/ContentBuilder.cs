@@ -68,15 +68,20 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }       
 
-        private static Vector3[] CreateQuadPoints(Rectangle dimension)
+        public static Vector3[] CreateQuadPoints(Rectangle dimension, bool includeCenterPoint = false)
         {
-            return new Vector3[4] 
+            Vector3[] results = new Vector3[5] 
             {
                 new Vector3(dimension.Left, 0, dimension.Top),
                 new Vector3(dimension.Right, 0, dimension.Top),
                 new Vector3(dimension.Right, 0, dimension.Bottom),
-                new Vector3(dimension.Left, 0, dimension.Bottom)
+                new Vector3(dimension.Left, 0, dimension.Bottom),
+                new Vector3(dimension.Left + (dimension.Width / 2.0f), 0, dimension.Bottom + (dimension.Height / 2.0f))
             };
+            if (!includeCenterPoint)
+                return results.Take(4).ToArray();
+            else
+                return results;
         }
 
         public static Mesh BuildViewportQuad(IGameApp game, byte[] shaderByteCode)
@@ -132,7 +137,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }       
 
-        private static Vector3[] CreateTrianglePoints(Rectangle dimension)
+        public static Vector3[] CreateTrianglePoints(Rectangle dimension)
         {
             return new Vector3[3]
             {
@@ -189,7 +194,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
-        private static Vector3[] CreateHexagonPoints(Rectangle dimension)
+        public static Vector3[] CreateHexagonPoints(Rectangle dimension)
         {
             return new Vector3[6]
             {
