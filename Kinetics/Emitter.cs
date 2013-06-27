@@ -55,11 +55,22 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             return Emit(DefaultParticleDescription);
         }
 
-        public List<Particle> Emit(ParticleDescription pd)
+        public List<Particle> Emit(ParticleDescription customParticleDescription)
         {
-            List<Particle> pList = Spawn(pd);
+            List<Particle> pList = Spawn(customParticleDescription);
             _particles.AddRange(pList);
             return pList;
+        }
+
+        public List<Particle> Emit(IEnumerable<Particle> particles)
+        {
+            _particles.AddRange(particles);
+            return particles.ToList();
+        }
+
+        public List<Particle> CreateParticles(int count, ParticleDescription customParticleDescription = null)
+        {
+            return Spawn(customParticleDescription != null ? customParticleDescription : DefaultParticleDescription);
         }
 
         public void KillAll()
@@ -72,6 +83,12 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         {
             _particles.Remove(p);
             Unlink(p);
+        }
+
+        public void Kill(IEnumerable<Particle> pList)
+        {
+            foreach (Particle p in pList)
+                Kill(p);
         }
 
         private List<Particle> Spawn(ParticleDescription description)
@@ -95,6 +112,13 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         {
             if(!_links.Exists( e=> (e.P1 == particle1 && e.P2 == particle2) || (e.P1 == particle2 && e.P2 == particle2)))
                 _links.Add(new ParticleLink(particle1, particle2));
+        }
+
+        public void Link(IEnumerable<Particle> particles)
+        {         
+            Particle[] pArray = particles.ToArray();
+            for(int i = 0; i < pArray.Length; i+=2)            
+                Link(pArray[i], pArray[i + 1]);
         }
 
         public void Unlink(Particle particle1, Particle particle2)
@@ -189,17 +213,17 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public EmitterAction() { }
         public EmitterAction(ulong time, EmitterTask task) { Time = time; Task = task; }
         public EmitterAction(ulong time, ParticleDescription customParticleDescription, EmitterTask task = EmitterTask.EmitCustom) { Time = time; CustomParticleDescriptionArg = customParticleDescription; Task = task; }
-        public EmitterAction(ulong time, Particle particle1, Particle particle2, EmitterTask task) { Time = time; ParticleArg1 = particle1; ParticleArg2 = particle2; Task = task; }
+        public EmitterAction(ulong time, IEnumerable<Particle> particleArgs, EmitterTask task) { Time = time; ParticleArgs = particleArgs; Task = task; }
         public EmitterAction(ulong time, Transform transform, EmitterTask task = EmitterTask.Transform) { Time = time; Transform = transform; Task = task; }
         public ulong Time { get; set; }
         public ParticleDescription CustomParticleDescriptionArg { get; set; }
-        public Particle ParticleArg1 { get; set; }
-        public Particle ParticleArg2 { get; set; }
+        public IEnumerable<Particle> ParticleArgs { get; set; }
         public Transform Transform { get; set; }
         public enum EmitterTask
         {
             Emit,
             EmitCustom,
+            EmitExplicit,
             Kill,
             KillAll,
             Link,
@@ -312,12 +336,15 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
     public class ParticleKeyframeSolver : ParticleSolver
     {
-        public TransformAnimation Animation { get; set; }
+        public class AnimationLookup : Dictionary<Particle, TransformAnimation> { }
+        public AnimationLookup TargetAnimations { get; set; }
 
         public override void UpdateParticleTransform(ulong time, Particle p)
         {
-            if (Animation != null)
-                p.Transform = Animation.GetValueAtT(time);
+            if (TargetAnimations != null)
+            {
+                p.Transform = TargetAnimations[p].GetValueAtT(time);
+            }
         }
     }
 }

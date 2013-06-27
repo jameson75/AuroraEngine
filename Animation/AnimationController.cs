@@ -76,7 +76,6 @@ namespace CipherPark.AngelJacket.Core.Animation
         public override void Start()
         {         
             _animationStartTime = null;
-            _isAnimationComplete = false;
         }
 
         public override void UpdateAnimation(long gameTime)
@@ -147,7 +146,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                                     Target.KillAll();
                                     break;
                                 case EmitterAction.EmitterTask.Kill:
-                                    Target.Kill(action.ParticleArg1);
+                                    Target.Kill(action.ParticleArgs);
                                     break;
                                 case EmitterAction.EmitterTask.Emit:
                                     Target.Emit();
@@ -155,8 +154,11 @@ namespace CipherPark.AngelJacket.Core.Animation
                                 case EmitterAction.EmitterTask.EmitCustom:
                                     Target.Emit(action.CustomParticleDescriptionArg);
                                     break;
+                                case EmitterAction.EmitterTask.EmitExplicit:
+                                    Target.Emit(action.ParticleArgs);
+                                    break;
                                 case EmitterAction.EmitterTask.Link:
-                                    Target.Link(action.ParticleArg1, action.ParticleArg2);
+                                    Target.Link(action.ParticleArgs);
                                     break;
                                 case EmitterAction.EmitterTask.Transform:
                                     Target.Transform = action.Transform;
@@ -180,7 +182,6 @@ namespace CipherPark.AngelJacket.Core.Animation
                         if( Solver != null )
                             Solver.UpdateParticleTransform((ulong)animationTime, p);
                     }
-
                 }
             }
         }      
