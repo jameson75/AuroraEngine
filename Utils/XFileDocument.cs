@@ -15,18 +15,18 @@ using System.Text.RegularExpressions;
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.AngelJacket.Core.Utils
-{
-    /// <summary>
-    /// 
-    /// </summary>    
-    public class XFileDocument
+{       
+    public abstract class XFileDocument
     {        
         private List<XFileDataObject> dataObjects = new List<XFileDataObject>();
 
-        public XFileHeader Header { get; private set; }
+        public XFileHeader Header { get; protected set; }
 
         public List<XFileDataObject> DataObjects { get { return dataObjects; } }
+    }
 
+    public class XFileTextDocument : XFileDocument
+    {
         public void Load(string textFileContent)
         {
             //TODO: Strip comments from file content here.
@@ -40,7 +40,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             {
                 readPosition = ReadNextDataObject(textFileContent, readPosition, out nextDataObject);
                 if (nextDataObject != null)
-                    dataObjects.Add(nextDataObject);
+                    DataObjects.Add(nextDataObject);
             }
         }
 

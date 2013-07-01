@@ -185,7 +185,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
         {
             RiggedModel result = null;
-            XFileDocument doc = new XFileDocument();                                 
+            XFileTextDocument doc = new XFileTextDocument();                                 
             
             //Read X-File Data
             //----------------
