@@ -158,6 +158,37 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     }
 
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct BasicVertexPositionNormalColor
+    {
+        public Vector4 Position;
+        public Vector3 Normal;
+        public Vector4 Color;
+
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+
+        static BasicVertexPositionNormalColor()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0),
+                 new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 28, 0)
+             };
+            _elementSize = 44;
+        }
+
+        public BasicVertexPositionNormalColor(Vector3 position, Vector3 normal, Vector4 color)
+        {
+            Position = new Vector4(position, 1.0f);
+            Normal = normal;
+            Color = color;
+        }
+    }
+
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct BasicSkinnedVertexTexture
     {
         public Vector4 Position;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
+using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -339,10 +340,10 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
             declData.NData = ReadNextInt(reader).Value;
             int dataOffset = vertexElementsOffset + nTotalVertexElementComponents + 1;
-            declData.Data = new long[declData.NData];
+            declData.Data = new UInt32[declData.NData];
             for (int i = 0; i < declData.NData; i++)
             {
-                declData.Data[i] = ReadNextLong(reader).Value;
+                declData.Data[i] = ReadNextUInt(reader).Value;
             }
             return declData;
         }
@@ -358,7 +359,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             //MatchCollection matches = Regex.Matches(childLessContent, valuesPattern);
             meshMaterialList.NMaterials = ReadNextInt(reader).Value;
             meshMaterialList.NFaceIndices = ReadNextInt(reader).Value;
-            int faceIndicesOffset = 2;
+            //int faceIndicesOffset = 2;
             meshMaterialList.FaceIndices = new int[meshMaterialList.NFaceIndices];
             for (int i = 0; i < meshMaterialList.NFaceIndices; i++)
             {
@@ -416,7 +417,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         private XFileMatrix ParseFrameTransformMatrix(TextReader reader)
         {
             //string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            //MatchCollection matches = Regex.Matches(matrixContent, valuesPattern);
+            //MatchCollection matches = Regex.Matches(matrixContent, valuesPattern);            
             XFileMatrix matrix = new XFileMatrix();
             matrix.m = new float[16];
             for (int i = 0; i < matrix.m.Length; i++)
@@ -540,13 +541,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return referenceName;
         }     
 
-        private static int? ReadNextInt(TextReader reader)
-        {
-            long? result = ReadNextLong(reader);
-            return result.HasValue ? (int?)result.Value : null;
-        }
-
-        private static long? ReadNextLong(TextReader reader)
+        private static uint? ReadNextUInt(TextReader reader)
         {
             StringBuilder sb = new StringBuilder();
             while (true)
@@ -557,11 +552,29 @@ namespace CipherPark.AngelJacket.Core.Utils
                 //skip preceding white spaces, semicolons and commas.
                 if ((sb.Length == 0) && ((char)input == ';' || input == ',' || char.IsWhiteSpace((char)input)))
                     continue;
-                if (!char.IsDigit((char)input))
+                if (!char.IsDigit((char)input) && (char)input != '-')
                     break;
                 sb.Append((char)input);
             }
-            return sb.Length != 0 ? (long?)long.Parse(sb.ToString()) : null;
+            return sb.Length != 0 ? (uint?)uint.Parse(sb.ToString()) : null;
+        }
+
+        private static int? ReadNextInt(TextReader reader)
+        {
+            StringBuilder sb = new StringBuilder();
+            while (true)
+            {
+                int input = reader.Read();
+                if (input == -1)
+                    break;
+                //skip preceding white spaces, semicolons and commas.
+                if ((sb.Length == 0) && ((char)input == ';' || input == ',' || char.IsWhiteSpace((char)input)))
+                    continue;
+                if (!char.IsDigit((char)input) && (char)input != '-')
+                    break;
+                sb.Append((char)input);
+            }
+            return sb.Length != 0 ? (int?)int.Parse(sb.ToString()) : null;
         }
 
         /// <summary>
@@ -580,7 +593,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 //skip preceding white spaces, semicolons and commas.
                 if ((sb.Length == 0) && ((char)input == ';' || input == ',' || char.IsWhiteSpace((char)input)))
                     continue;
-                if (!char.IsDigit((char)input) && (char)input != '.')
+                if (!char.IsDigit((char)input) && (char)input != '-' && (char)input != '.')
                     break;
                 sb.Append((char)input);
             }
@@ -688,7 +701,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                             nUnmatchedBraces--;
                             if (nUnmatchedBraces == 0)
                             {
-                                block.Data = sb.ToString().Substring(1).Trim(); //NOTE: The substring removes the opening brace.
+                                block.Data = sb.ToString().Trim().Substring(1).Trim(); //NOTE: The substring removes the opening brace.
                                 sb.Clear();
                                 currentState = XFileReaderState.Complete;
                             }
@@ -1243,38 +1256,125 @@ namespace CipherPark.AngelJacket.Core.Utils
         public int NVertexElements { get; set; }
         public XFileVertexElement[] VertexElements { get; set; }
         public int NData { get; set; }
-        public long[] Data { get; set; }
-        public T[] GetVertexDataStream<T>(int dataStreamIndex)
-        {
-            //NOTE: While we make ensure the dataStreamIndex is in range,
-            //we, implicitly, ensure that NVertexElements is not equalt to 0.
-            if (dataStreamIndex >= NVertexElements || dataStreamIndex < 0)
-                throw new ArgumentOutOfRangeException("Stream not available.");    
-         
-            T[] results = new T[NData / NVertexElements];
-            for (int i = 0; i < results.Length; i++)
-            {
-                int j = i * NVertexElements + dataStreamIndex;
-                results[i] = (T)Convert.ChangeType(Data[j], typeof(T));
-            }
+        public UInt32[] Data { get; set; }
 
-            return results;
+        public Vector2[] GetTextureCoords(int usageInstanceIndex = 0)
+        {
+            int? dataOffset = GetVertexDataOffset(VertexElementUsage.TexCoord, usageInstanceIndex);
+            int dataStride = GetVertexDataStride();
+            if (dataOffset.HasValue)
+            {
+                int nTexCoords = NData / dataStride;
+                Vector2[] texCoords = new Vector2[nTexCoords];
+                for (int i = 0; i < nTexCoords; i++)
+                {
+                    int k = dataOffset.Value + (dataStride * i);
+                    float u = BitConverter.ToSingle(BitConverter.GetBytes(Data[k]), 0);
+                    float v = BitConverter.ToSingle(BitConverter.GetBytes(Data[k + 1]), 0);
+                    texCoords[i] = new Vector2(u, v);
+                }
+                return texCoords;
+            }
+            else
+                return null;
         }
-        public T[] GetVertexDataStream<T>(VertexElementUsage usage, int usageInstanceIndex)
+
+        public Vector3[] GetNormals(int usageInstanceIndex = 0)
+        {
+            int? dataOffset = GetVertexDataOffset(VertexElementUsage.Normal, usageInstanceIndex);
+            int dataStride = GetVertexDataStride();
+            if (dataOffset.HasValue)
+            {
+                int nNormals = NData / dataStride;
+                Vector3[] normals = new Vector3[nNormals];
+                for (int i = 0; i < nNormals; i++)
+                {
+                    int k = dataOffset.Value + (dataStride * i);
+                    float x = BitConverter.ToSingle(BitConverter.GetBytes(Data[k]), 0);
+                    float y = BitConverter.ToSingle(BitConverter.GetBytes(Data[k + 1]), 0);
+                    float z = BitConverter.ToSingle(BitConverter.GetBytes(Data[k + 2]), 0);
+                    normals[i] = new Vector3(x, y, z);
+                }
+                return normals;
+            }
+            else
+                return null;
+        }
+
+        private int GetVertexDataStride()
+        {
+            int stride = 0;
+            for (int i = 0; i < NVertexElements; i++)
+                stride += GetElementDWORDSize(VertexElements[i].Type);
+            return stride;
+        }
+
+        private int? GetVertexDataOffset(VertexElementUsage usage, int usageInstanceIndex)
         {
             int usageInstancesFound = 0;
+            int offset = 0;
             for (int i = 0; i < NVertexElements; i++)
             {
                 if (VertexElements[i].Usage == usage)
                 {
                     if (usageInstanceIndex == usageInstancesFound)
-                        return GetVertexDataStream<T>(i);
+                        return offset;
                     else
                         usageInstancesFound++;
                 }
+                offset += GetElementDWORDSize(VertexElements[i].Type);
             }
             return null;
         }
+
+        private static int GetElementDWORDSize(VertexElementType type)
+        {
+            switch (type)
+            {
+                case VertexElementType.Float1:
+                    return 1;
+                case VertexElementType.Float2:
+                    return 2;
+                case VertexElementType.Float3:
+                    return 3;
+                case VertexElementType.Float4:
+                    return 4;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        //public T[] GetVertexDataStream<T>(int dataStreamIndex)
+        //{
+        //    //NOTE: While we make ensure the dataStreamIndex is in range,
+        //    //we, implicitly, ensure that NVertexElements is not equalt to 0.
+        //    if (dataStreamIndex >= NVertexElements || dataStreamIndex < 0)
+        //        throw new ArgumentOutOfRangeException("Stream not available.");    
+         
+        //    T[] results = new T[NData / NVertexElements];
+        //    for (int i = 0; i < results.Length; i++)
+        //    {
+        //        int j = i * NVertexElements + dataStreamIndex;
+        //        results[i] = (T)Convert.ChangeType(Data[j], typeof(T));
+        //    }
+
+        //    return results;
+        //}
+        //public T[] GetVertexDataStream<T>(VertexElementUsage usage, int usageInstanceIndex)
+        //{
+        //    int usageInstancesFound = 0;
+        //    for (int i = 0; i < NVertexElements; i++)
+        //    {
+        //        if (VertexElements[i].Usage == usage)
+        //        {
+        //            if (usageInstanceIndex == usageInstancesFound)
+        //                return GetVertexDataStream<T>(i);
+        //            else
+        //                usageInstancesFound++;
+        //        }
+        //    }
+        //    return null;
+        //}
     }
 
     public class XFileSkinWeightsObject : XFileDataObject

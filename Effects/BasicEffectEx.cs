@@ -91,5 +91,10 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             _effect.SetTexture(texture);
         }
+
+        public void SetTextureEnabled(bool enabled)
+        {
+            _effect.SetTextureEnabled(enabled);
+        }
     }
 }

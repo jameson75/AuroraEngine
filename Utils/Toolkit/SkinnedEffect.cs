@@ -10,18 +10,18 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 
 namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 {
-    public class BasicSkinnedEffect
+    public class SkinnedEffect
     {
         private IntPtr _nativeObject = IntPtr.Zero;
         private Device _device = null;
 
-        public BasicSkinnedEffect(Device device)
+        public SkinnedEffect(Device device)
         {
             _device = device;
             _nativeObject = UnsafeNativeMethods.New(device.NativePointer);
         }
 
-        ~BasicSkinnedEffect()
+        ~SkinnedEffect()
         {
             Delete();
         }
@@ -167,6 +167,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public void SetBoneTransforms(Matrix[] bones)
         {
             IntPtr _bonesPtr = Marshal.AllocHGlobal(bones.Length * sizeof(float) * 16);
+            int byteOffset = 0;
             for (int i = 0; i < bones.Length; i++ )
             {
                 float[] boneValues = bones[i].ToArray();
@@ -177,8 +178,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     {
                         //**********************************************************************************
                         //We're assuming boneValues.Length is always 16 and valueBytes.Length is always 4.
-                        //**********************************************************************************
-                        Marshal.WriteByte(_bonesPtr, i * 16 + j * 4 + k, valueBytes[k]);
+                        //**********************************************************************************                      
+                        Marshal.WriteByte(_bonesPtr, byteOffset, valueBytes[k]);
+                        byteOffset++;
                     }
                 }
             }

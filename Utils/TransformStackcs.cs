@@ -22,13 +22,10 @@ public class TransformStack
     {
         get
         {
-            Transform t = Transform.Identity;
-            foreach (Transform m in _innerList)
-            {
-                t.Rotation *= m.Rotation;
-                t.Translation += m.Translation;
-            }
-            return t;
+            Matrix m = Matrix.Identity;
+            foreach (Transform t in _innerList)
+                m *= t.ToMatrix();
+            return new Transform(m);
         }
     }
 
@@ -36,13 +33,10 @@ public class TransformStack
     {
         get
         {
-            Transform t = Transform.Identity;
-            for (int i = _innerList.Count - 1; i < 0; i--)
-            {
-                t.Rotation *= _innerList[i].Rotation;
-                t.Translation += _innerList[i].Translation;
-            }       
-            return t;
+            Matrix m = Matrix.Identity;
+            for (int i = _innerList.Count - 1; i < 0; i--)            
+                m *= _innerList[i].ToMatrix();
+            return new Transform(m);
         }
     }
 

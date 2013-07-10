@@ -47,12 +47,12 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public static Transform Multiply(Transform t1, Transform t2)
         {
-            return new Transform(t1.Rotation * t2.Rotation, t1.Translation + t2.Translation);
+            return new Transform(t1.ToMatrix() * t2.ToMatrix());
         }
 
         public static Transform Invert(Transform t)
         {
-            return new Transform(Quaternion.Invert(t.Rotation), Vector3.Negate(t.Translation));
+            return new Transform(Matrix.Invert(t.ToMatrix()));
         }
     }
 

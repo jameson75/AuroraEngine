@@ -23,16 +23,54 @@ namespace CipherPark.AngelJacket.Core.Effects
     {
         Matrix[] BoneTransforms { get; set; }
     }
-
     public class SkinnedEffectEx : Effect, ISkinEffect
     {
-        private BasicSkinnedEffect _effect = null;
+        private SkinnedEffect _effect = null;
         private int _weightsPerVertex = 0;
 
         public SkinnedEffectEx(Device graphicsDevice)
             : base(graphicsDevice)
         {
-            _effect = new BasicSkinnedEffect(graphicsDevice);
+            _effect = new SkinnedEffect(graphicsDevice);
+        }
+
+        public override Matrix World
+        {
+            get
+            {
+                return base.World;
+            }
+            set
+            {
+                base.World = value;
+                _effect.SetWorld(value);
+            }
+        }
+
+        public override Matrix View
+        {
+            get
+            {
+                return base.View;
+            }
+            set
+            {
+                base.View = value;
+                _effect.SetView(value);
+            }
+        }
+
+        public override Matrix Projection
+        {
+            get
+            {
+                return base.Projection;
+            }
+            set
+            {
+                base.Projection = value;
+                _effect.SetProjection(value);
+            }
         }
 
         public Matrix[] BoneTransforms { get; set; }
@@ -57,6 +95,11 @@ namespace CipherPark.AngelJacket.Core.Effects
             _effect.EnableDefaultLighting();
         }
 
+        public void SetTexture(ShaderResourceView resourceView)
+        {
+            _effect.SetTexture(resourceView);
+        }
+
         public override byte[] SelectShaderByteCode()
         {
             return _effect.SelectShaderByteCode();
@@ -66,9 +109,10 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             _effect.SetWorld(World);
             _effect.SetView(View);
-            _effect.SetProjection(Projection);            
-            _effect.SetBoneTransforms(BoneTransforms);          
-            base.Apply();
+            _effect.SetProjection(Projection);  
+            if(BoneTransforms != null)
+                _effect.SetBoneTransforms(BoneTransforms);
+            _effect.Apply();
         }
     }
 }

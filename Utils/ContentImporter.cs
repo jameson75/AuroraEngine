@@ -189,7 +189,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             
             //Read X-File Data
             //----------------
-            doc.Load(System.IO.File.ReadAllText(fileName));
+            doc.Load(System.IO.File.Open(fileName, FileMode.Open, FileAccess.ReadWrite));
 
             //Access X-File's first mesh Data and it's frame
             //----------------------------------------------
@@ -203,13 +203,24 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
             //Extract texture coords from mesh data
             //-------------------------------------
-            float[] texUStream = xMesh.DeclData.GetVertexDataStream<float>(VertexElementUsage.TexCoord, 0);
-            float[] texVStream = xMesh.DeclData.GetVertexDataStream<float>(VertexElementUsage.TexCoord, 1);
-            Vector2[] texCoords = texUStream.Zip(texVStream, (f, s) => new Vector2(f, s)).ToArray();         
+            ////float[] texUStream = xMesh.DeclData.GetVertexDataStream<float>(VertexElementUsage.TexCoord, 0);
+            ////float[] texVStream = xMesh.DeclData.GetVertexDataStream<float>(VertexElementUsage.TexCoord, 1);
+            ////Vector2[] texCoords = texUStream.Zip(texVStream, (f, s) => new Vector2(f, s)).ToArray();         
+            Vector2[] texCoords = xMesh.DeclData.GetTextureCoords();
+
+            //Extract normals.
+            //----------------
+            Vector3[] normals = xMesh.DeclData.GetNormals();
 
             //Construct model vertices from mesh data
             //---------------------------------------
-            BasicSkinnedVertexTexture[] _vertices = xMesh.Vertices.Zip(texCoords, (e,f) => new BasicSkinnedVertexTexture() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), TextureCoord = f }).ToArray();            
+            //BasicVertexPositionNormalTexture[] _vertices = xMesh.Vertices.Zip(normals, (e, f) => new BasicVertexPositionNormalTexture() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Normal = f, Color = Color.Green.ToVector4() }).ToArray();            
+            BasicSkinnedVertexTexture[] _vertices = xMesh.Vertices.Select((v, i) => new BasicSkinnedVertexTexture()
+            {
+                Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                Normal = normals[i],
+                TextureCoord = texCoords[i]
+            }).ToArray();
 
             //Construct model vertex indices from mesh data
             //----------------------------------------------
@@ -217,17 +228,21 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Cast<short>()).ToArray();
             short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Select( x => (short)x)).ToArray();
            
-            //Construct model skinning information from mesh data
-            //---------------------------------------------------
+            //Convert skinning information in .x file to skinning information required by SkinnedEffect shader.
+            //(The shader associates each vertex with 4 bone indices and 4 bone weights - we extract this 
+            //information from SkinWeights data object).
+            //-------------------------------------------------------------------------------------------------
+            
             List<float>[] weights = new List<float>[_vertices.Length];
             List<int>[] boneIndices = new List<int>[_vertices.Length];
             List<string>[] boneNames = new List<string>[_vertices.Length];
-            List<Bone> boneList = new List<Bone>();          
+            List<SkinOffset> skinOffsetList = new List<SkinOffset>();       
+               
             for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
             {                
                 XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];               
-                Animation.Transform boneTransform = new Animation.Transform(new Matrix(xSkinWeights.MatrixOffset.m));
-                boneList.Add(new Bone() { Name = xSkinWeights.TransformNodeName, Transform = boneTransform });
+                Transform skinOffsetTransform = new Transform(new Matrix(xSkinWeights.MatrixOffset.m));
+                skinOffsetList.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
                 for(int j = 0; j < xSkinWeights.NWeights; j++ )
                 {
                     int k = xSkinWeights.VertexIndices[j];
@@ -238,11 +253,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                    
                     if (weights[k] == null)
                         weights[k] = new List<float>();                   
-                    weights[k].Add(xSkinWeights.Weights[j]);
-
-                    if (boneNames[k] == null)
-                        boneNames[k] = new List<string>();
-                    boneNames[k].Add(xSkinWeights.TransformNodeName);                   
+                    weights[k].Add(xSkinWeights.Weights[j]);             
                 }
             }
             for (int i = 0; i < _vertices.Length; i++)
@@ -252,21 +263,19 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 if(weights[i] != null)
                 {
                     float[] _weights = weights[i].ToArray();
+                    //TODO: assert that _weights.Length <= weightValues.Length (we assume the .x file will have no more than 4 per vertex).
                     Array.Copy(_weights, weightValues, _weights.Length);
                 }
                 if (boneIndices[i] != null)
                 {
                     int[] _boneIndices = boneIndices[i].ToArray();
+                    //TODO: assert that _bondIndices.Length <= boneIndicesValues.Length (we assume the .x file will have no more than 4 per vertex).
                     Array.Copy(_boneIndices, boneIndicesValues, _boneIndices.Length);
-                }
-                if (boneNames[i] != null)
-                {
-                    string[] _boneNames = boneNames[i].ToArray();
-                }
+                }             
                 _vertices[i].Weights = new Vector4(weightValues);
                 _vertices[i].BoneIndices = new Int4(boneIndicesValues);
             }                 
-
+            
             //Construct bone hierarchy (skeleton) from frame data
             //----------------------------------------------------              
             //****************************************************
@@ -277,11 +286,13 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //TODO: Remove hard coding.
             XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
             Frame rootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
-            BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, boneList);           
+            BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsetList);           
 
+            /*
             //Construct animation data from frame data
             //----------------------------------------
             //TODO: Remove hard coding.
+           
             XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[8];
             List<KeyframeAnimationController> modelAnimationControllers = new List<KeyframeAnimationController>();
             List<Frame> frameList = rootFrame.FlattenToList();
@@ -313,27 +324,28 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     modelAnimationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
                 }
             }
-            
+            */
             //Create and return model
             //-----------------------
             result = new RiggedModel(app);
             result.Mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
-            result.Bones.AddRange(boneList);
-            result.FrameTree = rootFrame;
-            result.Animation.AddRange(modelAnimationControllers);            
+            result.SkinOffsets.AddRange(skinOffsetList);          
+            result.FrameTree = rootFrame;            
+            //result.Animation.AddRange(modelAnimationControllers);            
+             
             return result;
         }
 
-        private static void BuildBoneFrameHierarchy(XFileFrameObject xFrame, Frame frame, List<Bone> bones)
+        private static void BuildBoneFrameHierarchy(XFileFrameObject xBoneFrame, Frame boneframe, List<SkinOffset> skinOffsets)
         {
-            foreach (XFileFrameObject childXFrame in xFrame.ChildFrames)
+            foreach (XFileFrameObject xChildBoneFrame in xBoneFrame.ChildFrames)
             {
-                Bone bone = bones.Find(b => b.Name == childXFrame.Name);
-                Frame newChildFrame = new Frame() { Name = childXFrame.Name, Transform = new Transform(new Matrix(childXFrame.FrameTransformMatrix.m)) };
-                if (bone != null)
-                    newChildFrame.Reference = bone;
-                frame.Children.Add(newChildFrame);
-                BuildBoneFrameHierarchy(childXFrame, newChildFrame, bones);
+                SkinOffset skinOffset = skinOffsets.Find(b => b.Name == xChildBoneFrame.Name);
+                Frame childBoneFrame = new Frame() { Name = xChildBoneFrame.Name, Transform = new Transform(new Matrix(xChildBoneFrame.FrameTransformMatrix.m)) };
+                if (skinOffset != null)
+                    skinOffset.BoneReference = childBoneFrame;
+                boneframe.Children.Add(childBoneFrame);                
+                BuildBoneFrameHierarchy(xChildBoneFrame, childBoneFrame, skinOffsets);
             }
         }
     }

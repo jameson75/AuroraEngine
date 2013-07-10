@@ -101,7 +101,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             {
                 stack.Push(Animation.Transform.Invert(node.Transform));
                 node = node.Parent;
-            }
+            }          
             return stack.ReverseTransform;
         }
 

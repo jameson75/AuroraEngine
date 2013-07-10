@@ -26,7 +26,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// </summary>
     public class RiggedModel : BasicModel
     {
-        private Bones _bones = new Bones();
+        private SkinOffsets _bones = new SkinOffsets();
        
         private List<KeyframeAnimationController> _animationControllers = new List<KeyframeAnimationController>();
 
@@ -41,7 +41,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// <summary>
         /// 
         /// </summary>
-        public Bones Bones { get { return _bones; } }
+        public SkinOffsets SkinOffsets { get { return _bones; } }
 
         /// <summary>
         /// 
@@ -89,15 +89,14 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             if (skinEffect != null)
             {
                 if (FrameTree != null)
-                {
-                    List<Frame> frameList = this.FrameTree.FlattenToList();
-                    Matrix[] boneMatrices = new Matrix[Bones.Count];
-                    for (int i = 0; i < Bones.Count; i++ )
+                {                    
+                    Matrix[] finalBoneMatrices = new Matrix[SkinOffsets.Count];
+                    for (int i = 0; i < SkinOffsets.Count; i++ )
                     {
-                        Frame frame = frameList.Find( f => f.Reference == Bones[i] );
-                        boneMatrices[i] = Transform.Multiply(Bones[i].Transform, frame.LocalToWorld(frame.Transform)).ToMatrix();
+                        Frame bone = SkinOffsets[i].BoneReference;                       
+                        finalBoneMatrices[i] = SkinOffsets[i].Transform.ToMatrix() * bone.LocalToWorld(bone.Transform).ToMatrix();
                     }
-                    skinEffect.BoneTransforms = boneMatrices;     
+                    skinEffect.BoneTransforms = finalBoneMatrices;     
                 }
             }
             base.OnApplyingEffect();
@@ -107,22 +106,23 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// 
     /// </summary>
-    public class Bone 
+    public class SkinOffset 
     {
         /// <summary>
         /// 
         /// </summary>
         public string Name { get; set; }
-        public Transform Transform { get; set; }        
+        public Transform Transform { get; set; }
+        public Frame BoneReference { get; set; }
     }
 
-    public class Bones : List<Bone>
+    public class SkinOffsets : List<SkinOffset>
     {  
-        public Bone this[string name]
+        public SkinOffset this[string name]
         {
             get
             {
-                Bone result = this.Find(b => b.Name == name);
+                SkinOffset result = this.Find(b => b.Name == name);
                 if (result != null)
                     return result;
                 throw new IndexOutOfRangeException();                
@@ -138,12 +138,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public Frame()
         {
             _children = new Frames();
+            _children.CollectionChanged += this.Children_CollectionChanged;
             Transform = Transform.Identity;
         }
 
         public string Name { get; set; }
-        
-        public object Reference { get; set; }
         
         public Frame Parent
         {
@@ -176,7 +175,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _BuildFlattenedTree(this, results);
             return results;
         }
-
+       
         public Transform LocalToWorld(Transform localTransform)
         {
             TransformStack stack = new TransformStack();
