@@ -61,7 +61,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 vz2 += new Vector3(0f, 0f, -zStepSize);
             }
             //NOTE: We must get the shader byte code
-            MeshDescription meshDesc = new MeshDescription();
+            GeometryDescription meshDesc = new GeometryDescription();
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;

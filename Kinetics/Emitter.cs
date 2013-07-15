@@ -30,7 +30,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     {
         private List<Particle> _particles = new List<Particle>();
         private List<ParticleLink> _links = new List<ParticleLink>();
-        private Mesh _dynamicMesh = null;
+        private const int MaxParticles = 10000;
+        
+        //private Mesh _dynamicInstancedMesh = null;
 
         #region ITransformable Members
         public Transform Transform { get; set; }
@@ -50,44 +52,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         public ReadOnlyCollection<ParticleLink> Links { get { return _links.AsReadOnly(); } }
 
-        public Emitter(IGameApp game, Effect effect)
-        {              
-            _dynamicMesh = CreateDynamicMesh(game, effect);
-        }
+        public Effect Effect { get; set; }
 
-        private static Mesh CreateDynamicMesh(IGameApp game, Effect effect)
-        {
-            //Create indices, texcoords and verts for quad singularity...
-
-            short[] indices = {0, 1, 2, 2, 3, 0};
-            Vector3[] points = ContentBuilder.CreateQuadPoints(Rectangle.Empty);
-            Vector2[] texCoords = ContentBuilder.CreateQuadTextureCoords();
-            BasicVertexDualTextureIPosition[] verts = texCoords.Select(t => new BasicVertexDualTextureIPosition(t, Vector2.Zero)).ToArray();
-            
-            //Describe a dynamic mesh with an index buffer.
-            MeshDescription meshDesc = new MeshDescription();
-            BufferDescription vertexBufferDesc = new BufferDescription();
-            vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
-            vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
-            vertexBufferDesc.SizeInBytes = verts.Length * BasicVertexDualTextureIPosition.VertexElementSize;
-            vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-            vertexBufferDesc.StructureByteStride = 0;
-            DXBuffer vBuffer = DXBuffer.Create<BasicVertexDualTextureIPosition>(game.GraphicsDevice, verts, vertexBufferDesc);
-            meshDesc.VertexBuffer = vBuffer;
-            meshDesc.VertexCount = verts.Length;
-            meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, effect.SelectShaderByteCode(), BasicVertexDualTextureIPosition.InputElements);
-            meshDesc.VertexStride = BasicVertexDualTextureIPosition.VertexElementSize;
-            BufferDescription indexBufferDesc = new BufferDescription();
-            indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
-            indexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
-            indexBufferDesc.SizeInBytes = indices.Length * sizeof(short);
-            indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-            DXBuffer iBuffer = DXBuffer.Create<short>(game.GraphicsDevice, indices, indexBufferDesc);
-            meshDesc.IndexCount = indices.Length;
-            meshDesc.IndexBuffer = iBuffer;
-            meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
-            return new Mesh(game, meshDesc);
-        }
+        public Geometry Geometry { get; set; }      
 
         public List<Particle> Emit()
         {
@@ -149,8 +116,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 p.Age = 0;
                 p.Velocity = randomVelocity;
                 p.Transform = this.Transform;
-                p.Texture = description.Texture;
-                p.Effect = description.Effect;
+                //p.Texture = description.Texture;
+                //p.Effect = description.Effect;
+                p.SharedAttributes = description;
                 pList.Add(p);
             }
             return pList;
@@ -177,24 +145,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public void Unlink(Particle p)
         {
             _links.RemoveAll(e => e.P1 == p || e.P2 == p);
-        }
-
-        public void Draw(long gameTime)
-        {
-            foreach(Particle p in _particles )
-            {
-                p.Effect.World = this.Transform.ToMatrix() * p.Transform.ToMatrix(); //DESIGN FLAW (Use consistent method to aquire this object's world transform).
-                p.Effect.View; //DESIGN FLAW (Access game services to get the current camera/view).
-                p.Effect.Projection; //DESIGN FLAW. (Access game services to get the current camera/projection).
-                if (p.Effect is IParticleEffect)
-                {
-                    ((IParticleEffect)p.Effect).Color = p.Color;
-                    ((IParticleEffect)p.Effect).Opacity = p.Opacity;
-                    ((IParticleEffect)p.Effect).Size = p.Size;
-                    ((IParticleEffect)p.Effect).SetTexture(p.Texture);
-                }                
-            }            
-        }
+        }        
     } 
 
     /// <summary>
@@ -241,7 +192,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public ColorOverLife ColorOverLife { get; set; }
         public FloatOverLife OpacityOverLife { get; set; }        
         public Texture2D Texture { get; set; }
-        public Effect Effect { get; set; }
+        //public Effect Effect { get; set; }
         //public Model CustomModel { get; set; }
     }
 
@@ -271,8 +222,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         #endregion    
 
         #region Shared Attributes
-        public Texture2D Texture { get; set; }
-        public Effects.Effect Effect { get; set; }
+        //public Texture2D Texture { get; set; }
+        //public Effects.Effect Effect { get; set; }
+        public ParticleDescription SharedAttributes { get; set; }
         #endregion
     }
 
@@ -433,16 +385,6 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 p.Transform = TargetAnimations[p].GetValueAtT(time);
             }
         }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public interface IParticleEffect
-    {
-        public Color Color { get; set; }
-        public Vector2 Size { get; set; }
-        public float Opacity { get; set; }
-    }
+    }    
 }
     

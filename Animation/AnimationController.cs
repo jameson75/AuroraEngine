@@ -177,8 +177,8 @@ namespace CipherPark.AngelJacket.Core.Animation
                     else
                     {
                         float normalizedAge = p.Age / (float)p.Life;
-                        p.Color = p.SharedDescription.ColorOverLife.GetValueAtAge(normalizedAge);
-                        p.Opacity = p.SharedDescription.OpacityOverLife.GetValueAtAge(normalizedAge);
+                        p.Color = p.SharedAttributes.ColorOverLife.GetValueAtAge(normalizedAge);
+                        p.Opacity = p.SharedAttributes.OpacityOverLife.GetValueAtAge(normalizedAge);
                         if( Solver != null )
                             Solver.UpdateParticleTransform((ulong)animationTime, p);
                     }

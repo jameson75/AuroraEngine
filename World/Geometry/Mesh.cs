@@ -12,57 +12,76 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class Mesh
+    public class Geometry     
     {
         private DXBuffer _instanceBuffer = null;
         private DXBuffer _vertexBuffer = null;
         private DXBuffer _indexBuffer = null;
-        private IGameApp _app = null;       
-        private int _instanceCount = 0; 
+        private IGameApp _app = null;
+        private int _instanceCount = 0;
         private int _vertexCount = 0;
         private int _indexCount = 0;
         private int _vertexStride = 0;
         private int _instanceStride = 0;
         private InputLayout _vertexLayout = null;
-        private InputLayout _instanceLayout = null;
-       
+
         private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;
 
         public string Name { get; set; }
 
         public BoundingBox BoundingBox { get; private set; }
 
-        public Mesh(IGameApp app, MeshDescription meshDescription)
+        public Geometry(IGameApp app, GeometryDescription description)
         {
             _app = app;
-            _vertexStride = meshDescription.VertexStride;
-            _vertexLayout = meshDescription.VertexLayout;
-            _topology = meshDescription.Topology;
-            _vertexCount = meshDescription.VertexCount;
-            _vertexBuffer = meshDescription.VertexBuffer;           
-            BoundingBox = meshDescription.BoundingBox;
-            if (meshDescription.IndexBuffer != null)
+            _vertexStride = description.VertexStride;
+            _vertexLayout = description.VertexLayout;
+            _topology = description.Topology;
+            _vertexCount = description.VertexCount;
+            _vertexBuffer = description.VertexBuffer;
+            BoundingBox = description.BoundingBox;
+            if (description.IndexBuffer != null)
             {
-                _indexCount = meshDescription.IndexCount;
-                _indexBuffer = meshDescription.IndexBuffer;
+                _indexCount = description.IndexCount;
+                _indexBuffer = description.IndexBuffer;
             }
-            if (meshDescription.InstanceBuffer != null)
+            if (description.InstanceBuffer != null)
             {
-                _instanceCount = meshDescription.InstanceCount;
-                _instanceBuffer = meshDescription.InstanceBuffer;
+                _instanceStride = description.InstanceStride;
+                _instanceCount = description.InstanceCount;
+                _instanceBuffer = description.InstanceBuffer;
+            }
+        }
+        
+        public bool IsInstanced
+        {
+            get { return _instanceBuffer != null; }
+        }
+
+        public bool IsDynamic
+        {
+            get
+            {
+                DXBuffer xBuffer = (!IsInstanced) ? _vertexBuffer : _instanceBuffer;
+                return ((xBuffer.Description.CpuAccessFlags & CpuAccessFlags.Write) != 0);
             }
         }
 
-        public void Update<T>(T[] data, int elementSize, bool isInstanced = false) where T : struct
+        public void Update<T>(T[] data) where T : struct
         {
-            DXBuffer dynamicBuffer = (!isInstanced) ? _vertexBuffer : _instanceBuffer;
+            DXBuffer dynamicBuffer = (!IsInstanced) ? _vertexBuffer : _instanceBuffer;
+            int elementSize = (!IsInstanced) ? _vertexStride : _instanceStride;
             if (dynamicBuffer == null)
                 throw new InvalidOperationException("Buffer is not available.");
             DataBox box = _app.GraphicsDeviceContext.MapSubresource(dynamicBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(box.DataPointer, data.Length * elementSize);
             dataBuffer.Set<T>(0, data);
             _app.GraphicsDeviceContext.UnmapSubresource(dynamicBuffer, 0);
-        }
+            if(!IsInstanced)
+               _vertexCount = data.Length;
+            else
+                _instanceCount = data.Length;
+        }    
 
         public void Draw(long gameTime)
         {
@@ -76,41 +95,56 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
             _app.GraphicsDeviceContext.InputAssembler.InputLayout = _vertexLayout;
             _app.GraphicsDeviceContext.InputAssembler.PrimitiveTopology = _topology;
-            _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, _vertexStride, 0));
-            if (_instanceBuffer != null)
+            if (_instanceBuffer == null)
             {
-                if (_indexBuffer != null)
+                _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, _vertexStride, 0));
+                if (_indexBuffer == null)
+                    _app.GraphicsDeviceContext.Draw(_vertexCount, 0);
+                else
                 {
                     _app.GraphicsDeviceContext.InputAssembler.SetIndexBuffer(_indexBuffer, indexBufferFormat, 0);
                     _app.GraphicsDeviceContext.DrawIndexed(_indexCount, 0, 0);
                 }
-                else
-                    _app.GraphicsDeviceContext.Draw(_vertexCount, 0);
             }
             else
             {
-                if (_indexBuffer != null)
+                if (_instanceBuffer == null)
+                    throw new InvalidOperationException("Instance buffer was not created.");
+
+                _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding[] 
+                { 
+                    new VertexBufferBinding(_vertexBuffer, _vertexStride, 0),
+                    new VertexBufferBinding(_instanceBuffer, _instanceStride, 0)
+                });
+                if (_indexBuffer == null)
+                    _app.GraphicsDeviceContext.DrawInstanced(_vertexCount, _instanceCount, 0, 0);
+                else
                 {
                     _app.GraphicsDeviceContext.InputAssembler.SetIndexBuffer(_indexBuffer, indexBufferFormat, 0);
                     _app.GraphicsDeviceContext.DrawIndexedInstanced(_indexCount, _instanceCount, 0, 0, 0);
                 }
-                else
-                    _app.GraphicsDeviceContext.DrawInstanced(_vertexCount, _instanceCount, 0, 0);
             }
         }
     }
 
-    public struct MeshDescription
+    public class Mesh : Geometry 
+    {
+        public Mesh(IGameApp app, GeometryDescription description)
+            : base(app, description)
+        { }
+    }
+
+    public struct GeometryDescription
     {
         public DXBuffer IndexBuffer { get; set; }
         public DXBuffer VertexBuffer { get; set; }
         public DXBuffer InstanceBuffer { get; set; }
         public int VertexStride { get; set; }
         public int VertexCount { get; set; }
+        public int InstanceStride { get; set; }
         public int InstanceCount { get; set; }
         public int IndexCount { get; set; }
-        public InputLayout VertexLayout { get; set; }
-        public InputLayout InstanceLayout { get; set; }
+        public InputLayout VertexLayout { get; set; }       
         public PrimitiveTopology Topology { get; set; }
         public BoundingBox BoundingBox { get; set; }
     }
