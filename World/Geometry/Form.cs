@@ -7,15 +7,25 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.AngelJacket.Core.Kinetics;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public abstract class Form : Model
     {
-        private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();            
+        private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();
+        private Emitter _emitter = null;
 
         public Form(IGameApp game) : base(game)
         { }
+
+        public Emitter Emitter { get { return _emitter; } set { _emitter = value; OnEmitterChanged(); } }
+        
+        protected virtual void OnEmitterChanged()
+        { }
+        
+        public Effect EmitterEffect { get; set; }
 
         public override void Draw(long gameTime)
         {
@@ -26,8 +36,15 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             {
                 //this.Effect.SetWorld(this.Transform * element.Transform);               
                 this.Effect.World = formTransform * element.Transform;
-                this.Effect.Apply();
-                Mesh.Draw(gameTime);
+                this.Effect.Apply();                
+                this.Mesh.Draw(gameTime);
+
+                if (Emitter != null)
+                {
+                   // this.EmitterEffect.World = formTransform * element.Transform;
+                   // this.EmitterEffect.Apply();
+                   // Emitter.Draw(gameTime);
+                }
             }
             this.Effect.World = formTransform;
             this.Effect.Apply();

@@ -126,6 +126,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct BasicVertexPositionNormalTexture
     {
@@ -157,6 +160,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct BasicVertexPositionNormalColor
     {
@@ -188,6 +194,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct BasicSkinnedVertexTexture
     {
@@ -224,4 +233,39 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             BoneIndices = new Int4(boneIndices);
         }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct BasicVertexDualTextureIPosition
+    {        
+        public Vector2 TextureCoord0;
+        public Vector2 TextureCoord1;
+
+        private static InputElement[] _inputElements = null;
+        private static int _vertexElementSize = 0;
+        private static int _instanceElementSize = 0;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int VertexElementSize { get { return _vertexElementSize; } }
+        public static int InstanceElementSize { get { return _instanceElementSize; } }
+
+        static BasicVertexDualTextureIPosition()
+        {
+            _inputElements = new InputElement[]
+             {                
+                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 0, 0),
+                 new InputElement("TEXCOORD", 1, Format.R32G32_Float, 8, 0),
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1)
+             };
+            _vertexElementSize = 16;
+            _instanceElementSize = 16;
+        }
+
+        public BasicVertexDualTextureIPosition(Vector2 textureCoord0, Vector2 textureCoord1)
+        {
+            TextureCoord0 = textureCoord0;
+            TextureCoord1 = textureCoord1;
+        }
+    }    
 }

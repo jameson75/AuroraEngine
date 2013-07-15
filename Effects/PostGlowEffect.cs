@@ -160,8 +160,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         private void WriteConstants()
         {
             DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
-            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, ConstantBufferSize);
-            
+            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, ConstantBufferSize);            
             int offset = 0;
             dataBuffer.Set(offset, GlowSpan);
             offset += sizeof(float);
@@ -172,7 +171,6 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBuffer.Set(offset, ClearDepth);
             offset += sizeof(float);
             dataBuffer.Set(offset, ClearColor);
-
             GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
         }
     }

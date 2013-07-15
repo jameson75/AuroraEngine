@@ -288,11 +288,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             Frame rootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
             BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsetList);           
 
-            /*
             //Construct animation data from frame data
             //----------------------------------------
-            //TODO: Remove hard coding.
-           
+            //TODO: Remove hard coding.           
             XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[8];
             List<KeyframeAnimationController> modelAnimationControllers = new List<KeyframeAnimationController>();
             List<Frame> frameList = rootFrame.FlattenToList();
@@ -324,14 +322,14 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     modelAnimationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
                 }
             }
-            */
+            
             //Create and return model
             //-----------------------
             result = new RiggedModel(app);
             result.Mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
             result.SkinOffsets.AddRange(skinOffsetList);          
             result.FrameTree = rootFrame;            
-            //result.Animation.AddRange(modelAnimationControllers);            
+            result.Animation.AddRange(modelAnimationControllers);            
              
             return result;
         }

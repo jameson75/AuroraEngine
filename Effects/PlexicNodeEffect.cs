@@ -29,7 +29,8 @@ namespace CipherPark.AngelJacket.Core.Effects
         public Color ForegroundColor { get; set; }
         public Color BackgroundColor { get; set; }
 
-        public PlexicNodeEffect(Device graphicsDevice) : base(graphicsDevice)        {
+        public PlexicNodeEffect(Device graphicsDevice) : base(graphicsDevice)        
+        {
       
             ForegroundColor = Color.Transparent;
             BackgroundColor = Color.Transparent;
