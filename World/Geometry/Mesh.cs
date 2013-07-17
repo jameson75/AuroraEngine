@@ -10,6 +10,14 @@ using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public class Geometry     

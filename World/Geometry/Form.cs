@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
+using CipherPark.AngelJacket.Core.World.ParticleSystem;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
@@ -16,7 +17,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {
         private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();
         private Emitter _emitter = null;
-
+       
         public Form(IGameApp game) : base(game)
         { }
 
@@ -24,8 +25,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         
         protected virtual void OnEmitterChanged()
         { }
-        
-        public Effect EmitterEffect { get; set; }
+
+        public ParticleRenderer ParticleRenderer { get; set; }
 
         public override void Draw(long gameTime)
         {
@@ -38,13 +39,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 this.Effect.World = formTransform * element.Transform;
                 this.Effect.Apply();                
                 this.Mesh.Draw(gameTime);
-
-                if (Emitter != null)
-                {
-                   // this.EmitterEffect.World = formTransform * element.Transform;
-                   // this.EmitterEffect.Apply();
-                   // Emitter.Draw(gameTime);
-                }
+                if (Emitter != null && ParticleRenderer != null)                
+                    ParticleRenderer.Render(gameTime, Emitter.Transform.ToMatrix(), this.Effect.View, this.Effect.Projection, Emitter.Particles, Emitter.Links);                
             }
             this.Effect.World = formTransform;
             this.Effect.Apply();

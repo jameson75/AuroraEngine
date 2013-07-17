@@ -174,14 +174,11 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public ulong Life { get; set; }
         public int LifeRandomness { get; set; }
         public float InitialVelocity { get; set; }
-        public int InitialVelocityRandomness { get; set; }
-        //public ColorOverLife ColorOverLife { get; set; }
-        //public FloatOverLife OpacityOverLife { get; set; }
+        public int InitialVelocityRandomness { get; set; }       
         //public float Scale { get; set; }
         //public float ScaleRandomness { get; set; }
         //public float PointSize { get; set; }
         //public int RandomSeed { get; set; }
-        //public Texture2D Texture { get; set; }
     }
 
     /// <summary>
@@ -191,9 +188,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     {
         public ColorOverLife ColorOverLife { get; set; }
         public FloatOverLife OpacityOverLife { get; set; }        
-        public Texture2D Texture { get; set; }
-        //public Effect Effect { get; set; }
-        //public Model CustomModel { get; set; }
+        public Texture2D Texture { get; set; }      
     }
 
     /// <summary>
