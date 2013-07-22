@@ -42,35 +42,31 @@ namespace CipherPark.AngelJacket.Core.Effects
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
             _vertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
             _pixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
-            int bufferSize = sizeof(float) * 16 + sizeof(float) * 4 * 2; //size of WorldViewProj + ForegroundColor + BackgroundColor
+            int bufferSize = sizeof(float) * 16  * 3; //size of WorldViewProj + ForegroundColor + BackgroundColor
             _constantBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
         public override void Apply()
         {
-            BlendStateDescription blendDesc = BlendStateDescription.Default();
-            for (int i = 0; i < blendDesc.RenderTarget.Length; i++)
-            {
-                blendDesc.RenderTarget[i].IsBlendEnabled = true;
-                blendDesc.RenderTarget[i].SourceBlend = BlendOption.SourceAlpha;
-                blendDesc.RenderTarget[i].SourceAlphaBlend = BlendOption.SourceAlpha;
-                blendDesc.RenderTarget[i].DestinationBlend = BlendOption.InverseSourceAlpha;
-                blendDesc.RenderTarget[i].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
-            }
-            BlendState newBlendState = new BlendState(GraphicsDevice, blendDesc);
+            //BlendStateDescription blendDesc = BlendStateDescription.Default();
+            //for (int i = 0; i < blendDesc.RenderTarget.Length; i++)
+            //{
+            //    blendDesc.RenderTarget[i].IsBlendEnabled = true;
+            //    blendDesc.RenderTarget[i].SourceBlend = BlendOption.SourceAlpha;
+            //    blendDesc.RenderTarget[i].SourceAlphaBlend = BlendOption.SourceAlpha;
+            //    blendDesc.RenderTarget[i].DestinationBlend = BlendOption.InverseSourceAlpha;
+            //    blendDesc.RenderTarget[i].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
+            //}
+            //BlendState newBlendState = new BlendState(GraphicsDevice, blendDesc);
             //Game.GraphicsDeviceContext.OutputMerger.BlendFactor = Color.Zero;
-            BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
-            GraphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;
-
+            //BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
+            //GraphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;           
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             SetShaderConstants();
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
-
-            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
-            GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
+            //GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
         }
 
         public override byte[] SelectShaderByteCode()
@@ -82,8 +78,11 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             Matrix worldViewProjection = this.World * this.View * this.Projection;
-            worldViewProjection.Transpose();
-            dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);
+            worldViewProjection.Transpose();        
+            dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);          
+            Matrix view = this.View;
+            view.Transpose();
+            dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref view);
             Vector4 vForegroundColor = ForegroundColor.ToVector4();
             dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref vForegroundColor);
             Vector4 vBackgroundColor = BackgroundColor.ToVector4();

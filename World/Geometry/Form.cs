@@ -40,7 +40,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 this.Effect.Apply();                
                 this.Mesh.Draw(gameTime);
                 if (Emitter != null && ParticleRenderer != null)                
-                    ParticleRenderer.Render(gameTime, Emitter.Transform.ToMatrix(), this.Effect.View, this.Effect.Projection, Emitter.Particles, Emitter.Links);                
+                    ParticleRenderer.Render(gameTime, Effect.World * Emitter.Transform.ToMatrix() * Matrix.Translation(0, 1.0f, 0), this.Effect.View, this.Effect.Projection, Emitter.Particles, Emitter.Links);                
             }
             this.Effect.World = formTransform;
             this.Effect.Apply();

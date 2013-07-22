@@ -54,7 +54,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         public Effect Effect { get; set; }
 
-        public Geometry Geometry { get; set; }      
+        public Mesh Geometry { get; set; }      
 
         public List<Particle> Emit()
         {
@@ -74,9 +74,22 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             return particles.ToList();
         }
 
-        public List<Particle> CreateParticles(int count, ParticleDescription customParticleDescription = null)
+        public List<Particle> CreateParticles(int count)
         {
-            return Spawn(customParticleDescription != null ? customParticleDescription : DefaultParticleDescription);
+            List<Particle> pList = new List<Particle>();
+            for (int i = 0; i < count; i++)
+            {              
+                Particle p = new Particle();
+                p.Life = 0;
+                p.Color = Color.Transparent;
+                p.Opacity = 0;
+                p.Age = 0;
+                p.Velocity = 0;
+                p.Transform = this.Transform;
+                p.SharedAttributes = null;
+                pList.Add(p);
+            }
+            return pList;           
         }
 
         public void KillAll()
@@ -116,8 +129,6 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 p.Age = 0;
                 p.Velocity = randomVelocity;
                 p.Transform = this.Transform;
-                //p.Texture = description.Texture;
-                //p.Effect = description.Effect;
                 p.SharedAttributes = description;
                 pList.Add(p);
             }
@@ -216,9 +227,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public Vector2 Size { get; set; }
         #endregion    
 
-        #region Shared Attributes
-        //public Texture2D Texture { get; set; }
-        //public Effects.Effect Effect { get; set; }
+        #region Shared Attributes     
         public ParticleDescription SharedAttributes { get; set; }
         #endregion
     }
@@ -230,9 +239,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     {
         public EmitterAction() { }
         public EmitterAction(ulong time, EmitterTask task) { Time = time; Task = task; }
-        public EmitterAction(ulong time, ParticleDescription customParticleDescription, EmitterTask task = EmitterTask.EmitCustom) { Time = time; CustomParticleDescriptionArg = customParticleDescription; Task = task; }
+        public EmitterAction(ulong time, ParticleDescription customParticleDescription) { Time = time; CustomParticleDescriptionArg = customParticleDescription; Task = EmitterTask.EmitCustom; }
         public EmitterAction(ulong time, IEnumerable<Particle> particleArgs, EmitterTask task) { Time = time; ParticleArgs = particleArgs; Task = task; }
-        public EmitterAction(ulong time, Transform transform, EmitterTask task = EmitterTask.Transform) { Time = time; Transform = transform; Task = task; }
+        public EmitterAction(ulong time, Transform transform) { Time = time; Transform = transform; Task = EmitterTask.Transform; }
         public ulong Time { get; set; }
         public ParticleDescription CustomParticleDescriptionArg { get; set; }
         public IEnumerable<Particle> ParticleArgs { get; set; }

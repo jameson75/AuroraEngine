@@ -125,6 +125,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                 _animationStartTime = gameTime;
             
             long animationTime = gameTime - _animationStartTime.Value;
+            long elapsedTime = gameTime - _animationStartTime.Value;
 
             if( Target != null)
             {
@@ -138,7 +139,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                 {
                     foreach (EmitterAction action in this.Actions)
                     {
-                        if (action.Time > (ulong)(gameTime - _animationStartTime.Value))
+                        if (action.Time <= (ulong)elapsedTime )
                         {
                             switch (action.Task)
                             {
@@ -163,25 +164,28 @@ namespace CipherPark.AngelJacket.Core.Animation
                                 case EmitterAction.EmitterTask.Transform:
                                     Target.Transform = action.Transform;
                                     break;
-                            }
+                            }                            
                         }
                     }
+                    this.Actions.RemoveAll(a => a.Time <= (ulong)elapsedTime);
                 }
            
                 foreach (Particle p in Target.Particles)
                 {
-                    //update particle age.
-                    p.Age = (ulong)animationTime;
-                    if (p.Age > p.Life)
-                        Target.Kill(p);
-                    else
-                    {
-                        float normalizedAge = p.Age / (float)p.Life;
-                        p.Color = p.SharedAttributes.ColorOverLife.GetValueAtAge(normalizedAge);
-                        p.Opacity = p.SharedAttributes.OpacityOverLife.GetValueAtAge(normalizedAge);
-                        if( Solver != null )
-                            Solver.UpdateParticleTransform((ulong)animationTime, p);
-                    }
+                    ////update particle age.
+                    //p.Age = (ulong)animationTime;
+                    //if (p.Age > p.Life)
+                    //    Target.Kill(p);
+                    //else
+                    //{
+                    //    float normalizedAge = p.Age / (float)p.Life;
+                    //    p.Color =  p.SharedAttributes.ColorOverLife.GetValueAtAge(normalizedAge);
+                    //    p.Opacity = p.SharedAttributes.OpacityOverLife.GetValueAtAge(normalizedAge);
+                    //    if( Solver != null )
+                    //        Solver.UpdateParticleTransform((ulong)animationTime, p);
+                    //}
+                    if (Solver != null)
+                        Solver.UpdateParticleTransform((ulong)animationTime, p);
                 }
             }
         }      

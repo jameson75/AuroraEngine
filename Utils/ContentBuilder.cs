@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return null;
         }
 
-        public static Mesh BuildQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Color color)
+        public static Mesh BuildQuad(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Color color)
         {   
             BasicVertexPositionColor[] verts = new BasicVertexPositionColor[4];
             short[] indices = new short[6] { 0, 1, 2, 2, 3, 0 };
@@ -40,12 +40,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
         }    
 
-        public static Mesh BuildTexturedQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Vector2[] textureCoords = null)
+        public static Mesh BuildTexturedQuad(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[4];
             short[] indices = new short[6] { 0, 1, 2, 2, 3, 0 };
             Vector3[] positions = CreateQuadPoints(dimension);
-            Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1) };
+            Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : CreateQuadTextureCoords();
             verts[0] = new BasicVertexPositionTexture(positions[0], _textureCoords[0]);
             verts[1] = new BasicVertexPositionTexture(positions[1], _textureCoords[1]);
             verts[2] = new BasicVertexPositionTexture(positions[2], _textureCoords[2]);
@@ -54,7 +54,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildLitTexturedQuad(IGameApp game, byte[] shaderByteCode, Rectangle dimension, Vector2[] textureCoords = null)
+        public static Mesh BuildLitTexturedQuad(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[4];
             short[] indices = new short[6] { 0, 1, 2, 2, 3, 0 };
@@ -66,9 +66,23 @@ namespace CipherPark.AngelJacket.Core.Utils
             verts[3] = new BasicVertexPositionNormalTexture(positions[3], Vector3.UnitY, _textureCoords[2]);                 
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
-        }       
+        }
 
-        public static Vector3[] CreateQuadPoints(Rectangle dimension, bool includeCenterPoint = false)
+        public static Mesh BuildParticleQuad(IGameApp game, byte[] shaderByteCode, DrawingSizeF size)
+        {
+            ParticleVertexPositionTexture[] verts = new ParticleVertexPositionTexture[4];
+            short[] indices = new short[6] { 0, 1, 2, 2, 3, 0 };
+            Vector3[] positions = CreateQuadPoints(new RectangleF(0, 0, 0, 0));
+            Vector2[] _textureCoords = CreateQuadTextureCoords();
+            verts[0] = new ParticleVertexPositionTexture(positions[0], _textureCoords[0], new Vector2(-size.Width, size.Height));
+            verts[1] = new ParticleVertexPositionTexture(positions[1], _textureCoords[1], new Vector2(size.Width, size.Height));
+            verts[2] = new ParticleVertexPositionTexture(positions[2], _textureCoords[2], new Vector2(size.Width, -size.Height));
+            verts[3] = new ParticleVertexPositionTexture(positions[3], _textureCoords[2], new Vector2(-size.Width, -size.Height));
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            return BuildMesh<ParticleVertexPositionTexture>(game, shaderByteCode, verts, indices, ParticleVertexPositionTexture.InputElements, ParticleVertexPositionTexture.ElementSize, boundingBox); 
+        }
+
+        public static Vector3[] CreateQuadPoints(RectangleF dimension, bool includeCenterPoint = false)
         {
             Vector3[] results = new Vector3[5] 
             {
@@ -76,7 +90,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 new Vector3(dimension.Right, 0, dimension.Top),
                 new Vector3(dimension.Right, 0, dimension.Bottom),
                 new Vector3(dimension.Left, 0, dimension.Bottom),
-                new Vector3(dimension.Left + (dimension.Width / 2.0f), 0, dimension.Bottom + (dimension.Height / 2.0f))
+                new Vector3(dimension.Left + (dimension.Width / 2.0f), 0, dimension.Top + (dimension.Height / 2.0f))
             };
             if (!includeCenterPoint)
                 return results.Take(4).ToArray();
@@ -254,7 +268,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 vz2 += new Vector3(0f, 0f, -zStepSize);
             }
             //NOTE: We must get the shader byte code
-            GeometryDescription meshDesc = new GeometryDescription();
+            MeshDescription meshDesc = new MeshDescription();
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
@@ -336,8 +350,11 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         public static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, short[] indices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
         {            
-            GeometryDescription meshDesc = new GeometryDescription();
-            
+            MeshDescription meshDesc = new MeshDescription();
+
+            if (verts == null)
+                throw new ArgumentNullException("verts");
+
             //Vertices...
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
@@ -366,12 +383,58 @@ namespace CipherPark.AngelJacket.Core.Utils
 
             meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             meshDesc.BoundingBox = boundingBox;
+            
+            return new Mesh(game, meshDesc);
+        }
+
+        public static Mesh BuildDynamicMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, int maxVertices, short[] indices, int maxIndices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox, bool isCage = false) where T : struct
+        {
+            MeshDescription meshDesc = new MeshDescription();
+
+            if (maxVertices <= 0)
+                throw new ArgumentOutOfRangeException("maxVertices");
+
+            if (indices != null && maxIndices <= 0)
+                throw new ArgumentOutOfRangeException("maxIndices");
+
+            //Vertices...
+            BufferDescription vertexBufferDesc = new BufferDescription();
+            vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
+            vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
+            vertexBufferDesc.SizeInBytes = maxVertices * vertexSize;
+            vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
+            vertexBufferDesc.StructureByteStride = 0;
+            vertexBufferDesc.Usage = ResourceUsage.Dynamic;
+            DXBuffer vBuffer = (verts != null) ? DXBuffer.Create<T>(game.GraphicsDevice, verts, vertexBufferDesc) : new DXBuffer(game.GraphicsDevice, vertexBufferDesc);
+            meshDesc.VertexBuffer = vBuffer;
+            meshDesc.VertexCount = (verts != null) ? verts.Length : 0;
+            meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderByteCode, inputElements);
+            meshDesc.VertexStride = vertexSize;
+
+            //Optional Indices...
+            if (maxIndices != 0)
+            {                
+                BufferDescription indexBufferDesc = new BufferDescription();
+                indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
+                indexBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
+                indexBufferDesc.SizeInBytes = maxIndices * sizeof(short);
+                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
+                indexBufferDesc.Usage = ResourceUsage.Dynamic;
+                DXBuffer iBuffer = (indices != null) ? DXBuffer.Create<short>(game.GraphicsDevice, indices, indexBufferDesc) : new DXBuffer(game.GraphicsDevice, indexBufferDesc);
+                meshDesc.IndexCount = (indices != null) ? indices.Length : 0;
+                meshDesc.IndexBuffer = iBuffer;
+            }
+
+            meshDesc.Topology = (isCage) ? SharpDX.Direct3D.PrimitiveTopology.LineList : SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            meshDesc.BoundingBox = boundingBox;
             return new Mesh(game, meshDesc);
         }      
 
-        private static Geometry BuildInstancedGeometry<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices, InputElement[] vertexInputElements, int vertexSize, Ti[] instances, InputElement[] instanceInputElements, int instanceSize, bool dynamic = false) where Ti : struct where Tv : struct
+        private static Mesh BuildInstancedMesh<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices, 
+            InputElement[] vertexInputElements, int vertexSize, Ti[] instances, InputElement[] instanceInputElements, 
+            int instanceSize) where Ti : struct where Tv : struct
         {
-            GeometryDescription geomDesc = new GeometryDescription();
+            MeshDescription meshDesc = new MeshDescription();
             
             //Vertices..
             BufferDescription vertexBufferDesc = new BufferDescription();
@@ -381,22 +444,22 @@ namespace CipherPark.AngelJacket.Core.Utils
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
             DXBuffer vBuffer = DXBuffer.Create<Tv>(game.GraphicsDevice, verts, vertexBufferDesc);
-            geomDesc.VertexBuffer = vBuffer;
-            geomDesc.VertexCount = verts.Length;
-            geomDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderByteCode, vertexInputElements);
-            geomDesc.VertexStride = vertexSize;
+            meshDesc.VertexBuffer = vBuffer;
+            meshDesc.VertexCount = verts.Length;
+            meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderByteCode, vertexInputElements);
+            meshDesc.VertexStride = vertexSize;
             
             //Instances...
             BufferDescription instanceBufferDesc = new BufferDescription();
             instanceBufferDesc.BindFlags = BindFlags.VertexBuffer;
-            instanceBufferDesc.CpuAccessFlags = (dynamic) ? CpuAccessFlags.Write : CpuAccessFlags.None;
+            instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
             instanceBufferDesc.SizeInBytes = instanceSize * instances.Length;
             instanceBufferDesc.OptionFlags = ResourceOptionFlags.None;
             instanceBufferDesc.StructureByteStride = 0;
             DXBuffer nBuffer = DXBuffer.Create<Ti>(game.GraphicsDevice, instances, instanceBufferDesc);
-            geomDesc.InstanceBuffer = nBuffer;
-            geomDesc.InstanceCount = instances.Length;
-            geomDesc.InstanceStride = instanceSize;
+            meshDesc.InstanceBuffer = nBuffer;
+            meshDesc.InstanceCount = instances.Length;
+            meshDesc.InstanceStride = instanceSize;
             
             //Optional Indices...
             if (indices != null)
@@ -407,12 +470,12 @@ namespace CipherPark.AngelJacket.Core.Utils
                 indexBufferDesc.SizeInBytes = indices.Length * sizeof(short);
                 indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
                 DXBuffer iBuffer = DXBuffer.Create<short>(game.GraphicsDevice, indices, indexBufferDesc);                            
-                geomDesc.IndexCount = indices.Length;
-                geomDesc.IndexBuffer = iBuffer;
+                meshDesc.IndexCount = indices.Length;
+                meshDesc.IndexBuffer = iBuffer;
             }
             
-            geomDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
-            return new Mesh(game, geomDesc);
+            meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            return new Mesh(game, meshDesc);
         }
     }
 }

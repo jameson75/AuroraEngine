@@ -20,7 +20,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class Geometry     
+    public class Mesh     
     {
         private DXBuffer _instanceBuffer = null;
         private DXBuffer _vertexBuffer = null;
@@ -39,7 +39,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public BoundingBox BoundingBox { get; private set; }
 
-        public Geometry(IGameApp app, GeometryDescription description)
+        public Mesh(IGameApp app, MeshDescription description)
         {
             _app = app;
             _vertexStride = description.VertexStride;
@@ -135,14 +135,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
     }
 
-    public class Mesh : Geometry 
-    {
-        public Mesh(IGameApp app, GeometryDescription description)
-            : base(app, description)
-        { }
-    }
-
-    public struct GeometryDescription
+    public struct MeshDescription
     {
         public DXBuffer IndexBuffer { get; set; }
         public DXBuffer VertexBuffer { get; set; }

@@ -33,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             verts[0] = new BasicVertexPositionColor(new Vector3(0, 0, 20), Color.Blue.ToVector4());
             verts[1] = new BasicVertexPositionColor(new Vector3(15, 0, 0), Color.Blue.ToVector4());
             verts[2] = new BasicVertexPositionColor(new Vector3(-15, 0, 0), Color.Blue.ToVector4());
-            GeometryDescription meshDesc = new GeometryDescription();
+            MeshDescription meshDesc = new MeshDescription();
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;

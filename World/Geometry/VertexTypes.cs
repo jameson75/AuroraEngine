@@ -93,6 +93,40 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct ParticleVertexPositionTexture
+    {
+        public Vector4 Position;
+        public Vector4 TextureCoord;
+
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+        static ParticleVertexPositionTexture()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32B32A32_Float, 16, 0)
+             };
+            _elementSize = 32;
+        }
+        public ParticleVertexPositionTexture(Vector3 position)
+        {
+            Position = new Vector4(position, 1.0f);
+            TextureCoord = Vector4.Zero;
+        }
+        public ParticleVertexPositionTexture(Vector3 position, Vector2 textureCoord1A, Vector2 textureCoord1B)
+        {
+            Position = new Vector4(position, 1.0f);
+            TextureCoord = new Vector4(textureCoord1A.X, textureCoord1A.Y, textureCoord1B.X, textureCoord1B.Y);
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct BasicVertexScreenTexture
     {
         public Vector2 Position;
@@ -125,6 +159,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             TextureCoord = textureCoord;
         }
     }
+
 
     /// <summary>
     /// 
