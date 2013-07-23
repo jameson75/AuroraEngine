@@ -104,7 +104,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// <summary>
     /// 
     /// </summary>
-    public class ParticleSystemController : AnimationController
+    public class EmitterController : AnimationController
     {
         private long? _animationStartTime = null;
         private long? _lastEmitTime = null;
@@ -116,18 +116,18 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public override void Start()
         {
-            
+
         }
 
         public override void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
-            
+
             long animationTime = gameTime - _animationStartTime.Value;
             long elapsedTime = gameTime - _animationStartTime.Value;
 
-            if( Target != null)
+            if (Target != null)
             {
                 if (_lastEmitTime == null)
                     _lastEmitTime = gameTime;
@@ -139,7 +139,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                 {
                     foreach (EmitterAction action in this.Actions)
                     {
-                        if (action.Time <= (ulong)elapsedTime )
+                        if (action.Time <= (ulong)elapsedTime)
                         {
                             switch (action.Task)
                             {
@@ -164,12 +164,12 @@ namespace CipherPark.AngelJacket.Core.Animation
                                 case EmitterAction.EmitterTask.Transform:
                                     Target.Transform = action.Transform;
                                     break;
-                            }                            
+                            }
                         }
                     }
                     this.Actions.RemoveAll(a => a.Time <= (ulong)elapsedTime);
                 }
-           
+
                 foreach (Particle p in Target.Particles)
                 {
                     ////update particle age.
@@ -188,7 +188,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                         Solver.UpdateParticleTransform((ulong)animationTime, p);
                 }
             }
-        }      
+        }
     }
 
     /// <summary>

@@ -98,6 +98,7 @@
     <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Effects\SkyboxEffect.cs" />
     <Compile Include="Kinetics\Force.cs" />
+    <Compile Include="Kinetics\ParticleSystem.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
     <Compile Include="UI\Controls\CheckBox.cs" />
@@ -193,7 +194,7 @@
     <Compile Include="Kinetics\IRigidBody.cs" />
     <Compile Include="Kinetics\Emitter.cs" />
     <Compile Include="Kinetics\ForceField.cs" />
-    <Compile Include="World\ParticleSystem\ParticleRenderer.cs" />
+    <Compile Include="World\Renderers\ParticleRenderer.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />
     <Compile Include="World\Geometry\ReferenceGrid.cs" />
@@ -204,6 +205,7 @@
     <Compile Include="World\Scene\Scene.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="Sandbox\TestEffect.cs" />
+    <Compile Include="World\Weapon.cs" />
     <Compile Include="World\WorldSimulator.cs" />
   </ItemGroup>
   <ItemGroup>
