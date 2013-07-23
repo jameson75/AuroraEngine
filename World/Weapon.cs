@@ -17,13 +17,13 @@ namespace CipherPark.AngelJacket.Core.World
         public Transform Transform { get; set; }
     }
 
-    public class Weapon 
+    public abstract class Weapon 
     {
         public Emitter Emitter { get; set; }
         
-        public abstract KeyframeAnimationController CreateDischargeAnimation(Vector3 location, Vector3 direction, float velocity)
+        public abstract KeyframeAnimationController CreateDischargeAnimation(Vector3 location, Vector3 direction, float velocity);
         
-        public void Draw(gameTime)
+        public void Draw(long gameTime)
         { }
-    }
+    }    
 }

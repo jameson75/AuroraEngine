@@ -104,7 +104,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// <summary>
     /// 
     /// </summary>
-    public class EmitterController : AnimationController
+    public class EmitterAnimationController : AnimationController
     {
         private long? _animationStartTime = null;
         private long? _lastEmitTime = null;
