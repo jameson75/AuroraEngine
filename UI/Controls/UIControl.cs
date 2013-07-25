@@ -279,10 +279,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     foreach (UIControl child in args.NewItems)
                         OnChildAdded(child);
                     break;
+                
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (UIControl child in args.OldItems)                                 
                         OnChildRemoved(child);
                     break;
+                
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    foreach (UIControl child in args.OldItems)
+                        OnChildRemoved(child);
+                    foreach (UIControl child in args.NewItems)
+                        OnChildAdded(child);
+                    break;
+                
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     OnChildReset();
                     break;

@@ -36,6 +36,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         #region ITransformable Members
         public Transform Transform { get; set; }
+        public ITransformable TransformableParent { get; set; }
         #endregion    
 
         public Vector3 EmissionDirection { get; set; }
@@ -212,6 +213,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         #region ITransformable Members
         public Transform Transform { get; set; }
+        public ITransformable TransformableParent { get; set; }
         #endregion
 
         #region IRigidBody Members

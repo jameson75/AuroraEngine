@@ -114,6 +114,13 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                         OnChildRemoved(child);
                     break;
 
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    foreach (SceneNode child in e.OldItems)
+                        OnChildRemoved(child);
+                    foreach (SceneNode child in e.NewItems)
+                        OnChildAdded(child);
+                    break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     OnChildReset();
                     break;

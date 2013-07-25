@@ -74,7 +74,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                     {
                         Matrix specifiedNewView = Camera.TransformToView(value);
                         Vector3 up = new Vector3(specifiedNewView.Column2.ToArray().Take(3).ToArray());
-                        Vector3 lookAt = WorldToLocal(LockOnTarget.LocalToWorld(LockOnTarget.Transform)).Translation;
+                        Vector3 lookAt = this.WorldToLocal(LockOnTarget.LocalToWorld(LockOnTarget.Transform)).Translation;
                         Vector3 eye = value.Translation;
                         Camera.ViewMatrix = Matrix.LookAtLH(eye, lookAt, up);
                     }

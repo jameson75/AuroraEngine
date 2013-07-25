@@ -32,6 +32,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         private SceneNode _parent = null;
         private SceneNodes _children = null;
         private Scene _scene = null;
+        private ITransformable _transformableParent = null;
 
         public SceneNode(IGameApp game)
         {
@@ -51,7 +52,20 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public Scene Scene { get { return _scene; } set { _scene = value; OnSceneChanged(); } }
 
-        public SceneNode Parent { get { return _parent; } set { _parent = value; } }
+        //public SceneNode Parent { get { return _parent; } set { _parent = value; } }
+        public SceneNode Parent
+        {
+            get { return _parent; }
+            set
+            {
+                if (_parent != null && _parent.Children.Contains(this))
+                    _parent.Children.Remove(this);
+                _parent = value;
+                if (_parent != null && !_parent.Children.Contains(this))
+                    _parent.Children.Add(this);
+                _transformableParent = value;
+            }
+        }
 
         public SceneNodes Children { get { return _children; } }
         
@@ -79,31 +93,20 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         //    return stack.Transform;
         //}
 
-        public Transform LocalToWorld(Transform localTransform)
+        ITransformable ITransformable.TransformableParent
         {
-            TransformStack stack = new TransformStack();
-            stack.Push(localTransform);
-            SceneNode node = this.Parent;
-            while (node != null)
+            get { return this._transformableParent; }
+            set
             {
-                stack.Push(node.Transform);
-                node = node.Parent;
+                if (value is SceneNode)
+                    this.Parent = (SceneNode)value;
+                else
+                {
+                    this.Parent = null;
+                    _transformableParent = value;
+                }
             }
-            return stack.Transform;
-        }
-
-        public Transform WorldToLocal(Transform worldTransform)
-        {
-            TransformStack stack = new TransformStack();
-            stack.Push(worldTransform);
-            SceneNode node = this.Parent;
-            while (node != null)
-            {
-                stack.Push(Animation.Transform.Invert(node.Transform));
-                node = node.Parent;
-            }          
-            return stack.ReverseTransform;
-        }
+        }              
 
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
         {
@@ -113,14 +116,23 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                     foreach (SceneNode child in args.NewItems)
                         OnChildAdded(child);
                     break;
+                
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (SceneNode child in args.OldItems)
                         OnChildRemoved(child);
                     break;
+               
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (SceneNode child in args.NewItems)
+                        OnChildAdded(child);
+                    foreach (SceneNode child in args.OldItems)
+                        OnChildRemoved(child);
+                    break;
+                
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     OnChildReset();
                     break;
-            }
+            }           
         }
 
         protected void OnChildAdded(SceneNode child)
@@ -129,17 +141,19 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 child.Parent = this;
 
             if (child.Scene != this.Scene)
-                child.Scene = this.Scene;
+                child.Scene = this.Scene;            
         }
 
         protected void OnChildRemoved(SceneNode child)
         {
             child.Parent = null;
-            child.Scene = null;
+            child.Scene = null;          
         }
 
         protected void OnChildReset()
-        { }
+        {
+            
+        }
 
         protected void OnSceneChanged()
         {

@@ -94,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     for (int i = 0; i < SkinOffsets.Count; i++ )
                     {
                         Frame bone = SkinOffsets[i].BoneReference;                       
-                        finalBoneMatrices[i] = SkinOffsets[i].Transform.ToMatrix() * bone.LocalToWorld(bone.Transform).ToMatrix();
+                        finalBoneMatrices[i] = SkinOffsets[i].Transform.ToMatrix() * bone.LocalToWorld(bone.Transform.ToMatrix());
                     }
                     skinEffect.BoneTransforms = finalBoneMatrices;     
                 }
@@ -134,6 +134,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {
         private Frames _children = null;
         private Frame _parent = null;
+        private ITransformable _transformableParent = null;
 
         public Frame()
         {
@@ -154,6 +155,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 _parent = value;
                 if (_parent != null && !_parent.Children.Contains(this))
                     _parent.Children.Add(this);
+                _transformableParent = value;
             }
         }
 
@@ -162,6 +164,21 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         #region ITransformable implementation
         
         public Transform Transform { get; set; }
+
+        ITransformable ITransformable.TransformableParent
+        {
+            get { return this._transformableParent; }
+            set
+            {
+                if (value is Frame)
+                    this.Parent = (Frame)value;
+                else
+                {
+                    this.Parent = null;
+                    _transformableParent = value;
+                }
+            }
+        }
 
         #endregion
 
@@ -176,31 +193,31 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             return results;
         }
        
-        public Transform LocalToWorld(Transform localTransform)
-        {
-            TransformStack stack = new TransformStack();
-            stack.Push(localTransform);
-            Frame frame = this.Parent;
-            while (frame != null)
-            {
-                stack.Push(frame.Transform);
-                frame = frame.Parent;
-            }
-            return stack.Transform;
-        }
+        //public Transform LocalToWorld(Transform localTransform)
+        //{
+        //    TransformStack stack = new TransformStack();
+        //    stack.Push(localTransform);
+        //    Frame frame = this.Parent;
+        //    while (frame != null)
+        //    {
+        //        stack.Push(frame.Transform);
+        //        frame = frame.Parent;
+        //    }
+        //    return stack.Transform;
+        //}
 
-        public Transform WorldToLocal(Transform worldTransform)
-        {
-            TransformStack stack = new TransformStack();
-            stack.Push(worldTransform);
-            Frame frame = this.Parent;
-            while (frame != null)
-            {
-                stack.Push(Animation.Transform.Invert(frame.Transform));
-                frame = frame.Parent;
-            }
-            return stack.ReverseTransform;
-        }
+        //public Transform WorldToLocal(Transform worldTransform)
+        //{
+        //    TransformStack stack = new TransformStack();
+        //    stack.Push(worldTransform);
+        //    Frame frame = this.Parent;
+        //    while (frame != null)
+        //    {
+        //        stack.Push(Animation.Transform.Invert(frame.Transform));
+        //        frame = frame.Parent;
+        //    }
+        //    return stack.ReverseTransform;
+        //}
 
         private static void _BuildFlattenedTree(Frame frame, List<Frame> results)
         {

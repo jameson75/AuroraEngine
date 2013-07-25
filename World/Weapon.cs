@@ -9,21 +9,31 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
+using CipherPark.AngelJacket.Core.World.Geometry;
 
 namespace CipherPark.AngelJacket.Core.World
 {
     public class Projectile : ITransformable 
     {        
         public Transform Transform { get; set; }
+        ITransformable ITransformable.TransformableParent { get; set; }
     }
 
-    public abstract class Weapon 
+    public class Weapon 
     {
-        public Emitter Emitter { get; set; }
-        
-        public abstract KeyframeAnimationController CreateDischargeAnimation(Vector3 location, Vector3 direction, float velocity);
+        private List<Emitter> _emitters = new List<Emitter>();
+        private Frames _frames = new Frames();
+
+        public List<Emitter> Emitters { get { return _emitters; } }
+
+        public Frames Frames { get { return _frames; } }
+
+        public List<IAnimationController> CreateDischargeAnimation(Vector3 location, Vector3 direction, float velocity)
+        {
+            return null;
+        }
         
         public void Draw(long gameTime)
         { }
-    }    
+    }
 }

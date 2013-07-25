@@ -5,9 +5,13 @@ using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
+using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public struct Transform
     {
         private static Transform _zero = new Transform { Rotation = Quaternion.Zero, Translation = Vector3.Zero };
@@ -56,8 +60,54 @@ namespace CipherPark.AngelJacket.Core.Animation
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public interface ITransformable
     {
         Transform Transform { get; set; }
+        ITransformable TransformableParent { get; set; }      
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class TransformableExtension
+    {
+        public static Matrix LocalToWorld(this ITransformable transformable, Matrix localTransform)
+        {
+            MatrixStack stack = new MatrixStack();
+            stack.Push(localTransform);
+            ITransformable node = transformable.TransformableParent;
+            while (node != null)
+            {
+                stack.Push(node.Transform.ToMatrix());
+                node = node.TransformableParent;
+            }
+            return stack.Transform;
+        }
+
+        public static Matrix WorldToLocal(this ITransformable transformable, Matrix worldTransform)
+        {
+            MatrixStack stack = new MatrixStack();
+            stack.Push(worldTransform);
+            ITransformable node = transformable.TransformableParent;
+            while (node != null)
+            {
+                stack.Push(Matrix.Invert(node.Transform.ToMatrix()));
+                node = node.TransformableParent;
+            }
+            return stack.ReverseTransform;
+        }
+
+        public static Transform LocalToWorld(this ITransformable transformable, Transform localTransform)
+        {
+            return new Transform(transformable.LocalToWorld(localTransform.ToMatrix()));
+        }
+
+        public static Transform WorldToLocal(this ITransformable transformable, Transform worldTransform)
+        {
+            return new Transform(transformable.WorldToLocal(worldTransform.ToMatrix()));
+        }
     }
 }

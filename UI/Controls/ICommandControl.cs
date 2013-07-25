@@ -70,7 +70,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     }
                 }
             }
-            else if (args.Action == NotifyCollectionChangedAction.Remove || args.Action == NotifyCollectionChangedAction.Replace)
+            
+            if (args.Action == NotifyCollectionChangedAction.Remove || args.Action == NotifyCollectionChangedAction.Replace)
             {
                 foreach (UIControl control in args.OldItems)
                 {

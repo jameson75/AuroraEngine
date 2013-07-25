@@ -33,10 +33,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     foreach (ItemControl item in args.NewItems)
                         OnItemAdded(item);
                     break;
+                
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (ItemControl item in args.OldItems)
                         OnItemRemoved(item);
                     break;
+                
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    foreach (ItemControl item in args.OldItems)
+                        OnItemRemoved(item);
+                    foreach (ItemControl item in args.NewItems)
+                        OnItemAdded(item);
+                    break;
+                
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     OnItemsReset();
                     break;

@@ -8,6 +8,7 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.World.Scene;
+using CipherPark.AngelJacket.Core.Animation;
 using SharpDX;
 using SharpDX.Direct3D11;
 
@@ -164,9 +165,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 Vector3 dir = far - near;
                 Ray ray = new Ray(near, dir);
                 World.Geometry.Model model = ((ModelSceneNode)node).Model;
-                BoundingBox wBoundingBox = BoundingBoxExtension.Transform(model.Mesh.BoundingBox, node.LocalToWorld(node.Transform).ToMatrix());
+                BoundingBox wBoundingBox = BoundingBoxExtension.Transform(model.Mesh.BoundingBox, node.LocalToWorld(node.Transform.ToMatrix()));
                 if (wBoundingBox.Intersects(ref ray))
-                    return true;                
+                    return true;   
+                
             }
 
             return false;

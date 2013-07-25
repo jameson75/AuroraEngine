@@ -48,6 +48,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public Mesh Mesh { get { return _mesh; } set { _mesh = value; OnMeshChanged(); } }       
 
         public Transform Transform { get; set; }
+
+        ITransformable ITransformable.TransformableParent { get; set; }
         
         //public Camera Camera { get; set; }
 
@@ -125,30 +127,30 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public Matrix LocalToWorld(Matrix localTransform)
-        {
-            MatrixStack stack = new MatrixStack();
-            stack.Push(localTransform);
-            CompositeModel model = this.Parent;
-            while (model != null)
-            {
-                stack.Push(model.Transform.ToMatrix());
-                model = model.Parent;
-            }
-            return stack.Transform;
-        }
+        //public Matrix LocalToWorld(Matrix localTransform)
+        //{
+        //    MatrixStack stack = new MatrixStack();
+        //    stack.Push(localTransform);
+        //    CompositeModel model = this.Parent;
+        //    while (model != null)
+        //    {
+        //        stack.Push(model.Transform.ToMatrix());
+        //        model = model.Parent;
+        //    }
+        //    return stack.Transform;
+        //}
 
-        public Transform LocalToWorld(Transform localTransform)
-        {
-            TransformStack stack = new TransformStack();
-            stack.Push(localTransform);
-            CompositeModel model = this.Parent;
-            while (model != null)
-            {
-                stack.Push(model.Transform);
-                model = model.Parent;
-            }
-            return stack.Transform;
-        } 
+        //public Transform LocalToWorld(Transform localTransform)
+        //{
+        //    TransformStack stack = new TransformStack();
+        //    stack.Push(localTransform);
+        //    CompositeModel model = this.Parent;
+        //    while (model != null)
+        //    {
+        //        stack.Push(model.Transform);
+        //        model = model.Parent;
+        //    }
+        //    return stack.Transform;
+        //} 
     }   
 }
