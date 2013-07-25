@@ -45,6 +45,8 @@ namespace CipherPark.AngelJacket.Core.Animation
         public abstract void Start();
         
         public abstract void UpdateAnimation(long gameTime);
+        
+        public event EventHandler AnimationComplete;
 
         protected  virtual void OnAnimationComplete()
         {
@@ -52,9 +54,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             EventHandler handler = AnimationComplete;
             if (handler != null)
                 AnimationComplete(this, EventArgs.Empty);
-        }
-
-        public event EventHandler AnimationComplete;
+        }        
     }
 
     /// <summary>
@@ -63,6 +63,8 @@ namespace CipherPark.AngelJacket.Core.Animation
     public class KeyframeAnimationController : AnimationController
     {
         private long? _animationStartTime = null;
+
+        bool Loop { get; set; }
 
         public KeyframeAnimationController() : base()
         { }
@@ -83,14 +85,21 @@ namespace CipherPark.AngelJacket.Core.Animation
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
             
-            ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
+            ulong elapsedTime = (ulong)(gameTime - _animationStartTime.Value);
 
             if (Target != null && Animation != null)
             {
-                Target.Transform = Animation.GetValueAtT(timeT);
-                //signal this animation as complete once we've updated the target with the last key frame.
-                if (timeT >= Animation.RunningTime)
-                    OnAnimationComplete();
+                Target.Transform = Animation.GetValueAtT(elapsedTime);                
+                //check whether we've updated the target with the last key frame.
+                if (elapsedTime >= Animation.RunningTime && !IsAnimationComplete)
+                {
+                    //if Loop is specified, we start the animation over by resetting the animationStartTime.
+                    if (Loop)
+                        _animationStartTime = null;
+                    //otherwise, we signal this animation as complete                    
+                    else                        
+                        OnAnimationComplete();
+                }
             }
             else
                 throw new InvalidOperationException("Target or Animation was not initialized.");
@@ -110,8 +119,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         private long? _lastEmitTime = null;
 
         public Emitter Target { get; set; }
-        public List<EmitterAction> Actions { get; set; }
-        public ParticleSolver Solver { get; set; }
+        public List<EmitterAction> Actions { get; set; }       
         public bool ExplicitEmissionsOnly { get; set; }
 
         public override void Start()
@@ -123,8 +131,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
-
-            long animationTime = gameTime - _animationStartTime.Value;
+           
             long elapsedTime = gameTime - _animationStartTime.Value;
 
             if (Target != null)
@@ -168,25 +175,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                         }
                     }
                     this.Actions.RemoveAll(a => a.Time <= (ulong)elapsedTime);
-                }
-
-                foreach (Particle p in Target.Particles)
-                {
-                    ////update particle age.
-                    //p.Age = (ulong)animationTime;
-                    //if (p.Age > p.Life)
-                    //    Target.Kill(p);
-                    //else
-                    //{
-                    //    float normalizedAge = p.Age / (float)p.Life;
-                    //    p.Color =  p.SharedAttributes.ColorOverLife.GetValueAtAge(normalizedAge);
-                    //    p.Opacity = p.SharedAttributes.OpacityOverLife.GetValueAtAge(normalizedAge);
-                    //    if( Solver != null )
-                    //        Solver.UpdateParticleTransform((ulong)animationTime, p);
-                    //}
-                    if (Solver != null)
-                        Solver.UpdateParticleTransform((ulong)animationTime, p);
-                }
+                }              
             }
         }
     }
@@ -231,5 +220,70 @@ namespace CipherPark.AngelJacket.Core.Animation
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class MasterController : AnimationController
+    {
+        List<IAnimationController> _slaves = new List<IAnimationController>();
+
+        public override void Start()
+        {
+            
+        }
+
+        public override void UpdateAnimation(long gameTime)
+        {
+            //**********************************************************************************
+            //NOTE: We use an auxilary controller collection to enumerate through, in 
+            //the event that an updated controller alters this Simulator's Animation Controllers
+            //collection.
+            //**********************************************************************************
+            List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_slaves);            
+            foreach (IAnimationController controller in _slaves)
+            {
+                controller.UpdateAnimation(gameTime);
+                if (controller.IsAnimationComplete)
+                    _slaves.Remove(controller);
+            }
+
+            if (_slaves.Count == 0 && !IsAnimationComplete)
+                OnAnimationComplete();
+        }
+
+        public List<IAnimationController> Slaves { get { return _slaves; } }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ParticleSystemController : AnimationController
+    {
+        private List<EmitterAnimationController> _emitterControllers = new List<EmitterAnimationController>();
+        private long? _animationStartTime = null;
+
+        public ParticleSolver Solver { get; set; }
+
+        public override void Start()
+        {
+            
+        }
+
+        public override void UpdateAnimation(long gameTime)
+        {
+            if (_animationStartTime == null)
+                _animationStartTime = gameTime;
+
+            long elapsedTime = gameTime - _animationStartTime.Value;
+
+            if (Solver != null)
+            {
+                Particle[] allParticles = _emitterControllers.SelectMany(p => p.Target.Particles).ToArray();
+                for (int i = 0; i < allParticles.Length; i++)
+                    Solver.UpdateParticleTransform((ulong)elapsedTime, allParticles[i]);
+            }
+        }
     }
 }
