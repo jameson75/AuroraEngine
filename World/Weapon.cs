@@ -13,8 +13,8 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public class Projectile : ITransformable 
-    {        
+    public abstract class Projectile : ITransformable 
+    {    
         public Transform Transform { get; set; }
         ITransformable ITransformable.TransformableParent { get; set; }
     }
@@ -28,12 +28,19 @@ namespace CipherPark.AngelJacket.Core.World
 
         public Frames Frames { get { return _frames; } }
 
-        public List<IAnimationController> CreateDischargeAnimation(Vector3 location, Vector3 direction, float velocity)
+        public MasterController CreateDischargeAnimation()
         {
+            SimpleEmittingProjectile projectile = new SimpleEmittingProjectile();
+            
             return null;
         }
         
         public void Draw(long gameTime)
         { }
+    }
+
+    public class SimpleEmittingProjectile
+    {
+        private Emitter _emitter = new Emitter();
     }
 }

@@ -242,7 +242,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             //collection.
             //**********************************************************************************
             List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_slaves);            
-            foreach (IAnimationController controller in _slaves)
+            foreach (IAnimationController controller in auxAnimationControllers)
             {
                 controller.UpdateAnimation(gameTime);
                 if (controller.IsAnimationComplete)
