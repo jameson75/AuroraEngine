@@ -31,8 +31,12 @@ namespace CipherPark.AngelJacket.Core.World
         public MasterController CreateDischargeAnimation()
         {
             SimpleEmittingProjectile projectile = new SimpleEmittingProjectile();
-            
-            return null;
+            //Create path...
+            Vector3[] path = new
+            {
+               
+            };
+            RigidBodyAnimationController controller = new RigidBodyAnimationController(
         }
         
         public void Draw(long gameTime)

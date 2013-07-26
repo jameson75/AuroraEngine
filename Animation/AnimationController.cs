@@ -119,19 +119,16 @@ namespace CipherPark.AngelJacket.Core.Animation
         private long? _lastEmitTime = null;
 
         public Emitter Target { get; set; }
-        public List<EmitterAction> Actions { get; set; }       
+        public List<EmitterAction> Actions { get; set; }
         public bool ExplicitEmissionsOnly { get; set; }
 
-        public override void Start()
-        {
-
-        }
+        public override void Start() { }
 
         public override void UpdateAnimation(long gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
-           
+
             long elapsedTime = gameTime - _animationStartTime.Value;
 
             if (Target != null)
@@ -175,7 +172,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                         }
                     }
                     this.Actions.RemoveAll(a => a.Time <= (ulong)elapsedTime);
-                }              
+                }
             }
         }
     }
@@ -185,20 +182,26 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// </summary>
     public class RigidBodyAnimationController : AnimationController
     {
-        private long? _animationStartTime = null;   
-        
-        public NetForce Motion { get; set; } 
+        private long? _animationStartTime = null;         
 
         public IRigidBody Target { get; set; }
+     
         
         public RigidBodyAnimationController()
         { }
        
-        public RigidBodyAnimationController(NetForce motion, IRigidBody rigidBody)
+        public RigidBodyAnimationController(float linearVelocity, Vector3[] linearPath, IRigidBody target)
         {
-            Motion = motion;
-            Target = rigidBody;
-        }     
+            LinearVelocity = linearVelocity;
+            LinearPath = linearPath;           
+            Target = target;
+        }
+
+        public RigidBodyAnimationController(float linearVelocity, Vector3[] linearPath, float angularVelocity, float angle, IRigidBody target) : this(linearVelocity, linearPath, target)
+        {
+            AngularVelocity = angularVelocity;
+            Angle = angle;
+        }
 
         #region IAnimationController Members   
 
@@ -211,6 +214,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
+
             ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
             if (Target != null && Motion != null)
             {
