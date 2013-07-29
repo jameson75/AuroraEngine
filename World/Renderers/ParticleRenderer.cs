@@ -25,14 +25,14 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
         private IGameApp _game = null;
         private Mesh _particleMesh = null;
         private Mesh _linkMesh = null;
-        PlexicNodeEffect particleEffect = null;
+        BillboardEffect particleEffect = null;
         BasicEffectEx linkEffect = null;
 
         public ParticleRenderer(IGameApp game)
         {
             _game = game;
-            particleEffect = new PlexicNodeEffect(_game.GraphicsDevice);
-            _particleMesh = ContentBuilder.BuildParticleQuad(game, particleEffect.SelectShaderByteCode(), new DrawingSizeF(3, 3));           
+            particleEffect = new BillboardEffect(_game.GraphicsDevice);
+            _particleMesh = ContentBuilder.BuildBillboardQuad(game, particleEffect.SelectShaderByteCode(), new DrawingSizeF(3, 3));           
         
             linkEffect = new BasicEffectEx(_game.GraphicsDevice);
             linkEffect.EnableVertexColor = true;

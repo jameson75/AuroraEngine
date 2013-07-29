@@ -34,6 +34,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Update(long gameTime, SimulationContext context)
         {
+            //Update animation controllers.
             //**********************************************************************************
             //NOTE: We use an auxilary controller collection to enumerate through, in 
             //the event that an updated controller alters this Simulator's Animation Controllers
@@ -46,7 +47,17 @@ namespace CipherPark.AngelJacket.Core.World
                 if (controller.IsAnimationComplete)
                     _animationControllers.Remove(controller);
             }
-        }        
+
+            //Update scene based on the physical state of the scene objects.
+            foreach (SceneNode node in context.Scene.Nodes)
+                SimulatePhysics(node);
+        }
+
+        private void SimulatePhysics(SceneNode node)
+        {
+            foreach (SceneNode childNode in node.Children)
+                SimulatePhysics(childNode);
+        }
     }
 
     public class WorldSimulatorSettings

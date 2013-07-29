@@ -11,40 +11,46 @@ using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.Geometry;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.World
 {
-    public abstract class Projectile : ITransformable 
-    {    
-        public Transform Transform { get; set; }
-        ITransformable ITransformable.TransformableParent { get; set; }
-    }
-
-    public class Weapon 
+    public static class Weapon 
     {
-        private List<Emitter> _emitters = new List<Emitter>();
-        private Frames _frames = new Frames();
-
-        public List<Emitter> Emitters { get { return _emitters; } }
-
-        public Frames Frames { get { return _frames; } }
-
-        public MasterController CreateDischargeAnimation()
+        public static RigidBodyAnimationController CreateDischargeAnimation(IRigidBody projectile)
         {
-            SimpleEmittingProjectile projectile = new SimpleEmittingProjectile();
             //Create path...
-            Vector3[] path = new
-            {
-               
+            Vector3[] path = new Vector3[]
+            { 
+                new Vector3(0, 100, 0),
+                new Vector3(0, 100, 200),
+                new Vector3(200, 100, 200),
+                new Vector3(200, 200, 400)
             };
-            RigidBodyAnimationController controller = new RigidBodyAnimationController(
+            Motion motion = new Motion();
+            motion.LinearPath = path;
+            motion.LinearVelocity = 1.0f;
+            RigidBodyAnimationController animationPathController = new RigidBodyAnimationController(motion, projectile);
+            //IAnimationController projectileAnimationController = projectile.Animation;
+            //return new CompositeAnimationController(new IAnimationController[] { animationPathController, /*projectileAnimationController*/ });
+            return animationPathController;
         }
-        
-        public void Draw(long gameTime)
-        { }
     }
 
-    public class SimpleEmittingProjectile
-    {
-        private Emitter _emitter = new Emitter();
+    public class Projectile : ComplexModel, IRigidBody
+    {        
+        #region IRigidBody 
+        public Vector3 CenterOfMass { get; set; }
+        #endregion
+
+        public Projectile(IGameApp game)
+            : base(game)
+        { }
     }
 }

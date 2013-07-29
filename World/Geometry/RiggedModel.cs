@@ -24,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// 
     /// </summary>
-    public class RiggedModel : BasicModel
+    public class RiggedModel : BasicModel, IAnimatedModel
     {
         private SkinOffsets _bones = new SkinOffsets();
        
@@ -43,6 +43,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// </summary>
         public SkinOffsets SkinOffsets { get { return _bones; } }
 
+        #region IAnimatedModel
         /// <summary>
         /// 
         /// </summary>
@@ -53,35 +54,36 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// </summary>
         public List<KeyframeAnimationController> Animation
         { get { return _animationControllers; } }
+        #endregion 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="poseTime"></param>
-        /// <returns></returns>
-        public List<KeyframeAnimationController> CreatePoseAnimation(ulong poseKeyTime, ulong transitionTimeSpan = 0)
-        {           
-            List<KeyframeAnimationController> result = new List<KeyframeAnimationController>();
-            if (FrameTree != null)
-            {
-                List<Frame> frameList = FrameTree.FlattenToList();
-                foreach (Frame frame in frameList)
-                {
-                    TransformAnimation transitionAnimation = new TransformAnimation();
-                    if (transitionTimeSpan > 0)
-                    {
-                        AnimationKeyFrame startPoseKeyFrame = new AnimationKeyFrame(0, frame.Transform);
-                        transitionAnimation.SetKeyFrame(startPoseKeyFrame);
-                    }
-                    Transform endPoseTransform = (Transform)Animation.Find(a => a.Target == frame).Animation.GetActiveKeyFrameAtT(poseKeyTime).Value;
-                    AnimationKeyFrame endPoseKeyFrame = new AnimationKeyFrame(transitionTimeSpan, endPoseTransform);
-                    transitionAnimation.SetKeyFrame(endPoseKeyFrame);
-                    KeyframeAnimationController bonePoseController = new KeyframeAnimationController(transitionAnimation, frame);
-                    result.Add(bonePoseController);
-                }
-            }
-            return result;
-        }      
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="poseTime"></param>
+        ///// <returns></returns>
+        //public CompositeAnimationController CreatePoseAnimation(ulong poseKeyTime, ulong transitionTimeSpan = 0)
+        //{           
+        //    List<KeyframeAnimationController> result = new List<KeyframeAnimationController>();
+        //    if (FrameTree != null)
+        //    {
+        //        List<Frame> frameList = FrameTree.FlattenToList();
+        //        foreach (Frame frame in frameList)
+        //        {
+        //            TransformAnimation transitionAnimation = new TransformAnimation();
+        //            if (transitionTimeSpan > 0)
+        //            {
+        //                AnimationKeyFrame startPoseKeyFrame = new AnimationKeyFrame(0, frame.Transform);
+        //                transitionAnimation.SetKeyFrame(startPoseKeyFrame);
+        //            }
+        //            Transform endPoseTransform = (Transform)Animation.Find(a => a.Target == frame).Animation.GetActiveKeyFrameAtT(poseKeyTime).Value;
+        //            AnimationKeyFrame endPoseKeyFrame = new AnimationKeyFrame(transitionTimeSpan, endPoseTransform);
+        //            transitionAnimation.SetKeyFrame(endPoseKeyFrame);
+        //            KeyframeAnimationController frameController = new KeyframeAnimationController(transitionAnimation, frame);
+        //            result.Add(frameController);
+        //        }
+        //    }
+        //    return new CompositeAnimationController(result);
+        //}      
 
         protected override void OnApplyingEffect()
         {

@@ -58,13 +58,13 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
-        public override BoundingBox Bounds
-        {
-            get
-            {
-                return Model.Mesh.BoundingBox;
-            }
-        }
+        //public override BoundingBox Bounds
+        //{
+        //    get
+        //    {
+        //        return Model.Mesh.BoundingBox;
+        //    }
+        //}
 
         public override void Draw(long gameTime)
         {

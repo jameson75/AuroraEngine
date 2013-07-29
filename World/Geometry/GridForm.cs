@@ -14,7 +14,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class GridForm : Form
     {
         private Vector3 _dimensions = Vector3.Zero;
-        private Vector3 _cellSpacining = Vector3.Zero;
+        private Vector3 _cellSpacining = Vector3.Zero;       
 
         public GridForm(IGameApp game)
             : base(game)

@@ -68,18 +68,18 @@ namespace CipherPark.AngelJacket.Core.Utils
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildParticleQuad(IGameApp game, byte[] shaderByteCode, DrawingSizeF size)
+        public static Mesh BuildBillboardQuad(IGameApp game, byte[] shaderByteCode, DrawingSizeF size)
         {
-            ParticleVertexPositionTexture[] verts = new ParticleVertexPositionTexture[4];
+            BillboardVertexPositionTexture[] verts = new BillboardVertexPositionTexture[4];
             short[] indices = new short[6] { 0, 1, 2, 2, 3, 0 };
             Vector3[] positions = CreateQuadPoints(new RectangleF(0, 0, 0, 0));
             Vector2[] _textureCoords = CreateQuadTextureCoords();
-            verts[0] = new ParticleVertexPositionTexture(positions[0], _textureCoords[0], new Vector2(-size.Width, size.Height));
-            verts[1] = new ParticleVertexPositionTexture(positions[1], _textureCoords[1], new Vector2(size.Width, size.Height));
-            verts[2] = new ParticleVertexPositionTexture(positions[2], _textureCoords[2], new Vector2(size.Width, -size.Height));
-            verts[3] = new ParticleVertexPositionTexture(positions[3], _textureCoords[2], new Vector2(-size.Width, -size.Height));
+            verts[0] = new BillboardVertexPositionTexture(positions[0], _textureCoords[0], new Vector2(-size.Width, size.Height));
+            verts[1] = new BillboardVertexPositionTexture(positions[1], _textureCoords[1], new Vector2(size.Width, size.Height));
+            verts[2] = new BillboardVertexPositionTexture(positions[2], _textureCoords[2], new Vector2(size.Width, -size.Height));
+            verts[3] = new BillboardVertexPositionTexture(positions[3], _textureCoords[2], new Vector2(-size.Width, -size.Height));
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<ParticleVertexPositionTexture>(game, shaderByteCode, verts, indices, ParticleVertexPositionTexture.InputElements, ParticleVertexPositionTexture.ElementSize, boundingBox); 
+            return BuildMesh<BillboardVertexPositionTexture>(game, shaderByteCode, verts, indices, BillboardVertexPositionTexture.InputElements, BillboardVertexPositionTexture.ElementSize, boundingBox); 
         }
 
         public static Vector3[] CreateQuadPoints(RectangleF dimension, bool includeCenterPoint = false)

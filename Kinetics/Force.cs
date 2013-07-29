@@ -7,6 +7,14 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Animation;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.Kinetics
 {
     /// <summary>
@@ -14,31 +22,48 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// linear and angular velocities over time.
     /// </summary>
     public struct Motion
-    {   
-        public float LinearVelocity { get; set; }
-        public Vector3[] Path { get; set; }
-        public float AngularVelocity { get; set; }
-        public float Angle { get; set; }
+    {
+        private static Motion _identity = new Motion();
 
+        public float LinearVelocity { get; set; }
+        public Vector3[] LinearPath { get; set; }
+        //public float AngularVelocity { get; set; }
+        //public Vector3 AngularVector { get; set; }     
+        public static Motion Identity { get { return _identity; } }    
+    
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="timeT">time in millseconds</param>
+        /// <param name="timeT">time in seconds</param>
         /// <returns></returns>
-        public Transform Transform(Transform t, ulong timeT)
-        {
-            //***************************************************************************************************
-            //NOTE: timeT is specified in milliseconds, however, velocities are specified distance-per-seconds.
-            //We convert timeT into seconds (with decimal percision).
-            //***************************************************************************************************
-            //TODO: Figure out the distance in the linear path.
+        public Matrix GetTransformationAtT(float timeT)
+        {           
             //TODO: Implement catmull for curved paths...
-            //TODO: Implement hermite for acceleration curves...
-            float s_timeT = (float)timeT / 1000.0f;          
-            Vector3 translationDelta = LinearVelocity * s_timeT;
-            Quaternion rotationDelta = AngularVelocity * s_timeT;
-            return new Transform(rotationDelta, translationDelta);
-        }
+            //TODO: Implement hermite for acceleration curves... 
+
+            Vector3 translation = Vector3.Zero;
+            float step = LinearVelocity * timeT;
+            if (LinearPath != null)
+            {
+                Vector3 pathOrigin = Vector3.Zero;
+                Vector3 pathDirection = Vector3.Zero;
+                float accumLength = 0;
+                for (int i = 0; i < LinearPath.Length; i++)
+                {
+                    accumLength+= Vector3.Distance(LinearPath[i], pathOrigin);
+                    if (accumLength > step)
+                    {
+                        pathDirection = LinearPath[i] - pathOrigin;
+                        pathDirection.Normalize();
+                        break;
+                    }
+                    pathOrigin = LinearPath[i];
+                }
+                translation = pathOrigin + (pathDirection * step);
+            }           
+
+            return Matrix.Translation(translation);
+        }    
     }
 
     ///// <summary>

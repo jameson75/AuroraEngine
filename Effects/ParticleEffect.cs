@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class PlexicNodeEffect : Effect
+    public class BillboardEffect : Effect
     {
         private VertexShader _vertexShader = null;
         private PixelShader _pixelShader = null;
@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         public Color ForegroundColor { get; set; }
         public Color BackgroundColor { get; set; }
 
-        public PlexicNodeEffect(Device graphicsDevice) : base(graphicsDevice)        
+        public BillboardEffect(Device graphicsDevice) : base(graphicsDevice)        
         {      
             ForegroundColor = Color.Transparent;
             BackgroundColor = Color.Transparent;

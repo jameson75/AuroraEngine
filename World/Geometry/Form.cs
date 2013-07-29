@@ -10,6 +10,7 @@ using System.Collections.Specialized;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.ParticleSystem;
+using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
@@ -17,16 +18,34 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {
         private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();
         private Emitter _emitter = null;
-       
-        public Form(IGameApp game) : base(game)
-        { }
-
-        public Emitter Emitter { get { return _emitter; } set { _emitter = value; OnEmitterChanged(); } }
+        private Mesh _mesh = null;
         
-        protected virtual void OnEmitterChanged()
-        { }
+        public Mesh Mesh 
+        { 
+            get { return _mesh; }
+            set { _mesh = value; OnMeshChanged(); }
+        }
+        
+        public Emitter Emitter 
+        { 
+            get { return _emitter; } 
+            set { _emitter = value; OnEmitterChanged(); }
+        }
+
+        public override BoundingBox BoundingBox
+        {
+            get { return (Mesh != null) ? Mesh.BoundingBox : BoundingBoxExtension.Empty; }
+        }
 
         public ParticleRenderer ParticleRenderer { get; set; }
+
+        protected ObservableCollection<FormElement> Elements 
+        {
+            get { return _elements; }
+        }
+
+        public Form(IGameApp game) : base(game)
+        { }       
 
         public override void Draw(long gameTime)
         {
@@ -44,11 +63,15 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
             this.Effect.World = formTransform;
             this.Effect.Apply();
-        }    
-        
-        protected ObservableCollection<FormElement> Elements { get { return _elements; } }      
+        }            
+       
+        protected virtual void OnEmitterChanged()
+        { }
 
         protected virtual void OnLayoutChanged()
+        { }
+
+        protected virtual void OnMeshChanged()
         { }
     }   
 

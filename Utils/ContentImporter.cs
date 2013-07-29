@@ -151,7 +151,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
        
         public static Model ImportFBX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
         {
-            Model result = null;
+            BasicModel result = null;
             FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();            
             fbxMeshThunk.m = new float[16];
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);

@@ -117,63 +117,74 @@ namespace CipherPark.AngelJacket.Core.Animation
     {
         private long? _animationStartTime = null;
         private long? _lastEmitTime = null;
+        private const int EmissionRate = 1000;
 
         public Emitter Target { get; set; }
-        public List<EmitterAction> Actions { get; set; }
-        public bool ExplicitEmissionsOnly { get; set; }
+        public List<EmitterAction> ExplicitTasks { get; set; }
+        public bool IsExplicitMode { get; set; }
 
         public override void Start() { }
 
         public override void UpdateAnimation(long gameTime)
         {
+            if (Target == null)
+                throw new InvalidOperationException("Target not specified");
+
+            else if (IsExplicitMode && ExplicitTasks == null)
+                throw new InvalidOperationException("Actions not specified");
+
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
 
+            if (_lastEmitTime == null)
+                _lastEmitTime = gameTime;
+
             long elapsedTime = gameTime - _animationStartTime.Value;
+            long elapsedEmitTime = gameTime - _lastEmitTime.Value;
 
-            if (Target != null)
+            if (!IsExplicitMode)
             {
-                if (_lastEmitTime == null)
-                    _lastEmitTime = gameTime;
-
-                if (!ExplicitEmissionsOnly && gameTime - _lastEmitTime > 1000)
+                if (elapsedEmitTime > EmissionRate)
                     Target.Emit();
-
-                if (Actions != null)
+            }
+            else
+            {
+                foreach (EmitterAction action in this.ExplicitTasks)
                 {
-                    foreach (EmitterAction action in this.Actions)
+                    if (action.Time <= (ulong)elapsedTime)
                     {
-                        if (action.Time <= (ulong)elapsedTime)
+                        switch (action.Task)
                         {
-                            switch (action.Task)
-                            {
-                                case EmitterAction.EmitterTask.KillAll:
-                                    Target.KillAll();
-                                    break;
-                                case EmitterAction.EmitterTask.Kill:
-                                    Target.Kill(action.ParticleArgs);
-                                    break;
-                                case EmitterAction.EmitterTask.Emit:
-                                    Target.Emit();
-                                    break;
-                                case EmitterAction.EmitterTask.EmitCustom:
-                                    Target.Emit(action.CustomParticleDescriptionArg);
-                                    break;
-                                case EmitterAction.EmitterTask.EmitExplicit:
-                                    Target.Emit(action.ParticleArgs);
-                                    break;
-                                case EmitterAction.EmitterTask.Link:
-                                    Target.Link(action.ParticleArgs);
-                                    break;
-                                case EmitterAction.EmitterTask.Transform:
-                                    Target.Transform = action.Transform;
-                                    break;
-                            }
+                            case EmitterAction.EmitterTask.KillAll:
+                                Target.KillAll();
+                                break;
+                            case EmitterAction.EmitterTask.Kill:
+                                Target.Kill(action.ParticleArgs);
+                                break;
+                            case EmitterAction.EmitterTask.Emit:
+                                Target.Emit();
+                                break;
+                            case EmitterAction.EmitterTask.EmitCustom:
+                                Target.Emit(action.CustomParticleDescriptionArg);
+                                break;
+                            case EmitterAction.EmitterTask.EmitExplicit:
+                                Target.Emit(action.ParticleArgs);
+                                break;
+                            case EmitterAction.EmitterTask.Link:
+                                Target.Link(action.ParticleArgs);
+                                break;
+                            case EmitterAction.EmitterTask.Transform:
+                                Target.Transform = action.Transform;
+                                break;
                         }
                     }
-                    this.Actions.RemoveAll(a => a.Time <= (ulong)elapsedTime);
                 }
-            }
+
+                this.ExplicitTasks.RemoveAll(a => a.Time <= (ulong)elapsedTime);
+                
+                if (ExplicitTasks.Count == 0)
+                    OnAnimationComplete();
+            }           
         }
     }
 
@@ -185,22 +196,17 @@ namespace CipherPark.AngelJacket.Core.Animation
         private long? _animationStartTime = null;         
 
         public IRigidBody Target { get; set; }
-     
-        
-        public RigidBodyAnimationController()
-        { }
-       
-        public RigidBodyAnimationController(float linearVelocity, Vector3[] linearPath, IRigidBody target)
-        {
-            LinearVelocity = linearVelocity;
-            LinearPath = linearPath;           
-            Target = target;
-        }
+        public Motion Delta { get; set; }        
 
-        public RigidBodyAnimationController(float linearVelocity, Vector3[] linearPath, float angularVelocity, float angle, IRigidBody target) : this(linearVelocity, linearPath, target)
+        public RigidBodyAnimationController()
         {
-            AngularVelocity = angularVelocity;
-            Angle = angle;
+            Delta = Motion.Identity;
+        }
+       
+        public RigidBodyAnimationController(Motion delta, IRigidBody target)
+        {
+            Delta = delta;           
+            Target = target;
         }
 
         #region IAnimationController Members   
@@ -215,12 +221,12 @@ namespace CipherPark.AngelJacket.Core.Animation
             if (_animationStartTime == null)
                 _animationStartTime = gameTime;
 
-            ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
-            if (Target != null && Motion != null)
-            {
-                Target.Transform = Transform.Multiply(Target.Transform, Motion.GetTransformDeltaAtT(timeT));
-                Motion.RemoveImpulses();
-            }
+            ulong elapsedTime = (ulong)(gameTime - _animationStartTime.Value);
+
+            if (Target != null)            
+                Target.Transform = new Transform(Delta.GetTransformationAtT((float)elapsedTime / 1000.0f));
+
+            OnAnimationComplete();
         }
 
         #endregion
@@ -229,14 +235,19 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// <summary>
     /// 
     /// </summary>
-    public class MasterController : AnimationController
+    public class CompositeAnimationController : AnimationController
     {
-        List<IAnimationController> _slaves = new List<IAnimationController>();
+        List<IAnimationController> _children = new List<IAnimationController>();
 
-        public override void Start()
+        public CompositeAnimationController()
+        { }
+
+        public CompositeAnimationController(IEnumerable<IAnimationController> children)
         {
-            
+            _children.AddRange(children);
         }
+
+        public override void Start() { }
 
         public override void UpdateAnimation(long gameTime)
         {
@@ -245,19 +256,19 @@ namespace CipherPark.AngelJacket.Core.Animation
             //the event that an updated controller alters this Simulator's Animation Controllers
             //collection.
             //**********************************************************************************
-            List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_slaves);            
+            List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_children);
             foreach (IAnimationController controller in auxAnimationControllers)
             {
                 controller.UpdateAnimation(gameTime);
                 if (controller.IsAnimationComplete)
-                    _slaves.Remove(controller);
+                    _children.Remove(controller);
             }
 
-            if (_slaves.Count == 0 && !IsAnimationComplete)
+            if (_children.Count == 0 && !IsAnimationComplete)
                 OnAnimationComplete();
         }
 
-        public List<IAnimationController> Slaves { get { return _slaves; } }
+        public List<IAnimationController> Children { get { return _children; } }
     }
 
     /// <summary>
@@ -270,10 +281,7 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public ParticleSolver Solver { get; set; }
 
-        public override void Start()
-        {
-            
-        }
+        public override void Start() { }
 
         public override void UpdateAnimation(long gameTime)
         {
