@@ -213,7 +213,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
             if (Meshes != null)
             {
-                foreach(Mesh mesh in Meshes)
+                foreach (Mesh mesh in Meshes)
                     mesh.Draw(gameTime);
             }
         }
