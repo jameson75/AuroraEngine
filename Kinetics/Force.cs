@@ -47,10 +47,12 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             {
                 Vector3 pathOrigin = Vector3.Zero;
                 Vector3 pathDirection = Vector3.Zero;
+                float pathDistance = 0;
                 float accumLength = 0;
                 for (int i = 0; i < LinearPath.Length; i++)
                 {
-                    accumLength+= Vector3.Distance(LinearPath[i], pathOrigin);
+                    pathDistance = Vector3.Distance(LinearPath[i], pathOrigin);
+                    accumLength+= pathDistance;
                     if (accumLength > step)
                     {
                         pathDirection = LinearPath[i] - pathOrigin;
@@ -59,7 +61,8 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                     }
                     pathOrigin = LinearPath[i];
                 }
-                translation = pathOrigin + (pathDirection * step);
+                float pathStep = step - accumLength + pathDistance;
+                translation = pathOrigin + (pathDirection * pathStep);
             }           
 
             return Matrix.Translation(translation);

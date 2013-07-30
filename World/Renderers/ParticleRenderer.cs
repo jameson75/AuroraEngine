@@ -67,12 +67,16 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
                 linkVertices.Add(v1);
                 linkVertices.Add(v2);
             }
-            linkEffect.World = Matrix.Identity;
-            linkEffect.View = view;
-            linkEffect.Projection = projection;
-            linkEffect.Apply();
-            _linkMesh.Update<BasicVertexPositionColor>(linkVertices.ToArray());
-            _linkMesh.Draw(gameTime);
+
+            if (linkVertices.Count > 0)
+            {
+                linkEffect.World = Matrix.Identity;
+                linkEffect.View = view;
+                linkEffect.Projection = projection;
+                linkEffect.Apply();
+                _linkMesh.Update<BasicVertexPositionColor>(linkVertices.ToArray());
+                _linkMesh.Draw(gameTime);
+            }
         }
     }
 }

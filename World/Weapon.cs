@@ -28,14 +28,14 @@ namespace CipherPark.AngelJacket.Core.World
             //Create path...
             Vector3[] path = new Vector3[]
             { 
-                new Vector3(0, 100, 0),
-                new Vector3(0, 100, 200),
-                new Vector3(200, 100, 200),
-                new Vector3(200, 200, 400)
+                new Vector3(200, 20, 0),
+                new Vector3(200, 20, 200),
+                new Vector3(200, 20, 400),
+                new Vector3(0, 20, 400)
             };
             Motion motion = new Motion();
             motion.LinearPath = path;
-            motion.LinearVelocity = 1.0f;
+            motion.LinearVelocity = 200.0f;
             RigidBodyAnimationController animationPathController = new RigidBodyAnimationController(motion, projectile);
             //IAnimationController projectileAnimationController = projectile.Animation;
             //return new CompositeAnimationController(new IAnimationController[] { animationPathController, /*projectileAnimationController*/ });

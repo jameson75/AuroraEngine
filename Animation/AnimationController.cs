@@ -223,14 +223,10 @@ namespace CipherPark.AngelJacket.Core.Animation
 
             ulong elapsedTime = (ulong)(gameTime - _animationStartTime.Value);
 
-            if (Target != null)  
-            {
-                Matrix mTransform = Target.Transform.ToMatrix();
-                Matrix mNewTransform = mTransform * Delta.GetTransformationAtT((float)elapsedTime / 1000.0f);
-                Target.Transform = new Transform(mNewTransform);
-            }
+            if (Target != null)                             
+                Target.Transform = new Transform(Delta.GetTransformationAtT((float)elapsedTime / 1000.0f));                         
 
-            OnAnimationComplete();
+            //OnAnimationComplete();
         }
 
         #endregion
