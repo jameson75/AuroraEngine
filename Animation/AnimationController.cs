@@ -226,7 +226,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             if (Target != null)  
             {
                 Matrix mTransform = Target.Transform.ToMatrix();
-                Matrix mNewTransform = mTransform * Delta.GetTransformationAtT((float)elapsedTime / 1000.0f));
+                Matrix mNewTransform = mTransform * Delta.GetTransformationAtT((float)elapsedTime / 1000.0f);
                 Target.Transform = new Transform(mNewTransform);
             }
 
