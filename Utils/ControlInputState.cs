@@ -18,8 +18,8 @@ namespace CipherPark.AngelJacket.Core.Utils
     {
         public const long DelayTimeAfterPress = 300;
         public const long DelayTimeAfterHold = 80;
-        private List<Key> _delayedScannedKeysDown = new List<Key>();
         private InputState _inputState = null;
+        private List<Key> _delayedScannedKeysDown = new List<Key>();        
         private Dictionary<Key, long> _inputDelayExpirationTimes = new Dictionary<Key, long>();
 
         public ControlInputState(InputState inputState)
@@ -61,6 +61,9 @@ namespace CipherPark.AngelJacket.Core.Utils
             return _inputState.GetKeysReleased();
         }
 
+        /// <summary>
+        /// This method only needs be called once per frame and must be called before any input is read.
+        /// </summary>
         public void UpdateState()
         {
             List<Key> keysToRemove = new List<Key>();

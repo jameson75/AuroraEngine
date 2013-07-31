@@ -83,7 +83,7 @@ namespace CipherPark.AngelJacket.Core
         { }
 
         private void InitializeDirectXResources(Form form)
-        {
+        {           
             _deviceHwnd = form.Handle;            
 
             //Initialize Direct3D11 Resources.

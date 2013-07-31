@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.DirectInput;
+using SharpDX.XInput;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,6 +18,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 {
     public class InputState
     {
+        ControllerStateWindow[] controllerStateWindows = null;
         KeyboardStateWindow keyboardStateWindow = null;
         MouseStateWindow mouseStateWindow = null;
         Key[] _releasedKeys = null;
@@ -33,7 +35,6 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
 
         public long StateUpdateTime { get { return _stateUpdateTime; } }
-
        
         public void UpdateState()
         {
@@ -43,11 +44,54 @@ namespace CipherPark.AngelJacket.Core.Utils
             _mouseButtonsReleased = null;
             _mouseButtonsPressed = null;
 
+            //**********************************************************************************
+            //NOTE: Since directx (apparently) doesn't support mouse wheel input, I've devised
+            //my own. HwndMessageHook uses the game's window-handle to intercept 
+            //mouse messages.
+            //**********************************************************************************
             if (_messageHook == null)
             {
                 _messageHook = new HwndMessageHook();
                 _messageHook.Initialize(_game.DeviceHwnd);
             }
+
+            //GAME PAD
+            //========
+            
+            //Update Old/New Snapshots
+            //------------------------
+            if (controllerStateWindows == null)            
+                controllerStateWindows = new ControllerStateWindow[4];
+            for (int i = 0; i < 4; i++)
+            {
+                if (controllerStateWindows[i] == null)
+                {
+                    Controller gameController = new Controller((UserIndex)i);
+                    controllerStateWindows[i] = new ControllerStateWindow();
+                    controllerStateWindows[i].GameController = gameController;
+                    controllerStateWindows[i].OldState = new ControllerState(gameController.GetState().Gamepad, gameController.IsConnected);
+                }
+                else
+                    controllerStateWindows[i].OldState = controllerStateWindows[i].NewState;
+                controllerStateWindows[i].NewState = new ControllerState(controllerStateWindows[i].GameController.GetState().Gamepad, controllerStateWindows[i].GameController.IsConnected);
+            }
+
+            //Update button press time stamps
+            for (int i = 0; i < 4; i++)
+            {               
+                //Remove time stamps of buttons which have just been released.
+                foreach (int releasedButton in this.GetGamepadButtonsReleased(i))                
+                    controllerStateWindows[i].PressTime.Remove(releasedButton);                
+                //Set time stamps for buttons which have just been pressed.
+                foreach (int newPressedButtons in this.GetGamepadButtonsDown(i))
+                {
+                    if (!controllerStateWindows[i].PressTime.ContainsKey(newPressedButtons))
+                        controllerStateWindows[i].PressTime.Add(newPressedButtons, _stateUpdateTime);
+                }
+            }               
+           
+            //KEYBOARD
+            //========
 
             //Update Old/New Snapshots
             //------------------------
@@ -71,6 +115,9 @@ namespace CipherPark.AngelJacket.Core.Utils
                 if(!keyboardStateWindow.PressTime.ContainsKey(newPressedKey))
                     keyboardStateWindow.PressTime.Add(newPressedKey, _stateUpdateTime);                
             }
+
+            //MOUSE
+            //=====
 
             //Update Old/New Snapshots
             //------------------------
@@ -103,7 +150,163 @@ namespace CipherPark.AngelJacket.Core.Utils
                     mouseStateWindow.PressLocation.Add(newPressedButtons, new Vector2(_game.Mouse.GetCurrentState().X, _game.Mouse.GetCurrentState().Y));
             }
         }
-        
+
+        public bool IsGamepadButtonUp(int controllerIndex, int button)
+        {
+            if (controllerStateWindows == null)
+                return false;
+            else
+            {
+                ControllerState state = controllerStateWindows[controllerIndex].NewState;
+                if (!state.IsConnected)
+                    return false;
+                else
+                    return !state.Gamepad.Buttons.HasFlag((GamepadButtonFlags)button);
+            }
+        }
+
+        public bool IsGamepadButtonDown(int controllerIndex, int button)
+        {
+            if (controllerStateWindows == null)
+                return false;
+            else
+            {
+                ControllerState state = controllerStateWindows[controllerIndex].NewState;
+                if (!state.IsConnected)
+                    return false;
+                else
+                    return state.Gamepad.Buttons.HasFlag((GamepadButtonFlags)button);
+            }
+        }
+
+        public bool IsGamepadButtonReleased(int controllerIndex, int button)
+        {
+            if (controllerStateWindows == null)
+                return false;
+            else
+            {
+                ControllerState oldState = controllerStateWindows[controllerIndex].OldState;
+                ControllerState newState = controllerStateWindows[controllerIndex].NewState;
+                if (!oldState.IsConnected || !newState.IsConnected)
+                    return false;
+                else
+                    return oldState.Gamepad.Buttons.HasFlag((GamepadButtonFlags)button) &&
+                           !newState.Gamepad.Buttons.HasFlag((GamepadButtonFlags)button);
+            }
+        }
+
+        public int[] GetGamepadButtonsDown(int controllerIndex)
+        {
+            if (controllerStateWindows == null)
+                return new int[0];
+            else
+            {                     
+                ControllerState state = controllerStateWindows[controllerIndex].NewState;
+                return GetControllerStateressedButtons(state);
+            }
+        }
+
+        public int[] GetGamepadButtonsReleased(int controllerIndex)
+        {
+            if (controllerStateWindows == null)
+                return new int[0];
+            else
+            {
+                ControllerState oldState = controllerStateWindows[controllerIndex].OldState;
+                int[] oldPressedButtons = GetControllerStateressedButtons(oldState);
+                ControllerState newState = controllerStateWindows[controllerIndex].NewState;
+                int[] newPressedButtons = GetControllerStateressedButtons(newState);
+                return oldPressedButtons.Where(b => !newPressedButtons.Contains(b)).ToArray();
+            }
+        }
+
+        public bool GamepadConnectionOccured(int i)
+        {
+            if (controllerStateWindows == null)
+                return false;
+            else
+            {
+                ControllerState oldState = controllerStateWindows[i].OldState;
+                ControllerState newState = controllerStateWindows[i].NewState;
+                return (!oldState.IsConnected && newState.IsConnected);
+            }          
+        }
+
+        public bool GamepadDisconnectionOccured(int i)
+        {
+            if (controllerStateWindows == null)
+                return false;
+            else
+            {
+                ControllerState oldState = controllerStateWindows[i].OldState;
+                ControllerState newState = controllerStateWindows[i].NewState;
+                return (oldState.IsConnected && !newState.IsConnected);
+            }     
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This method can be used to determine the values of the controller's right and left triggers and
+        /// right and left thumb sticks.
+        /// </remarks>
+        public Gamepad GetControllerGamepadState(int i)
+        {
+            if (controllerStateWindows == null)
+                return new Gamepad(); //empty state.
+            else
+            {
+                return controllerStateWindows[i].NewState.Gamepad;
+            }
+        }
+
+        public bool IsControllerConnected(int i)
+        {
+            if (controllerStateWindows == null)
+                return false;
+            else
+            {
+                return controllerStateWindows[i].GameController.IsConnected;
+            }
+        }
+
+        private static int[] GetControllerStateressedButtons(ControllerState state)
+        {
+            List<int> buttonsDown = new List<int>();
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))
+                buttonsDown.Add((int)GamepadButtonFlags.A);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))
+                buttonsDown.Add((int)GamepadButtonFlags.B);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Back))
+                buttonsDown.Add((int)GamepadButtonFlags.Back);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown))
+                buttonsDown.Add((int)GamepadButtonFlags.DPadDown);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadLeft))
+                buttonsDown.Add((int)GamepadButtonFlags.DPadLeft);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadRight))
+                buttonsDown.Add((int)GamepadButtonFlags.DPadRight);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadUp))
+                buttonsDown.Add((int)GamepadButtonFlags.DPadUp);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
+                buttonsDown.Add((int)GamepadButtonFlags.LeftShoulder);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftThumb))
+                buttonsDown.Add((int)GamepadButtonFlags.LeftThumb);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder))
+                buttonsDown.Add((int)GamepadButtonFlags.RightShoulder);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightThumb))
+                buttonsDown.Add((int)GamepadButtonFlags.RightThumb);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start))
+                buttonsDown.Add((int)GamepadButtonFlags.Start);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.X))
+                buttonsDown.Add((int)GamepadButtonFlags.X);
+            if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Y))
+                buttonsDown.Add((int)GamepadButtonFlags.Y);
+            return buttonsDown.ToArray();
+        }
+
         public bool IsKeyUp(Key key)
         { 
              if(keyboardStateWindow == null)
@@ -316,6 +519,22 @@ namespace CipherPark.AngelJacket.Core.Utils
             Middle,
         }
 
+        public struct ControllerState
+        {
+            public Gamepad Gamepad;
+            public bool IsConnected;
+            public ControllerState(Gamepad gamepad, bool isConnected)
+            {
+                Gamepad = gamepad;
+                IsConnected = isConnected;
+            }
+        }
+
+        public class ControllerStateWindow : StateWindow<ControllerState, int>
+        {
+            public Controller GameController { get; set; }
+        }
+
         //public class KeyboardStateWindow
         //{
         //    private Dictionary<Keys, long> _keyPressTime = null;
@@ -323,7 +542,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         //    public KeyboardState NewState { get; set; }
         //    public Dictionary<Keys, long> KeyPressTime { get { return _keyPressTime; } }
         //    public KeyboardStateWindow() { _keyPressTime = new Dictionary<Keys,long>(); }
-        //}       
+        //}             
 
         private void SetMouseCurrentPosition(MouseState state)
         {
