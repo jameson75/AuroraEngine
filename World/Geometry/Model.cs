@@ -19,6 +19,7 @@ using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
 using CoreEffect = CipherPark.AngelJacket.Core.Effects.Effect;
 using CipherPark.AngelJacket.Core.Kinetics;
+using CipherPark.AngelJacket.Core.World.ParticleSystem;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -98,12 +99,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         {
             if (Effect != null)
             {
+                Effect.World = ((ITransformable)this).LocalToWorld(this.Transform).ToMatrix();
                 OnApplyingEffect();
                 Effect.Apply();
-            }
-            
-            if (Mesh != null)
-                Mesh.Draw(gameTime);
+                if (Mesh != null)
+                    Mesh.Draw(gameTime);
+            }      
         }
 
         protected virtual void OnMeshChanged()
@@ -177,17 +178,14 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private List<Mesh> _meshes = new List<Mesh>();
         private List<Emitter> _emitters = new List<Emitter>();
 
-        public List<Mesh> Meshes { get { return _meshes; } }
-        
-        public List<Emitter> Emitters { get { return _emitters; } }
-        
+        public List<Mesh> Meshes { get { return _meshes; } }        
+        public List<Emitter> Emitters { get { return _emitters; } }        
         #region IAnimatedModel
-        public Frame FrameTree { get; set; }
-        
+        public Frame FrameTree { get; set; }        
         public List<KeyframeAnimationController> Animation { get; set; }
-        #endregion
-        
+        #endregion        
         public List<MeshTextures> MeshTextures { get; set; }
+        public ParticleRenderer EmitterRenderer { get; set; }
 
         public override BoundingBox BoundingBox
         {
@@ -205,17 +203,18 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         
         public override void Draw(long gameTime)
         {
+            List<Frame> frameList = null;
+                if(FrameTree != null)
+                    frameList = FrameTree.FlattenToList();
+
             if (Effect != null)
             {
+                Effect.World = ((ITransformable)this).LocalToWorld(this.Transform).ToMatrix();
                 OnApplyingEffect();
                 Effect.Apply();
-            }
-
-            if (Meshes != null)
-            {
                 foreach (Mesh mesh in Meshes)
                     mesh.Draw(gameTime);
-            }
+            }                     
         }
 
         protected override void OnApplyingEffect()

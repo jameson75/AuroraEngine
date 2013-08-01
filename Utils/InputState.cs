@@ -69,11 +69,13 @@ namespace CipherPark.AngelJacket.Core.Utils
                     Controller gameController = new Controller((UserIndex)i);
                     controllerStateWindows[i] = new ControllerStateWindow();
                     controllerStateWindows[i].GameController = gameController;
-                    controllerStateWindows[i].OldState = new ControllerState(gameController.GetState().Gamepad, gameController.IsConnected);
+                    controllerStateWindows[i].OldState = gameController.IsConnected ? new ControllerState(gameController.GetState().Gamepad, gameController.IsConnected) :
+                                                                                      new ControllerState(new Gamepad(), false);
                 }
                 else
                     controllerStateWindows[i].OldState = controllerStateWindows[i].NewState;
-                controllerStateWindows[i].NewState = new ControllerState(controllerStateWindows[i].GameController.GetState().Gamepad, controllerStateWindows[i].GameController.IsConnected);
+                controllerStateWindows[i].NewState = controllerStateWindows[i].GameController.IsConnected ? new ControllerState(controllerStateWindows[i].GameController.GetState().Gamepad, controllerStateWindows[i].GameController.IsConnected) :
+                                                                                                            new ControllerState(new Gamepad(), false);
             }
 
             //Update button press time stamps
@@ -202,7 +204,10 @@ namespace CipherPark.AngelJacket.Core.Utils
             else
             {                     
                 ControllerState state = controllerStateWindows[i].NewState;
-                return GetControllerStatePressedButtons(state);
+                if (!state.IsConnected)
+                    return new GamepadButtonFlags[0];
+                else 
+                    return GetControllerStatePressedButtons(state);
             }
         }
 
@@ -213,10 +218,15 @@ namespace CipherPark.AngelJacket.Core.Utils
             else
             {
                 ControllerState oldState = controllerStateWindows[i].OldState;
-                GamepadButtonFlags[] oldPressedButtons = GetControllerStatePressedButtons(oldState);
                 ControllerState newState = controllerStateWindows[i].NewState;
-                GamepadButtonFlags[] newPressedButtons = GetControllerStatePressedButtons(newState);
-                return oldPressedButtons.Where(b => !newPressedButtons.Contains(b)).ToArray();
+                if (!oldState.IsConnected || !newState.IsConnected)
+                    return new GamepadButtonFlags[0];
+                else
+                {
+                    GamepadButtonFlags[] oldPressedButtons = GetControllerStatePressedButtons(oldState);
+                    GamepadButtonFlags[] newPressedButtons = GetControllerStatePressedButtons(newState);
+                    return oldPressedButtons.Where(b => !newPressedButtons.Contains(b)).ToArray();
+                }
             }
         }
 

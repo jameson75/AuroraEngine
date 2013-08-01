@@ -27,6 +27,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         void Start();
         void UpdateAnimation(long gameTime);
         bool IsAnimationComplete { get; }
+        void SetComplete(bool complete = true);
         event EventHandler AnimationComplete;
     }
 
@@ -40,6 +41,13 @@ namespace CipherPark.AngelJacket.Core.Animation
         public bool IsAnimationComplete
         {
             get { return _isAnimationComplete; }
+        }
+
+        public void SetComplete(bool complete = true)
+        {
+            _isAnimationComplete = complete;
+            if (complete)
+                OnAnimationComplete();
         }
 
         public abstract void Start();

@@ -329,7 +329,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             _values.Clear();
         }
 
-        public void SetConstant(T value)
+        public void SetScalar(T value)
         {
             this.Clear();
             this.SetValueAtAge(value, 0);
@@ -341,6 +341,13 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// </summary>
     public class FloatOverLife : ValueOverLife<float>
     {
+        public static FloatOverLife FromScalar(float value)
+        {
+            FloatOverLife fov = new FloatOverLife();
+            fov.SetScalar(value);
+            return fov;
+        }
+
         protected override float Lerp(float v0, float v1, float percentage)
         {
             return v0 + (percentage * (v1 - v0));
@@ -357,6 +364,13 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// </summary>
     public class ColorOverLife : ValueOverLife<Color>
     {
+        public static ColorOverLife FromScalar(Color value)
+        {
+            ColorOverLife cov = new ColorOverLife();
+            cov.SetScalar(value);
+            return cov;
+        }
+
         protected override Color Lerp(Color v0, Color v1, float percentage)
         {
             return Color.Lerp(v0, v1, percentage);

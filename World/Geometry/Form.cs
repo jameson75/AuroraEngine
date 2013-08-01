@@ -11,6 +11,7 @@ using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.ParticleSystem;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
@@ -48,10 +49,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         { }       
 
         public override void Draw(long gameTime)
-        {
-            //this.Effect.SetView(Camera.ViewMatrix);
-            //this.Effect.SetProjection(Camera.ProjectionMatrix);
-            Matrix formTransform = this.Effect.World;
+        {            
+            //Matrix formTransform = this.Effect.World;
+            Matrix formTransform = ((ITransformable)this).LocalToWorld(this.Transform).ToMatrix();
             foreach (FormElement element in _elements)
             {
                 //this.Effect.SetWorld(this.Transform * element.Transform);               
@@ -61,7 +61,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 if (Emitter != null && ParticleRenderer != null)                
                     ParticleRenderer.Render(gameTime, Effect.World * Emitter.Transform.ToMatrix() * Matrix.Translation(0, 1.0f, 0), this.Effect.View, this.Effect.Projection, Emitter.Particles, Emitter.Links);                
             }
-            this.Effect.World = formTransform;
+            //this.Effect.World = formTransform;
             this.Effect.Apply();
         }            
        
