@@ -80,10 +80,10 @@ namespace CipherPark.AngelJacket.Core.Utils
             for (int i = 0; i < 4; i++)
             {               
                 //Remove time stamps of buttons which have just been released.
-                foreach (int releasedButton in this.GetGamepadButtonsReleased(i))                
+                foreach (GamepadButtonFlags releasedButton in this.GetGamepadButtonsReleased(i))                
                     controllerStateWindows[i].PressTime.Remove(releasedButton);                
                 //Set time stamps for buttons which have just been pressed.
-                foreach (int newPressedButtons in this.GetGamepadButtonsDown(i))
+                foreach (GamepadButtonFlags newPressedButtons in this.GetGamepadButtonsDown(i))
                 {
                     if (!controllerStateWindows[i].PressTime.ContainsKey(newPressedButtons))
                         controllerStateWindows[i].PressTime.Add(newPressedButtons, _stateUpdateTime);
@@ -151,71 +151,71 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
 
-        public bool IsGamepadButtonUp(int controllerIndex, int button)
+        public bool IsGamepadButtonUp(int i, GamepadButtonFlags button)
         {
             if (controllerStateWindows == null)
                 return false;
             else
             {
-                ControllerState state = controllerStateWindows[controllerIndex].NewState;
+                ControllerState state = controllerStateWindows[i].NewState;
                 if (!state.IsConnected)
                     return false;
                 else
-                    return !state.Gamepad.Buttons.HasFlag((GamepadButtonFlags)button);
+                    return !state.Gamepad.Buttons.HasFlag(button);
             }
         }
 
-        public bool IsGamepadButtonDown(int controllerIndex, int button)
+        public bool IsGamepadButtonDown(int i, GamepadButtonFlags button)
         {
             if (controllerStateWindows == null)
                 return false;
             else
             {
-                ControllerState state = controllerStateWindows[controllerIndex].NewState;
+                ControllerState state = controllerStateWindows[i].NewState;
                 if (!state.IsConnected)
                     return false;
                 else
-                    return state.Gamepad.Buttons.HasFlag((GamepadButtonFlags)button);
+                    return state.Gamepad.Buttons.HasFlag(button);
             }
         }
 
-        public bool IsGamepadButtonReleased(int controllerIndex, int button)
+        public bool IsGamepadButtonReleased(int i, GamepadButtonFlags button)
         {
             if (controllerStateWindows == null)
                 return false;
             else
             {
-                ControllerState oldState = controllerStateWindows[controllerIndex].OldState;
-                ControllerState newState = controllerStateWindows[controllerIndex].NewState;
+                ControllerState oldState = controllerStateWindows[i].OldState;
+                ControllerState newState = controllerStateWindows[i].NewState;
                 if (!oldState.IsConnected || !newState.IsConnected)
                     return false;
                 else
-                    return oldState.Gamepad.Buttons.HasFlag((GamepadButtonFlags)button) &&
-                           !newState.Gamepad.Buttons.HasFlag((GamepadButtonFlags)button);
+                    return oldState.Gamepad.Buttons.HasFlag(button) &&
+                           !newState.Gamepad.Buttons.HasFlag(button);
             }
         }
 
-        public int[] GetGamepadButtonsDown(int controllerIndex)
+        public GamepadButtonFlags[] GetGamepadButtonsDown(int i)
         {
             if (controllerStateWindows == null)
-                return new int[0];
+                return new GamepadButtonFlags[0];
             else
             {                     
-                ControllerState state = controllerStateWindows[controllerIndex].NewState;
-                return GetControllerStateressedButtons(state);
+                ControllerState state = controllerStateWindows[i].NewState;
+                return GetControllerStatePressedButtons(state);
             }
         }
 
-        public int[] GetGamepadButtonsReleased(int controllerIndex)
+        public GamepadButtonFlags[] GetGamepadButtonsReleased(int i)
         {
             if (controllerStateWindows == null)
-                return new int[0];
+                return new GamepadButtonFlags[0];
             else
             {
-                ControllerState oldState = controllerStateWindows[controllerIndex].OldState;
-                int[] oldPressedButtons = GetControllerStateressedButtons(oldState);
-                ControllerState newState = controllerStateWindows[controllerIndex].NewState;
-                int[] newPressedButtons = GetControllerStateressedButtons(newState);
+                ControllerState oldState = controllerStateWindows[i].OldState;
+                GamepadButtonFlags[] oldPressedButtons = GetControllerStatePressedButtons(oldState);
+                ControllerState newState = controllerStateWindows[i].NewState;
+                GamepadButtonFlags[] newPressedButtons = GetControllerStatePressedButtons(newState);
                 return oldPressedButtons.Where(b => !newPressedButtons.Contains(b)).ToArray();
             }
         }
@@ -273,37 +273,37 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
 
-        private static int[] GetControllerStateressedButtons(ControllerState state)
+        private static GamepadButtonFlags[] GetControllerStatePressedButtons(ControllerState state)
         {
-            List<int> buttonsDown = new List<int>();
+            List<GamepadButtonFlags> buttonsDown = new List<GamepadButtonFlags>();
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))
-                buttonsDown.Add((int)GamepadButtonFlags.A);
+                buttonsDown.Add(GamepadButtonFlags.A);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))
-                buttonsDown.Add((int)GamepadButtonFlags.B);
+                buttonsDown.Add(GamepadButtonFlags.B);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Back))
-                buttonsDown.Add((int)GamepadButtonFlags.Back);
+                buttonsDown.Add(GamepadButtonFlags.Back);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown))
-                buttonsDown.Add((int)GamepadButtonFlags.DPadDown);
+                buttonsDown.Add(GamepadButtonFlags.DPadDown);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadLeft))
-                buttonsDown.Add((int)GamepadButtonFlags.DPadLeft);
+                buttonsDown.Add(GamepadButtonFlags.DPadLeft);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadRight))
-                buttonsDown.Add((int)GamepadButtonFlags.DPadRight);
+                buttonsDown.Add(GamepadButtonFlags.DPadRight);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadUp))
-                buttonsDown.Add((int)GamepadButtonFlags.DPadUp);
+                buttonsDown.Add(GamepadButtonFlags.DPadUp);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
-                buttonsDown.Add((int)GamepadButtonFlags.LeftShoulder);
+                buttonsDown.Add(GamepadButtonFlags.LeftShoulder);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftThumb))
-                buttonsDown.Add((int)GamepadButtonFlags.LeftThumb);
+                buttonsDown.Add(GamepadButtonFlags.LeftThumb);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder))
-                buttonsDown.Add((int)GamepadButtonFlags.RightShoulder);
+                buttonsDown.Add(GamepadButtonFlags.RightShoulder);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightThumb))
-                buttonsDown.Add((int)GamepadButtonFlags.RightThumb);
+                buttonsDown.Add(GamepadButtonFlags.RightThumb);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start))
-                buttonsDown.Add((int)GamepadButtonFlags.Start);
+                buttonsDown.Add(GamepadButtonFlags.Start);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.X))
-                buttonsDown.Add((int)GamepadButtonFlags.X);
+                buttonsDown.Add(GamepadButtonFlags.X);
             if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Y))
-                buttonsDown.Add((int)GamepadButtonFlags.Y);
+                buttonsDown.Add(GamepadButtonFlags.Y);
             return buttonsDown.ToArray();
         }
 
@@ -530,7 +530,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
 
-        public class ControllerStateWindow : StateWindow<ControllerState, int>
+        public class ControllerStateWindow : StateWindow<ControllerState, GamepadButtonFlags>
         {
             public Controller GameController { get; set; }
         }
@@ -593,8 +593,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 IntPtr hookWndProcFuncPtr = Marshal.GetFunctionPointerForDelegate(_hookWndProcDelegate);
                 IntPtr originalWndProcFuncPtr = (UnsafeNativeMethods.SetWindowLong(hWnd, UnsafeNativeMethods.GWL_WNDPROC, hookWndProcFuncPtr));
                 if (originalWndProcFuncPtr != IntPtr.Zero)
-                    _originalWndProcDelegate = Marshal.GetDelegateForFunctionPointer(originalWndProcFuncPtr, typeof(WndProcDelegate));
-                
+                    _originalWndProcDelegate = Marshal.GetDelegateForFunctionPointer(originalWndProcFuncPtr, typeof(WndProcDelegate));                
             }
 
             private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
