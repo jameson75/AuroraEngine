@@ -114,7 +114,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 rectangle.Left = thisRect.Left;         
             else            
                 rectangle.Left = thisRect.Left + ((thisRect.Width - rectangle.Width) / 2.0f);            
-            if(!alignment.HasFlag(RectangleAlignment.Right));
+            if(!alignment.HasFlag(RectangleAlignment.Right))
                 rectangle.Right = rectangle.Left + originalSize.Width;
 
             //RIGHT            

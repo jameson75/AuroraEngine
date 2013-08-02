@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.AngelJacket.Core.UI.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -36,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         DrawingSizeF ScreenSize { get; }
 
-        List<IAnimationController> Animations { get; }
+        List<UIControlAnimationControllerBase> Animations { get; }
 
         //IUITheme Theme { get; }     
     }

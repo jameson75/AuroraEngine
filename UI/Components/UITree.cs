@@ -29,9 +29,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private UIStyleCollection styles = null;
         private UIResourceCollection resources = null;
         private FocusManager focusManager = null;
+        private List<UIControlAnimationControllerBase> _animationControllers = null;
         //private IUITheme theme = null;
 
-        public List<UI> Animations { get { return _animationControllers; } }
+        public List<UIControlAnimationControllerBase> Animations { get { return _animationControllers; } }
 
         private Dictionary<string, UIControlParser> _controlParsers = new Dictionary<string, UIControlParser>();
         private Dictionary<string, UIStyleParser> _styleParsers = new Dictionary<string, UIStyleParser>();
@@ -44,6 +45,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             styles = new UIStyleCollection();
             resources = new UIResourceCollection();
             focusManager = new FocusManager(this);
+            _animationControllers = new List<UIControlAnimationControllerBase>();
             //theme = new DefaultTheme();    
         }     
 
@@ -148,6 +150,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             focusManager.Update();
 
+            UpdateAnimations(gameTime);
+
             foreach (UIControl control in this.controls)
                 control.Update(gameTime);
         }
@@ -166,8 +170,33 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             
             Game.GraphicsDeviceContext.OutputMerger.DepthStencilState = oldState;
             Game.GraphicsDeviceContext.Rasterizer.State = oldRasterizerState;
-        }      
+        }        
 
+        public void OnLoadComplete()
+        {
+            EventHandler handler = LoadComplete;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        private void UpdateAnimations(long gameTime)
+        {
+
+            //Update animation controllers.
+            //**********************************************************************************
+            //NOTE: We use an auxilary controller collection to enumerate through, in 
+            //the event that an updated controller alters this Simulator's Animation Controllers
+            //collection.
+            //**********************************************************************************
+            List<UIControlAnimationControllerBase > auxAnimationControllers = new List<UIControlAnimationControllerBase>(_animationControllers);
+            foreach (UIControlAnimationControllerBase controller in auxAnimationControllers)
+            {
+                controller.UpdateAnimation(gameTime);
+                if (controller.IsAnimationComplete)
+                    _animationControllers.Remove(controller);
+            }
+        }
+        
         private void RegisterStandardParsers()
         {
             RegisterStyleParser(new TextStyleParser(), "TextStyle");
@@ -193,13 +222,6 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public void RegisterControlParser(UIControlParser parser, string elementName)
         {
             _controlParsers.Add(elementName, parser);
-        }
-
-        public void OnLoadComplete()
-        {
-            EventHandler handler = LoadComplete;
-            if (handler != null)
-                handler(this, EventArgs.Empty);
         }
 
         public event EventHandler LoadComplete;

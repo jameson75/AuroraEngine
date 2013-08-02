@@ -23,16 +23,64 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class AlertBox : Panel
     {
-        private AlertBox(IUIRoot ui) : base(ui)
-        {}
+        private SplitterPanel childSplitter = null;
+        private ContentControl childIconContent = null;
+        private ContentControl childTextContent = null;
 
-        public static void ShowAlert(IUIRoot ui, TextStyle textStyle, AlertBoxStyle style, ulong displayTime)
+        private AlertBox(IUIRoot ui) : base(ui)
         {
+            childIconContent = new ContentControl(ui);
+            childIconContent.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            childIconContent.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+
+            childIconContent = new ContentControl(ui);
+            childIconContent.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            childIconContent.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+
+            childSplitter = new SplitterPanel(ui);
+            childSplitter.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            childSplitter.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            Guid textContentCellId = Guid.NewGuid();
+            childSplitter.Splitters.Add(new SplitterLayoutDivision(textContentCellId, 0, SplitterLayoutFixedSide.One));
+           
+            childTextContent.LayoutId = textContentCellId;
+            childSplitter.Children.Add(childIconContent);
+            childSplitter.Children.Add(childTextContent);
+
+            this.Children.Add(childSplitter);
+        }
+
+        public ImageContent Icon
+        {
+            get { return (ImageContent)childIconContent.Content; }
+            set 
+            {                
+                childIconContent.Content = value;
+                if (value == null && childSplitter.Splitters[0].Distance != 0)
+                    childSplitter.Splitters[0].Distance = 0;
+                else if (value != null && childSplitter.Splitters[0].Distance < 32)
+                    childSplitter.Splitters[0].Distance = 32;
+            }
+        }
+
+        public TextContent Text
+        {
+            get { return (TextContent)childTextContent.Content; }
+            set { childTextContent.Content = value; }
+        }
+        
+        public static void ShowAlert(IUIRoot ui, TextContent messageContent, ImageContent iconContent, ulong displayTime)
+        {
+            if (ui == null || messageContent == null)
+                throw new ArgumentNullException();
+
             AlertBox alertControl = new AlertBox(ui);
             alertControl.Visible = false;
+            alertControl.Text = messageContent;
+            alertControl.Icon = iconContent;
             RectangleF screenRect = new RectangleF(0, 0, ui.ScreenSize.Width, ui.ScreenSize.Height);
             DrawingSizeF textMargin = new DrawingSizeF(5, 5);
-            DrawingSizeF minMessageFit = textStyle.Font.MeasureString(textStyle.Text).Add(textMargin);
+            DrawingSizeF minMessageFit = messageContent.Font.MeasureString(messageContent.Text).Add(textMargin);
             DrawingSizeF minMessageBoxSize = new DrawingSizeF(100, 20);
             DrawingSizeF messageBoxSize = new DrawingSizeF(Math.Max(minMessageFit.Width, minMessageBoxSize.Width),
                                                            Math.Max(minMessageFit.Height, minMessageBoxSize.Height));

@@ -273,6 +273,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public SplitterLayoutFixedSide FixedSide { get; set; }
         public Guid DivisionId { get { return _divisionId; } }
         public SplitterLayoutDivision(Guid id) { _divisionId = id; }
+        public SplitterLayoutDivision(Guid id, float distance, SplitterLayoutFixedSide fixedSide)
+        {
+            _divisionId = id;
+            Distance = distance;
+            FixedSide = fixedSide;
+        }
     }
 
     public enum SplitterLayoutFixedSide

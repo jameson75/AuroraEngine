@@ -20,19 +20,10 @@ using CipherPark.AngelJacket.Core.Animation;
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.AngelJacket.Core.UI.Animation
-{   
-
-    public abstract class UIControlAnimationController<T> : PropertiesAnimationController where T : UIControl
-    {       
-        private long? _elapsedTime = null;      
-
-        public T Target { get; set; }
-
-        public UIControlAnimationController()
-        {
-
-        }
-
+{
+    public abstract class UIControlAnimationControllerBase : PropertiesAnimationController
+    { 
+        private long? _elapsedTime = null;
         protected long? ElapsedTime 
         {
              get { return _elapsedTime; }
@@ -55,7 +46,19 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             _elapsedTime = gameTime;
         }
 
-        public virtual void OnUpdateTarget(ulong timeT)
+        protected virtual void OnUpdateTarget(ulong timeT)
+        { }
+    }
+
+    public abstract class UIControlAnimationController<T> : UIControlAnimationControllerBase where T : UIControl
+    {       
+        public T Target { get; set; }
+
+        public UIControlAnimationController()
+        {
+        }
+
+        protected override void OnUpdateTarget(ulong timeT)
         {            
             if (TargetPropertyExists(UIControlPropertyNames.Enabled))
                 Target.Enabled = GetPropertyBooleanValueAtT(UIControlPropertyNames.Enabled, timeT);
@@ -78,6 +81,8 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
                 Target.Position = rect.Position();
                 Target.Size = rect.Size();
             }
+
+            base.OnUpdateTarget(timeT);
         }
 
         public bool GetEnabledAtT(ulong timeT)
@@ -184,7 +189,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
 
     public class PanelAnimationController : UIControlAnimationController<Panel>
     {
-        public override void OnUpdateTarget(ulong timeT)
+        protected override void OnUpdateTarget(ulong timeT)
         {
             base.OnUpdateTarget(timeT);
         }
@@ -192,7 +197,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
 
     public class ContentControlAnimationController : UIControlAnimationController<ContentControl>
     {
-        public override void OnUpdateTarget(ulong timeT)
+        protected override void OnUpdateTarget(ulong timeT)
         {
             base.OnUpdateTarget(timeT);
         }
