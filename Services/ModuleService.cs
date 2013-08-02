@@ -17,6 +17,7 @@ namespace CipherPark.AngelJacket.Core.Services
     public interface IModuleService
     {
         GameModule ActiveModule { get; }
+        bool ExitSignaled { get; }
         void ActivateOnUpdate(string moduleName);
         void ExitOnUpdate();
         void RegisterModule(string registeredName, GameModule module);
@@ -30,6 +31,8 @@ namespace CipherPark.AngelJacket.Core.Services
         GameModule _pendingActiveModule = null;
         GameModule _activeModule = null;
         Dictionary<string, GameModule> _modules = null;
+
+        public bool ExitSignaled { get; private set; }
 
         public ModuleService(IGameApp game)
         {
@@ -52,7 +55,7 @@ namespace CipherPark.AngelJacket.Core.Services
 
         public void ExitOnUpdate()
         {
-            
+            this.ExitSignaled = true;
         }
 
         public void RegisterModule(string registeredName, GameModule module)

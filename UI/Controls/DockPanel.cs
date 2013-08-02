@@ -100,7 +100,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 if (container.Side == DockSide.Client)
                 {
                     container.Position = clientAreaRect.Position();
-                    container.Size = clientAreaRect.GetSize();
+                    container.Size = clientAreaRect.Size();
                 }
             }
 

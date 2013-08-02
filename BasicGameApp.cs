@@ -39,6 +39,7 @@ namespace CipherPark.AngelJacket.Core
         private Mouse _mouse = null;
         private Keyboard _keyboard = null;
         private ServiceTable _services = null;
+        private bool _closeFormOnUpdate = false;
 
         public BasicGameApp()
         {
@@ -47,6 +48,8 @@ namespace CipherPark.AngelJacket.Core
 
         public void Run(Form form)
         {
+            form.FormClosing += form_FormClosing;
+            
             InitializeDirectXResources(form);           
 
             Initialize();
@@ -57,12 +60,16 @@ namespace CipherPark.AngelJacket.Core
             {
                 Update();
                 Draw();
-            });
-
-            UnloadContent();
-
-            Uninitialize();
+                if (_closeFormOnUpdate)
+                    form.Close();                  
+            });                    
         }
+
+        void form_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            UnloadContent();
+            Uninitialize();  
+        }      
 
         protected virtual void Update()
         { }
@@ -81,6 +88,11 @@ namespace CipherPark.AngelJacket.Core
 
         protected virtual void Uninitialize()
         { }
+
+        protected void Exit()
+        {
+            _closeFormOnUpdate = true;
+        }
 
         private void InitializeDirectXResources(Form form)
         {           

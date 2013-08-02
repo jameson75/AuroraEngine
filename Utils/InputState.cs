@@ -254,6 +254,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             }     
         }
 
+        public bool GamepadConnectionChanged(int i)
+        {
+            return GamepadConnectionOccured(i) || GamepadDisconnectionOccured(i);
+        }
+
         /// <summary>
         /// 
         /// </summary>

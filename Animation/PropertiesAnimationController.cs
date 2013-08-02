@@ -9,7 +9,7 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public abstract class PropertyGroupAnimation
+    public abstract class PropertiesAnimationController : AnimationController
     {
         private PropertyAnimations _animations = new PropertyAnimations();
         private PropertyAnimations Animations { get { return _animations; } }
@@ -78,6 +78,12 @@ namespace CipherPark.AngelJacket.Core.Animation
             Animations.Remove(propertyName);
         }
 
+
+        protected float GetPropertyIntValueAtT(string propertyName, ulong t)
+        {
+            return ((IntAnimation)Animations[propertyName]).GetValueAtT(t);
+        }
+        
         protected float GetPropertyFloatValueAtT(string propertyName, ulong t)
         {
             return ((FloatAnimation)Animations[propertyName]).GetValueAtT(t);
@@ -97,10 +103,20 @@ namespace CipherPark.AngelJacket.Core.Animation
         {
             return ((DrawingSizeAnimation)Animations[propertyName]).GetValueAtT(t);
         }
+        
+        protected RectangleF GetPropertyRectangleValueAtT(string propertyName, ulong t)
+        {
+            return ((RectangleAnimation)Animations[propertyName]).GetValueAtT(t);
+        }
 
         protected string GetPropertyStringValueAtT(string propertyName, ulong t)
         {
             return ((StringAnimation)Animations[propertyName]).GetValueAtT(t);
+        }       
+
+        protected object GetPropertyObjectValueAtT(string propertyName, ulong t)
+        {
+            return ((ObjectAnimation)Animations[propertyName]).GetValueAtT(t);
         }
 
         protected bool TargetPropertyExists(string propertyName)
@@ -109,6 +125,6 @@ namespace CipherPark.AngelJacket.Core.Animation
         }
 
         private class PropertyAnimations : SortedList<string, KeyframeAnimation>
-        { }
+        { }    
     }
 }

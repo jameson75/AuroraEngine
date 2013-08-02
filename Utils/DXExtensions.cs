@@ -80,13 +80,17 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public static class RectangleFExtension
     {
+        private static RectangleF _empty = new RectangleF();
+
+        public static RectangleF Empty { get { return _empty; } }
+
         public static bool Contains(this RectangleF r, DrawingPointF point)
         {
             return r.X <= point.X && r.X + r.Width >= point.X &&
                    r.Y <= point.Y && r.Y + r.Height >= point.Y;
         }
 
-        public static DrawingSizeF GetSize(this RectangleF r)
+        public static DrawingSizeF Size(this RectangleF r)
         {
             return new DrawingSizeF(r.Right - r.Left, r.Bottom - r.Top);
         }
@@ -99,6 +103,43 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static RectangleF CreateLTWH(float l, float t, float width, float height)
         {
             return new RectangleF(l, t, l + width, t + height);
+        }
+
+        public static void AlignRectangle(this RectangleF thisRect, ref RectangleF rectangle, RectangleAlignment alignment)
+        {
+            DrawingSizeF originalSize = rectangle.Size();
+
+            //LEFT            
+            if (alignment.HasFlag(RectangleAlignment.Left))            
+                rectangle.Left = thisRect.Left;         
+            else            
+                rectangle.Left = thisRect.Left + ((thisRect.Width - rectangle.Width) / 2.0f);            
+            if(!alignment.HasFlag(RectangleAlignment.Right));
+                rectangle.Right = rectangle.Left + originalSize.Width;
+
+            //RIGHT            
+            if (alignment.HasFlag(RectangleAlignment.Right))
+                rectangle.Right = thisRect.Right;
+            else             
+                rectangle.Right = thisRect.Right - ((thisRect.Width - rectangle.Width) / 2.0f);                
+            if (!alignment.HasFlag(RectangleAlignment.Left))
+                rectangle.Left = rectangle.Right - originalSize.Width;            
+            
+            //TOP
+            if (alignment.HasFlag(RectangleAlignment.Top))
+                rectangle.Top = thisRect.Top;
+            else
+                rectangle.Top = thisRect.Top + ((thisRect.Height - rectangle.Height) / 2.0f);
+            if (!alignment.HasFlag(RectangleAlignment.Bottom))
+                rectangle.Bottom = rectangle.Top + originalSize.Height;
+
+            //BOTTOM
+            if (alignment.HasFlag(RectangleAlignment.Bottom))
+                rectangle.Bottom = thisRect.Bottom;
+            else
+                rectangle.Bottom = thisRect.Bottom - ((thisRect.Height - rectangle.Height) / 2.0f);
+            if (!alignment.HasFlag(RectangleAlignment.Top))
+                rectangle.Top = rectangle.Bottom - originalSize.Width;
         }
     }
 
@@ -113,6 +154,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new DrawingSizeF(s.Width + s2.Width, s.Height + s2.Height);
         }
 
+        public static DrawingSizeF Add(this DrawingSizeF s, float w, float h)
+        {
+            return Add(s, new DrawingSizeF(w, h));
+        }
+
         public static DrawingSize ToDrawingSize(this DrawingSizeF sizeF)
         {
             return new DrawingSize(Convert.ToInt32(Math.Ceiling(sizeF.Width)), Convert.ToInt32(Math.Ceiling(sizeF.Height)));
@@ -121,7 +167,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static Vector2 ToVector2(this DrawingSizeF sizeF)
         {
             return new Vector2(sizeF.Width, sizeF.Height);
-        }
+        }    
     }
 
     public static class DrawingSizeExtension
@@ -217,5 +263,16 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
 
         public static BoundingBox Empty { get { return _empty; } }    
+    }
+
+    [Flags]
+    public enum RectangleAlignment
+    {
+        Centered = 0,
+        Middle = 0,
+        Left = 1,
+        Right = 2,
+        Top = 4,
+        Bottom = 8
     }
 }

@@ -43,13 +43,13 @@ namespace CipherPark.AngelJacket.Core.Module
 
         //public event ModuleSwitchEventHandler Switch;
 
-        protected virtual void SignalExitModule()
+        protected void SignalExitModule()
         {
             IModuleService moduleService = (IModuleService)Game.Services.GetService(typeof(IModuleService));
             moduleService.ExitOnUpdate();
         }
 
-        protected virtual void SignalSwitchModule(string key)
+        protected void SignalSwitchModule(string key)
         {
             IModuleService moduleService = (IModuleService)Game.Services.GetService(typeof(IModuleService));
             moduleService.ActivateOnUpdate(key);

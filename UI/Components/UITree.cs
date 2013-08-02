@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml.Linq;
+using SharpDX.Direct3D11;
+using SharpDX;
 using CipherPark.AngelJacket.Core.UI.Design;
 using CipherPark.AngelJacket.Core.UI.Controls;
 using CipherPark.AngelJacket.Core.Module;
-using SharpDX.Direct3D11;
+using CipherPark.AngelJacket.Core.UI.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -28,6 +30,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private UIResourceCollection resources = null;
         private FocusManager focusManager = null;
         //private IUITheme theme = null;
+
+        public List<UI> Animations { get { return _animationControllers; } }
 
         private Dictionary<string, UIControlParser> _controlParsers = new Dictionary<string, UIControlParser>();
         private Dictionary<string, UIStyleParser> _styleParsers = new Dictionary<string, UIStyleParser>();
@@ -54,6 +58,16 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public FocusManager FocusManager { get { return focusManager; } }
 
         //public IUITheme Theme { get { return theme; } }
+
+        public DrawingSizeF ScreenSize
+        {
+            get
+            {
+                return new DrawingSizeF(_game.RenderTarget.ResourceAs<Texture2D>().Description.Width,
+                                        _game.RenderTarget.ResourceAs<Texture2D>().Description.Height);                                                       
+
+            }
+        }
 
         public void Initialize(string markupFileName)
         {
