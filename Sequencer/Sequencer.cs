@@ -77,7 +77,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
 
     public struct SequencerContext
     {
-        public SequencerContext(GameAssets assets, Scene scene, WorldSimulator simulator, UITree ui) : this()
+        public SequencerContext(GameAssets assets, Scene scene, WorldSimulator simulator, IUIRoot ui) : this()
         {            
             Assets = assets;
             Scene = scene;
@@ -88,7 +88,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         public GameAssets Assets { get; private set; }
         public Scene Scene { get; private set; }
         public WorldSimulator Simulator { get; private set; }
-        public UITree UI { get; private set; }
+        public IUIRoot UI { get; private set; }
         public IGameApp Game { get; private set; }
     }
 }

@@ -18,12 +18,17 @@ namespace CipherPark.AngelJacket.Core.Services
     /// </summary>
     public interface IInputService
     {
-        InputState GetInputState();
         /// <summary>
-        /// Retreives the game's control input state manager.
+        /// Retrieves the game's input state manager.
+        /// </summary>
+        /// <returns></returns>       
+        InputState GetInputState();
+
+        /// <summary>
+        /// Retreives the game's buffered input state manager.
         /// </summary>
         /// <returns></returns>
-        ControlInputState GetControlInputState();
+        BufferedInputState GetBufferedInputState();
 
         /// <summary>
         /// Updates the input state.
@@ -38,14 +43,14 @@ namespace CipherPark.AngelJacket.Core.Services
     {
         #region Fields
         InputState _ism = null;
-        ControlInputState _cim = null;
+        BufferedInputState _cim = null;
         #endregion
 
         #region Constructors
         public InputService(IGameApp game)
         {
             _ism = new InputState(game);
-            _cim = new ControlInputState(_ism);
+            _cim = new BufferedInputState(_ism);
             Create(_ism, _cim);
         }
         #endregion
@@ -64,7 +69,7 @@ namespace CipherPark.AngelJacket.Core.Services
         /// Retreives the game's control input state manager.
         /// </summary>
         /// <returns></returns>
-        public ControlInputState GetControlInputState()
+        public BufferedInputState GetBufferedInputState()
         {
             return _cim;
         }
@@ -85,7 +90,7 @@ namespace CipherPark.AngelJacket.Core.Services
         /// <param name="ism">The game's input state manager.</param>
         /// <param name="cim">The game's control input state manager.</param>
         /// <param name="fm">The game's control focus manager.</param>
-        private void Create(InputState ism, ControlInputState cim)
+        private void Create(InputState ism, BufferedInputState cim)
         {
             _ism = ism;
             _cim = cim;

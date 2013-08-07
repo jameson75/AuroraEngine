@@ -91,11 +91,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public void Update()
         {
             IInputService inputService = (IInputService)_visualRoot.Game.Services.GetService(typeof(IInputService));
-            ControlInputState state = inputService.GetControlInputState();
-            InputState.MouseButton[] buttonsDown = state.InputStateManager.GetMouseButtonsDown();
+            BufferedInputState state = inputService.GetBufferedInputState();
+            InputState.MouseButton[] buttonsDown = state.InputState.GetMouseButtonsDown();
             if (buttonsDown.Any(x => x == InputState.MouseButton.Left || x == InputState.MouseButton.Right))
             {
-                UIControl focusTarget = GetHitFocusTarget(_visualRoot.Controls, state.InputStateManager.GetMouseLocation());
+                UIControl focusTarget = GetHitFocusTarget(_visualRoot.Controls, state.InputState.GetMouseLocation());
                 if (focusTarget != null && focusTarget != _focusedControl)
                     SetFocus(focusTarget);
             }

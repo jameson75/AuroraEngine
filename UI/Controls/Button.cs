@@ -117,7 +117,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
                 if (inputServices == null)
                     throw new InvalidOperationException("Input services not available.");
-                ControlInputState cim = inputServices.GetControlInputState();
+                BufferedInputState cim = inputServices.GetBufferedInputState();
 
                 if (cim.IsKeyReleased(Key.Return))
                 {

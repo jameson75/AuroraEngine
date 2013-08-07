@@ -36,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         DrawingSizeF ScreenSize { get; }
 
-        List<UIControlAnimationControllerBase> Animations { get; }
+        List<UIAnimationControllerBase> Animations { get; }
 
         //IUITheme Theme { get; }     
     }

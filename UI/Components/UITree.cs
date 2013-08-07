@@ -29,10 +29,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private UIStyleCollection styles = null;
         private UIResourceCollection resources = null;
         private FocusManager focusManager = null;
-        private List<UIControlAnimationControllerBase> _animationControllers = null;
+        private List<UIAnimationControllerBase> _animationControllers = null;
         //private IUITheme theme = null;
 
-        public List<UIControlAnimationControllerBase> Animations { get { return _animationControllers; } }
+        public List<UIAnimationControllerBase> Animations { get { return _animationControllers; } }
 
         private Dictionary<string, UIControlParser> _controlParsers = new Dictionary<string, UIControlParser>();
         private Dictionary<string, UIStyleParser> _styleParsers = new Dictionary<string, UIStyleParser>();
@@ -45,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             styles = new UIStyleCollection();
             resources = new UIResourceCollection();
             focusManager = new FocusManager(this);
-            _animationControllers = new List<UIControlAnimationControllerBase>();
+            _animationControllers = new List<UIAnimationControllerBase>();
             //theme = new DefaultTheme();    
         }     
 
@@ -188,8 +188,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             //the event that an updated controller alters this Simulator's Animation Controllers
             //collection.
             //**********************************************************************************
-            List<UIControlAnimationControllerBase > auxAnimationControllers = new List<UIControlAnimationControllerBase>(_animationControllers);
-            foreach (UIControlAnimationControllerBase controller in auxAnimationControllers)
+            List<UIAnimationControllerBase > auxAnimationControllers = new List<UIAnimationControllerBase>(_animationControllers);
+            foreach (UIAnimationControllerBase controller in auxAnimationControllers)
             {
                 controller.UpdateAnimation(gameTime);
                 if (controller.IsAnimationComplete)

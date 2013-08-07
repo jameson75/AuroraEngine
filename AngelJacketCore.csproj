@@ -76,6 +76,7 @@
     <Compile Include="Animation\AnimationKeyFrame.cs" />
     <Compile Include="Animation\BoneAnimation.cs" />
     <Compile Include="Animation\BooleanAnimation.cs" />
+    <Compile Include="Animation\Color4Animation.cs" />
     <Compile Include="Animation\DrawingPointAnimation.cs" />
     <Compile Include="Animation\DrawingSizeAnimation.cs" />
     <Compile Include="Animation\FloatAnimation.cs" />
@@ -177,7 +178,7 @@
     <Compile Include="UI\Serialization\UIResourceParser.cs" />
     <Compile Include="UI\Serialization\UIStyleParser.cs" />
     <Compile Include="Utils\ColorParser.cs" />
-    <Compile Include="Utils\ControlInputState.cs" />
+    <Compile Include="Utils\BufferedInputState.cs" />
     <Compile Include="Utils\InputState.cs" />
     <Compile Include="Utils\ContentImporter.cs" />
     <Compile Include="Utils\MarshalHelper.cs" />

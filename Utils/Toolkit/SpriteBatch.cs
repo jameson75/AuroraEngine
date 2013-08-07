@@ -7,6 +7,14 @@ using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 {
     public class SpriteBatch
@@ -27,7 +35,11 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         {            
             float[] _transformationMatrix = (transformationMatrix.HasValue) ? transformationMatrix.Value.ToArray() : Matrix.Identity.ToArray();
             IntPtr customShaderFunc = (customShaderCallback != null) ? Marshal.GetFunctionPointerForDelegate(customShaderCallback) : IntPtr.Zero;
-            UnsafeNativeMethods.Begin(this._nativeObject, mode, blendState.NativePointer, samplerState.NativePointer, depthStencilState.NativePointer, rasterizerState.NativePointer, customShaderFunc, _transformationMatrix);
+            IntPtr blendStatePtr = blendState != null ? blendState.NativePointer : IntPtr.Zero;
+            IntPtr samplerStatePtr = samplerState != null ? samplerState.NativePointer : IntPtr.Zero;
+            IntPtr depthStencilStatePtr = depthStencilState != null ? depthStencilState.NativePointer : IntPtr.Zero;
+            IntPtr rasterizerStatePtr = rasterizerState != null ? rasterizerState.NativePointer : IntPtr.Zero;
+            UnsafeNativeMethods.Begin(this._nativeObject, mode, blendStatePtr, samplerStatePtr, depthStencilStatePtr, rasterizerStatePtr, customShaderFunc, _transformationMatrix);
         }
 
         public void Begin()

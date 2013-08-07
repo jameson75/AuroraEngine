@@ -69,9 +69,9 @@ namespace CipherPark.AngelJacket.Core.World
     public struct SimulationContext
     {
         public Scene.Scene Scene { get; set; }
-        public UI.Components.UITree UI { get; set; }
+        public UI.Components.IUIRoot UI { get; set; }
 
-        public SimulationContext(Scene.Scene scene, UI.Components.UITree ui) : this()
+        public SimulationContext(Scene.Scene scene, UI.Components.IUIRoot ui) : this()
         {
             Scene = scene;
             UI = ui;

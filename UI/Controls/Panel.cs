@@ -18,7 +18,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {       
         public Panel(IUIRoot visualRoot)
             : base(visualRoot)
-        { }
+        { }   
     }
 
     public class SplitterPanel : Panel

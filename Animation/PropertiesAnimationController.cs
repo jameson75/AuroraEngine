@@ -6,14 +6,35 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
     public abstract class PropertiesAnimationController : AnimationController
     {
-        private PropertyAnimations _animations = new PropertyAnimations();
-        private PropertyAnimations Animations { get { return _animations; } }
+        private PropertyAnimations _animatedProperties = new PropertyAnimations();
+        private PropertyAnimations AnimatedProperties { get { return _animatedProperties; } }
         private const ulong DefaultKeyFrameTime = 0;
+
+        public ulong RunningTime
+        {
+            get
+            {
+                ulong runningTime = 0;
+                foreach (string key in _animatedProperties.Keys)
+                {
+                    if (_animatedProperties[key].RunningTime > runningTime)
+                        runningTime = _animatedProperties[key].RunningTime;
+                }
+                return runningTime;
+            }
+        }
 
         /// <summary>
         /// Gets the nearest key frame whose time is less than or equal to timeT.
@@ -28,35 +49,35 @@ namespace CipherPark.AngelJacket.Core.Animation
         {
             if (!TargetPropertyExists(propertyName))
                 throw new ArgumentException("The specified property is not a target property of this effect.", "propertyName");
-            return Animations[propertyName].GetActiveKeyFrameAtT(timeT);
+            return AnimatedProperties[propertyName].GetActiveKeyFrameAtT(timeT);
         }
 
         private AnimationKeyFrame GetNextKeyFrame(string propertyName, AnimationKeyFrame keyFrame)
         {
             if (!TargetPropertyExists(propertyName))
                 throw new ArgumentException("The specified property is not a target property of this effect.", "propertyName");
-            return Animations[propertyName].GetNextKeyFrame(keyFrame);
+            return AnimatedProperties[propertyName].GetNextKeyFrame(keyFrame);
         }
 
         private AnimationKeyFrame GetPreviousKeyFrame(string propertyName, AnimationKeyFrame keyFrame)
         {
             if (!TargetPropertyExists(propertyName))
                 throw new ArgumentException("The specified property is not a target property of this effect.", "propertyName");
-            return Animations[propertyName].GetPreviousKeyFrame(keyFrame);
+            return AnimatedProperties[propertyName].GetPreviousKeyFrame(keyFrame);
         }
 
         protected void AddPropertyAnimation(string propertyName, KeyframeAnimation animation)
         {
             if (TargetPropertyExists(propertyName))
                 throw new InvalidOperationException("The target property already exists for this effect");
-            Animations.Add(propertyName, animation);
+            AnimatedProperties.Add(propertyName, animation);
         }
 
         protected void SetPropertyKeyFrame(string propertyName, AnimationKeyFrame keyFrame)
         {
             if (!TargetPropertyExists(propertyName))
                 throw new ArgumentException("The specified property is not a target property of this effect.", "propertyName");
-            Animations[propertyName].SetKeyFrame(keyFrame);
+            AnimatedProperties[propertyName].SetKeyFrame(keyFrame);
         }
 
         protected void RemovePropertyKeyFrame(string propertyName, ulong tF, bool removeEmptyAnimation = false)
@@ -64,10 +85,10 @@ namespace CipherPark.AngelJacket.Core.Animation
             if (!TargetPropertyExists(propertyName))
                 throw new ArgumentException("The specified property is not a target property of this effect.", "propertyName");
 
-            Animations[propertyName].RemoveKeyFrame(tF);
+            AnimatedProperties[propertyName].RemoveKeyFrame(tF);
 
-            if (removeEmptyAnimation && Animations[propertyName].FrameCount == 0)
-                Animations.Remove(propertyName);
+            if (removeEmptyAnimation && AnimatedProperties[propertyName].FrameCount == 0)
+                AnimatedProperties.Remove(propertyName);
         }
 
         protected void RemoveProperty(string propertyName)
@@ -75,55 +96,60 @@ namespace CipherPark.AngelJacket.Core.Animation
             if (!TargetPropertyExists(propertyName))
                 throw new ArgumentException("The specified property is not a target property of this effect.", "propertyName");
 
-            Animations.Remove(propertyName);
+            AnimatedProperties.Remove(propertyName);
         }
 
 
         protected float GetPropertyIntValueAtT(string propertyName, ulong t)
         {
-            return ((IntAnimation)Animations[propertyName]).GetValueAtT(t);
+            return ((IntAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
         
         protected float GetPropertyFloatValueAtT(string propertyName, ulong t)
         {
-            return ((FloatAnimation)Animations[propertyName]).GetValueAtT(t);
+            return ((FloatAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
 
         protected bool GetPropertyBooleanValueAtT(string propertyName, ulong t)
         {
-            return ((BooleanAnimation)Animations[propertyName]).GetValueAtT(t);
+            return ((BooleanAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
 
         protected DrawingPointF GetPropertyDrawingPointValueAtT(string propertyName, ulong t)
         {
-            return ((DrawingPointAnimation)Animations[propertyName]).GetValueAtT(t);
+            return ((DrawingPointAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
 
         protected DrawingSizeF GetPropertyDrawingSizeValueAtT(string propertyName, ulong t)
         {
-            return ((DrawingSizeAnimation)Animations[propertyName]).GetValueAtT(t);
+            return ((DrawingSizeAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
         
         protected RectangleF GetPropertyRectangleValueAtT(string propertyName, ulong t)
         {
-            return ((RectangleAnimation)Animations[propertyName]).GetValueAtT(t);
+            return ((RectangleAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
 
         protected string GetPropertyStringValueAtT(string propertyName, ulong t)
         {
-            return ((StringAnimation)Animations[propertyName]).GetValueAtT(t);
-        }       
+            return ((StringAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
+        }
+
+        protected Color4 GetPropertyColorValueAtT(string propertyName, ulong t)
+        {
+            return ((Color4Animation)AnimatedProperties[propertyName]).GetValueAtT(t);
+        }
 
         protected object GetPropertyObjectValueAtT(string propertyName, ulong t)
         {
-            return ((ObjectAnimation)Animations[propertyName]).GetValueAtT(t);
+            return ((ObjectAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
 
         protected bool TargetPropertyExists(string propertyName)
         {
-            return (Animations.ContainsKey(propertyName));
+            return (AnimatedProperties.ContainsKey(propertyName));
         }
-
+       
         private class PropertyAnimations : SortedList<string, KeyframeAnimation>
         { }    
     }

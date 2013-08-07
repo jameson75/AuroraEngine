@@ -20,42 +20,72 @@ using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.UI.Animation
 {
-    public class UIContentAnimationController<T> : PropertiesAnimationController where T : UIContent
+    public class UIContentAnimationController<T> : UIAnimationControllerBase where T : UIContent
     { 
-        private long? _elapsedTime = null;      
-
         public T Target { get; set; }
 
         public UIContentAnimationController()
         {
 
-        }
+        }   
 
-        protected long? ElapsedTime 
+        protected override void OnUpdateTarget(ulong timeT)
         {
-             get { return _elapsedTime; }
-        }
+            if (TargetPropertyExists(UIContentPropertyNames.Opacity))
+                Target.Opacity = GetPropertyFloatValueAtT(UIContentPropertyNames.Opacity, timeT);
 
-        public override void Start()
+            base.OnUpdateTarget(timeT);
+        }
+        
+        public float GetOpacityAtT(ulong timeT)
         {
-            _elapsedTime = null;            
+            if (TargetPropertyExists(UIContentPropertyNames.Opacity))
+                return GetPropertyFloatValueAtT(UIContentPropertyNames.Opacity, timeT);
+            else
+                return Target.Opacity;
         }
 
-        public override void UpdateAnimation(long gameTime)
+        public void SetOpacityAtT(ulong timeT, float value)
         {
-            if (_elapsedTime == null)
-                _elapsedTime = gameTime;
-            
-            ulong timeT = (ulong)(gameTime - _elapsedTime.Value);
-
-            OnUpdateTarget(timeT);
-
-            _elapsedTime = gameTime;
+            if (!TargetPropertyExists(UIContentPropertyNames.Opacity))
+                AddPropertyAnimation(UIContentPropertyNames.Opacity, new FloatAnimation());
+            SetPropertyKeyFrame(UIContentPropertyNames.Opacity, new AnimationKeyFrame(timeT, value));
         }
 
-        public virtual void OnUpdateTarget(ulong timeT)
+        private static class UIContentPropertyNames
         {
-            
+            public const string Opacity = "Opacity";
         }
+    }
+
+    public class ColorContentAnimationController : UIContentAnimationController<ColorContent>
+    {
+        protected override void OnUpdateTarget(ulong timeT)
+        {
+            if (TargetPropertyExists(ColorContentPropertyNames.Color))
+                Target.Opacity = GetPropertyFloatValueAtT(ColorContentPropertyNames.Color, timeT);
+
+            base.OnUpdateTarget(timeT);
+        }
+
+        public Color4 GetColorAT(ulong timeT)
+        {
+            if (TargetPropertyExists(ColorContentPropertyNames.Color))
+                return GetPropertyColorValueAtT(ColorContentPropertyNames.Color, timeT);
+            else
+                return Target.Color;
+        }
+
+        public void SetColorAtT(ulong timeT, Color4 value)
+        {
+            if (!TargetPropertyExists(ColorContentPropertyNames.Color))
+                AddPropertyAnimation(ColorContentPropertyNames.Color, new Color4Animation());
+            SetPropertyKeyFrame(ColorContentPropertyNames.Color, new AnimationKeyFrame(timeT, value));
+        }
+
+        private static class ColorContentPropertyNames
+        {
+            public const string Color = "Color";
+        }  
     }
 }

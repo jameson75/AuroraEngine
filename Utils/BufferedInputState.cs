@@ -14,7 +14,7 @@ using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.Utils
 {
-    public class ControlInputState
+    public class BufferedInputState
     {
         public const long DelayTimeAfterPress = 300;
         public const long DelayTimeAfterHold = 80;
@@ -22,12 +22,12 @@ namespace CipherPark.AngelJacket.Core.Utils
         private List<Key> _delayedScannedKeysDown = new List<Key>();        
         private Dictionary<Key, long> _inputDelayExpirationTimes = new Dictionary<Key, long>();
 
-        public ControlInputState(InputState inputState)
+        public BufferedInputState(InputState inputState)
         {
             _inputState = inputState;
         }
 
-        public InputState InputStateManager
+        public InputState InputState
         {
             get { return _inputState; }
         }
@@ -44,6 +44,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             else
                 return _delayedScannedKeysDown.Contains(key);
         }
+        
+        public bool IsKeyHit(Key key)
+        {
+            return _inputState.IsKeyHit(key);
+        }
 
         public bool IsKeyReleased(Key key)
         {
@@ -59,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         public Key[] GetKeysReleased()
         {
             return _inputState.GetKeysReleased();
-        }
+        }    
 
         /// <summary>
         /// This method only needs be called once per frame and must be called before any input is read.

@@ -42,23 +42,26 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 throw new InvalidOperationException("No container for this content was specified.");
             
             DrawingPointF contentSurfacePosition = Container.PositionToSurface(Container.Position);
-            if (!HasDrawParameters)
-                Container.ControlSpriteBatch.Begin();
-            else
-                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);
-            string outputString = string.IsNullOrEmpty(Text) ? string.Empty : string.IsNullOrEmpty(Format) ? Text : string.Format(Format, Text);
+            this.BeginDraw();
+            //if (!HasDrawParameters)
+            //    Container.ControlSpriteBatch.Begin();
+            //else
+            //    Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);
+            string outputString = string.IsNullOrEmpty(Text) ? string.Empty : string.IsNullOrEmpty(Format) ? Text : string.Format(Format, Text);            
             Container.ControlSpriteBatch.DrawString(Font, outputString, contentSurfacePosition.ToVector2(), FontColor);
-            Container.ControlSpriteBatch.End();                        
+            
+            //Container.ControlSpriteBatch.End();     
+            this.EndDraw();                   
         }
 
-        public override Rectangle CalculateSmallestBoundingRect()
+        public override RectangleF CalculateSmallestBoundingRect()
         {
             if (Font == null || string.IsNullOrEmpty(Text))
-                return Rectangle.Empty;
+                return RectangleF.Empty;
             else
             {
                 DrawingSizeF textSize = Font.MeasureString(Text);
-                return RectangleExtension.CreateLTWH(0, 0, (int)Math.Ceiling(textSize.Width),(int) Math.Ceiling(textSize.Height));
+                return RectangleFExtension.CreateLTWH(0, 0, (int)Math.Ceiling(textSize.Width),(int) Math.Ceiling(textSize.Height));
             }
         }
 

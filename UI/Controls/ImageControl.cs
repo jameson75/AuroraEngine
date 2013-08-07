@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.AngelJacket.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -54,6 +55,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     _content.Container = this;
             }
         }
+        
+        public override void ApplyTemplate(UIControlTemplate template)
+        {
+            ImageControlTemplate imageControlTemplate = (ImageControlTemplate)template;
+            if (imageControlTemplate.ImageStyle != null)
+                this.Content = (ImageContent)imageControlTemplate.ImageStyle.GenerateContent();
+            base.ApplyTemplate(template);
+        }
 
         protected override void OnDraw(long gameTime)
         {
@@ -62,12 +71,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnDraw(gameTime);
         }
 
-        public override void ApplyTemplate(UIControlTemplate template)
+        public void SizeToContent()
         {
-            ImageControlTemplate imageControlTemplate = (ImageControlTemplate)template;
-            if (imageControlTemplate.ImageStyle != null)
-                this.Content = (ImageContent)imageControlTemplate.ImageStyle.GenerateContent();
-            base.ApplyTemplate(template);
+            if (this._content != null)
+                this.Size = this.Content.CalculateSmallestBoundingRect().Size();
+            else
+                this.Size = DrawingSizeFExtension.Zero;
         }
     }
 }

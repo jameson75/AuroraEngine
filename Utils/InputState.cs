@@ -197,6 +197,22 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
 
+        public bool IsGamepadButtonHit(int i, GamepadButtonFlags button)
+        {
+            if (controllerStateWindows == null)
+                return false;
+            else
+            {
+                ControllerState oldState = controllerStateWindows[i].OldState;
+                ControllerState newState = controllerStateWindows[i].NewState;
+                if (!oldState.IsConnected || !newState.IsConnected)
+                    return false;
+                else
+                    return !oldState.Gamepad.Buttons.HasFlag(button) &&
+                           newState.Gamepad.Buttons.HasFlag(button);
+            }
+        }
+
         public GamepadButtonFlags[] GetGamepadButtonsDown(int i)
         {
             if (controllerStateWindows == null)
@@ -344,6 +360,14 @@ namespace CipherPark.AngelJacket.Core.Utils
                 return false;
             else 
                 return keyboardStateWindow.OldState.IsKeyDown(key) && keyboardStateWindow.NewState.IsKeyUp(key);
+        }
+
+        public bool IsKeyHit(Key key)
+        {
+            if (keyboardStateWindow == null)
+                return false;
+            else
+                return keyboardStateWindow.OldState.IsKeyUp(key) && keyboardStateWindow.NewState.IsKeyDown(key);
         }
 
         public Key[] GetKeysDown()

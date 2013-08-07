@@ -166,10 +166,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
                 if (inputServices == null)
                     throw new InvalidOperationException("Input services not available.");
-                ControlInputState cim = inputServices.GetControlInputState();
+               
+                InputState inputState = inputServices.GetInputState();
+                
+                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && inputState.IsKeyHit(Key.UpArrow)) || 
+                                             (Orienation == MenuOrientation.Horizontal && inputState.IsKeyHit(Key.Left)) ||
+                                             (Orienation == MenuOrientation.Vertical && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp)) ||
+                                             (Orienation == MenuOrientation.Horizontal && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadLeft));
 
-                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(Key.UpArrow)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(Key.Left));
-                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && cim.IsKeyDown(Key.Down)) || (Orienation == MenuOrientation.Horizontal && cim.IsKeyDown(Key.Right));
+                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && inputState.IsKeyDown(Key.Down)) ||
+                                         (Orienation == MenuOrientation.Horizontal && inputState.IsKeyDown(Key.Right)) ||
+                                         (Orienation == MenuOrientation.Vertical && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadDown)) ||
+                                         (Orienation == MenuOrientation.Horizontal && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadRight));
 
                 if (selectPreviousKeyDown)
                     this.SelectPreviousItem();
@@ -177,7 +185,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 else if (selectNextKeyDown)
                     this.SelectNextItem();
 
-                else if (cim.IsKeyReleased(Key.Return))
+                else if (inputState.IsKeyReleased(Key.Return) || inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.A))
                 {
                     if (this.SelectedItem != null)
                     {

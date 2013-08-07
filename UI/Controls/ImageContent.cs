@@ -57,26 +57,26 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (_texture != null)
             {
                 if (_textureView == null)
-                    _textureView = new ShaderResourceView(Container.Game.GraphicsDevice, _texture);                
-
-                if (!HasDrawParameters)
-                    Container.ControlSpriteBatch.Begin();
-                else
-                    Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);                
-                
+                    _textureView = new ShaderResourceView(Container.Game.GraphicsDevice, _texture);
+                this.BeginDraw();
+                //if (!HasDrawParameters)
+                //    Container.ControlSpriteBatch.Begin();
+                //else
+                //    Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);                                
                 Container.ControlSpriteBatch.Draw(_textureView, Container.PositionToSurface(Container.Position).ToVector2(), SharpDX.Color.White);              
-                Container.ControlSpriteBatch.End();
+                // Container.ControlSpriteBatch.End();
+                this.EndDraw();
             }
 
             base.Draw(gameTime);
         }       
 
-        public override Rectangle CalculateSmallestBoundingRect()
+        public override RectangleF CalculateSmallestBoundingRect()
         {
             if (Texture == null)
-                return Rectangle.Empty;
+                return RectangleF.Empty;
             else
-                return RectangleExtension.CreateLTWH(0, 0, Texture.Description.Width, Texture.Description.Height);
+                return RectangleFExtension.CreateLTWH(0, 0, Texture.Description.Width, Texture.Description.Height);
         }
     }
 }

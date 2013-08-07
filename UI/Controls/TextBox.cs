@@ -74,13 +74,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 Services.InputService inputServices = (Services.InputService)Game.Services.GetService(typeof(Services.InputService));
                 if (inputServices == null)
                     throw new InvalidOperationException("Input services not available.");
-                ControlInputState cim = inputServices.GetControlInputState();                
+                BufferedInputState cim = inputServices.GetBufferedInputState();                
                 //cim.UpdateState(gameTime);
                 if (cim.IsKeyReleased(Key.Return))
                     OnEnterKey();
                 else if (cim.GetKeysDown().Length > 0)
                 {
-                    AsciiCharacterInfo[] cis = ControlInputState.ConvertToAsciiCharacters(cim.GetKeysDown(), AsciiCharacterConversionFlags.IgnoreNewLine | AsciiCharacterConversionFlags.IgnoreTab);                                           
+                    AsciiCharacterInfo[] cis = BufferedInputState.ConvertToAsciiCharacters(cim.GetKeysDown(), AsciiCharacterConversionFlags.IgnoreNewLine | AsciiCharacterConversionFlags.IgnoreTab);                                           
                     foreach (AsciiCharacterInfo ci in cis)
                         if (ci.KeyType == AsciiCharacterType.Printable)
                             this._textContent.Text += ci.Ascii.ToString();

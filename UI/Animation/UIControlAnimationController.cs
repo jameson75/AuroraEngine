@@ -21,36 +21,37 @@ using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.UI.Animation
 {
-    public abstract class UIControlAnimationControllerBase : PropertiesAnimationController
+    public abstract class UIAnimationControllerBase : PropertiesAnimationController
     { 
-        private long? _elapsedTime = null;
+        private long? _animationStartTime = null;
         protected long? ElapsedTime 
         {
-             get { return _elapsedTime; }
+             get { return _animationStartTime; }
         }
 
         public override void Start()
         {
-            _elapsedTime = null;            
+            _animationStartTime = null;            
         }
 
         public override void UpdateAnimation(long gameTime)
         {
-            if (_elapsedTime == null)
-                _elapsedTime = gameTime;
+            if (_animationStartTime == null)
+                _animationStartTime = gameTime;
             
-            ulong timeT = (ulong)(gameTime - _elapsedTime.Value);
+            ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
 
             OnUpdateTarget(timeT);
 
-            _elapsedTime = gameTime;
+            if (timeT > RunningTime)
+                this.OnAnimationComplete();           
         }
 
         protected virtual void OnUpdateTarget(ulong timeT)
         { }
     }
 
-    public abstract class UIControlAnimationController<T> : UIControlAnimationControllerBase where T : UIControl
+    public abstract class UIControlAnimationController<T> : UIAnimationControllerBase where T : UIControl
     {       
         public T Target { get; set; }
 

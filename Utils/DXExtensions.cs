@@ -15,14 +15,9 @@ using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.Utils
 {
-    public static class Vector2Extension
-    {
-        public static Vector2 Size(this Rectangle r)
-        {
-            return new Vector2(r.Width, r.Height);
-        }
-    }
-
+    /// <summary>
+    /// 
+    /// </summary>
     public static class RectangleExtension
     {
         public static bool Contains(this Rectangle r, DrawingPoint point)
@@ -36,7 +31,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new Vector2(r.X, r.Y);
         }
 
-        public static DrawingSize GetSize(this Rectangle r)
+        public static Vector2 Size(this Rectangle r)
+        {
+            return new Vector2(r.Width, r.Height);
+        }
+
+        public static DrawingSize DrawingSize(this Rectangle r)
         {
             return new DrawingSize(r.Right - r.Left, r.Bottom - r.Top);
         }
@@ -47,6 +47,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class MouseStateExtension
     {
         public static ButtonState LeftButton(this MouseState ms)
@@ -65,6 +68,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class KeyboardStateExtension
     {
         public static bool IsKeyDown(this KeyboardState ks, Key key)
@@ -78,6 +84,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class RectangleFExtension
     {
         private static RectangleF _empty = new RectangleF();
@@ -139,10 +148,13 @@ namespace CipherPark.AngelJacket.Core.Utils
             else
                 rectangle.Bottom = thisRect.Bottom - ((thisRect.Height - rectangle.Height) / 2.0f);
             if (!alignment.HasFlag(RectangleAlignment.Top))
-                rectangle.Top = rectangle.Bottom - originalSize.Width;
+                rectangle.Top = rectangle.Bottom - originalSize.Height;
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class DrawingSizeFExtension
     {
         private static DrawingSizeF _zero = new DrawingSizeF(0, 0);
@@ -170,6 +182,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }    
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class DrawingSizeExtension
     {
         private static DrawingSize _zero = new DrawingSize(0, 0);
@@ -192,6 +207,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class DrawingPointExtension
     {
         private static DrawingPoint _zero = new DrawingPoint(0, 0);
@@ -214,6 +232,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class DrawingPointFExtension
     {
         private static DrawingPointF _zero = new DrawingPointF(0, 0);
@@ -236,6 +257,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class BoundingBoxExtension
     {
         private static BoundingBox _empty = new BoundingBox(Vector3.Zero, Vector3.Zero);
@@ -265,6 +289,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static BoundingBox Empty { get { return _empty; } }    
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [Flags]
     public enum RectangleAlignment
     {

@@ -88,9 +88,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public void SizeToContent()
         {
-            Rectangle smallestBounds = Content.CalculateSmallestBoundingRect();
-            Vector2 smallestSize = smallestBounds.Size();
-            this.Size = new DrawingSizeF(smallestSize.X, smallestSize.Y);
+            //RectangleF smallestBounds = Content.CalculateSmallestBoundingRect();
+            //Vector2 smallestSize = smallestBounds.Size();
+            //this.Size = new DrawingSizeF(smallestSize.X, smallestSize.Y);
+            if (Content != null)
+                this.Size = Content.CalculateSmallestBoundingRect().Size();
+            else
+                this.Size = DrawingSizeFExtension.Zero;
         }
     }
 }
