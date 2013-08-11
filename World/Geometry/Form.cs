@@ -51,7 +51,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public override void Draw(long gameTime)
         {            
             //Matrix formTransform = this.Effect.World;
-            Matrix formTransform = ((ITransformable)this).LocalToWorld(this.Transform).ToMatrix();
+            Matrix formTransform = ((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
             foreach (FormElement element in _elements)
             {
                 //this.Effect.SetWorld(this.Transform * element.Transform);               

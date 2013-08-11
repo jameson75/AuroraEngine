@@ -21,22 +21,45 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class ModelSceneNode : SceneNode
     {
-        Transform _cachedTransform = Transform.Identity;       
-
+        Transform _transform = Transform.Identity;       
+        Model _model = null;
+        
         public ModelSceneNode(IGameApp game)
             : base(game)
         {
+            Transform = Transform.Identity;
             HitTestable = true;
         }
 
         public ModelSceneNode(Model model, string name = null)
             : base(model.Game, name)
         {
+            Transform = Transform.Identity;
             Model = model;
             HitTestable = true;
         }
 
-        public Model Model { get; set; }
+        public Model Model 
+        { 
+            get 
+            { 
+                return _model; 
+            } 
+            set 
+            {
+                if (_model != null)
+                {
+                    ((ITransformable)_model).TransformableParent = null;
+                    if (value == null)
+                        _transform = _model.Transform;
+                }
+
+                _model = value;
+                
+                if (_model != null)               
+                    ((ITransformable)_model).TransformableParent = this;                                  
+            }
+        }
 
         public bool HitTestable { get; set; }
 
@@ -44,17 +67,17 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         { 
             get 
             {
-                if (Model != null)
-                    return Model.Transform;
-                else
-                    return Transform.Identity;
+                //if (Model != null)
+                //    return Model.Transform;
+                //else
+                    return _transform;
             }
             set 
             {
-                if (Model != null)
-                    Model.Transform = value;
-                else
-                    _cachedTransform = value;
+                //if (Model != null)
+                //    Model.Transform = value;
+                //else
+                    _transform = value;
             }
         }
 
@@ -71,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             if (Model != null)
             {
                 //Model.Effect.World = this.LocalToWorld(this.Transform.ToMatrix());
-                Model.Effect.View = Camera.TransformToView(Scene.CameraNode.LocalToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
+                Model.Effect.View = Camera.TransformToView(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
                 Model.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;                
                 Model.Draw(gameTime);               
             }

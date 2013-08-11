@@ -82,40 +82,52 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// </summary>
     public static class TransformableExtension
     {
-        public static Matrix LocalToWorld(this ITransformable transformable, Matrix localTransform)
+        public static Matrix ParentToWorld(this ITransformable transformable, Matrix localTransform)
         {
             MatrixStack stack = new MatrixStack();
-            stack.Push(localTransform);
+            //stack.Push(localTransform);
             ITransformable node = transformable.TransformableParent;
             while (node != null)
             {
                 stack.Push(node.Transform.ToMatrix());
                 node = node.TransformableParent;
             }
-            return stack.Transform;
+            return localTransform * stack.Transform;
         }
 
-        public static Matrix WorldToLocal(this ITransformable transformable, Matrix worldTransform)
+        public static Matrix WorldToParent(this ITransformable transformable, Matrix worldTransform)
         {
             MatrixStack stack = new MatrixStack();
-            stack.Push(worldTransform);
+            //stack.Push(Matrix.Invert(worldTransform));
             ITransformable node = transformable.TransformableParent;
             while (node != null)
             {
-                stack.Push(Matrix.Invert(node.Transform.ToMatrix()));
+                stack.Push(Matrix.Invert(node.Transform.ToMatrix()));                
                 node = node.TransformableParent;
             }
-            return stack.ReverseTransform;
+            return worldTransform * stack.ReverseTransform;            
         }
 
-        public static Transform LocalToWorld(this ITransformable transformable, Transform localTransform)
+        public static Transform ParentToWorld(this ITransformable transformable, Transform localTransform)
         {
-            return new Transform(transformable.LocalToWorld(localTransform.ToMatrix()));
+            return new Transform(transformable.ParentToWorld(localTransform.ToMatrix()));
         }
 
-        public static Transform WorldToLocal(this ITransformable transformable, Transform worldTransform)
+        public static Transform WorldToParent(this ITransformable transformable, Transform worldTransform)
         {
-            return new Transform(transformable.WorldToLocal(worldTransform.ToMatrix()));
+            return new Transform(transformable.WorldToParent(worldTransform.ToMatrix()));
+        }
+
+        public static Vector3 ParentToWorld(this ITransformable transformable, Vector3 position)
+        {
+            Matrix m = Matrix.Translation(position);
+            return ParentToWorld(transformable, m).TranslationVector;
+        }
+
+        public static Vector3 WorldToParent(this ITransformable transformable, Vector3 position)
+        {
+            Matrix m = Matrix.Translation(position);
+            return WorldToParent(transformable, m).TranslationVector;
         }
     }
 }

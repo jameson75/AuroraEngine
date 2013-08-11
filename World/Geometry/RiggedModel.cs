@@ -96,7 +96,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     for (int i = 0; i < SkinOffsets.Count; i++ )
                     {
                         Frame bone = SkinOffsets[i].BoneReference;                       
-                        finalBoneMatrices[i] = SkinOffsets[i].Transform.ToMatrix() * bone.LocalToWorld(bone.Transform.ToMatrix());
+                        finalBoneMatrices[i] = SkinOffsets[i].Transform.ToMatrix() * bone.ParentToWorld(bone.Transform.ToMatrix());
                     }
                     skinEffect.BoneTransforms = finalBoneMatrices;     
                 }

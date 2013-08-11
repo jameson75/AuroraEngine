@@ -99,7 +99,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         {
             if (Effect != null)
             {
-                Effect.World = ((ITransformable)this).LocalToWorld(this.Transform).ToMatrix();
+                Effect.World = ((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
                 OnApplyingEffect();
                 Effect.Apply();
                 if (Mesh != null)
@@ -209,7 +209,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
             if (Effect != null)
             {
-                Effect.World = ((ITransformable)this).LocalToWorld(this.Transform).ToMatrix();
+                Effect.World = ((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
                 OnApplyingEffect();
                 Effect.Apply();
                 foreach (Mesh mesh in Meshes)

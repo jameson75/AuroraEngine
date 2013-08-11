@@ -35,7 +35,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             get
             {
                 Matrix t = Matrix.Identity;
-                for (int i = _innerList.Count - 1; i < 0; i--)
+                for (int i = _innerList.Count - 1; i >= 0; i--)
                     t *= _innerList[i];
                 return t;
             }         

@@ -289,6 +289,19 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static BoundingBox Empty { get { return _empty; } }    
     }
 
+    public static class MathUtilExtension
+    {
+        public static short Clamp(short value, short min, short max)
+        {
+            if (value < min)
+                return min;
+            else if (value > max)
+                return max;
+            else
+                return value;
+        }
+    }
+
     /// <summary>
     /// 
     /// </summary>
