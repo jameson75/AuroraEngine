@@ -30,17 +30,17 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         { }
     }
 
-    public class CameraOffsetSceneNode : SceneNode
+    public class TrackingSceneNode : SceneNode
     {
-        public CameraOffsetSceneNode(IGameApp game)
+        public TrackingSceneNode(IGameApp game)
             : base(game)
         { }
 
-        public CameraOffsetSceneNode(IGameApp game, string name)
+        public TrackingSceneNode(IGameApp game, string name)
             : base(game, name)
         { }
 
-        public ITransformable OuterObject { get; set; }
+        public ITransformable TrackedObject { get; set; }
 
         public float InnerRadius { get; set; }
 
@@ -48,10 +48,10 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public override void Update(long gameTime)
         {
-            if (OuterObject != null && OuterRadius > 0)
+            if (TrackedObject != null && OuterRadius > 0)
             {
-                //Get world location of outer object.
-                Transform gTransform = OuterObject.ParentToWorld(OuterObject.Transform);
+                //Get world location of tracked object.
+                Transform gTransform = TrackedObject.ParentToWorld(TrackedObject.Transform);
                 //Get the location of outer object in this node's parent's space.
                 Vector3 psLocation = this.WorldToParent(gTransform).Translation;
                 //Project the vector on to the parent space y=0 plane.
