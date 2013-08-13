@@ -211,6 +211,7 @@
     <Compile Include="World\Scene\Scene.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="Sandbox\TestEffect.cs" />
+    <Compile Include="World\Scene\SceneNodeEffector.cs" />
     <Compile Include="World\Weapon.cs" />
     <Compile Include="World\WorldSimulator.cs" />
   </ItemGroup>

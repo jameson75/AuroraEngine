@@ -78,7 +78,11 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public virtual void Draw(long gameTime) { }
 
-        public virtual void Update(long gameTime) { }
+        public virtual void Update(long gameTime) 
+        {
+            if (NodeEffector != null)
+                NodeEffector.Update(gameTime, this);
+        }
 
         //public Matrix LocalToWorld(Matrix localTransform)
         //{
@@ -160,6 +164,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             foreach (SceneNode child in Children)
                 child.Scene = this._scene;
         }
+
+        public SceneNodeEffector NodeEffector
+        { get; set; }
     }
      
     public class SceneNodes :  ObservableCollection<SceneNode>
@@ -183,5 +190,5 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 throw new IndexOutOfRangeException();
             }
         }
-    }  
+    }    
 }
