@@ -76,7 +76,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public float PivotAngle { get; set; }
         
         private KeyframeAnimationController pivotAnimationController = null;
-        private bool? trackedObjectSign = null;
+        private int previousObjectSign = 0;
 
         public override void Update(long gameTime, SceneNode node)
         {  
@@ -85,19 +85,24 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 //Get world location of tracked object.
                 Vector3 gTrackedObjectLocation = TrackedObject.ParentToWorld(TrackedObject.Transform).Translation;
                 //Get the location of outer object in this node's parent space.
-                Vector3 gPivotObjectLocation = PivotObject.ParentToWorld(PivotObject.Transform).Translation;                
+                Vector3 gPivotObjectLocation = PivotObject.ParentToWorld(PivotObject.Transform).Translation;                             
                 
-                //TOOD: Determine whether to discard the previous animation based on 
-                //change of 'sign'.               
+                int sign = Math.Sign(gPivotObjectLocation.X);
+                if (previousObjectSign != sign)
+                    pivotAnimationController = null;
 
                 if (pivotAnimationController == null)
                 {
                     pivotAnimationController = new KeyframeAnimationController();                
                     TransformAnimation animation = new TransformAnimation();
+                    
+                    //TOOD: Use the current position to 
+                    //calculate the end time of the animation (with in-mind that a complete pivot is 1 second).
+
                     animation.SetKeyFrame(new AnimationKeyFrame(0, PivotObject.Transform));
                     Vector3 negatedTranslation = Vector3.Negate(PivotObject.Transform.Translation);
                     Matrix pivotObjectRotations = PivotObject.Transform.ToMatrix() * Matrix.Translation(negatedTranslation);
-                    Matrix pivotMatrix = pivotObjectRotations * Matrix.RotationAxis(PivotAxis, PivotAngle);
+                    Matrix pivotMatrix = pivotObjectRotations * Matrix.RotationAxis(PivotAxis, PivotAngle * -sign);
                     animation.SetKeyFrame(new AnimationKeyFrame(1000, pivotMatrix));
                     pivotAnimationController.Target = node;
                     pivotAnimationController.Animation = animation;
@@ -109,6 +114,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
                 if (pivotAnimationController != null)
                     pivotAnimationController.UpdateAnimation(gameTime);
+
+                previousObjectSign = sign;
             }
         }
     }  
