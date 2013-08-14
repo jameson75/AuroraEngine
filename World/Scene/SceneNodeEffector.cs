@@ -36,31 +36,33 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public ITransformable TrackedObject { get; set; }
 
+        public ITransformable CenterObject { get; set; }
+
         public float InnerRadius { get; set; }
 
         public float OuterRadius { get; set; }
 
         public override void Update(long gameTime, SceneNode node)
         {
-            if (TrackedObject != null && OuterRadius > 0)
+            if (TrackedObject != null && CenterObject != null && OuterRadius > 0)
             {
                 //Get world location of tracked object.
-                Transform gTransform = TrackedObject.ParentToWorld(TrackedObject.Transform);
-                //Get the location of outer object in this node's parent's space.
-                Vector3 psLocation = node.WorldToParent(gTransform).Translation;
-                //Project the vector on to the parent space y=0 plane.
+                Transform gTrackedObjectTransform = TrackedObject.ParentToWorld(TrackedObject.Transform);
+                //Get the location of outer object in the center object's local space.
+                Vector3 csTrackedObjectLocation = CenterObject.WorldToLocal(gTrackedObjectTransform).Translation;
+                //Project the vector on to the center object's y=0 plane.
                 //{Projection of a Vector on a plane : B = A ( A dot N ) * N, where A is the vector N is the plane's normal.}
-                Vector3 ppsLocation = psLocation - (Vector3.Dot(psLocation, Vector3.UnitY)) * Vector3.UnitY;
+                Vector3 pcsTrackedObjectLocation = csTrackedObjectLocation - (Vector3.Dot(csTrackedObjectLocation, Vector3.UnitY)) * Vector3.UnitY;
                 //Get distance of projected location.
-                float ppsLocationDistance = Vector3.Distance(Vector3.Zero, ppsLocation);
+                float pcsTrackedObjectDistance = Vector3.Distance(Vector3.Zero, pcsTrackedObjectLocation);
                 //Calc percentage of the outer radius is covered by the distance.
-                float clampedOffsetPct = MathUtil.Clamp(ppsLocationDistance / OuterRadius, 0, 1);
+                float clampedOffsetPct = MathUtil.Clamp(pcsTrackedObjectDistance / OuterRadius, 0, 1);
                 //Get the direction of the projected location.
-                Vector3 dir = Vector3.Normalize(ppsLocation);
+                Vector3 pcsTrackedObjectDir = Vector3.Normalize(pcsTrackedObjectLocation);
                 //Calculate the new location, multplying the direction by the portion of the radius to be covered.
-                Vector3 offsetLocation = dir * clampedOffsetPct * InnerRadius;
+                Vector3 newNodeLocation = pcsTrackedObjectDir * clampedOffsetPct * InnerRadius;
                 //Transform this offset node to the new location.
-                node.Transform = new Transform(Matrix.Translation(offsetLocation));
+                node.Transform = new Transform(Matrix.Translation(newNodeLocation));
             }
             //base.Update(gameTime);
         }
@@ -69,17 +71,44 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     public class PivotSceneNodeEffector : SceneNodeEffector
     {
         public ITransformable TrackedObject { get; set; }
+        public ITransformable PivotObject { get; set; }
+        public Vector3 PivotAxis { get; set; }
+        public float PivotAngle { get; set; }
+        
+        private KeyframeAnimationController pivotAnimationController = null;
+        private bool? trackedObjectSign = null;
 
         public override void Update(long gameTime, SceneNode node)
-        {
-            if (TrackedObject != null)
+        {  
+            if (TrackedObject != null && PivotObject != null)
             {
                 //Get world location of tracked object.
-                Transform gTransform = TrackedObject.ParentToWorld(TrackedObject.Transform);
+                Vector3 gTrackedObjectLocation = TrackedObject.ParentToWorld(TrackedObject.Transform).Translation;
                 //Get the location of outer object in this node's parent space.
-                Vector3 psLocation = node.WorldToParent(gTransform).Translation;
-                //
-                // float XDistance = Math.Abs(psLocation.X);                
+                Vector3 gPivotObjectLocation = PivotObject.ParentToWorld(PivotObject.Transform).Translation;                
+                
+                //TOOD: Determine whether to discard the previous animation based on 
+                //change of 'sign'.               
+
+                if (pivotAnimationController == null)
+                {
+                    pivotAnimationController = new KeyframeAnimationController();                
+                    TransformAnimation animation = new TransformAnimation();
+                    animation.SetKeyFrame(new AnimationKeyFrame(0, PivotObject.Transform));
+                    Vector3 negatedTranslation = Vector3.Negate(PivotObject.Transform.Translation);
+                    Matrix pivotObjectRotations = PivotObject.Transform.ToMatrix() * Matrix.Translation(negatedTranslation);
+                    Matrix pivotMatrix = pivotObjectRotations * Matrix.RotationAxis(PivotAxis, PivotAngle);
+                    animation.SetKeyFrame(new AnimationKeyFrame(1000, pivotMatrix));
+                    pivotAnimationController.Target = node;
+                    pivotAnimationController.Animation = animation;
+                    pivotAnimationController.AnimationComplete+= (object sender, EventArgs args) =>
+                        {
+                            pivotAnimationController = null;
+                        };
+                }
+
+                if (pivotAnimationController != null)
+                    pivotAnimationController.UpdateAnimation(gameTime);
             }
         }
     }  
