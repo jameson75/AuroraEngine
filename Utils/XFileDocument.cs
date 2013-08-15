@@ -23,7 +23,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         public XFileHeader Header { get; protected set; }
 
-        public List<XFileDataObject> DataObjects { get { return dataObjects; } }
+        public DataObjectCollection DataObjects { get { return dataObjects; } }
     }
 
     public class XFileTextDocument : XFileDocument
@@ -1524,5 +1524,17 @@ namespace CipherPark.AngelJacket.Core.Utils
         public float X;
         public float Y;
         public float Z;
+    }
+
+    public class DataObjectCollection : List<XFileDataObject>
+    {
+        public T GetDataObject<T>(int instance) where T : XFileDataObject
+        {
+            int instancesFound = 0;
+            foreach (XFileDataObject dataObj in this)
+                if (dataObj is T && instancesFound == instance - 1)
+                    return (T)dataObj;
+            return null;
+        }
     }
 }

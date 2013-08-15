@@ -149,7 +149,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
         }
        
-        public static Model ImportFBX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
+        public static Model ImportFBX(IGameApp app, string fileName, byte[] shaderByteCode, FBXFileChannels channels = FBXFileChannels.Default)
         {
             BasicModel result = null;
             FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();            
@@ -170,7 +170,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //NOTE: We only support specific channel combinations. We throw an exception for an unsupported combination.
             switch (channels)
             {
-                case MeshImportChannel.PositionColor:
+                case FBXFileChannels.PositionColor:
                     BasicVertexPositionColor[] _vertices = vertices.Select(e => new BasicVertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.Red.ToVector4() }).ToArray();
                     mesh = ContentBuilder.BuildMesh<BasicVertexPositionColor>(app, shaderByteCode, _vertices, _indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
                     result = new BasicModel(app);
@@ -182,7 +182,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             return result;
         }
 
-        public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, MeshImportChannel channels = MeshImportChannel.Default)
+        public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, XFileChannels channels)
         {
             RiggedModel result = null;
             XFileTextDocument doc = new XFileTextDocument();                                 
@@ -193,101 +193,108 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
             //Access X-File's first mesh Data and it's frame
             //----------------------------------------------
-            //TODO: Remove hard coding.
-            XFileFrameObject xMeshFrame = ((XFileFrameObject)doc.DataObjects[4]);
+            ////TODO: Remove hard coding.
+            //XFileFrameObject xMeshFrame = ((XFileFrameObject)doc.DataObjects[4]);
+            
+            XFileFrameObject xMeshFrame = (XFileFrameObject)doc.DataObjects.GetDataObject<XFileFrameObject>(1);
             XFileMeshObject xMesh = xMeshFrame.Meshes[0];            
 
             //Calculate mesh bounding box from mesh Data
             //------------------------------------------
             BoundingBox boundingBox = BoundingBox.FromPoints(xMesh.Vertices.Select(v => new Vector3(v.X, v.Y, v.Z)).ToArray());            
 
+            //Construct model vertex indices from mesh data
+            //----------------------------------------------            
+            short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Select( x => (short)x)).ToArray();
+           
             //Extract texture coords from mesh data
             //-------------------------------------
-            ////float[] texUStream = xMesh.DeclData.GetVertexDataStream<float>(VertexElementUsage.TexCoord, 0);
-            ////float[] texVStream = xMesh.DeclData.GetVertexDataStream<float>(VertexElementUsage.TexCoord, 1);
-            ////Vector2[] texCoords = texUStream.Zip(texVStream, (f, s) => new Vector2(f, s)).ToArray();         
-            Vector2[] texCoords = xMesh.DeclData.GetTextureCoords();
+            Vector2[] texCoords = null;
+            if((channels & XFileChannels.DeclTextureCoords1) != 0)
+                texCoords = xMesh.DeclData.GetTextureCoords();
 
             //Extract normals.
             //----------------
-            Vector3[] normals = xMesh.DeclData.GetNormals();
+            Vector3[] normals = null;
+            if((channels & XFileChannels.DeclNormals) != 0)
+                xMesh.DeclData.GetNormals();
 
             //Construct model vertices from mesh data
             //---------------------------------------
             //BasicVertexPositionNormalTexture[] _vertices = xMesh.Vertices.Zip(normals, (e, f) => new BasicVertexPositionNormalTexture() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Normal = f, Color = Color.Green.ToVector4() }).ToArray();            
-            BasicSkinnedVertexTexture[] _vertices = xMesh.Vertices.Select((v, i) => new BasicSkinnedVertexTexture()
+            if((channels & XFileChannels.Skinning) != 0)
             {
-                Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
-                Normal = normals[i],
-                TextureCoord = texCoords[i]
-            }).ToArray();
-
-            //Construct model vertex indices from mesh data
-            //----------------------------------------------
-
-            //short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Cast<short>()).ToArray();
-            short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Select( x => (short)x)).ToArray();
-           
-            //Convert skinning information in .x file to skinning information required by SkinnedEffect shader.
-            //(The shader associates each vertex with 4 bone indices and 4 bone weights - we extract this 
-            //information from SkinWeights data object).
-            //-------------------------------------------------------------------------------------------------
-            
-            List<float>[] weights = new List<float>[_vertices.Length];
-            List<int>[] boneIndices = new List<int>[_vertices.Length];
-            List<string>[] boneNames = new List<string>[_vertices.Length];
-            List<SkinOffset> skinOffsetList = new List<SkinOffset>();       
+                dynamic _vertices = null;
+                if(normals != null && texCoords != null)
+                {
+                    /*BasicSkinnedVertexTexture[]*/ _vertices = xMesh.Vertices.Select((v, i) => new BasicSkinnedVertexTexture()
+                    {
+                        Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                        Normal = normals[i],
+                        TextureCoord = texCoords[i]
+                    }).ToArray();
+                }
                
-            for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
-            {                
-                XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];               
-                Transform skinOffsetTransform = new Transform(new Matrix(xSkinWeights.MatrixOffset.m));
-                skinOffsetList.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
-                for(int j = 0; j < xSkinWeights.NWeights; j++ )
-                {
-                    int k = xSkinWeights.VertexIndices[j];
-                    
-                    if (boneIndices[k] == null) 
-                        boneIndices[k] = new List<int>();
-                    boneIndices[k].Add(i);
-                   
-                    if (weights[k] == null)
-                        weights[k] = new List<float>();                   
-                    weights[k].Add(xSkinWeights.Weights[j]);             
-                }
-            }
-            for (int i = 0; i < _vertices.Length; i++)
-            {               
-                float[] weightValues = new float[4] { 0, 0, 0, 0};
-                int[] boneIndicesValues = new int[4] { 0, 0, 0, 0 };
-                if(weights[i] != null)
-                {
-                    float[] _weights = weights[i].ToArray();
-                    //TODO: assert that _weights.Length <= weightValues.Length (we assume the .x file will have no more than 4 per vertex).
-                    Array.Copy(_weights, weightValues, _weights.Length);
-                }
-                if (boneIndices[i] != null)
-                {
-                    int[] _boneIndices = boneIndices[i].ToArray();
-                    //TODO: assert that _bondIndices.Length <= boneIndicesValues.Length (we assume the .x file will have no more than 4 per vertex).
-                    Array.Copy(_boneIndices, boneIndicesValues, _boneIndices.Length);
-                }             
-                _vertices[i].Weights = new Vector4(weightValues);
-                _vertices[i].BoneIndices = new Int4(boneIndicesValues);
-            }                 
+                //Convert skinning information in .x file to skinning information required by a skinning shader.
+                //(A skinning shader associates each vertex with 4 bone indices and 4 bone weights - we extract this 
+                //information from SkinWeights data object).
+                //-------------------------------------------------------------------------------------------------
             
-            //Construct bone hierarchy (skeleton) from frame data
-            //----------------------------------------------------              
-            //****************************************************
-            //NOTE: It is assumed that
-            //there is only one bone at the root and, therefore,
-            //one bone-frame at the root level of the X-File
-            //****************************************************
-            //TODO: Remove hard coding.
-            XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
-            Frame rootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
-            BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsetList);           
-
+                List<float>[] weights = new List<float>[_vertices.Length];
+                List<int>[] boneIndices = new List<int>[_vertices.Length];
+                List<string>[] boneNames = new List<string>[_vertices.Length];
+                List<SkinOffset> skinOffsetList = new List<SkinOffset>();       
+               
+                for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
+                {                
+                    XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];               
+                    Transform skinOffsetTransform = new Transform(new Matrix(xSkinWeights.MatrixOffset.m));
+                    skinOffsetList.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
+                    for(int j = 0; j < xSkinWeights.NWeights; j++ )
+                    {
+                        int k = xSkinWeights.VertexIndices[j];
+                    
+                        if (boneIndices[k] == null) 
+                            boneIndices[k] = new List<int>();
+                        boneIndices[k].Add(i);
+                   
+                        if (weights[k] == null)
+                            weights[k] = new List<float>();                   
+                        weights[k].Add(xSkinWeights.Weights[j]);             
+                    }
+                }
+                for (int i = 0; i < _vertices.Length; i++)
+                {               
+                    float[] weightValues = new float[4] { 0, 0, 0, 0};
+                    int[] boneIndicesValues = new int[4] { 0, 0, 0, 0 };
+                    if(weights[i] != null)
+                    {
+                        float[] _weights = weights[i].ToArray();
+                        //TODO: assert that _weights.Length <= weightValues.Length (we assume the .x file will have no more than 4 per vertex).
+                        Array.Copy(_weights, weightValues, _weights.Length);
+                    }
+                    if (boneIndices[i] != null)
+                    {
+                        int[] _boneIndices = boneIndices[i].ToArray();
+                        //TODO: assert that _bondIndices.Length <= boneIndicesValues.Length (we assume the .x file will have no more than 4 per vertex).
+                        Array.Copy(_boneIndices, boneIndicesValues, _boneIndices.Length);
+                    }             
+                    _vertices[i].Weights = new Vector4(weightValues);
+                    _vertices[i].BoneIndices = new Int4(boneIndicesValues);
+                }                 
+            
+                //Construct bone hierarchy (skeleton) from frame data
+                //----------------------------------------------------              
+                //****************************************************
+                //NOTE: It is assumed that
+                //there is only one bone at the root and, therefore,
+                //one bone-frame at the root level of the X-File
+                //****************************************************
+                //TODO: Remove hard coding.
+                XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
+                Frame rootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
+                BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsetList);           
+            }
             //Construct animation data from frame data
             //----------------------------------------
             //TODO: Remove hard coding.           
@@ -349,7 +356,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
     }
   
     [Flags]
-    public enum MeshImportChannel
+    public enum FBXFileChannels
     {
         Default = Position | Color,
         Position = 0x01,
@@ -363,6 +370,35 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         PositionNormalTexture = Position | Normal | Texture0,
         PositionMultiTexture = Position | Texture0 | Texture1,
         PositionNormalMultiTexture  = Position | Normal | Texture0 | Texture1
+    }
+
+    [Flags]
+    public enum XFileChannels
+    {
+        //Mesh =                  0x0001, //NOTE: Mesh is always an assumed channel.
+        Skinning =              0x0002,
+        Frames =                0x0004,
+        Animation =             0x0008,
+        MeshTextureCoords1 =    0x0010,
+        MeshTextureCoords2 =    0x0020,
+        MeshVertexColors =      0x0040,
+        DeclTextureCoords1 =    0x0080,
+        DeclTextureCoords2 =    0x0100,
+        MeshNormals =           0x0200,
+        DeclNormals =           0x0400,
+        CommonAlinBasic = Mesh,
+        CommonAlinRigged = Mesh | Skinning | Frames | Animation,
+        CommonAlinRiggedTexture1 = CommonAlinRigged | DeclTextureCoords1,
+        CommonAlinRiggedTexture2 = CommonAlinRiggedTexture1 | DeclTextureCoords2, 
+        CommonAlinComplex = Mesh |Frames | Animation,
+        CommonAlinComplexTexture1 = CommonAlinComplex | DeclTextureCoords1,
+        CommonAlinComplexTexture2 = CommonAlinComplexTexture1 | DeclTextureCoords2,
+        CommonLegacyRigged = Skinning | Frames | Animation,
+        CommonLegacyRiggedTexture1 = CommonLegacyRigged | MeshTextureCoords1,
+        CommonLegacyRiggedTexture2 = CommonLegacyRiggedTexture1 | MeshTextureCoords2
+        CommonLegacyComplex = Mesh | Frames | Animation,
+        CommonLegacyComplexTexture1 = CommonLegacyComplex | MeshTextureCoords1,
+        CommonLegacyComplexTexture2 = CommonLegacyComplexTexture1 | MeshTextureCoords2       
     }
 
     [StructLayout(LayoutKind.Sequential)]
