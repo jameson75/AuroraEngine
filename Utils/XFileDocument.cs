@@ -19,7 +19,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 {       
     public abstract class XFileDocument
     {        
-        private List<XFileDataObject> dataObjects = new List<XFileDataObject>();
+        private DataObjectCollection dataObjects = new DataObjectCollection();
 
         public XFileHeader Header { get; protected set; }
 
@@ -1528,6 +1528,12 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public class DataObjectCollection : List<XFileDataObject>
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="instance">1-based instance index</param>
+        /// <returns></returns>
         public T GetDataObject<T>(int instance) where T : XFileDataObject
         {
             int instancesFound = 0;

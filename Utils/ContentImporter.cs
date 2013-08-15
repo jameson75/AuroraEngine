@@ -18,8 +18,6 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Animation;
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
 // Company: Cipher Park
@@ -185,8 +183,12 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, XFileChannels channels)
         {
             RiggedModel result = null;
-            XFileTextDocument doc = new XFileTextDocument();                                 
-            
+            Mesh resultMesh = null;
+            Frame resultRootFrame = null;
+            List<KeyframeAnimationController> resultAnimationControllers = null;
+            List<SkinOffset> resultSkinOffsets = null;
+            XFileTextDocument doc = new XFileTextDocument();     
+
             //Read X-File Data
             //----------------
             doc.Load(System.IO.File.Open(fileName, FileMode.Open, FileAccess.ReadWrite));
@@ -217,7 +219,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //----------------
             Vector3[] normals = null;
             if((channels & XFileChannels.DeclNormals) != 0)
-                xMesh.DeclData.GetNormals();
+                normals = xMesh.DeclData.GetNormals();
 
             //Construct model vertices from mesh data
             //---------------------------------------
@@ -243,13 +245,13 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 List<float>[] weights = new List<float>[_vertices.Length];
                 List<int>[] boneIndices = new List<int>[_vertices.Length];
                 List<string>[] boneNames = new List<string>[_vertices.Length];
-                List<SkinOffset> skinOffsetList = new List<SkinOffset>();       
+                resultSkinOffsets = new List<SkinOffset>();       
                
                 for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
                 {                
                     XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];               
                     Transform skinOffsetTransform = new Transform(new Matrix(xSkinWeights.MatrixOffset.m));
-                    skinOffsetList.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
+                    resultSkinOffsets.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
                     for(int j = 0; j < xSkinWeights.NWeights; j++ )
                     {
                         int k = xSkinWeights.VertexIndices[j];
@@ -290,53 +292,60 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 //there is only one bone at the root and, therefore,
                 //one bone-frame at the root level of the X-File
                 //****************************************************
-                //TODO: Remove hard coding.
-                XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
-                Frame rootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
-                BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsetList);           
-            }
-            //Construct animation data from frame data
-            //----------------------------------------
-            //TODO: Remove hard coding.           
-            XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[8];
-            List<KeyframeAnimationController> modelAnimationControllers = new List<KeyframeAnimationController>();
-            List<Frame> frameList = rootFrame.FlattenToList();
-            for (int i = 0; i < xAnimationSet.Animations.Count; i++)
-            {
-                XFileAnimationObject xAnimation = xAnimationSet.Animations[i];
-                Frame animationTarget = frameList.Find(f => f.Name == xAnimation.FrameRef);
-                if (animationTarget != null)
-                {
-                    Dictionary<long, Matrix> matrixTransformKeys = new Dictionary<long, Matrix>();
-                    for (int j = 0; j < xAnimation.Keys.Count; j++)
-                    {
-                        XFileAnimationKeyObject xAnimationKey = xAnimation.Keys[j];
-                        switch (xAnimationKey.KeyType)
-                        {
-                            case KeyType.Matrix:
-                                for (int k = 0; k < xAnimationKey.NKeys; k++)
-                                {
-                                    matrixTransformKeys.Add(xAnimationKey.TimedFloatKeys[k].Time,
-                                                            new Matrix(xAnimationKey.TimedFloatKeys[k].Values));
-                                }
-                                break;
-                        }
-                    }
-                    TransformAnimation modelAnimation = new TransformAnimation();
-                    foreach (long time in matrixTransformKeys.Keys)
-                        modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
-
-                    modelAnimationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
-                }
-            }
+                ////TODO: Remove hard coding.
+                //XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
+                XFileFrameObject xRootBoneFrame = doc.DataObjects.GetDataObject<XFileFrameObject>(2);
+                resultRootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
+                BuildBoneFrameHierarchy(xRootBoneFrame, resultRootFrame, resultSkinOffsets);           
             
-            //Create and return model
-            //-----------------------
-            result = new RiggedModel(app);
-            result.Mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
-            result.SkinOffsets.AddRange(skinOffsetList);          
-            result.FrameTree = rootFrame;            
-            result.Animation.AddRange(modelAnimationControllers);            
+                if( (channels & XFileChannels.Animation) != 0)
+                {
+                    //Construct animation data from frame data
+                    //----------------------------------------
+                    ////TODO: Remove hard coding.           
+                    //XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[8];
+                    XFileAnimationSetObject xAnimationSet = doc.DataObjects.GetDataObject<XFileAnimationSetObject>(1);
+                    resultAnimationControllers = new List<KeyframeAnimationController>();
+                    List<Frame> frameList = resultRootFrame.FlattenToList();
+                    for (int i = 0; i < xAnimationSet.Animations.Count; i++)
+                    {
+                        XFileAnimationObject xAnimation = xAnimationSet.Animations[i];
+                        Frame animationTarget = frameList.Find(f => f.Name == xAnimation.FrameRef);
+                        if (animationTarget != null)
+                        {
+                            Dictionary<long, Matrix> matrixTransformKeys = new Dictionary<long, Matrix>();
+                            for (int j = 0; j < xAnimation.Keys.Count; j++)
+                            {
+                                XFileAnimationKeyObject xAnimationKey = xAnimation.Keys[j];
+                                switch (xAnimationKey.KeyType)
+                                {
+                                    case KeyType.Matrix:
+                                        for (int k = 0; k < xAnimationKey.NKeys; k++)
+                                        {
+                                            matrixTransformKeys.Add(xAnimationKey.TimedFloatKeys[k].Time,
+                                                                    new Matrix(xAnimationKey.TimedFloatKeys[k].Values));
+                                        }
+                                        break;
+                                }
+                            }
+                            TransformAnimation modelAnimation = new TransformAnimation();
+                            foreach (long time in matrixTransformKeys.Keys)
+                                modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
+                            resultAnimationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
+                        }    
+                    }
+                }
+
+                resultMesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
+            
+                //Create and return model
+                //-----------------------
+                result = new RiggedModel(app);
+                result.Mesh = resultMesh;
+                result.SkinOffsets.AddRange(resultSkinOffsets);          
+                result.FrameTree = resultRootFrame;            
+                result.Animation.AddRange(resultAnimationControllers);
+            }                       
              
             return result;
         }
@@ -375,7 +384,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
     [Flags]
     public enum XFileChannels
     {
-        //Mesh =                  0x0001, //NOTE: Mesh is always an assumed channel.
+        Mesh =                  0x0001, //NOTE: Mesh is always an assumed channel.
         Skinning =              0x0002,
         Frames =                0x0004,
         Animation =             0x0008,
@@ -395,7 +404,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         CommonAlinComplexTexture2 = CommonAlinComplexTexture1 | DeclTextureCoords2,
         CommonLegacyRigged = Skinning | Frames | Animation,
         CommonLegacyRiggedTexture1 = CommonLegacyRigged | MeshTextureCoords1,
-        CommonLegacyRiggedTexture2 = CommonLegacyRiggedTexture1 | MeshTextureCoords2
+        CommonLegacyRiggedTexture2 = CommonLegacyRiggedTexture1 | MeshTextureCoords2,
         CommonLegacyComplex = Mesh | Frames | Animation,
         CommonLegacyComplexTexture1 = CommonLegacyComplex | MeshTextureCoords1,
         CommonLegacyComplexTexture2 = CommonLegacyComplexTexture1 | MeshTextureCoords2       
