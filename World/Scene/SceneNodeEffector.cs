@@ -47,9 +47,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             if (TrackedObject != null && CenterObject != null && OuterRadius > 0)
             {
                 //Get world location of tracked object.
-                Transform gTrackedObjectTransform = TrackedObject.ParentToWorld(TrackedObject.Transform);
+                Transform wsTrackedObjectTransform = TrackedObject.ParentToWorld(TrackedObject.Transform);
                 //Get the location of outer object in the center object's local space.
-                Vector3 csTrackedObjectLocation = CenterObject.WorldToLocal(gTrackedObjectTransform).Translation;
+                Vector3 csTrackedObjectLocation = CenterObject.WorldToLocal(wsTrackedObjectTransform).Translation;
                 //Project the vector on to the center object's y=0 plane.
                 //{Projection of a Vector on a plane : B = A ( A dot N ) * N, where A is the vector N is the plane's normal.}
                 Vector3 pcsTrackedObjectLocation = csTrackedObjectLocation - (Vector3.Dot(csTrackedObjectLocation, Vector3.UnitY)) * Vector3.UnitY;
@@ -69,54 +69,34 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     }
 
     public class PivotSceneNodeEffector : SceneNodeEffector
-    {
+    { 
         public ITransformable TrackedObject { get; set; }
         public ITransformable PivotObject { get; set; }
         public Vector3 PivotAxis { get; set; }
-        public float PivotAngle { get; set; }
-        
-        private KeyframeAnimationController pivotAnimationController = null;
-        private int previousObjectSign = 0;
+        public float TrackingRange { get; set; }
+        public float MaxPivotAngle { get; set; }
+        public float PivotSpeed { get; set; }    
 
         public override void Update(long gameTime, SceneNode node)
-        {  
-            if (TrackedObject != null && PivotObject != null)
+        {
+            if (TrackedObject != null && PivotObject != null && TrackingRange > 0)
             {
-                //Get world location of tracked object.
-                Vector3 gTrackedObjectLocation = TrackedObject.ParentToWorld(TrackedObject.Transform).Translation;
-                //Get the location of outer object in this node's parent space.
-                Vector3 gPivotObjectLocation = PivotObject.ParentToWorld(PivotObject.Transform).Translation;                             
-                
-                int sign = Math.Sign(gPivotObjectLocation.X);
-                if (previousObjectSign != sign)
-                    pivotAnimationController = null;
-
-                if (pivotAnimationController == null)
-                {
-                    pivotAnimationController = new KeyframeAnimationController();                
-                    TransformAnimation animation = new TransformAnimation();
-                    
-                    //TOOD: Use the current position to 
-                    //calculate the end time of the animation (with in-mind that a complete pivot is 1 second).
-
-                    animation.SetKeyFrame(new AnimationKeyFrame(0, PivotObject.Transform));
-                    Vector3 negatedTranslation = Vector3.Negate(PivotObject.Transform.Translation);
-                    Matrix pivotObjectRotations = PivotObject.Transform.ToMatrix() * Matrix.Translation(negatedTranslation);
-                    Matrix pivotMatrix = pivotObjectRotations * Matrix.RotationAxis(PivotAxis, PivotAngle * -sign);
-                    animation.SetKeyFrame(new AnimationKeyFrame(1000, pivotMatrix));
-                    pivotAnimationController.Target = node;
-                    pivotAnimationController.Animation = animation;
-                    pivotAnimationController.AnimationComplete+= (object sender, EventArgs args) =>
-                        {
-                            pivotAnimationController = null;
-                        };
-                }
-
-                if (pivotAnimationController != null)
-                    pivotAnimationController.UpdateAnimation(gameTime);
-
-                previousObjectSign = sign;
-            }
+                //Get the location of outer object in wold space.
+                Vector3 wsPivotObjectLocation = PivotObject.ParentToWorld(PivotObject.Transform).Translation;
+                //Get the location of the tracked object in this world space.
+                Vector3 wsTrackedObjectLocation = TrackedObject.ParentToWorld(TrackedObject.Transform).Translation;
+                //Get the x-offset of the tracked object from the pivot object.
+                float xOffset = (wsTrackedObjectLocation - wsTrackedObjectLocation).X;
+                //Get the percentage of the tracking range covered by the xoffset (clamped between -1 and 1).
+                float trackingRangePct = MathUtil.Clamp(xOffset / TrackingRange, -1, 1);
+                //Determine the angle of the pivot object.
+                float pivotAngle = -trackingRangePct * MaxPivotAngle;
+                //Transform scene node (pivot about axis at determined angle).
+                //NOTE: We make sure to combine rotations.
+                Matrix nodeMatrix = node.Transform.ToMatrix();                
+                Matrix nodeRotations = nodeMatrix * Matrix.Translation(-nodeMatrix.TranslationVector);
+                node.Transform = new Transform(nodeRotations * Matrix.RotationAxis(PivotAxis, pivotAngle) * Matrix.Translation(nodeMatrix.TranslationVector));
+            }              
         }
     }  
 }

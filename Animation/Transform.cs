@@ -24,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     {
         private static Transform _zero = new Transform { Rotation = Quaternion.Zero, Translation = Vector3.Zero };
         private static Transform _identity = new Transform { Rotation = Quaternion.Identity, Translation = Vector3.Zero };
-
+        
         public Quaternion Rotation { get; set; }
 
         public Vector3 Translation { get; set; }
