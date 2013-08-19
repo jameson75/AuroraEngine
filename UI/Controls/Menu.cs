@@ -242,11 +242,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += this.Margin.Width;
+                        offset += this.Margin.Top;
                     else
-                        offset += Items[i - 1].Padding.Height;
-                    Items[i].Position = new DrawingPointF(0f, offset);
-                    Items[i].Size = new DrawingSizeF(this.Size.Width, Items[i].Size.Height);
+                        offset += Items[i - 1].Padding.Bottom;
+                    Items[i].Position = new DrawingPointF(this.Margin.Left, offset);
+                    Items[i].Size = new DrawingSizeF(this.Size.Width - this.Margin.Right, Items[i].Size.Height);
                     offset += Items[0].Size.Height;
                 }
             }
@@ -255,11 +255,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += this.Margin.Width;
+                        offset += this.Margin.Left;
                     else
-                        offset += Items[i - 1].Padding.Width;
-                    Items[i].Position = new DrawingPointF(offset, 0f);
-                    Items[i].Size = new DrawingSizeF(Items[i].Size.Width, this.Size.Height);
+                        offset += Items[i - 1].Padding.Right;
+                    Items[i].Position = new DrawingPointF(offset, this.Margin.Top);
+                    Items[i].Size = new DrawingSizeF(Items[i].Size.Width, this.Size.Height - this.Margin.Bottom);
                     offset += Items[0].Size.Width;
                 }
             }
@@ -278,7 +278,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public override void ApplyTemplate(Components.UIControlTemplate template)
         {
             MenuTemplate menuTemplate = (MenuTemplate)template;
-
             base.ApplyTemplate(template);
         }
 

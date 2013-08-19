@@ -61,8 +61,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         }
                         break;
                     case HorizontalAlignment.Stretch:
-                        newPositionX = _container.Padding.Width + child.Margin.Width;
-                        newWidth = _container.Bounds.Width - (int)(_container.Padding.Width * 2);
+                        newPositionX = 0; //_container.Padding.Width + child.Margin.Width;
+                        newWidth = _container.Bounds.Width; //- (int)(_container.Padding.Width * 2);
                         break;
                 }
                 
@@ -82,8 +82,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         }
                         break;
                     case VerticalAlignment.Stretch:
-                        newPositionY = _container.Padding.Height + child.Margin.Height;                       
-                        newHeight = _container.Bounds.Height - (_container.Padding.Width * 2);
+                        newPositionY = 0; //_container.Padding.Height + child.Margin.Height;                       
+                        newHeight = _container.Bounds.Height; // - (_container.Padding.Width * 2);
                         break;
                 }
 
@@ -220,7 +220,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         }
                         break;
                     case HorizontalAlignment.Stretch:
-                        newPositionX = cellRectangle.Left + child.Margin.Width;
+                        newPositionX = cellRectangle.Left; // + child.Margin.Width;
                         newWidth = cellRectangle.Width;
                         break;
                 }
@@ -241,8 +241,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         }
                         break;
                     case VerticalAlignment.Stretch:
-                        newPositionY = cellRectangle.Top + child.Margin.Height;                       
-                        newHeight = _container.Bounds.Height - (_container.Padding.Width * 2);
+                        newPositionY = cellRectangle.Top; // + child.Margin.Height;                       
+                        newHeight = _container.Bounds.Height - (_container.Padding.Height * 2);
                         break;
                 }
 

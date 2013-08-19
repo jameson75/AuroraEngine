@@ -15,7 +15,7 @@ using SharpDX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.AngelJacket.Core.Content
 {       
     public abstract class XFileDocument
     {        
@@ -1538,8 +1538,15 @@ namespace CipherPark.AngelJacket.Core.Utils
         {
             int instancesFound = 0;
             foreach (XFileDataObject dataObj in this)
-                if (dataObj is T && instancesFound == instance - 1)
-                    return (T)dataObj;
+            {
+                if (dataObj is T)
+                {
+                    if (instancesFound == instance - 1)
+                        return (T)dataObj;
+                    else
+                        instancesFound++;
+                }
+            }
             return null;
         }
     }

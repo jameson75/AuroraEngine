@@ -8,6 +8,8 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
+using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +19,7 @@ using DXBuffer = SharpDX.Direct3D11.Buffer;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.AngelJacket.Core.Content
 {
     public static class ContentBuilder
     {

@@ -39,11 +39,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += this.Margin.Width;
+                        offset += this.Margin.Top;
                     else
-                        offset += Items[i - 1].Padding.Height;
-                    Items[i].Position = new DrawingPointF(0f, offset);
-                    Items[i].Size = new DrawingSizeF(this.Size.Width, Items[i].Size.Height);
+                        offset += Items[i - 1].Padding.Bottom;
+                    Items[i].Position = new DrawingPointF(this.Margin.Left, offset);
+                    Items[i].Size = new DrawingSizeF(this.Size.Width - this.Margin.Right, Items[i].Size.Height);
                     offset += Items[0].Size.Height;
                 }
                 isLayoutUpdating = false;                

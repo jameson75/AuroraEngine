@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.UI.Animation;
+using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -106,34 +106,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                                            Math.Max(minMessageFit.Height, minMessageBoxSize.Height));
             RectangleF finalPanelRect = new RectangleF(0, 0, messageBoxSize.Width, messageBoxSize.Height);
             screenRect.AlignRectangle(ref finalPanelRect, RectangleAlignment.Centered);
-            RectangleF initialPanelRect = new RectangleF(0, finalPanelRect.Top, 0, finalPanelRect.Bottom);
-            finalPanelRect.AlignRectangle(ref initialPanelRect, RectangleAlignment.Centered);
-            alertControl.Position = initialPanelRect.Position();
-            alertControl.Size = initialPanelRect.Size();
-            //alertControl.Position = finalPanelRect.Position();
-            //alertControl.Size = finalPanelRect.Size();
-            PanelAnimationController controller = new PanelAnimationController();
-            controller.Target = (Panel)alertControl;
-            controller.SetPositionAndSizeAtT(0, initialPanelRect);
-            controller.SetPositionAndSizeAtT(250, finalPanelRect);
-            controller.SetVisibleAtT(0, true);
-            controller.SetVisibleAtT(displayTime, true);         
-            ui.Controls.Add(alertControl);
+            CompositeAnimationController controller = UIAnimationBuilder.BuildAlertBoxAnimation(ui, alertControl, finalPanelRect, backgroundContent, messageContent, displayTime);
             ui.Animations.Add(controller);
-            controller.AnimationComplete += (object sender, EventArgs args) =>
-                {
-                    ui.Controls.Remove(alertControl);
-                };
-            ColorContentAnimationController backgroundContentController = new ColorContentAnimationController();
-            backgroundContentController.Target = backgroundContent;
-            backgroundContentController.SetOpacityAtT(0, 0);
-            backgroundContentController.SetOpacityAtT(250, .5f);
-            ui.Animations.Add(backgroundContentController);
-            UIContentAnimationController<TextContent> messageContentController = new UIContentAnimationController<TextContent>();
-            messageContentController.Target = messageContent;
-            messageContentController.SetOpacityAtT(0, 0);
-            messageContentController.SetOpacityAtT(250, 1);
-            ui.Animations.Add(messageContentController);
         }
 
         public static void ShowAlert(IUIRoot ui, string text, Texture2D icon, Color backgroundColor, ulong displayTime)

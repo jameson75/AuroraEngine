@@ -17,6 +17,7 @@ using DXBuffer = SharpDX.Direct3D11.Buffer;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -26,7 +27,7 @@ using CipherPark.AngelJacket.Core.Animation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils.Toolkit
+namespace CipherPark.AngelJacket.Core.Content
 {
     public static class ContentImporter
     {
@@ -183,10 +184,10 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, XFileChannels channels)
         {
             RiggedModel result = null;
-            Mesh resultMesh = null;
-            Frame resultRootFrame = null;
-            List<KeyframeAnimationController> resultAnimationControllers = null;
-            List<SkinOffset> resultSkinOffsets = null;
+            Mesh mesh = null;
+            Frame rootFrame = null;
+            List<KeyframeAnimationController> animationControllers = null;
+            List<SkinOffset> skinOffsets = null;
             XFileTextDocument doc = new XFileTextDocument();     
 
             //Read X-File Data
@@ -226,16 +227,16 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             //BasicVertexPositionNormalTexture[] _vertices = xMesh.Vertices.Zip(normals, (e, f) => new BasicVertexPositionNormalTexture() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Normal = f, Color = Color.Green.ToVector4() }).ToArray();            
             if((channels & XFileChannels.Skinning) != 0)
             {
-                dynamic _vertices = null;
-                if(normals != null && texCoords != null)
-                {
-                    /*BasicSkinnedVertexTexture[]*/ _vertices = xMesh.Vertices.Select((v, i) => new BasicSkinnedVertexTexture()
+                //dynamic _vertices = null;
+                //if(normals != null && texCoords != null)
+                //{
+                    BasicSkinnedVertexTexture[] _vertices = xMesh.Vertices.Select((v, i) => new BasicSkinnedVertexTexture()
                     {
                         Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
                         Normal = normals[i],
                         TextureCoord = texCoords[i]
                     }).ToArray();
-                }
+                //}
                
                 //Convert skinning information in .x file to skinning information required by a skinning shader.
                 //(A skinning shader associates each vertex with 4 bone indices and 4 bone weights - we extract this 
@@ -245,13 +246,13 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 List<float>[] weights = new List<float>[_vertices.Length];
                 List<int>[] boneIndices = new List<int>[_vertices.Length];
                 List<string>[] boneNames = new List<string>[_vertices.Length];
-                resultSkinOffsets = new List<SkinOffset>();       
+                skinOffsets = new List<SkinOffset>();       
                
                 for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
                 {                
                     XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];               
                     Transform skinOffsetTransform = new Transform(new Matrix(xSkinWeights.MatrixOffset.m));
-                    resultSkinOffsets.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
+                    skinOffsets.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
                     for(int j = 0; j < xSkinWeights.NWeights; j++ )
                     {
                         int k = xSkinWeights.VertexIndices[j];
@@ -295,8 +296,8 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 ////TODO: Remove hard coding.
                 //XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
                 XFileFrameObject xRootBoneFrame = doc.DataObjects.GetDataObject<XFileFrameObject>(2);
-                resultRootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
-                BuildBoneFrameHierarchy(xRootBoneFrame, resultRootFrame, resultSkinOffsets);           
+                rootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
+                BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsets);           
             
                 if( (channels & XFileChannels.Animation) != 0)
                 {
@@ -305,8 +306,8 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                     ////TODO: Remove hard coding.           
                     //XFileAnimationSetObject xAnimationSet = (XFileAnimationSetObject)doc.DataObjects[8];
                     XFileAnimationSetObject xAnimationSet = doc.DataObjects.GetDataObject<XFileAnimationSetObject>(1);
-                    resultAnimationControllers = new List<KeyframeAnimationController>();
-                    List<Frame> frameList = resultRootFrame.FlattenToList();
+                    animationControllers = new List<KeyframeAnimationController>();
+                    List<Frame> frameList = rootFrame.FlattenToList();
                     for (int i = 0; i < xAnimationSet.Animations.Count; i++)
                     {
                         XFileAnimationObject xAnimation = xAnimationSet.Animations[i];
@@ -331,20 +332,20 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                             TransformAnimation modelAnimation = new TransformAnimation();
                             foreach (long time in matrixTransformKeys.Keys)
                                 modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
-                            resultAnimationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
+                            animationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
                         }    
                     }
                 }
 
-                resultMesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
+                mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
             
                 //Create and return model
                 //-----------------------
                 result = new RiggedModel(app);
-                result.Mesh = resultMesh;
-                result.SkinOffsets.AddRange(resultSkinOffsets);          
-                result.FrameTree = resultRootFrame;            
-                result.Animation.AddRange(resultAnimationControllers);
+                result.Mesh = mesh;
+                result.SkinOffsets.AddRange(skinOffsets);          
+                result.FrameTree = rootFrame;            
+                result.Animation.AddRange(animationControllers);
             }                       
              
             return result;
@@ -398,7 +399,9 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         CommonAlinBasic = Mesh,
         CommonAlinRigged = Mesh | Skinning | Frames | Animation,
         CommonAlinRiggedTexture1 = CommonAlinRigged | DeclTextureCoords1,
+        CommonAlinRiggedLitTexture1 = CommonAlinRiggedTexture1 | DeclNormals,
         CommonAlinRiggedTexture2 = CommonAlinRiggedTexture1 | DeclTextureCoords2, 
+        CommonAlinRiggedLitTexture2 = CommonAlinRiggedTexture2 | DeclNormals,
         CommonAlinComplex = Mesh |Frames | Animation,
         CommonAlinComplexTexture1 = CommonAlinComplex | DeclTextureCoords1,
         CommonAlinComplexTexture2 = CommonAlinComplexTexture1 | DeclTextureCoords2,

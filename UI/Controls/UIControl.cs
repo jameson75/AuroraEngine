@@ -37,8 +37,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _visualRoot = visualRoot;
             _visualRoot.LoadComplete += VisualRoot_LoadComplete;            
             _game = visualRoot.Game;
-            Padding = DrawingSizeFExtension.Zero;
-            Margin = DrawingSizeFExtension.Zero;            
+            Padding = BoundaryF.Zero;
+            Margin = BoundaryF.Zero;            
             Enabled = true;
             EnableFocus = true;
             Visible = true;
@@ -191,8 +191,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 #endregion       
         public RectangleF Bounds { get { return RectangleFExtension.CreateLTWH(Position.X, Position.Y, this.Size.Width, this.Size.Height); } }
         public virtual RectangleF ClientRectangle { get { return new RectangleF(0, 0, this.Size.Width, this.Size.Height); } }
-        public DrawingSizeF Padding { get; set; }
-        public DrawingSizeF Margin { get; set; }
+        public BoundaryF Padding { get; set; }
+        public BoundaryF Margin { get; set; }
         public UIControl Parent
         {
             get { return _parent; }

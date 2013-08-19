@@ -204,6 +204,36 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
         }
     }
 
+    public class MenuAnimationController : UIControlAnimationController<Menu>
+    {
+        protected override void OnUpdateTarget(ulong timeT)
+        {
+            //if (TargetPropertyExists(UIControlPropertyNames.Enabled))
+            //    Target.Enabled = GetPropertyBooleanValueAtT(UIControlPropertyNames.Enabled, timeT);
+
+            //if (TargetPropertyExists(UIControlPropertyNames.Position))
+            //    Target.Position = GetPropertyDrawingPointValueAtT(UIControlPropertyNames.Position, timeT);
+
+            //if (TargetPropertyExists(UIControlPropertyNames.Size))
+            //    Target.Size = GetPropertyDrawingSizeValueAtT(UIControlPropertyNames.Size, timeT);
+
+            //if (TargetPropertyExists(UIControlPropertyNames.Visible))
+            //    Target.Visible = GetPropertyBooleanValueAtT(UIControlPropertyNames.Visible, timeT);
+
+            //if (TargetPropertyExists(UIControlPropertyNames.ZOrder))
+            //    Target.ZOrder = GetPropertyFloatValueAtT(UIControlPropertyNames.ZOrder, timeT);
+
+            //if (TargetPropertyExists(UIControlPropertyNames.PositionAndSize))
+            //{
+            //    RectangleF rect = GetPropertyRectangleValueAtT(UIControlPropertyNames.PositionAndSize, timeT);
+            //    Target.Position = rect.Position();
+            //    Target.Size = rect.Size();
+            //}
+
+            base.OnUpdateTarget(timeT);
+        }
+    }
+
     //public abstract class UIContentAnimation : PropertyGroupAnimation
     //{
     //    public SpriteSortMode? SpriteSortMode { get; set; }

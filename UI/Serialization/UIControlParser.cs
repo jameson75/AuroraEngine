@@ -50,10 +50,10 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             }
 
             if (element.Attribute(PaddingAttributeName) != null)
-                control.Padding = UIControlPropertyParser.ParseDrawingSizeF(element.Attribute(PaddingAttributeName).Value);
+                control.Padding = UIControlPropertyParser.ParseBoundaryF(element.Attribute(PaddingAttributeName).Value);
 
             if (element.Attribute(MarginAttributeName) != null)
-                control.Margin = UIControlPropertyParser.ParseDrawingSizeF(element.Attribute(MarginAttributeName).Value);
+                control.Margin = UIControlPropertyParser.ParseBoundaryF(element.Attribute(MarginAttributeName).Value);
 
             if (element.Attribute(VerticleAlignmentAttributeName) != null)
                 control.VerticalAlignment = UIControlPropertyParser.ParseEnum<VerticalAlignment>(element.Attribute(VerticleAlignmentAttributeName).Value);

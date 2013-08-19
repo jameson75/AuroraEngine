@@ -10,6 +10,7 @@ using CipherPark.AngelJacket.Core.UI.Design;
 using CipherPark.AngelJacket.Core.UI.Controls;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.UI.Animation;
+using CipherPark.AngelJacket.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -29,10 +30,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private UIStyleCollection styles = null;
         private UIResourceCollection resources = null;
         private FocusManager focusManager = null;
-        private List<UIAnimationControllerBase> _animationControllers = null;
-        //private IUITheme theme = null;
-
-        public List<UIAnimationControllerBase> Animations { get { return _animationControllers; } }
+        private List<IAnimationController> _animationControllers = null;
+        //private IUITheme theme = null;       
 
         private Dictionary<string, UIControlParser> _controlParsers = new Dictionary<string, UIControlParser>();
         private Dictionary<string, UIStyleParser> _styleParsers = new Dictionary<string, UIStyleParser>();
@@ -45,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             styles = new UIStyleCollection();
             resources = new UIResourceCollection();
             focusManager = new FocusManager(this);
-            _animationControllers = new List<UIAnimationControllerBase>();
+            _animationControllers = new List<IAnimationController>();
             //theme = new DefaultTheme();    
         }     
 
@@ -58,6 +57,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public UIResourceCollection Resources { get { return resources; } }
 
         public FocusManager FocusManager { get { return focusManager; } }
+
+        public List<IAnimationController> Animations { get { return _animationControllers; } }
 
         //public IUITheme Theme { get { return theme; } }
 
@@ -181,15 +182,14 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         private void UpdateAnimations(long gameTime)
         {
-
             //Update animation controllers.
             //**********************************************************************************
             //NOTE: We use an auxilary controller collection to enumerate through, in 
             //the event that an updated controller alters this Simulator's Animation Controllers
             //collection.
             //**********************************************************************************
-            List<UIAnimationControllerBase > auxAnimationControllers = new List<UIAnimationControllerBase>(_animationControllers);
-            foreach (UIAnimationControllerBase controller in auxAnimationControllers)
+            List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_animationControllers);
+            foreach (IAnimationController controller in auxAnimationControllers)
             {
                 controller.UpdateAnimation(gameTime);
                 if (controller.IsAnimationComplete)

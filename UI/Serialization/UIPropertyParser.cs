@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using SharpDX;
 using SharpDX.Direct3D;
+using CipherPark.AngelJacket.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -24,6 +25,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
         private const string vector2Pattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*}$";
         private const string vector4Pattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*,\s*(?:(?:z\s*=\s*(?<z>[0-9]))|(?<z>[0-9]))?\s*,\s*(?:(?:w\s*=\s*(?<w>[0-9]))|(?<w>[0-9]))?\s*}$";
         private const string rectanglePattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*,\s*(?:(?:(?:width|w)\s*=\s*(?<width>[0-9]))|(?<width>[0-9]))?\s*,\s*(?:(?:(?:height|h)\s*=\s*(?<height>[0-9]))|(?<height>[0-9]))?\s*}$";
+        private const string boundaryPattery = @"^{\s*(?:(?:l\s*=\s*(?<l>[0-9]))|(?<l>[0-9]))?\s*,\s*(?:(?:t\s*=\s*(?<t>[0-9]))|(?<t>[0-9]))?\s*,\s*(?:(?:(?:r)\s*=\s*(?<r>[0-9]))|(?<r>[0-9]))?\s*,\s*(?:(?:(?:b)\s*=\s*(?<b>[0-9]))|(?<b>[0-9]))?\s*}$";
         private const string drawingSizePattern = @"^{\s*(?:(?:w\s*=\s*(?<w>[0-9]))|(?<w>[0-9]))?\s*,\s*(?:(?:h\s*=\s*(?<h>[0-9]))|(?<h>[0-9]))?\s*}$";
 
         public static Vector4 ParseVector4(string value)
@@ -32,10 +34,10 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             Match match = Regex.Match(value, vector4Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                vector.X = UIControlPropertyParser.SafeParseFloat(match.Groups["x"].Value);
-                vector.Y = UIControlPropertyParser.SafeParseFloat(match.Groups["y"].Value);
-                vector.Z = UIControlPropertyParser.SafeParseFloat(match.Groups["z"].Value);
-                vector.W = UIControlPropertyParser.SafeParseFloat(match.Groups["w"].Value);
+                vector.X = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["x"].Value);
+                vector.Y = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["y"].Value);
+                vector.Z = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["z"].Value);
+                vector.W = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["w"].Value);
             }
             else
                 throw new IOException("Invalid format for type Vector4");
@@ -48,9 +50,9 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             Match match = Regex.Match(value, vector3Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                vector.X = UIControlPropertyParser.SafeParseFloat(match.Groups["x"].Value);
-                vector.Y = UIControlPropertyParser.SafeParseFloat(match.Groups["y"].Value);
-                vector.Z = UIControlPropertyParser.SafeParseFloat(match.Groups["z"].Value);               
+                vector.X = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["x"].Value);
+                vector.Y = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["y"].Value);
+                vector.Z = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["z"].Value);               
             }
             else
                 throw new IOException("Invalid format for type Vector3");
@@ -63,8 +65,8 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             Match match = Regex.Match(value, vector2Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                vector.X = UIControlPropertyParser.SafeParseFloat(match.Groups["x"].Value);
-                vector.Y = UIControlPropertyParser.SafeParseFloat(match.Groups["y"].Value);
+                vector.X = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["x"].Value);
+                vector.Y = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["y"].Value);
             }
             else
                 throw new IOException("Invalid format for type Vector2");
@@ -77,8 +79,8 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             Match match = Regex.Match(value, drawingSizePattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                size.Width = UIControlPropertyParser.SafeParseInt(match.Groups["w"].Value);
-                size.Height = UIControlPropertyParser.SafeParseInt(match.Groups["h"].Value);
+                size.Width = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["w"].Value);
+                size.Height = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["h"].Value);
             }
             else
                 throw new IOException("Invalid format for type DrawingSize");
@@ -91,8 +93,8 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             Match match = Regex.Match(value, drawingSizePattern, RegexOptions.IgnoreCase);
             if (match.Success)  
             {
-                size.Width = UIControlPropertyParser.SafeParseFloat(match.Groups["w"].Value);
-                size.Height = UIControlPropertyParser.SafeParseFloat(match.Groups["h"].Value);
+                size.Width = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["w"].Value);
+                size.Height = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["h"].Value);
             }
             else
                 throw new IOException("Invalid format for type DrawingSizeF");
@@ -105,8 +107,8 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             Match match = Regex.Match(value, vector2Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                size.X = UIControlPropertyParser.SafeParseInt(match.Groups["x"].Value);
-                size.Y = UIControlPropertyParser.SafeParseInt(match.Groups["y"].Value);
+                size.X = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["x"].Value);
+                size.Y = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["y"].Value);
             }
             else
                 throw new IOException("Invalid format for type DrawingPoint");
@@ -119,8 +121,8 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             Match match = Regex.Match(value, vector2Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                size.X = UIControlPropertyParser.SafeParseFloat(match.Groups["x"].Value);
-                size.Y = UIControlPropertyParser.SafeParseFloat(match.Groups["y"].Value);
+                size.X = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["x"].Value);
+                size.Y = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["y"].Value);
             }
             else
                 throw new IOException("Invalid format for type DrawingPoint");
@@ -133,14 +135,46 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             Match match = Regex.Match(value, rectanglePattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                r.Left = UIControlPropertyParser.SafeParseInt(match.Groups["left"].Value);
-                r.Top = UIControlPropertyParser.SafeParseInt(match.Groups["top"].Value);
-                r.Right = UIControlPropertyParser.SafeParseInt(match.Groups["right"].Value);
-                r.Bottom = UIControlPropertyParser.SafeParseInt(match.Groups["bottom"].Value);
+                r.Left = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["x"].Value);
+                r.Top = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["y"].Value);
+                r.Right = r.Left + UIControlPropertyParser.ParseOrDefaultInt(match.Groups["width"].Value);
+                r.Bottom = r.Top + UIControlPropertyParser.ParseOrDefaultInt(match.Groups["height"].Value);
             }
             else
                 throw new IOException("Invalid format for type Rectangle");
             return r;
+        }
+
+        public static RectangleF ParseRectangleF(string value)
+        {
+            RectangleF r = new RectangleF();
+            Match match = Regex.Match(value, rectanglePattern, RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                r.Left = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["x"].Value);
+                r.Top = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["y"].Value);
+                r.Right = r.Left + UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["width"].Value);
+                r.Bottom = r.Top + UIControlPropertyParser.ParseOrDefaultFloat (match.Groups["height"].Value);
+            }
+            else
+                throw new IOException("Invalid format for type RectangleF");
+            return r;
+        }
+
+        public static BoundaryF ParseBoundaryF(string value)
+        {
+            BoundaryF b = new BoundaryF();
+            Match match = Regex.Match(value, rectanglePattern, RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                b.Left = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["l"].Value);
+                b.Top = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["t"].Value);
+                b.Right = b.Left + UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["r"].Value);
+                b.Bottom = b.Top + UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["b"].Value);
+            }
+            else
+                throw new IOException("Invalid format for type BoundaryF");
+            return b;
         }
 
         public static T ParseEnum<T>(string value)
@@ -154,11 +188,11 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             string propertyName = value.Replace("Color4.", string.Empty);
             PropertyInfo pi = colorType.GetProperty(propertyName);
             if (pi == null)
-                throw new FormatException(string.Format("{0} is not a recognized Xna color", propertyName));
+                throw new FormatException(string.Format("{0} is not a recognized SharpDX color", propertyName));
             return (Color4)pi.GetValue(null, null);
         }
 
-        private static float SafeParseFloat(string value)
+        private static float ParseOrDefaultFloat(string value)
         {
             float fVal = 0;
             if(!string.IsNullOrEmpty(value))
@@ -166,7 +200,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
              return fVal;            
         }
 
-        private static int SafeParseInt(string value)
+        private static int ParseOrDefaultInt(string value)
         {
             int iVal = 0;
             if (!string.IsNullOrEmpty(value))

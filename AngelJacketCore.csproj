@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Kinetics\Animation\ParticleAnimationBuilder.cs" />
     <Compile Include="Animation\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />
     <Compile Include="Animation\AnimationKeyFrame.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Kinetics\ParticleSystem.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
+    <Compile Include="UI\Animation\UIAnimationBuilder.cs" />
     <Compile Include="UI\Animation\UIContentAnimationController.cs" />
     <Compile Include="UI\Controls\AlertBox.cs" />
     <Compile Include="UI\Controls\CheckBox.cs" />
@@ -113,13 +115,14 @@
     <Compile Include="UI\Controls\Design\IUITheme.cs" />
     <Compile Include="UI\Controls\PropertyGrid.cs" />
     <Compile Include="UI\Controls\Spinner.cs" />
+    <Compile Include="Utils\Boundary.cs" />
     <Compile Include="Utils\GameAssets.cs" />
-    <Compile Include="Utils\ContentBuilder.cs" />
+    <Compile Include="Content\ContentBuilder.cs" />
     <Compile Include="Utils\MatrixStack.cs" />
     <Compile Include="Utils\Toolkit\BasicEffect.cs" />
     <Compile Include="Utils\Toolkit\SkinnedEffect.cs" />
     <Compile Include="Utils\TransformStackcs.cs" />
-    <Compile Include="Utils\XFileDocument.cs" />
+    <Compile Include="Content\XFileDocument.cs" />
     <Compile Include="World\Camera.cs" />
     <Compile Include="Module\GameModule.cs" />
     <Compile Include="IGameApp.cs" />
@@ -180,7 +183,7 @@
     <Compile Include="Utils\ColorParser.cs" />
     <Compile Include="Utils\BufferedInputState.cs" />
     <Compile Include="Utils\InputState.cs" />
-    <Compile Include="Utils\ContentImporter.cs" />
+    <Compile Include="Content\ContentImporter.cs" />
     <Compile Include="Utils\MarshalHelper.cs" />
     <Compile Include="Utils\Toolkit\SpriteBatch.cs" />
     <Compile Include="Utils\Toolkit\SpriteFont.cs" />
