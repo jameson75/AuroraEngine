@@ -15,8 +15,9 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
 {
     public class UIAnimationBuilder
     {
-        public static CompositeAnimationController BuildAlertBoxAnimation(IUIRoot ui, AlertBox alertControl, RectangleF finalPanelRect, ColorContent backgroundContent, TextContent messageContent, ulong displayTime)
-        {            
+        public static CompositeAnimationController BuildAlertBoxAnimation(IUIRoot ui, AlertBox alertControl, ColorContent backgroundContent, TextContent messageContent, ulong displayTime)
+        {
+            RectangleF finalPanelRect = alertControl.Bounds;
             RectangleF initialPanelRect = new RectangleF(0, finalPanelRect.Top, 0, finalPanelRect.Bottom);
             finalPanelRect.AlignRectangle(ref initialPanelRect, RectangleAlignment.Centered);
             alertControl.Position = initialPanelRect.Position();
@@ -44,24 +45,35 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             return alertBoxController;
         }
 
-        public static CompositeAnimationController BuildMenuAnimation(IUIRoot ui, Menu menu, RectangleF finalPanelRect, ulong animationTime)
+        public static CompositeAnimationController BuildMenuAnimation(Menu menu, ulong animationTime)
         {
-            CompositeAnimationController compController = new CompositeAnimationController();
-            RectangleF initialRect = new RectangleF(finalPanelRect.Left, finalPanelRect.Bottom, finalPanelRect.Left, finalPanelRect.Bottom);
-            menu.Position = initialRect.Position();
-            menu.Size = initialRect.Size();
+            CompositeAnimationController compositeController = new CompositeAnimationController();       
+            RectangleF finalMenuRect = menu.Bounds; 
+            RectangleF initialPanelRect = new RectangleF(finalMenuRect.Left, finalMenuRect.Bottom, finalMenuRect.Left, finalMenuRect.Bottom);            
+            menu.SuspendLayout();
+            menu.Position = initialPanelRect.Position();
+            menu.Size = initialPanelRect.Size();
             MenuAnimationController menuController = new MenuAnimationController();
-            menuController.SetPositionAndSizeAtT(0, initialRect);
-            menuController.SetPositionAndSizeAtT(animationTime, finalPanelRect);
-            DrawingSizeF offset = new DrawingSizeF();
-            for (int i = 0; i < menu.Items.Count; i++)
+            menuController.SetPositionAndSizeAtT(0, initialPanelRect);
+            menuController.SetPositionAndSizeAtT(animationTime, finalMenuRect);
+            menuController.Target = menu;
+            menuController.AnimationComplete+= (object sender, EventArgs args) =>
+                {
+                    menu.ResumeLayout();
+                };            
+            for(int i = 0; i < menu.Items.Count; i++)
             {
-                //menuController.SetItemOffsetAtT(0, i, offset);
-                //menuController.SetItemOffsetAtT(animationTime, i, offset);
-                //menuController.SetItemOffsetAtT(animationTime + 250, i, DrawingSizeFExtension.Zero);
-            }
-            compController.Children.Add(menuController);
-            return compController;
+                MenuItemAnimationController itemController = new MenuItemAnimationController();
+                DrawingPointF finalPosition = menu.Items[i].Position;
+                DrawingPointF initialPosition = new DrawingPointF(-menu.Items[i].Size.Width, menu.Items[i].Position.Y);
+                itemController.SetPositionAtT(0, initialPosition);
+                itemController.FreezePositionAtT(animationTime);
+                itemController.SetPositionAtT(animationTime + 250, finalPosition);
+                itemController.Target = menu.Items[i];
+                compositeController.Children.Add(itemController);
+            }            
+            compositeController.Children.Add(menuController);
+            return compositeController;
         }
     }
 }
