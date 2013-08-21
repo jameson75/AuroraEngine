@@ -49,8 +49,8 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
         {
             CompositeAnimationController compositeController = new CompositeAnimationController();       
             RectangleF finalMenuRect = menu.Bounds; 
-            RectangleF initialPanelRect = new RectangleF(finalMenuRect.Left, finalMenuRect.Bottom, finalMenuRect.Left, finalMenuRect.Bottom);            
-            menu.SuspendLayout();
+            RectangleF initialPanelRect = new RectangleF(finalMenuRect.Left, finalMenuRect.Bottom, finalMenuRect.Left, finalMenuRect.Bottom);
+            menu.SuspendLayout = true;
             menu.Position = initialPanelRect.Position();
             menu.Size = initialPanelRect.Size();
             MenuAnimationController menuController = new MenuAnimationController();
@@ -59,7 +59,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             menuController.Target = menu;
             menuController.AnimationComplete+= (object sender, EventArgs args) =>
                 {
-                    menu.ResumeLayout();
+                    menu.SuspendLayout = false;
                 };            
             for(int i = 0; i < menu.Items.Count; i++)
             {
@@ -67,9 +67,9 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
                 DrawingPointF finalPosition = menu.Items[i].Position;
                 DrawingPointF initialPosition = new DrawingPointF(-menu.Items[i].Size.Width, menu.Items[i].Position.Y);
                 itemController.SetPositionAtT(0, initialPosition);
-                itemController.FreezePositionAtT(animationTime);
+                itemController.SetPositionAtT(animationTime, initialPosition);
                 itemController.SetPositionAtT(animationTime + 250, finalPosition);
-                itemController.Target = menu.Items[i];
+                itemController.Target = (MenuItem)menu.Items[i];
                 compositeController.Children.Add(itemController);
             }            
             compositeController.Children.Add(menuController);

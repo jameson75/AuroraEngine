@@ -212,6 +212,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public HorizontalAlignment HorizontalAlignment { get; set; }
         //TODO: Implement mouse capture in control tree.
         public bool Capture { get; set; }
+        public bool SuspendLayout { get; set; }
         #endregion
 
         #region Methods       
@@ -353,9 +354,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected void UpdateLayout(LayoutUpdateReason reason)
         {
-            if(LayoutManager != null)
-                LayoutManager.UpdateLayout(reason);
-            OnLayoutChanged();
+            if (!SuspendLayout)
+            {
+                if (LayoutManager != null)
+                    LayoutManager.UpdateLayout(reason);
+                OnLayoutChanged();
+            }
         }
 
         protected virtual void OnPaddingChanged()

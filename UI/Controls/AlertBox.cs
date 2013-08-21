@@ -106,7 +106,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                                            Math.Max(minMessageFit.Height, minMessageBoxSize.Height));
             RectangleF finalPanelRect = new RectangleF(0, 0, messageBoxSize.Width, messageBoxSize.Height);
             screenRect.AlignRectangle(ref finalPanelRect, RectangleAlignment.Centered);
-            CompositeAnimationController controller = UIAnimationBuilder.BuildAlertBoxAnimation(ui, alertControl, finalPanelRect, backgroundContent, messageContent, displayTime);
+            alertControl.Position = finalPanelRect.Position();
+            alertControl.Size = finalPanelRect.Size();
+            CompositeAnimationController controller = UIAnimationBuilder.BuildAlertBoxAnimation(ui, alertControl, backgroundContent, messageContent, displayTime);
             ui.Animations.Add(controller);
         }
 

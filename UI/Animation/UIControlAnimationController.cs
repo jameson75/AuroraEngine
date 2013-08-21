@@ -101,7 +101,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             SetPropertyKeyFrame(UIControlPropertyNames.Enabled, new AnimationKeyFrame(timeT, value));
         }
 
-        public DrawingPointF GetPostionAtT(ulong timeT)
+        public DrawingPointF GetPositionAtT(ulong timeT)
         {
             if (TargetPropertyExists(UIControlPropertyNames.Position))
                 return GetPropertyDrawingPointValueAtT(UIControlPropertyNames.Position, timeT);
@@ -109,7 +109,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
                 return Target.Position;
         }
 
-        public void SetEnabledAtT(ulong timeT, DrawingPointF value)
+        public void SetPositionAtT(ulong timeT, DrawingPointF value)
         {
             if (!TargetPropertyExists(UIControlPropertyNames.Position))
                 AddPropertyAnimation(UIControlPropertyNames.Position, new DrawingPointAnimation());
@@ -208,28 +208,14 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
     {
         protected override void OnUpdateTarget(ulong timeT)
         {
-            //if (TargetPropertyExists(UIControlPropertyNames.Enabled))
-            //    Target.Enabled = GetPropertyBooleanValueAtT(UIControlPropertyNames.Enabled, timeT);
+            base.OnUpdateTarget(timeT);
+        }
+    }
 
-            //if (TargetPropertyExists(UIControlPropertyNames.Position))
-            //    Target.Position = GetPropertyDrawingPointValueAtT(UIControlPropertyNames.Position, timeT);
-
-            //if (TargetPropertyExists(UIControlPropertyNames.Size))
-            //    Target.Size = GetPropertyDrawingSizeValueAtT(UIControlPropertyNames.Size, timeT);
-
-            //if (TargetPropertyExists(UIControlPropertyNames.Visible))
-            //    Target.Visible = GetPropertyBooleanValueAtT(UIControlPropertyNames.Visible, timeT);
-
-            //if (TargetPropertyExists(UIControlPropertyNames.ZOrder))
-            //    Target.ZOrder = GetPropertyFloatValueAtT(UIControlPropertyNames.ZOrder, timeT);
-
-            //if (TargetPropertyExists(UIControlPropertyNames.PositionAndSize))
-            //{
-            //    RectangleF rect = GetPropertyRectangleValueAtT(UIControlPropertyNames.PositionAndSize, timeT);
-            //    Target.Position = rect.Position();
-            //    Target.Size = rect.Size();
-            //}
-
+    public class MenuItemAnimationController : UIControlAnimationController<MenuItem>
+    {
+        protected override void OnUpdateTarget(ulong timeT)
+        {
             base.OnUpdateTarget(timeT);
         }
     }
