@@ -45,6 +45,8 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public static PostEffectChain Create(IGameApp game)
         {
+            //TODO: Validate this method call. 
+
             PostEffectChain effectChain = new PostEffectChain(game);
 
             Texture2DDescription textureDesc = new Texture2DDescription();
@@ -84,18 +86,15 @@ namespace CipherPark.AngelJacket.Core.Effects
             effectChain._depthShaderResource = new ShaderResourceView(game.GraphicsDevice, game.DepthStencil.ResourceAs<Texture2D>(), depthResourceDesc);
 
             effectChain.passThruEffect = new PassThruPostEffect(game.GraphicsDevice, game);           
-            //byte[] targetShaderByteCode = effectChain.passThruEffect.SelectShaderByteCode();        
-            
-            return effectChain;
-            //TODO: Validate this method call.
+                 
+            return effectChain;            
         }
 
         public void Begin(long gameTime)
         {
             _originalRenderView = _game.GraphicsDeviceContext.OutputMerger.GetRenderTargets(1, out _originalDepthStencilView)[0];            
             _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _textureRenderTarget);
-            _game.GraphicsDeviceContext.ClearRenderTargetView(_textureRenderTarget, Color.Black);
-           // _game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
+            _game.GraphicsDeviceContext.ClearRenderTargetView(_textureRenderTarget, Color.Black);           
             _isEffectInProgress = true;
         }
 
@@ -105,18 +104,14 @@ namespace CipherPark.AngelJacket.Core.Effects
             
             foreach (PostEffect postEffect in this)
             {
-                _game.GraphicsDeviceContext.OutputMerger.SetTargets(_auxTextureRenderTarget);
-                //_game.GraphicsDeviceContext.ClearRenderTargetView(_auxTextureRenderTarget, Color.Black);
-                //_game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);                
-                postEffect.InputTexture = _textureShaderResource;
-                //postEffect.Depth = _depthShaderResource;
+                _game.GraphicsDeviceContext.OutputMerger.SetTargets(_auxTextureRenderTarget);                               
+                postEffect.InputTexture = _textureShaderResource;                
                 postEffect.Apply();       
                 Swap<ShaderResourceView>(ref _textureShaderResource, ref _auxTextureShaderResource);
                 Swap<RenderTargetView>(ref _textureRenderTarget, ref _auxTextureRenderTarget);
             }
                 
-            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderView);            
-            //_game.GraphicsDeviceContext.ClearDepthStencilView(_game.DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
+            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderView);   
             passThruEffect.InputTexture = _textureShaderResource;
             passThruEffect.Apply();        
 

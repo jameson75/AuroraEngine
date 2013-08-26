@@ -19,93 +19,148 @@ using CipherPark.AngelJacket.Core.Content;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    class PostGlowEffect : PostEffect
+    public class PostGlowEffect : PostEffect
     {
         private IGameApp _game = null;
-        private const int ConstantBufferSize = 32;
+        private const int ConstantBufferSize = 48;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
         private VertexShader _vertexShaderP0 = null;
         private PixelShader _pixelShaderP0P1 = null;
         private VertexShader _vertexShaderP1 = null;
         private VertexShader _vertexShaderP2 = null;
         private PixelShader _pixelShaderP2 = null;
-        private VertexShader _vertexShaderP3 = null;
-        private PixelShader _pixelShaderP3 = null;
         private byte[] _vertexShaderByteCode = null;
-        private RenderTargetView _tempRenderTarget = null;
-        private ShaderResourceView _tempShaderResource = null;
-        private SamplerState _tempSamplerState = null;
+        private RenderTargetView _sceneTextureRenderTargetView = null;
+        private ShaderResourceView _sceneTextureShaderResourceView = null;
+        private SamplerState _sceneTextureSampler = null;
+        private RenderTargetView _glowMap1RenderTargetView = null;
+        private ShaderResourceView _glowMap1ShaderResourceView = null;
+        private SamplerState _glowMap1Sampler = null;
+        private RenderTargetView _glowMap2RenderTargetView = null;
+        private ShaderResourceView _glowMap2ShaderResourceView = null;
+        private SamplerState _glowMap2Sampler = null;
         private Mesh _quad = null;
+        private PassThruPostEffect _passThruEffect = null;
 
         public float GlowSpan { get; set; }
         public float Glowness { get; set; }
         public float Sceneness { get; set; }
         public float ClearDepth { get; set; }
         public Vector4 ClearColor { get; set; }
+        public Vector2 ViewportSize { get; set; }
 
         public PostGlowEffect(Device graphicsDevice, IGameApp app)
             : base(graphicsDevice)
         {
             _game = app;
             _constantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _passThruEffect = new PassThruPostEffect(graphicsDevice, app);
             CreateShaders();
             CreateShaderTargets();
         }
 
         public override void Apply()
-        {
-            //********************************************************************************************
+        {            
+            //***********************************************************************************************************
             //NOTE: This method assumes that the input shader resource view (InputTexture) is bound to the same texture
             //as the current render target.
-            //********************************************************************************************
-
+            //***********************************************************************************************************         
+           
+            /////////////////
+            //Setup
+            ////////////////
+            //Cache render targets.
             RenderTargetView previousRenderTarget = null;
             DepthStencilView previousDepthStencil = null;
             previousRenderTarget = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out previousDepthStencil)[0];
-
+            //Copy InputTexture (the current rendertarget texture) to the SceneTexture.
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_sceneTextureRenderTargetView);
+            _passThruEffect.InputTexture = this.InputTexture;
+            _passThruEffect.Apply();
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
+            //Set the constant variables that will be used by the vertex and pixel shaders on each pass.
             WriteConstants();
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
+            ////Cache graphic states and setup new ones.
+            RasterizerState oldRasterizerState = GraphicsDevice.ImmediateContext.Rasterizer.State;
+            RasterizerStateDescription newRasterizerStateDesc = (oldRasterizerState != null) ? oldRasterizerState.Description : RasterizerStateDescription.Default();
+            newRasterizerStateDesc.CullMode = CullMode.None;
+            GraphicsDevice.ImmediateContext.Rasterizer.State = new RasterizerState(GraphicsDevice, newRasterizerStateDesc);
+            DepthStencilState oldDepthStencilState = GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState;
+            DepthStencilStateDescription newDepthStencilStateDesc = (oldDepthStencilState != null) ? oldDepthStencilState.Description : DepthStencilStateDescription.Default();
+            newDepthStencilStateDesc.IsDepthEnabled = true;
+            newDepthStencilStateDesc.DepthWriteMask = 0;
+            //newDepthStencilStateDesc.IsStencilEnabled = false;
+            GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = new DepthStencilState(GraphicsDevice, newDepthStencilStateDesc);
+            BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
+            BlendStateDescription newBlendStateDesc = (oldBlendState != null) ? oldBlendState.Description : BlendStateDescription.Default();
+            for (int i = 0; i < newBlendStateDesc.RenderTarget.Length; i++)
+                newBlendStateDesc.RenderTarget[i].IsBlendEnabled = false;
+            GraphicsDevice.ImmediateContext.OutputMerger.BlendState = new BlendState(GraphicsDevice, newBlendStateDesc);
 
             /////////
             //Pass0
-            /////////
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_tempRenderTarget);
+            /////////                     
+            //Input: SceneTexture
+            //Output: GlowMap1
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _sceneTextureShaderResourceView);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _sceneTextureSampler);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap1RenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP0);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP0P1);
+            _quad.Draw(0);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
-            
+
             /////////
             //Pass1
             /////////
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _tempShaderResource);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
+            //Input: GlowMap1
+            //Output: GlowMap2
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _glowMap1ShaderResourceView);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _glowMap1Sampler);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap2RenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP1);
             //NOTE: We're using the same pixel shader from pass0.
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
+            _quad.Draw(0);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
 
             //////////
             //Pass2
             //////////
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_tempRenderTarget);
+            //Input: GlowMap2, SceneTexture
+            //Output: OriginalRenderTarget
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _glowMap2ShaderResourceView);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _glowMap2Sampler);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, _sceneTextureShaderResourceView);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, _sceneTextureSampler);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP2);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP2);
+            _quad.Draw(0);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
-
-            //////////
-            //Pass3
-            //////////
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _tempShaderResource);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP3);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP3);
-
+          
+            ////////////
+            //Clean up
+            ////////////           
+            //Clear constant buffers.
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
-
+            //Clear shader resources.
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
+            ////Clear samplers.
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, null);
+            //Reset graphic states.
+            GraphicsDevice.ImmediateContext.Rasterizer.State = oldRasterizerState;
+            GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = oldDepthStencilState;
+            GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
+            //Reset render targets.  
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousDepthStencil, previousRenderTarget);
         }
 
@@ -113,24 +168,15 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\postglowfs-x1-vs.cso", out _vertexShaderP0);                       
             LoadPixelShader("Content\\Shaders\\postglowfs-x1x2-ps.cso", out _pixelShaderP0P1);
-            LoadVertexShader("Content\\Shaders\\postflowfs-x2-vs.cso", out _vertexShaderP1);
-            LoadVertexShader("Content\\Shaders\\postflowfs-x3-vs.cso", out _vertexShaderP2);
-            LoadPixelShader("Content\\Shaders\\postflowfs-x3-ps.cso", out _pixelShaderP2);
-            LoadVertexShader("Content\\Shaders\\postflowfs-x4-vs.cso", out _vertexShaderP3);
-            LoadPixelShader("Content\\Shaders\\postflowfs-x4-ps.cso", out _pixelShaderP3);
+            LoadVertexShader("Content\\Shaders\\postglowfs-x2-vs.cso", out _vertexShaderP1);
+            LoadVertexShader("Content\\Shaders\\postglowfs-x3-vs.cso", out _vertexShaderP2);
+            LoadPixelShader("Content\\Shaders\\postglowfs-x3-ps.cso", out _pixelShaderP2);           
         }
 
         private void CreateShaderTargets()
         {
-            _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);            
             
-            SamplerStateDescription samplerDesc = SamplerStateDescription.Default();
-            samplerDesc.Filter = Filter.MinMagMipLinear;
-            samplerDesc.AddressU = TextureAddressMode.Clamp;
-            samplerDesc.AddressV = TextureAddressMode.Clamp;
-            samplerDesc.AddressU = TextureAddressMode.Clamp;
-            _tempSamplerState = new SamplerState(GraphicsDevice, samplerDesc);
-
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
             textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
@@ -142,19 +188,44 @@ namespace CipherPark.AngelJacket.Core.Effects
             textureDesc.OptionFlags = ResourceOptionFlags.None;
             textureDesc.Usage = ResourceUsage.Default;
             textureDesc.SampleDescription.Count = 1;
+            
+            ShaderResourceViewDescription resourceViewDesc = new ShaderResourceViewDescription();
+            resourceViewDesc.Format = textureDesc.Format;
+            resourceViewDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
+            resourceViewDesc.Texture2D.MostDetailedMip = 0;
+            resourceViewDesc.Texture2D.MipLevels = 1;
+            
+            RenderTargetViewDescription renderTargetViewDesc = new RenderTargetViewDescription();
+            renderTargetViewDesc.Format = textureDesc.Format;
+            renderTargetViewDesc.Dimension = RenderTargetViewDimension.Texture2D;
+            renderTargetViewDesc.Texture2D.MipSlice = 0;           
+            
+            SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
+            samplerStateDesc.Filter = Filter.MinMagMipLinear;
+            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+            samplerStateDesc.AddressV = TextureAddressMode.Clamp;
+            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+            
+            //SceneTexture
+            //------------
+            Texture2D _sceneTexture = new Texture2D(GraphicsDevice, textureDesc);
+            _sceneTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _sceneTexture, resourceViewDesc);       
+            _sceneTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _sceneTexture, renderTargetViewDesc);  
+            _sceneTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);         
 
-            Texture2D tempTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
-            RenderTargetViewDescription targetDesc = new RenderTargetViewDescription();
-            targetDesc.Format = textureDesc.Format;
-            targetDesc.Dimension = RenderTargetViewDimension.Texture2D;
-            targetDesc.Texture2D.MipSlice = 0;
-            _tempRenderTarget = new RenderTargetView(_game.GraphicsDevice, tempTexture, targetDesc);
-            ShaderResourceViewDescription resourceDesc = new ShaderResourceViewDescription();
-            resourceDesc.Format = targetDesc.Format;
-            resourceDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
-            resourceDesc.Texture2D.MostDetailedMip = 0;
-            resourceDesc.Texture2D.MipLevels = 1;
-            _tempShaderResource = new ShaderResourceView(GraphicsDevice, tempTexture, resourceDesc);           
+            //GlowMap1
+            //--------
+            Texture2D _glowMap1 = new Texture2D(_game.GraphicsDevice, textureDesc);
+            _glowMap1ShaderResourceView = new ShaderResourceView(GraphicsDevice, _glowMap1, resourceViewDesc);
+            _glowMap1RenderTargetView = new RenderTargetView(GraphicsDevice, _glowMap1, renderTargetViewDesc);
+            _glowMap1Sampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+
+            //GlowMap2
+            //--------
+            Texture2D _glowMap2 = new Texture2D(_game.GraphicsDevice, textureDesc);
+            _glowMap2ShaderResourceView = new ShaderResourceView(GraphicsDevice, _glowMap2, resourceViewDesc);
+            _glowMap2RenderTargetView = new RenderTargetView(GraphicsDevice, _glowMap2, renderTargetViewDesc);
+            _glowMap2Sampler = new SamplerState(GraphicsDevice, samplerStateDesc);
         }
 
         private void WriteConstants()
@@ -171,6 +242,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBuffer.Set(offset, ClearDepth);
             offset += sizeof(float);
             dataBuffer.Set(offset, ClearColor);
+            offset += (sizeof(float) * 4);
+            dataBuffer.Set(offset, ViewportSize);
             GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
         }
     }
