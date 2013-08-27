@@ -99,7 +99,7 @@
     <Compile Include="Effects\PostEffect.cs" />
     <Compile Include="Effects\PostEffectChain.cs" />
     <Compile Include="Effects\PostGlowEffect.cs" />
-    <Compile Include="Effects\SHLightingEffect.cs" />
+    <Compile Include="Effects\Obsolete\SHLightingEffect.cs" />
     <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Effects\SkyboxEffect.cs" />
     <Compile Include="Kinetics\Force.cs" />
@@ -211,6 +211,7 @@
     <Compile Include="World\Geometry\Mesh.cs" />
     <Compile Include="World\Geometry\VertexTypes.cs" />
     <Compile Include="World\Scene\NullSceneNode.cs" />
+    <Compile Include="World\Scene\ParticleSystemNode.cs" />
     <Compile Include="World\Scene\Scene.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="Sandbox\TestEffect.cs" />

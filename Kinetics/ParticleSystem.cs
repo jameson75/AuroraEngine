@@ -9,7 +9,6 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     public class ParticleSystem
     {      
         public List<Emitter> _emitters = new List<Emitter>();
-
         public List<Emitter> Emitters { get; set; }
     }
 }

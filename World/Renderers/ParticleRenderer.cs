@@ -19,15 +19,19 @@ using CipherPark.AngelJacket.Core.Content;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.ParticleSystem
+namespace CipherPark.AngelJacket.Core.World.Renderers
 {
     public class ParticleRenderer
     {        
         private IGameApp _game = null;
         private Mesh _particleMesh = null;
         private Mesh _linkMesh = null;
-        BillboardEffect particleEffect = null;
-        BasicEffectEx linkEffect = null;
+        private BillboardEffect particleEffect = null;
+        private BasicEffectEx linkEffect = null;
+
+        public Matrix EffectView { get; set; }
+
+        public Matrix EffectProjection { get; set; }
 
         public ParticleRenderer(IGameApp game)
         {
@@ -52,7 +56,8 @@ namespace CipherPark.AngelJacket.Core.World.ParticleSystem
             {
                 particleEffect.World = emitterTransform * p.Transform.ToMatrix();
                 particleEffect.Apply();
-                _particleMesh.Draw(gameTime);
+                _particleMesh.Update<BillboardEffect>(particleBillboards);
+                _particleMesh.Draw(gameTime);                
                 //_linkMesh.Update<BasicVertexPositionColor>(linkVertices);
             }
 

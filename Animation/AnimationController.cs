@@ -7,7 +7,7 @@ using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.World.ParticleSystem;
+using CipherPark.AngelJacket.Core.World.Renderers;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

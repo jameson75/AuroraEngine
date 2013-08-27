@@ -26,15 +26,13 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         
         public ModelSceneNode(IGameApp game)
             : base(game)
-        {
-            Transform = Transform.Identity;
+        {            
             HitTestable = true;
         }
 
         public ModelSceneNode(Model model, string name = null)
             : base(model.Game, name)
         {
-            Transform = Transform.Identity;
             Model = model;
             HitTestable = true;
         }
@@ -69,7 +67,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             {
                 //if (Model != null)
                 //    return Model.Transform;
-                //else
+                //elsef
                     return _transform;
             }
             set 
@@ -98,6 +96,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 Model.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;                
                 Model.Draw(gameTime);               
             }
+            base.Draw(gameTime);
         }
     }
 }
