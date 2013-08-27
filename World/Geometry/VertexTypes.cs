@@ -1,11 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpDX;
+﻿using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-using SharpDX.Direct3D;
 using Float4 = SharpDX.Vector4;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,17 +106,58 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
              };
             _elementSize = 32;
         }
+
         public BillboardVertexPositionTexture(Vector3 position)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = Vector4.Zero;
         }
-        public BillboardVertexPositionTexture(Vector3 position, Vector2 textureCoord1A, Vector2 textureCoord1B)
+
+        public BillboardVertexPositionTexture(Vector3 position, Vector2 textureCoords, Vector2 dimensions)
         {
             Position = new Vector4(position, 1.0f);
-            TextureCoord = new Vector4(textureCoord1A.X, textureCoord1A.Y, textureCoord1B.X, textureCoord1B.Y);
+            TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, dimensions.X, dimensions.Y);
         }
     }
+
+    /// <summary>
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct BillboardInstanceVertexTexture
+    {
+        public Vector4 Position;
+        public Vector4 TextureCoord;
+
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+        static BillboardInstanceVertexTexture()
+        {           
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32B32A32_Float, 16, 0),
+                 new InputElement("MATRIX", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 1, Format.R32G32B32A32_Float, 16, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 2, Format.R32G32B32A32_Float, 32, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 3, Format.R32G32B32A32_Float, 64, 1, InputClassification.PerInstanceData, 1)
+             };
+            _elementSize = 32;
+        }
+
+        public BillboardInstanceVertexTexture(Vector3 position)
+        {
+            Position = new Vector4(position, 1.0f);
+            TextureCoord = Vector4.Zero;
+        }
+
+        public BillboardInstanceVertexTexture(Vector3 position, Vector2 textureCoords, Vector2 dimensions)
+        {
+            Position = new Vector4(position, 1.0f);
+            TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, dimensions.X, dimensions.Y);
+        }
+    }    
 
     /// <summary>
     /// 
@@ -267,40 +303,5 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Weights = new Float4(weights);
             BoneIndices = new Int4(boneIndices);
         }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BasicVertexDualTextureIPosition
-    {        
-        public Vector2 TextureCoord0;
-        public Vector2 TextureCoord1;
-
-        private static InputElement[] _inputElements = null;
-        private static int _vertexElementSize = 0;
-        private static int _instanceElementSize = 0;
-        public static InputElement[] InputElements { get { return _inputElements; } }
-        public static int VertexElementSize { get { return _vertexElementSize; } }
-        public static int InstanceElementSize { get { return _instanceElementSize; } }
-
-        static BasicVertexDualTextureIPosition()
-        {
-            _inputElements = new InputElement[]
-             {                
-                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 0, 0),
-                 new InputElement("TEXCOORD", 1, Format.R32G32_Float, 8, 0),
-                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1)
-             };
-            _vertexElementSize = 16;
-            _instanceElementSize = 16;
-        }
-
-        public BasicVertexDualTextureIPosition(Vector2 textureCoord0, Vector2 textureCoord1)
-        {
-            TextureCoord0 = textureCoord0;
-            TextureCoord1 = textureCoord1;
-        }
-    }    
+    }   
 }

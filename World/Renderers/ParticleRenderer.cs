@@ -48,18 +48,16 @@ namespace CipherPark.AngelJacket.Core.World.Renderers
 
         public void Render(long gameTime, Matrix emitterTransform, Matrix view, Matrix projection, IEnumerable<Particle> pList, IEnumerable<ParticleLink> pLinks)
         {              
-            //pne.BackgroundColor = Color.Red;
-            //pne.ForegroundColor = Color.Blue;
-            particleEffect.View = view;
-            particleEffect.Projection = projection;         
-            foreach (Particle p in pList)
-            {
-                particleEffect.World = emitterTransform * p.Transform.ToMatrix();
-                particleEffect.Apply();
-                _particleMesh.Update<BillboardEffect>(particleBillboards);
-                _particleMesh.Draw(gameTime);                
-                //_linkMesh.Update<BasicVertexPositionColor>(linkVertices);
-            }
+            //particleEffect.View = view;
+            //particleEffect.Projection = projection;         
+            //foreach (Particle p in pList)
+            //{
+            //    particleEffect.World = emitterTransform * p.Transform.ToMatrix();
+            //    particleEffect.Apply();               
+            //    _particleMesh.Draw(gameTime);                     
+            //}
+
+            List<
 
             List<BasicVertexPositionColor> linkVertices = new List<BasicVertexPositionColor>();
             foreach (ParticleLink link in pLinks)

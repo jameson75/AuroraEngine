@@ -432,7 +432,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return new Mesh(game, meshDesc);
         }      
 
-        private static Mesh BuildInstancedMesh<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices, 
+        public static Mesh BuildInstancedMesh<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices, 
             InputElement[] vertexInputElements, int vertexSize, Ti[] instances, InputElement[] instanceInputElements, 
             int instanceSize) where Ti : struct where Tv : struct
         {
@@ -452,11 +452,13 @@ namespace CipherPark.AngelJacket.Core.Content
             meshDesc.VertexStride = vertexSize;
             
             //Instances...
+            //NOTE: We always make the instance buffer a dynamic/writable one.
             BufferDescription instanceBufferDesc = new BufferDescription();
             instanceBufferDesc.BindFlags = BindFlags.VertexBuffer;
-            instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
+            instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
             instanceBufferDesc.SizeInBytes = instanceSize * instances.Length;
             instanceBufferDesc.OptionFlags = ResourceOptionFlags.None;
+            instanceBufferDesc.Usage = ResourceUsage.Dynamic;
             instanceBufferDesc.StructureByteStride = 0;
             DXBuffer nBuffer = DXBuffer.Create<Ti>(game.GraphicsDevice, instances, instanceBufferDesc);
             meshDesc.InstanceBuffer = nBuffer;

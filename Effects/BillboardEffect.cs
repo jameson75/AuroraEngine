@@ -22,10 +22,13 @@ namespace CipherPark.AngelJacket.Core.Effects
     public class BillboardEffect : Effect
     {
         private VertexShader _vertexShader = null;
+        private VertexShader _ivertexShader = null;
         private PixelShader _pixelShader = null;
         private byte[] _vertexShaderByteCode = null;
+        private byte[] _ivertexShaderByteCode = null;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
 
+        public bool UseInstancing { get; set; }
         public Color ForegroundColor { get; set; }
         public Color BackgroundColor { get; set; }
 
@@ -39,8 +42,11 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             string psFileName = "Content\\Shaders\\plexicnode-ps.cso";
             string vsFileName = "Content\\Shaders\\plexicnode-vs.cso";
+            string ivsFileName = "Content\\Shaders\\plexicnode-i-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
+            _ivertexShaderByteCode = System.IO.File.ReadAllBytes(ivsFileName);
             _vertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
+            _ivertexShader = new VertexShader(GraphicsDevice, _ivertexShaderByteCode);
             _pixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
             int bufferSize = sizeof(float) * 16  * 3; //size of WorldViewProj + ForegroundColor + BackgroundColor
             _constantBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
@@ -62,7 +68,10 @@ namespace CipherPark.AngelJacket.Core.Effects
             //BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
             //GraphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;           
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+            if (UseInstancing)
+                GraphicsDevice.ImmediateContext.VertexShader.Set(_ivertexShader);
+            else
+                GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             SetShaderConstants();
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
@@ -71,7 +80,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public override byte[] SelectShaderByteCode()
         {
-            return _vertexShaderByteCode;
+            return (UseInstancing) ? _ivertexShaderByteCode : _vertexShaderByteCode;
         }
 
         private void SetShaderConstants()
