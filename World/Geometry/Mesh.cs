@@ -75,15 +75,15 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public void Update<T>(T[] data) where T : struct
+        public void Update<T>(T[] data, int offset = 0) where T : struct
         {
             DXBuffer dynamicBuffer = (!IsInstanced) ? _vertexBuffer : _instanceBuffer;
-            int elementSize = (!IsInstanced) ? _vertexStride : _instanceStride;
+            int dataStride = (!IsInstanced) ? _vertexStride : _instanceStride;
             if (dynamicBuffer == null)
                 throw new InvalidOperationException("Buffer is not available.");
             DataBox box = _app.GraphicsDeviceContext.MapSubresource(dynamicBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
-            DataBuffer dataBuffer = new DataBuffer(box.DataPointer, data.Length * elementSize);
-            dataBuffer.Set<T>(0, data);
+            DataBuffer dataBuffer = new DataBuffer(box.DataPointer, data.Length * dataStride);
+            dataBuffer.Set<T>(offset * dataStride, data);            
             _app.GraphicsDeviceContext.UnmapSubresource(dynamicBuffer, 0);
             if(!IsInstanced)
                _vertexCount = data.Length;
@@ -103,6 +103,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
             _app.GraphicsDeviceContext.InputAssembler.InputLayout = _vertexLayout;
             _app.GraphicsDeviceContext.InputAssembler.PrimitiveTopology = _topology;
+            
             if (_instanceBuffer == null)
             {
                 _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, _vertexStride, 0));
@@ -116,9 +117,6 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
             else
             {
-                if (_instanceBuffer == null)
-                    throw new InvalidOperationException("Instance buffer was not created.");
-
                 _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding[] 
                 { 
                     new VertexBufferBinding(_vertexBuffer, _vertexStride, 0),

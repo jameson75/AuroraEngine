@@ -28,10 +28,16 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// </summary>
     public class Emitter : ITransformable
     {
-        private List<Particle> _particles = new List<Particle>();
-        private List<ParticleLink> _links = new List<ParticleLink>();
         private const int MaxParticles = 10000;
-        
+
+        private List<Particle> _particles = new List<Particle>();
+        private List<ParticleLink> _links = new List<ParticleLink>();     
+
+        public Emitter()
+        {
+            
+        }
+
         //private Mesh _dynamicInstancedMesh = null;
 
         #region ITransformable Members
@@ -49,7 +55,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         public ParticleDescription DefaultParticleDescription { get; set; }
 
-        public ReadOnlyCollection<Particle> Particles { get { return _particles.AsReadOnly(); } }
+        public ReadOnlyCollection<Particle> Particles { get { return _particles.ToList().AsReadOnly(); } }
 
         public ReadOnlyCollection<ParticleLink> Links { get { return _links.AsReadOnly(); } }
 
@@ -66,12 +72,14 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         {
             List<Particle> pList = Spawn(customParticleDescription);
             _particles.AddRange(pList);
+            OnParticlesAdded(pList);
             return pList;
         }
 
         public List<Particle> Emit(IEnumerable<Particle> particles)
         {
             _particles.AddRange(particles);
+            OnParticlesAdded(particles);
             return particles.ToList();
         }
 
@@ -95,18 +103,21 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         public void KillAll()
         {
+            List<Particle> auxParticles = new List<Particle>(_particles);
             _particles.Clear();
+            OnParticlesRemoved(auxParticles);
             _links.Clear();
         }
 
         public void Kill(Particle p)
-        {
+        {            
             _particles.Remove(p);
+            OnParticlesRemoved(new Particle[] { p });
             Unlink(p);
         }
 
         public void Kill(IEnumerable<Particle> pList)
-        {
+        {         
             foreach (Particle p in pList)
                 Kill(p);
         }
@@ -157,7 +168,19 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public void Unlink(Particle p)
         {
             _links.RemoveAll(e => e.P1 == p || e.P2 == p);
-        }        
+        }
+
+        protected virtual void OnParticlesAdded(IEnumerable<Particle> particles)
+        {
+            foreach (Particle p in particles)
+                p.TransformableParent = this;
+        }
+
+        protected virtual void OnParticlesRemoved(IEnumerable<Particle> particles)
+        {
+            foreach (Particle p in particles)
+                p.TransformableParent = null;
+        }
     } 
 
     /// <summary>

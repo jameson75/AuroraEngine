@@ -91,7 +91,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         {
             if (Model != null)
             {
-                //Model.Effect.World = this.LocalToWorld(this.Transform.ToMatrix());
+                //TODO: Change design so that Model.Draw() implementations aquire the Camera from a IViewportService
+                //and set the view and projecton matrices themselves.
+                
                 Model.Effect.View = Camera.TransformToView(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
                 Model.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;                
                 Model.Draw(gameTime);               

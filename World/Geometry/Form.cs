@@ -15,6 +15,7 @@ using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
+    //TODO: Refactor this class so that it 1. Inherits + Leverages ComplexModel and uses InstanceRenderer (class used to render instances).
     public abstract class Form : Model
     {
         private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();
@@ -58,8 +59,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 this.Effect.World = formTransform * element.Transform;
                 this.Effect.Apply();                
                 this.Mesh.Draw(gameTime);
-                if (Emitter != null && ParticleRenderer != null)                
-                    ParticleRenderer.Render(gameTime, Effect.World * Emitter.Transform.ToMatrix() * Matrix.Translation(0, 1.0f, 0), this.Effect.View, this.Effect.Projection, Emitter.Particles, Emitter.Links);                
+                if (Emitter != null && ParticleRenderer != null)
+                    //ParticleRenderer.Render(gameTime, Effect.World * Emitter.Transform.ToMatrix() * Matrix.Translation(0, 1.0f, 0), this.Effect.View, this.Effect.Projection, Emitter.Particles, Emitter.Links);                                                    
+                    ParticleRenderer.Draw(gameTime, new[] { Emitter });
             }
             //this.Effect.World = formTransform;
             this.Effect.Apply();

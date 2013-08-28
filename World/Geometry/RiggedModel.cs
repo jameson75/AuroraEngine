@@ -167,7 +167,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         
         public Transform Transform { get; set; }
 
-        ITransformable ITransformable.TransformableParent
+        public ITransformable TransformableParent
         {
             get { return this._transformableParent; }
             set

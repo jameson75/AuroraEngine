@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
+using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
@@ -22,65 +23,88 @@ using CipherPark.AngelJacket.Core.Content;
 namespace CipherPark.AngelJacket.Core.World.Renderers
 {
     public class ParticleRenderer
-    {        
+    {
         private IGameApp _game = null;
         private Mesh _particleMesh = null;
-        private Mesh _linkMesh = null;
-        private BillboardEffect particleEffect = null;
-        private BasicEffectEx linkEffect = null;
+        private Effect _particleEffect = null;
 
-        public Matrix EffectView { get; set; }
+       // private Mesh _linkMesh = null;
+        //private BillboardEffect particleEffect = null;
+        //private BasicEffectEx linkEffect = null;    
 
-        public Matrix EffectProjection { get; set; }
-
-        public ParticleRenderer(IGameApp game)
+        public ParticleRenderer(IGameApp game, Mesh particleMesh, Effect particleEffect)
         {
             _game = game;
-            particleEffect = new BillboardEffect(_game.GraphicsDevice);
-            _particleMesh = ContentBuilder.BuildBillboardQuad(game, particleEffect.SelectShaderByteCode(), new DrawingSizeF(3, 3));           
-        
-            linkEffect = new BasicEffectEx(_game.GraphicsDevice);
-            linkEffect.EnableVertexColor = true;
-            //BasicVertexPositionColor[] emptyVerts = new BasicVertexPositionColor[4];
-            //emptyVerts.Initialize();
-            _linkMesh = ContentBuilder.BuildDynamicMesh<BasicVertexPositionColor>(game, linkEffect.SelectShaderByteCode(), null, 8, null, 0, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, BoundingBoxExtension.Empty, true);
+            _particleMesh = particleMesh;
+            _particleEffect = particleEffect;
+            //_game = game;
+            //particleEffect = new BillboardEffect(_game.GraphicsDevice);
+            //particleEffect.UseInstancing = enableInstancing;
+            //3));
+
+            //linkEffect = new BasicEffectEx(_game.GraphicsDevice);
+            //linkEffect.EnableVertexColor = true;
+            ////BasicVertexPositionColor[] emptyVerts = new BasicVertexPositionColor[4];
+            ////emptyVerts.Initialize();
+            //_linkMesh = ContentBuilder.BuildDynamicMesh<BasicVertexPositionColor>(game, linkEffect.SelectShaderByteCode(), null, 8, null, 0, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, BoundingBoxExtension.Empty, true);
         }
 
-        public void Render(long gameTime, Matrix emitterTransform, Matrix view, Matrix projection, IEnumerable<Particle> pList, IEnumerable<ParticleLink> pLinks)
-        {              
-            //particleEffect.View = view;
-            //particleEffect.Projection = projection;         
-            //foreach (Particle p in pList)
+        public Mesh ParticleMesh { get { return _particleMesh; } }
+
+        public Effect ParticleEffect { get { return _particleEffect; } }
+
+        public void Draw(long gameTime, IEnumerable<Emitter> emitters)
+        {      
+            if (_particleMesh.IsInstanced)
+            {
+                List<Matrix> matrices = new List<Matrix>();
+                foreach (Emitter emitter in emitters)
+                {
+                    foreach (Particle p in emitter.Particles)
+                        matrices.Add(p.WorldTransform().ToMatrix());
+                }   
+                //Flawed design: The data type of the instanced data is being
+                //assumed here... for now it's just a world transformation matrix.
+                //TODO: Figure out a way to infer the data type of the instance data.
+                _particleMesh.Update<Matrix>(matrices.ToArray());
+                _particleEffect.Apply();
+                _particleMesh.Draw(gameTime);
+            }
+            else
+            {
+                foreach (Emitter emitter in emitters)
+                {
+                    foreach (Particle p in emitter.Particles)
+                    {
+                        _particleEffect.World = p.WorldTransform().ToMatrix();
+                        _particleEffect.Apply();
+                        _particleMesh.Draw(gameTime);
+                    }
+                }                
+            }
+
+            //List<BasicVertexPositionColor> linkVertices = new List<BasicVertexPositionColor>();
+            //foreach (ParticleLink link in pLinks)
             //{
-            //    particleEffect.World = emitterTransform * p.Transform.ToMatrix();
-            //    particleEffect.Apply();               
-            //    _particleMesh.Draw(gameTime);                     
+            //    BasicVertexPositionColor v1 = new BasicVertexPositionColor();
+            //    v1.Color = Color.White.ToVector4();
+            //    v1.Position = new Vector4((emitterTransform * link.P1.Transform.ToMatrix()).TranslationVector, 1.0f);
+            //    BasicVertexPositionColor v2 = new BasicVertexPositionColor();
+            //    v2.Color = Color.White.ToVector4();
+            //    v2.Position = new Vector4((emitterTransform * link.P2.Transform.ToMatrix()).TranslationVector, 1.0f);
+            //    linkVertices.Add(v1);
+            //    linkVertices.Add(v2);
             //}
 
-            List<
-
-            List<BasicVertexPositionColor> linkVertices = new List<BasicVertexPositionColor>();
-            foreach (ParticleLink link in pLinks)
-            {
-                BasicVertexPositionColor v1 = new BasicVertexPositionColor();
-                v1.Color = Color.White.ToVector4();
-                v1.Position = new Vector4((emitterTransform * link.P1.Transform.ToMatrix()).TranslationVector, 1.0f);
-                BasicVertexPositionColor v2 = new BasicVertexPositionColor();
-                v2.Color = Color.White.ToVector4();
-                v2.Position = new Vector4((emitterTransform * link.P2.Transform.ToMatrix()).TranslationVector, 1.0f);
-                linkVertices.Add(v1);
-                linkVertices.Add(v2);
-            }
-
-            if (linkVertices.Count > 0)
-            {
-                linkEffect.World = Matrix.Identity;
-                linkEffect.View = view;
-                linkEffect.Projection = projection;
-                linkEffect.Apply();
-                _linkMesh.Update<BasicVertexPositionColor>(linkVertices.ToArray());
-                _linkMesh.Draw(gameTime);
-            }
+            //if (linkVertices.Count > 0)
+            //{
+            //    linkEffect.World = Matrix.Identity;
+            //    linkEffect.View = view;
+            //    linkEffect.Projection = projection;
+            //    linkEffect.Apply();
+            //    _linkMesh.Update<BasicVertexPositionColor>(linkVertices.ToArray());
+            //    _linkMesh.Draw(gameTime);
+            //}
         }
     }
 }

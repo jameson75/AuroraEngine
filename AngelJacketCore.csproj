@@ -211,7 +211,6 @@
     <Compile Include="World\Geometry\Mesh.cs" />
     <Compile Include="World\Geometry\VertexTypes.cs" />
     <Compile Include="World\Scene\NullSceneNode.cs" />
-    <Compile Include="World\Scene\ParticleSystemNode.cs" />
     <Compile Include="World\Scene\Scene.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="Sandbox\TestEffect.cs" />

@@ -53,7 +53,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public Transform Transform { get; set; }
 
-        ITransformable ITransformable.TransformableParent { get; set; }
+        public ITransformable TransformableParent { get; set; }
         
         //public Camera Camera { get; set; }
 
@@ -176,16 +176,21 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class ComplexModel : Model, IAnimatedModel
     {
         private List<Mesh> _meshes = new List<Mesh>();
+        
         private List<Emitter> _emitters = new List<Emitter>();
 
         public List<Mesh> Meshes { get { return _meshes; } }        
-        public List<Emitter> Emitters { get { return _emitters; } }        
+        
+        public List<Emitter> Emitters { get { return _emitters; } }
+
+        public ParticleRenderer ParticleRenderer { get; set; }
+        
         #region IAnimatedModel
         public Frame FrameTree { get; set; }        
         public List<KeyframeAnimationController> Animation { get; set; }
         #endregion        
+        
         public List<MeshTextures> MeshTextures { get; set; }
-        public ParticleRenderer EmitterRenderer { get; set; }
 
         public override BoundingBox BoundingBox
         {
@@ -206,7 +211,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             List<Frame> frameList = null;
                 if(FrameTree != null)
                     frameList = FrameTree.FlattenToList();
-
+             
             if (Effect != null)
             {
                 Effect.World = ((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
@@ -214,7 +219,10 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 Effect.Apply();
                 foreach (Mesh mesh in Meshes)
                     mesh.Draw(gameTime);
-            }                     
+            }
+
+            if (Emitters != null && ParticleRenderer != null)
+                ParticleRenderer.Draw(gameTime, Emitters);              
         }
 
         protected override void OnApplyingEffect()

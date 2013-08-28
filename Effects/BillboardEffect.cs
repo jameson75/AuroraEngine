@@ -28,7 +28,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         private byte[] _ivertexShaderByteCode = null;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
 
-        public bool UseInstancing { get; set; }
+        public bool EnableInstancing { get; set; }
         public Color ForegroundColor { get; set; }
         public Color BackgroundColor { get; set; }
 
@@ -68,7 +68,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
             //GraphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;           
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            if (UseInstancing)
+            if (EnableInstancing)
                 GraphicsDevice.ImmediateContext.VertexShader.Set(_ivertexShader);
             else
                 GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
@@ -80,7 +80,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public override byte[] SelectShaderByteCode()
         {
-            return (UseInstancing) ? _ivertexShaderByteCode : _vertexShaderByteCode;
+            return (EnableInstancing) ? _ivertexShaderByteCode : _vertexShaderByteCode;
         }
 
         private void SetShaderConstants()

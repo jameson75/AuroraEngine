@@ -123,16 +123,18 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BillboardInstanceVertexTexture
+    public struct BillboardInstancePositionVertexTexture
     {
         public Vector4 Position;
         public Vector4 TextureCoord;
 
         private static InputElement[] _inputElements = null;
         private static int _elementSize = 0;
+        private static int _instanceSize = 0;
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
-        static BillboardInstanceVertexTexture()
+        public static int InstanceSize { get { return _instanceSize; } }
+        static BillboardInstancePositionVertexTexture()
         {           
             _inputElements = new InputElement[]
              {
@@ -141,18 +143,19 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                  new InputElement("MATRIX", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1),
                  new InputElement("MATRIX", 1, Format.R32G32B32A32_Float, 16, 1, InputClassification.PerInstanceData, 1),
                  new InputElement("MATRIX", 2, Format.R32G32B32A32_Float, 32, 1, InputClassification.PerInstanceData, 1),
-                 new InputElement("MATRIX", 3, Format.R32G32B32A32_Float, 64, 1, InputClassification.PerInstanceData, 1)
+                 new InputElement("MATRIX", 3, Format.R32G32B32A32_Float, 48, 1, InputClassification.PerInstanceData, 1)
              };
             _elementSize = 32;
+            _instanceSize = 64;
         }
 
-        public BillboardInstanceVertexTexture(Vector3 position)
+        public BillboardInstancePositionVertexTexture(Vector3 position)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = Vector4.Zero;
         }
 
-        public BillboardInstanceVertexTexture(Vector3 position, Vector2 textureCoords, Vector2 dimensions)
+        public BillboardInstancePositionVertexTexture(Vector3 position, Vector2 textureCoords, Vector2 dimensions)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, dimensions.X, dimensions.Y);

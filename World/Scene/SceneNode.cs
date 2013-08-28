@@ -97,7 +97,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         //    return stack.Transform;
         //}
 
-        ITransformable ITransformable.TransformableParent
+        public virtual ITransformable TransformableParent
         {
             get { return this._transformableParent; }
             set
