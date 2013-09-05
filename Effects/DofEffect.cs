@@ -17,7 +17,6 @@ using CipherPark.AngelJacket.Core.Content;
 // Angel Jacket by Cipher Park is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
-
 namespace CipherPark.AngelJacket.Core.Effects
 {
     public class DofEffect : PostEffect
