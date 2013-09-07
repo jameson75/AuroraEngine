@@ -40,9 +40,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             View = Matrix.Identity;
             Projection = Matrix.Identity;
 
-            string psFileName = "Content\\Shaders\\plexicnode-ps.cso";
-            string vsFileName = "Content\\Shaders\\plexicnode-vs.cso";
-            string ivsFileName = "Content\\Shaders\\plexicnode-i-vs.cso";
+            string psFileName = "Content\\Shaders\\billboard-ps.cso";
+            string vsFileName = "Content\\Shaders\\billboard-vs.cso";
+            string ivsFileName = "Content\\Shaders\\billboard-i-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
             _ivertexShaderByteCode = System.IO.File.ReadAllBytes(ivsFileName);
             _vertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
