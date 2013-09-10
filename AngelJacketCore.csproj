@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Effects\MotionBlur.cs" />
     <Compile Include="Effects\SSAOEffect.cs" />
     <Compile Include="Kinetics\Animation\ParticleAnimationBuilder.cs" />
     <Compile Include="Animation\AnimationController.cs" />

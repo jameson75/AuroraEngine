@@ -46,6 +46,10 @@ namespace CipherPark.AngelJacket.Core.Effects
         private ShaderResourceView _tempShaderResource = null;
         private SamplerState _tempSampler = null;
 
+        public Vector2 ViewportSize { get; set; }
+        public Vector2 MaxCoC { get; set; }
+        public float RadiusScale { get; set; }
+
         public DofEffect(Device graphicsDevice, IGameApp game)
             : base(graphicsDevice)
         {
@@ -123,12 +127,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             resourceDesc.Texture2D.MipLevels = 1;
             _tempShaderResource = new ShaderResourceView(GraphicsDevice, tempTexture, resourceDesc);
             _tempSampler = new SamplerState(GraphicsDevice, samplerDesc);                                                       
-        }
-        
-        public Vector2 ViewportSize { get; set; }
-        public Vector2 MaxCoC { get; set; }
-        public float RadiusScale { get; set; }
-
+        }       
+      
         private void WriteShaderConstants()
         {
             DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer1, 0, MapMode.WriteDiscard, MapFlags.None);
