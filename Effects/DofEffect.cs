@@ -171,7 +171,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Name: DownSampling
             //Texture: ScreenImage
             //RenderTarget: LowRes
-            /////////////////////////////            
+            ////////////////////////////            
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _screenImageSampler);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_lowResTarget);
@@ -188,7 +188,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Name: Guassian1
             //Texture: LowRes
             //RenderTarget: Temp
-            /////////////////////////////
+            ////////////////////////////
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _lowResShaderResource);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _lowResSampler);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_tempTarget);
@@ -205,7 +205,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Name: Guassian2
             //Texture: Temp
             //RenderTarget: LowRes
-            /////////////////////////////
+            ////////////////////////////
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _tempShaderResource);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _tempSampler);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_lowResTarget);
