@@ -25,13 +25,20 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public Mesh Mesh 
         { 
             get { return _mesh; }
-            set { _mesh = value; OnMeshChanged(); }
+            set { 
+                _mesh = value; 
+                OnMeshChanged(); 
+            }
         }
         
         public Emitter Emitter 
         { 
             get { return _emitter; } 
-            set { _emitter = value; OnEmitterChanged(); }
+            set {
+                OnEmitterChanging();
+                _emitter = value; 
+                OnEmitterChanged(); 
+            }
         }
 
         public override BoundingBox BoundingBox
@@ -60,21 +67,41 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 this.Effect.Apply();                
                 this.Mesh.Draw(gameTime);
                 if (Emitter != null && ParticleRenderer != null)
+                {
                     //ParticleRenderer.Render(gameTime, Effect.World * Emitter.Transform.ToMatrix() * Matrix.Translation(0, 1.0f, 0), this.Effect.View, this.Effect.Projection, Emitter.Particles, Emitter.Links);                                                    
+                    Transform cachedTransform = Emitter.Transform;
+                    Emitter.Transform = new Transform(this.Effect.World * cachedTransform.ToMatrix());
+                    ParticleRenderer.ParticleEffect.View = this.Effect.View;
+                    ParticleRenderer.ParticleEffect.Projection = this.Effect.Projection;
                     ParticleRenderer.Draw(gameTime, new[] { Emitter });
+                    Emitter.Transform = cachedTransform;
+                }
             }
             //this.Effect.World = formTransform;
             this.Effect.Apply();
-        }            
-       
+        }
+
+        protected virtual void OnEmitterChanging()
+        {
+            if (this.Emitter != null)
+                ((ITransformable)this.Emitter).TransformableParent = null;
+        }
+
         protected virtual void OnEmitterChanged()
-        { }
+        {
+            if (this.Emitter != null)
+                ((ITransformable)this.Emitter).TransformableParent = this;
+        }
 
         protected virtual void OnLayoutChanged()
-        { }
+        {
+          
+        }
 
         protected virtual void OnMeshChanged()
-        { }
+        { 
+
+        }
     }   
 
     public class FormElement

@@ -61,14 +61,18 @@ namespace CipherPark.AngelJacket.Core.World.Renderers
                 foreach (Emitter emitter in emitters)
                 {
                     foreach (Particle p in emitter.Particles)
-                        matrices.Add(p.WorldTransform().ToMatrix());
+                        matrices.Add(Matrix.Transpose(p.WorldTransform().ToMatrix()));
                 }   
                 //Flawed design: The data type of the instanced data is being
                 //assumed here... for now it's just a world transformation matrix.
-                //TODO: Figure out a way to infer the data type of the instance data.
-                _particleMesh.Update<Matrix>(matrices.ToArray());
-                _particleEffect.Apply();
-                _particleMesh.Draw(gameTime);
+                //TODO: Figure out a way to infer the data type of the instance data.   
+                if (matrices.Count > 0)
+                {
+                    _particleEffect.World = Matrix.Transpose(matrices[0]);
+                    _particleMesh.Update<Matrix>(matrices.ToArray());
+                    _particleEffect.Apply();
+                    _particleMesh.Draw(gameTime);
+                }
             }
             else
             {

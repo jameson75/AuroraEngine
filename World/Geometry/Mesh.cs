@@ -32,6 +32,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private int _vertexStride = 0;
         private int _instanceStride = 0;
         private InputLayout _vertexLayout = null;
+        private int _maxInstanceCount = 0;
 
         private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;
 
@@ -58,6 +59,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 _instanceStride = description.InstanceStride;
                 _instanceCount = description.InstanceCount;
                 _instanceBuffer = description.InstanceBuffer;
+                _maxInstanceCount = _instanceCount;
             }
         }
         
@@ -88,7 +90,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             if(!IsInstanced)
                _vertexCount = data.Length;
             else
-                _instanceCount = data.Length;
+               _instanceCount = data.Length;
         }    
 
         public void Draw(long gameTime)
@@ -106,7 +108,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             
             if (_instanceBuffer == null)
             {
-                _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(_vertexBuffer, _vertexStride, 0));
+                _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding[] 
+                    {
+                        new VertexBufferBinding(_vertexBuffer, _vertexStride, 0),
+                        new VertexBufferBinding(null, 0, 0)
+                    });
                 if (_indexBuffer == null)
                     _app.GraphicsDeviceContext.Draw(_vertexCount, 0);
                 else
