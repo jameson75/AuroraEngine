@@ -103,7 +103,7 @@
     <Compile Include="Effects\PostGlowEffect.cs" />
     <Compile Include="Effects\Obsolete\SHLightingEffect.cs" />
     <Compile Include="Effects\SkinnedEffectEx.cs" />
-    <Compile Include="Effects\SkyboxEffect.cs" />
+    <Compile Include="Effects\SkysphereEffect.cs" />
     <Compile Include="Kinetics\Force.cs" />
     <Compile Include="Kinetics\ParticleSystem.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
