@@ -52,6 +52,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         {
             CameraNode.Camera.PostEffectChain.Begin(gameTime);
             OnBeginDraw();
+            if (SkyModel != null)
+                SkyModel.Draw(gameTime);
             foreach (SceneNode node in Nodes)
                 _DrawNodeHierarchy(gameTime, node);
             OnEndDraw();

@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             _constantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _passThruEffect = new PassThruPostEffect(graphicsDevice, app);
             CreateShaders();
-            CreateShaderTargets();
+            CreateResources();
         }
 
         public override void Apply()
@@ -90,8 +90,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             DepthStencilState oldDepthStencilState = GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState;
             DepthStencilStateDescription newDepthStencilStateDesc = (oldDepthStencilState != null) ? oldDepthStencilState.Description : DepthStencilStateDescription.Default();
             newDepthStencilStateDesc.IsDepthEnabled = true;
-            newDepthStencilStateDesc.DepthWriteMask = 0;
-            //newDepthStencilStateDesc.IsStencilEnabled = false;
+            newDepthStencilStateDesc.DepthWriteMask = 0;            
             GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = new DepthStencilState(GraphicsDevice, newDepthStencilStateDesc);
             BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
             BlendStateDescription newBlendStateDesc = (oldBlendState != null) ? oldBlendState.Description : BlendStateDescription.Default();
@@ -173,7 +172,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             LoadPixelShader("Content\\Shaders\\postglowfs-x3-ps.cso", out _pixelShaderP2);           
         }
 
-        private void CreateShaderTargets()
+        private void CreateResources()
         {
             _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);            
             

@@ -104,6 +104,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 Effect.Apply();
                 if (Mesh != null)
                     Mesh.Draw(gameTime);
+                Effect.RestoreGraphicsState();
             }      
         }
 
@@ -219,10 +220,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 Effect.Apply();
                 foreach (Mesh mesh in Meshes)
                     mesh.Draw(gameTime);
+                Effect.RestoreGraphicsState();
             }
 
             if (Emitters != null && ParticleRenderer != null)
-                ParticleRenderer.Draw(gameTime, Emitters);              
+                ParticleRenderer.Draw(gameTime, Emitters.SelectMany(e => e.Particles));              
         }
 
         protected override void OnApplyingEffect()

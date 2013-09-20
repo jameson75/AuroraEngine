@@ -44,6 +44,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         public virtual void Apply()
         { }
 
+        public virtual void RestoreGraphicsState()
+        { }
+
         protected byte[] LoadVertexShader(string fileName, out VertexShader shader)
         {
             byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);

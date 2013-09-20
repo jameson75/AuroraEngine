@@ -85,7 +85,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 }
             }
             //this.Effect.World = formTransform;
-            this.Effect.Apply();
+            //this.Effect.Apply();
         }
 
         protected virtual void OnEmitterChanging()
