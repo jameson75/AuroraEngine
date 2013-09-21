@@ -132,8 +132,30 @@ namespace CipherPark.AngelJacket.Core.Content
 
         public static Texture2D LoadTexture(DeviceContext deviceContext, string fileName)
         {
-            IntPtr _nativeShaderResourceView = UnsafeNativeMethods.CreateTextureFromFile(deviceContext.NativePointer, fileName);
-            return new Texture2D(_nativeShaderResourceView);
+            IntPtr _nativeTextureResource = UnsafeNativeMethods.CreateTextureFromFile(deviceContext.NativePointer, fileName);
+            return new Texture2D(_nativeTextureResource);
+        }
+
+        public static Texture2D LoadCubeTexture(DeviceContext deviceContext, string[] fileNames)
+        {
+            if (fileNames.Length != 6)
+                throw new InvalidOperationException("Number of specified file names is less or greater than 6");
+            Texture2D[] _textures = new Texture2D[6];            
+            DataBox[] _dataBoxes = new DataBox[6];
+            for(int i = 0; i < _textures.Length; i++)                       
+            {
+                _textures[i] = LoadTexture(deviceContext, fileNames[i]);               
+                _dataBoxes[i] = deviceContext.MapSubresource(_textures[i], 0, MapMode.Read, MapFlags.None);
+            }                
+            Texture2DDescription cubeDescription = _textures[0].Description;
+            cubeDescription.ArraySize = 6;
+            cubeDescription.OptionFlags = ResourceOptionFlags.TextureCube;
+            cubeDescription.Usage = ResourceUsage.Default;
+            cubeDescription.CpuAccessFlags = CpuAccessFlags.None;          
+            Texture2D cubeTexture = new Texture2D(deviceContext.Device, cubeDescription, _dataBoxes );
+            for (int i = 0; i < _textures.Length; i++)
+                deviceContext.UnmapSubresource(_textures[i], 0);
+            return cubeTexture;
         }
 
         private static class UnsafeNativeMethods
@@ -183,7 +205,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
         public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, XFileChannels channels)
         {
-            RiggedModel result = null;
+            Model result = null;
             Mesh mesh = null;
             Frame rootFrame = null;
             List<KeyframeAnimationController> animationControllers = null;
@@ -225,52 +247,52 @@ namespace CipherPark.AngelJacket.Core.Content
             //Construct model vertices from mesh data
             //---------------------------------------
             //BasicVertexPositionNormalTexture[] _vertices = xMesh.Vertices.Zip(normals, (e, f) => new BasicVertexPositionNormalTexture() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Normal = f, Color = Color.Green.ToVector4() }).ToArray();            
-            if((channels & XFileChannels.Skinning) != 0)
+            if ((channels & XFileChannels.Skinning) != 0)
             {
                 //dynamic _vertices = null;
                 //if(normals != null && texCoords != null)
                 //{
-                    BasicSkinnedVertexTexture[] _vertices = xMesh.Vertices.Select((v, i) => new BasicSkinnedVertexTexture()
-                    {
-                        Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
-                        Normal = normals[i],
-                        TextureCoord = texCoords[i]
-                    }).ToArray();
+                BasicSkinnedVertexTexture[] _vertices = xMesh.Vertices.Select((v, i) => new BasicSkinnedVertexTexture()
+                {
+                    Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                    Normal = normals[i],
+                    TextureCoord = texCoords[i]
+                }).ToArray();
                 //}
-               
+
                 //Convert skinning information in .x file to skinning information required by a skinning shader.
                 //(A skinning shader associates each vertex with 4 bone indices and 4 bone weights - we extract this 
                 //information from SkinWeights data object).
                 //-------------------------------------------------------------------------------------------------
-            
+
                 List<float>[] weights = new List<float>[_vertices.Length];
                 List<int>[] boneIndices = new List<int>[_vertices.Length];
                 List<string>[] boneNames = new List<string>[_vertices.Length];
-                skinOffsets = new List<SkinOffset>();       
-               
+                skinOffsets = new List<SkinOffset>();
+
                 for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
-                {                
-                    XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];               
+                {
+                    XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];
                     Transform skinOffsetTransform = new Transform(new Matrix(xSkinWeights.MatrixOffset.m));
                     skinOffsets.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
-                    for(int j = 0; j < xSkinWeights.NWeights; j++ )
+                    for (int j = 0; j < xSkinWeights.NWeights; j++)
                     {
                         int k = xSkinWeights.VertexIndices[j];
-                    
-                        if (boneIndices[k] == null) 
+
+                        if (boneIndices[k] == null)
                             boneIndices[k] = new List<int>();
                         boneIndices[k].Add(i);
-                   
+
                         if (weights[k] == null)
-                            weights[k] = new List<float>();                   
-                        weights[k].Add(xSkinWeights.Weights[j]);             
+                            weights[k] = new List<float>();
+                        weights[k].Add(xSkinWeights.Weights[j]);
                     }
                 }
                 for (int i = 0; i < _vertices.Length; i++)
-                {               
-                    float[] weightValues = new float[4] { 0, 0, 0, 0};
+                {
+                    float[] weightValues = new float[4] { 0, 0, 0, 0 };
                     int[] boneIndicesValues = new int[4] { 0, 0, 0, 0 };
-                    if(weights[i] != null)
+                    if (weights[i] != null)
                     {
                         float[] _weights = weights[i].ToArray();
                         //TODO: assert that _weights.Length <= weightValues.Length (we assume the .x file will have no more than 4 per vertex).
@@ -281,11 +303,11 @@ namespace CipherPark.AngelJacket.Core.Content
                         int[] _boneIndices = boneIndices[i].ToArray();
                         //TODO: assert that _bondIndices.Length <= boneIndicesValues.Length (we assume the .x file will have no more than 4 per vertex).
                         Array.Copy(_boneIndices, boneIndicesValues, _boneIndices.Length);
-                    }             
+                    }
                     _vertices[i].Weights = new Vector4(weightValues);
                     _vertices[i].BoneIndices = new Int4(boneIndicesValues);
-                }                 
-            
+                }
+
                 //Construct bone hierarchy (skeleton) from frame data
                 //----------------------------------------------------              
                 //****************************************************
@@ -296,10 +318,10 @@ namespace CipherPark.AngelJacket.Core.Content
                 ////TODO: Remove hard coding.
                 //XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
                 XFileFrameObject xRootBoneFrame = doc.DataObjects.GetDataObject<XFileFrameObject>(2);
-                rootFrame = new Frame() {Name = xRootBoneFrame.Name, Transform = new Transform( new Matrix(xRootBoneFrame.FrameTransformMatrix.m) ) };
-                BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsets);           
-            
-                if( (channels & XFileChannels.Animation) != 0)
+                rootFrame = new Frame() { Name = xRootBoneFrame.Name, Transform = new Transform(new Matrix(xRootBoneFrame.FrameTransformMatrix.m)) };
+                BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsets);
+
+                if ((channels & XFileChannels.Animation) != 0)
                 {
                     //Construct animation data from frame data
                     //----------------------------------------
@@ -333,21 +355,34 @@ namespace CipherPark.AngelJacket.Core.Content
                             foreach (long time in matrixTransformKeys.Keys)
                                 modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
                             animationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
-                        }    
+                        }
                     }
                 }
 
                 mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
-            
+
                 //Create and return model
                 //-----------------------
-                result = new RiggedModel(app);
-                result.Mesh = mesh;
-                result.SkinOffsets.AddRange(skinOffsets);          
-                result.FrameTree = rootFrame;            
-                result.Animation.AddRange(animationControllers);
-            }                       
-             
+                RiggedModel riggedModel = new RiggedModel(app);
+                riggedModel.Mesh = mesh;
+                riggedModel.SkinOffsets.AddRange(skinOffsets);
+                riggedModel.FrameTree = rootFrame;
+                riggedModel.Animation.AddRange(animationControllers);
+                result = riggedModel;
+            }
+            
+            else
+            {
+                BasicVertexPositionColor[] _vertices = xMesh.Vertices.Select((v, i) => new BasicVertexPositionColor()
+                {
+                    Position = new Vector4(v.X, v.Y, v.Z, 1.0f)
+                }).ToArray();
+                mesh = ContentBuilder.BuildMesh<BasicVertexPositionColor>(app, shaderByteCode, _vertices, _indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+                BasicModel basicModel = new BasicModel(app);
+                basicModel.Mesh = mesh;
+                result = basicModel;
+            }
+
             return result;
         }
 

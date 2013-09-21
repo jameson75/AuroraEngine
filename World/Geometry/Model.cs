@@ -223,8 +223,10 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 Effect.RestoreGraphicsState();
             }
 
-            if (Emitters != null && ParticleRenderer != null)
-                ParticleRenderer.Draw(gameTime, Emitters.SelectMany(e => e.Particles));              
+            //TODO: UnCommment and support instanced particles - Possibly by delegating the 
+            //operations to a ParticleSystem class.
+            //if (Emitters != null && ParticleRenderer != null)
+            //    ParticleRenderer.Draw(gameTime, Emitters.SelectMany(e => e.Particles));              
         }
 
         protected override void OnApplyingEffect()

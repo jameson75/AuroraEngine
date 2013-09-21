@@ -46,39 +46,21 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateResources()
         {
-            _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);
-
-            Texture2DDescription textureDesc = new Texture2DDescription();
-            textureDesc.ArraySize = 1;
-            textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
-            textureDesc.CpuAccessFlags = CpuAccessFlags.None;
-            textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            textureDesc.Height = _game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
-            textureDesc.Width = _game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
-            textureDesc.MipLevels = 1;
-            textureDesc.OptionFlags = ResourceOptionFlags.None;
-            textureDesc.Usage = ResourceUsage.Default;
-            textureDesc.SampleDescription.Count = 1;          
-
-            ShaderResourceViewDescription resourceViewDesc = new ShaderResourceViewDescription();
-            resourceViewDesc.Format = textureDesc.Format;
-            resourceViewDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
-            resourceViewDesc.Texture2D.MostDetailedMip = 0;
-            resourceViewDesc.Texture2D.MipLevels = 1;
+            _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);           
             
             SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
             samplerStateDesc.Filter = Filter.MinMagMipLinear;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
             samplerStateDesc.AddressV = TextureAddressMode.Clamp;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
-
-            Texture2D _environmentMapTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
-            _environmentMapShaderResourceView = new ShaderResourceView(GraphicsDevice, _environmentMapTexture, resourceViewDesc);            
-            _environmentMapSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc); 
         }
 
         public override void Apply()
         {
+
+            if (_environmentMapShaderResourceView == null)
+                throw new InvalidOperationException("Environment map not set.");
+
             ///////////
             //Setup
             ///////////
@@ -124,6 +106,11 @@ namespace CipherPark.AngelJacket.Core.Effects
         public override byte[] SelectShaderByteCode()
         {
             return _vertexShaderByteCode;
+        }
+
+        public void SetTexture(ShaderResourceView texture)
+        {
+            _environmentMapShaderResourceView = texture;
         }
 
         protected void WriteShaderConstants()
