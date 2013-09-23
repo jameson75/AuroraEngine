@@ -52,14 +52,25 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         {
             CameraNode.Camera.PostEffectChain.Begin(gameTime);
             OnBeginDraw();
-            if (SkyModel != null)
-                SkyModel.Draw(gameTime);
+            _DrawSkyModel(gameTime);
             foreach (SceneNode node in Nodes)
                 _DrawNodeHierarchy(gameTime, node);
             OnEndDraw();
             CameraNode.Camera.PostEffectChain.End(gameTime);
         }
-        
+
+        private void _DrawSkyModel(long gameTime)
+        {
+            if (SkyModel != null)
+            {
+                //TODO: Allow Models to access camera so the view and projection matrices of the effect can be set up
+                //locally.
+                SkyModel.Effect.View = CameraNode.Camera.ViewMatrix;
+                SkyModel.Effect.Projection = CameraNode.Camera.ProjectionMatrix;
+                SkyModel.Draw(gameTime);
+            }
+        }
+
         private void _UpdateNodeHierarchy(long gameTime, SceneNode node)
         {       
             node.Update(gameTime);            

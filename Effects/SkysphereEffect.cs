@@ -24,8 +24,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         private PixelShader _pixelShader = null;
         private byte[] _vertexShaderByteCode = null;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
-        private IGameApp _game = null;
-        private Mesh _quad = null;
+        private IGameApp _game = null;      
         private ShaderResourceView _environmentMapShaderResourceView = null;
         private SamplerState _environmentMapSamplerState = null;
         private bool _isRestoreRequired = false;
@@ -42,17 +41,12 @@ namespace CipherPark.AngelJacket.Core.Effects
             _pixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
             int bufferSize = sizeof(float) * 16 * 2; //Size of View and Projection matrices.
             _constantBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-        }
-
-        private void CreateResources()
-        {
-            _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);           
-            
             SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
             samplerStateDesc.Filter = Filter.MinMagMipLinear;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
             samplerStateDesc.AddressV = TextureAddressMode.Clamp;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+            _environmentMapSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
         }
 
         public override void Apply()
@@ -84,7 +78,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Output: Render Target
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _environmentMapShaderResourceView);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _environmentMapSamplerState);
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);            
         }

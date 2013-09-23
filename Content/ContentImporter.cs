@@ -140,13 +140,27 @@ namespace CipherPark.AngelJacket.Core.Content
         {
             if (fileNames.Length != 6)
                 throw new InvalidOperationException("Number of specified file names is less or greater than 6");
-            Texture2D[] _textures = new Texture2D[6];            
-            DataBox[] _dataBoxes = new DataBox[6];
-            for(int i = 0; i < _textures.Length; i++)                       
+            Texture2D[] _textures = new Texture2D[6];
+            Texture2D[] _stagingTextures = new Texture2D[6];
+            DataBox[] _dataBoxes = new DataBox[6];            
+            for(int i = 0; i < _textures.Length; i++)                                   
+                _textures[i] = LoadTexture(deviceContext, fileNames[i]);
+            //NOTE: We have to first copy the textures into a "staging" area because the textures
+            //returned by LoadTexture() are all GPU-only.
+            Texture2DDescription stagingTextureDesc = _textures[0].Description;
+            stagingTextureDesc.BindFlags = BindFlags.None;
+            stagingTextureDesc.CpuAccessFlags = CpuAccessFlags.Read;
+            stagingTextureDesc.Usage = ResourceUsage.Staging;
+            for (int i = 0; i < _textures.Length; i++)
             {
-                _textures[i] = LoadTexture(deviceContext, fileNames[i]);               
-                _dataBoxes[i] = deviceContext.MapSubresource(_textures[i], 0, MapMode.Read, MapFlags.None);
-            }                
+                _stagingTextures[i] = new Texture2D(deviceContext.Device, stagingTextureDesc);
+                deviceContext.CopyResource(_textures[i], _stagingTextures[i]);                
+            }     
+            //NOTE: we create a separate loop so that the DeviceContext.CopyResource() operation in the prior loop
+            //can finish as many async operations as possible before calling DeviceContext.MapSubResource() on the
+            //respective texture.
+            for (int i = 0; i < _textures.Length; i++)
+                _dataBoxes[i] = deviceContext.MapSubresource(_stagingTextures[i], 0, MapMode.Read, MapFlags.None);
             Texture2DDescription cubeDescription = _textures[0].Description;
             cubeDescription.ArraySize = 6;
             cubeDescription.OptionFlags = ResourceOptionFlags.TextureCube;
@@ -154,7 +168,7 @@ namespace CipherPark.AngelJacket.Core.Content
             cubeDescription.CpuAccessFlags = CpuAccessFlags.None;          
             Texture2D cubeTexture = new Texture2D(deviceContext.Device, cubeDescription, _dataBoxes );
             for (int i = 0; i < _textures.Length; i++)
-                deviceContext.UnmapSubresource(_textures[i], 0);
+                deviceContext.UnmapSubresource(_stagingTextures[i], 0);
             return cubeTexture;
         }
 
