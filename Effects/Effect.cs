@@ -60,5 +60,10 @@ namespace CipherPark.AngelJacket.Core.Effects
             shader = new PixelShader(GraphicsDevice, shaderByteCode);
             return shaderByteCode;
         }
+
+        protected static int CalculateRequiredConstantBufferSize(int actualRequiredSize)
+        {
+            return actualRequiredSize + (16 - (actualRequiredSize % 16));
+        }
     }
 }

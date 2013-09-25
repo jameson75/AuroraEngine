@@ -71,6 +71,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Effects\BloomPostEffect.cs" />
+    <Compile Include="Effects\FlexboardEffect.cs" />
     <Compile Include="Effects\MotionBlur.cs" />
     <Compile Include="Effects\SSAOEffect.cs" />
     <Compile Include="Kinetics\Animation\ParticleAnimationBuilder.cs" />

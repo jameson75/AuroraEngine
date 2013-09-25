@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Content;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class PostGlowEffect : PostEffect
+    public class GlowPostEffect : PostEffect
     {
         private IGameApp _game = null;
         private const int ConstantBufferSize = 48;
@@ -49,7 +49,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         public Vector4 ClearColor { get; set; }
         public Vector2 ViewportSize { get; set; }
 
-        public PostGlowEffect(Device graphicsDevice, IGameApp app)
+        public GlowPostEffect(Device graphicsDevice, IGameApp app)
             : base(graphicsDevice)
         {
             _game = app;
