@@ -86,7 +86,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             Matrix worldViewProjection = this.World * this.View * this.Projection;
-            worldViewProjection.Transpose();        
+            worldViewProjection.Transpose();               
             dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);          
             Matrix view = this.View;
             view.Transpose();
