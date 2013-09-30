@@ -31,12 +31,21 @@ namespace CipherPark.AngelJacket.Core.Effects
         private VertexShader _vs3 = null;
         private PixelShader _ps3 = null;
         private Mesh _quad = null;
+        private SharpDX.Direct3D11.Buffer _constantsBuffer = null;
+        private SamplerState _inputTextureSampler = null;
+        private ShaderResourceView _sumTextureShaderResourceView = null;
+        private SamplerState _sumTextureSampler = null;
+        private RenderTargetView _tempTextureRenderTargetView = null;
+        private ShaderResourceView _tempTextureShaderResourceView = null;
+        private SamplerState _tempTextureSampler = null;
+        private RenderTargetView _sumTextureRenderTargetView = null;
+        private int ConstantsBufferSize = 16;
 
         public CameraMotionBlur(Device graphicsDevice, IGameApp game) : base(graphicsDevice)
         {
             _game = game;
             CreateConstantBuffers();
-            CreateResources();
+            CreateTextures();
             CreateShaders();            
         }
 
@@ -110,15 +119,18 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateConstantBuffers()
         {
-
+            _constantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
         private void CreateShaders()
         {
-
+            _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\pixel-velocity-blur-calc-vs.cso", out _worldVertexShader);
+            LoadPixelShader("Content\\Shaders\\pixel-velocity-blur-clr-ps.cso", out _worldColorPixelShader);
+            LoadPixelShader("Content\\Shaders\\pixel-velocity-blur-vel-ps.cso", out _worldVelocityPixelShader);
+            LoadPixelShader("Content\\Shaders\\pixel-velocity-blur-blr-ps.cso", out _blurPixelShader);  
         }
 
-        private void CreateResources()
+        private void CreateTextures()
         {
             _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);
 
@@ -154,7 +166,14 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void WriteShaderConstants()
         {
-
+            int inputTextureWidth = InputTexture.ResourceAs<Texture2D>().Description.Width;
+            int inputTextureHeight = InputTexture.ResourceAs<Texture2D>().Description.Height;          
+            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            float invWidth = 1 / inputTextureWidth;
+            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref invWidth);
+            float invHeight = 1 / inputTextureHeight;
+            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref invHeight);
+            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);        
         }
     }
 }
