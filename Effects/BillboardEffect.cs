@@ -52,20 +52,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         }
 
         public override void Apply()
-        {
-            //BlendStateDescription blendDesc = BlendStateDescription.Default();
-            //for (int i = 0; i < blendDesc.RenderTarget.Length; i++)
-            //{
-            //    blendDesc.RenderTarget[i].IsBlendEnabled = true;
-            //    blendDesc.RenderTarget[i].SourceBlend = BlendOption.SourceAlpha;
-            //    blendDesc.RenderTarget[i].SourceAlphaBlend = BlendOption.SourceAlpha;
-            //    blendDesc.RenderTarget[i].DestinationBlend = BlendOption.InverseSourceAlpha;
-            //    blendDesc.RenderTarget[i].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
-            //}
-            //BlendState newBlendState = new BlendState(GraphicsDevice, blendDesc);
-            //Game.GraphicsDeviceContext.OutputMerger.BlendFactor = Color.Zero;
-            //BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
-            //GraphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;           
+        {                      
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             if (IsBillboardInstanced)
                 GraphicsDevice.ImmediateContext.VertexShader.Set(_ivertexShader);

@@ -31,7 +31,6 @@ namespace CipherPark.AngelJacket.Core.Effects
             World = Matrix.Identity;
             View = Matrix.Identity;
             Projection = Matrix.Identity;
-
             string psFileName = "Content\\Shaders\\flexboard-ps.cso";
             string vsFileName = "Content\\Shaders\\flexboard-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);           
@@ -42,26 +41,12 @@ namespace CipherPark.AngelJacket.Core.Effects
         }
 
         public override void Apply()
-        {
-            //BlendStateDescription blendDesc = BlendStateDescription.Default();
-            //for (int i = 0; i < blendDesc.RenderTarget.Length; i++)
-            //{
-            //    blendDesc.RenderTarget[i].IsBlendEnabled = true;
-            //    blendDesc.RenderTarget[i].SourceBlend = BlendOption.SourceAlpha;
-            //    blendDesc.RenderTarget[i].SourceAlphaBlend = BlendOption.SourceAlpha;
-            //    blendDesc.RenderTarget[i].DestinationBlend = BlendOption.InverseSourceAlpha;
-            //    blendDesc.RenderTarget[i].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
-            //}
-            //BlendState newBlendState = new BlendState(GraphicsDevice, blendDesc);
-            //Game.GraphicsDeviceContext.OutputMerger.BlendFactor = Color.Zero;
-            //BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
-            //GraphicsDevice.ImmediateContext.OutputMerger.BlendState = newBlendState;           
+        {             
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             SetShaderConstants();
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
-            //GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
         }
 
         public override byte[] SelectShaderByteCode()
