@@ -49,10 +49,37 @@ namespace CipherPark.AngelJacket.Core.Effects
         private Mesh _quad = null;
         private bool _lastVelocityTextureFilled = false;
 
+        private Matrix _previousWorld = Matrix.Identity;
+        private Matrix _previousView = Matrix.Identity;
+        private Matrix _previousProjection = Matrix.Identity;
+
+       
+        public Color MaterialAmbient { get; set; }
+
+        public Color MaterialDiffuse { get; set; }
+         /// <summary>
+        /// <remarks>Default: (1,1,1,1)</remarks>
+        /// </summary>
+        public Color LightAmbient { get; set; }
+        /// <summary>
+        /// <remarks>Default: (1,1,1,1)</remarks>
+        /// </summary>
+        public Color LightDiffuse { get; set; }
+        /// <summary>
+        /// <remarks>Default: (1,1,1)</remarks>
+        /// </summary>
+        public Vector3 LightDir { get; set; }
+
+        public float BlurAmount { get; set; }
+
         public PixelVelocityBlur(Device graphicsDevice, IGameApp game)
             : base(graphicsDevice)
         {
             _game = game;
+            LightAmbient = new Color(1, 1, 1, 1);
+            LightDiffuse = new Color(1, 1, 1, 1);
+            LightDir = new Vector3(1, 1, 1);
+            BlurAmount = 1.0f;
             CreateConstantBuffers();
             CreateTextures();
             CreateShaders();
@@ -163,6 +190,13 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Restore State
             //////////////////////////////////
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderTargetView);
+
+            /////////////////////////////////////////////////////////////////////////////////////
+            //Cache world, view and projection matrices used (in WriteConstants()) for this call. 
+            /////////////////////////////////////////////////////////////////////////////////////
+            _previousWorld = this.World;
+            _previousView = this.View;
+            _previousProjection = this.Projection;            
         }
 
         private void CreateConstantBuffers()
@@ -203,9 +237,33 @@ namespace CipherPark.AngelJacket.Core.Effects
             samplerStateDesc.Filter = Filter.MinMagMipLinear;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
             samplerStateDesc.AddressV = TextureAddressMode.Clamp;
-            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+            samplerStateDesc.AddressU = TextureAddressMode.Clamp;          
+            
+            //MeshTexture
+            //------------
+            _meshTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
 
-            //TODO: Create shader resources here...
+            //Color
+            //-----
+            Texture2D colorTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
+            _colorTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, colorTexture, resourceViewDesc);
+            _colorTextureRenderTargetView = new RenderTargetView(GraphicsDevice, colorTexture, renderTargetViewDesc);
+            _colorTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+
+            //Currrent Velocity
+            //-----------------
+            Texture2D _currentVelocityTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
+            _currentVelocityTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _currentVelocityTexture, resourceViewDesc);
+            _currentVelocityTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _currentVelocityTexture, renderTargetViewDesc);
+            _currentVelocityTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+
+            //Last Velocity
+            //-------------
+            Texture2D _lastVelocityTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
+            _lastVelocityTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _lastVelocityTexture, resourceViewDesc);
+            _lastVelocityTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _lastVelocityTexture, renderTargetViewDesc);
+            _lastVelocityTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+
         }
 
         private void CreateShaders()
@@ -220,7 +278,43 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void WriteConstants()
         {
-            //TODO: Write shader constants here...
+            DataBox dataBox;
+
+            dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_worldVertexConstantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            //mWorld
+            Matrix world = this.World;
+            world.Transpose();
+            dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref world);
+            //mWorldViewProjection
+            Matrix worldViewProjection = this.World * this.View * this.Projection;
+            worldViewProjection.Transpose();
+            dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);
+            //mWorldViewProjectionLast
+            Matrix worldViewProjectionLast = this._previousWorld * this._previousView * this._previousProjection;
+            worldViewProjection.Transpose();
+            dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);           
+            //MaterialAmbientColor
+            Vector4 materialAmbient = MaterialAmbient.ToVector4();
+            dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref materialAmbient);
+            //MaterialDiffuseColor
+            Vector4 materialDiffuse = MaterialDiffuse.ToVector4();
+            dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref materialDiffuse);
+            //LightAmbient
+            Vector4 lightAmbient = LightAmbient.ToVector4();
+            dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref lightAmbient);
+            //LightDiffuse
+            Vector4 lightDiffuse = LightDiffuse.ToVector4();
+            dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref lightDiffuse);
+            //LightDir
+            Vector3 lightDir = Vector3.Normalize(LightDir);
+            dataBox.DataPointer = Utilities.WriteAndPosition<Vector3>(dataBox.DataPointer, ref lightDir);
+            GraphicsDevice.ImmediateContext.UnmapSubresource(_worldVertexConstantBuffer, 0);
+            
+            dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_blurPixelConstantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            //PixelBlurConst
+            float blurAmount = this.BlurAmount;
+            dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref blurAmount);
+            GraphicsDevice.ImmediateContext.UnmapSubresource(_blurPixelConstantBuffer, 0);         
         }
     }
 }
