@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Content;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class SSAOEffect : PostEffect
+    public class SSAOPostEffect : PostEffect
     {
         private const int ConstantBufferSize = 32;
 
@@ -45,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         public Vector2 ScreenSize { get; set; }
         public bool EnableBackOcclusion { get; set; }
 
-        public SSAOEffect(Device graphicsDevice, IGameApp app) : base(graphicsDevice)
+        public SSAOPostEffect(Device graphicsDevice, IGameApp app) : base(graphicsDevice)
         {
             _game = app;
             _constantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
@@ -170,7 +170,4 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
         }
     }
-
-   
-
 }

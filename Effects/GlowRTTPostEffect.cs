@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Content;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class PostGlowRTTEffect
+    public class GlowRTTPostEffect : PostEffect
     {
 
     }

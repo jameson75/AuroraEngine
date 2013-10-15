@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Content;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class PixelVelocityBlur : PostEffect
+    public class PixelVelocityBlurPostEffect : PostEffect
     {
         private const int WorldVertexConstantBufferSize = 80;
         private const int BlurVertexConstantBufferSize = 16;
@@ -72,7 +72,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public float BlurAmount { get; set; }
 
-        public PixelVelocityBlur(Device graphicsDevice, IGameApp game)
+        public PixelVelocityBlurPostEffect(Device graphicsDevice, IGameApp game)
             : base(graphicsDevice)
         {
             _game = game;
@@ -263,7 +263,6 @@ namespace CipherPark.AngelJacket.Core.Effects
             _lastVelocityTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _lastVelocityTexture, resourceViewDesc);
             _lastVelocityTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _lastVelocityTexture, renderTargetViewDesc);
             _lastVelocityTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
-
         }
 
         private void CreateShaders()

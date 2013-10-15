@@ -81,6 +81,9 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public override void Apply()
         {
+            //TODO: This method is incomplete. Needs finishing.
+            //-------------------------------------------------
+
             /////////////
             //Pass0
             /////////////
@@ -166,6 +169,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
             samplerStateDesc.AddressV = TextureAddressMode.Clamp;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+
+            //TODO: Finish creating resources here.
         }
 
         private void WriteShaderConstants()

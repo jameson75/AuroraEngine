@@ -74,9 +74,10 @@
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\FlexboardEffect.cs" />
     <Compile Include="Effects\CameraMotionBlur.cs" />
-    <Compile Include="Effects\PixelVelocityBlur.cs" />
-    <Compile Include="Effects\PostGlowRTTEffect.cs" />
-    <Compile Include="Effects\SSAOEffect.cs" />
+    <Compile Include="Effects\PixelVelocityBlurPostEffect.cs" />
+    <Compile Include="Effects\GlowRTTPostEffect.cs" />
+    <Compile Include="Effects\SSAOPostEffect.cs" />
+    <Compile Include="Effects\BlendMapPostEffect.cs" />
     <Compile Include="Kinetics\Animation\ParticleAnimationBuilder.cs" />
     <Compile Include="Animation\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />
@@ -104,7 +105,7 @@
     <Compile Include="Effects\BillboardEffect.cs" />
     <Compile Include="Effects\PostEffect.cs" />
     <Compile Include="Effects\PostEffectChain.cs" />
-    <Compile Include="Effects\PostGlowFSEffect.cs" />
+    <Compile Include="Effects\GlowFSPostEffect.cs" />
     <Compile Include="Effects\Obsolete\SHLightingEffect.cs" />
     <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Effects\SkysphereEffect.cs" />
