@@ -71,9 +71,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\FlexboardEffect.cs" />
     <Compile Include="Effects\CameraMotionBlur.cs" />
+    <Compile Include="Effects\GlitchPostEffect.cs" />
     <Compile Include="Effects\PixelVelocityBlurPostEffect.cs" />
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
     <Compile Include="Effects\SSAOPostEffect.cs" />
