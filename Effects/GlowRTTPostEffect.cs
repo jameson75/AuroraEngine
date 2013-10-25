@@ -33,6 +33,17 @@ namespace CipherPark.AngelJacket.Core.Effects
         private const int ConstantBufferSize3 = 16;
         private Mesh _quad = null;
         private IGameApp _game = null;
+        private byte[] _vertexShaderByteCode = null;
+        private SamplerState _inputTextureSamplerState = null;
+        private ShaderResourceView _hBlurShaderResourceView = null;
+        private RenderTargetView _hBlurRenderTargetView = null;
+        private SamplerState _hBlurSamplerState = null;
+        private ShaderResourceView _hvBlurShaderResourceView = null;
+        private RenderTargetView _hvBlurRenderTargetView = null;
+        private SamplerState _hvBlurSamplerState = null;
+        private ShaderResourceView _glowMapShaderResourceView = null;
+        private RenderTargetView _glowMapRenderTargetView = null;
+        private SamplerState _glowMapSamplerState = null;
 
         public GlowRTTPostEffect(Device graphicsDevice, IGameApp gameApp)
             : base(graphicsDevice)
@@ -40,6 +51,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             _game = gameApp;
             CreateShaders();
             CreateTargets();
+            CreateConstantBuffers();
         }
 
         public float Sceneness { get; set; }
@@ -56,14 +68,10 @@ namespace CipherPark.AngelJacket.Core.Effects
             //---------------------
             RenderTargetView previousRenderTarget = null;
             DepthStencilView previousDepthStencil = null;
-            previousRenderTarget = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out previousDepthStencil)[0];            
-            
-            //Set the constant variables that will be used by the vertex and pixel shaders on each pass.
-            //------------------------------------------------------------------------------------------
-            WriteConstants();           
+            previousRenderTarget = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out previousDepthStencil)[0];                         
 
             //Cache graphic states and setup new ones.
-            //------------------------------------------
+            //----------------------------------------
             RasterizerState oldRasterizerState = GraphicsDevice.ImmediateContext.Rasterizer.State;
             RasterizerStateDescription newRasterizerStateDesc = (oldRasterizerState != null) ? oldRasterizerState.Description : RasterizerStateDescription.Default();
             newRasterizerStateDesc.CullMode = CullMode.None;
@@ -78,6 +86,10 @@ namespace CipherPark.AngelJacket.Core.Effects
             for (int i = 0; i < newBlendStateDesc.RenderTarget.Length; i++)
                 newBlendStateDesc.RenderTarget[i].IsBlendEnabled = false;
             GraphicsDevice.ImmediateContext.OutputMerger.BlendState = new BlendState(GraphicsDevice, newBlendStateDesc);
+
+            //Set the constant variables that will be used by the vertex and pixel shaders on each pass.
+            //------------------------------------------------------------------------------------------
+            WriteConstants();     
            
             /////////
             //Pass0
@@ -86,7 +98,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Output: HBlur         
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer1);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _inputTextureSampler);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _inputTextureSamplerState);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_hBlurRenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_horzVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_blurPixelShader);
@@ -101,13 +113,16 @@ namespace CipherPark.AngelJacket.Core.Effects
             /////////                     
             //Input: HBlur
             //Output: HVBlur
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _sceneTextureShaderResourceView);
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _sceneTextureSampler);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap1RenderTargetView);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer1);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _hBlurShaderResourceView);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _hBlurSamplerState);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_hvBlurRenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_blurPixelShader);
             _quad.Draw(0);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
 
 	        /////////
@@ -115,13 +130,16 @@ namespace CipherPark.AngelJacket.Core.Effects
             /////////                     
             //Input: HVBlur
             //Output: GlowMap
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _sceneTextureShaderResourceView);
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _sceneTextureSampler);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap1RenderTargetView);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer2);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _hvBlurShaderResourceView);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _hvBlurSamplerState);
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMapRenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_glowPixelShader);
             _quad.Draw(0);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
 
             //////////
@@ -129,38 +147,39 @@ namespace CipherPark.AngelJacket.Core.Effects
             //////////
             //Input: GlowMap
             //Output: Final (GlowMap overlayed).
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _sceneTextureShaderResourceView);
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _sceneTextureSampler);
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap1RenderTargetView);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, _glowMapShaderResourceView);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, InputTexture);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _glowMapSamplerState);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, _inputTextureSamplerState);            
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_glowPixelShader);
             _quad.Draw(0);
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
 
             ////////////
-            //Clean up
-            ////////////           
-            //Clear constant buffers.
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
-            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
-            //Clear shader resources.
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
-            ////Clear samplers.
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, null);
+            //Restore
+            ////////////                      
+
             //Reset graphic states.
+            //---------------------
             GraphicsDevice.ImmediateContext.Rasterizer.State = oldRasterizerState;
             GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = oldDepthStencilState;
             GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
+
             //Reset render targets.  
+            //---------------------
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousDepthStencil, previousRenderTarget); 
         }
 
         private void CreateShaders()
         {
-            LoadVertexShader(@"Content\Shaders\glowrtt-horz9-vs.cso", out _horzVertexShader);
+            _vertexShaderByteCode = LoadVertexShader(@"Content\Shaders\glowrtt-horz9-vs.cso", out _horzVertexShader);
             LoadVertexShader(@"Content\Shaders\glowrtt-vert9-vs.cso", out _vertVertexShader);
             LoadPixelShader(@"Content\Shaders\glowrtt-blur.cso", out _blurPixelShader);
             LoadPixelShader(@"Content\Shaders\glowrtt-glow.cso", out _glowPixelShader);
@@ -169,7 +188,68 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateTargets()
         {
+            _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);
 
+            Texture2DDescription textureDesc = new Texture2DDescription();
+            textureDesc.ArraySize = 1;
+            textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
+            textureDesc.CpuAccessFlags = CpuAccessFlags.None;
+            textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
+            textureDesc.Height = _game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
+            textureDesc.Width = _game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
+            textureDesc.MipLevels = 1;
+            textureDesc.OptionFlags = ResourceOptionFlags.None;
+            textureDesc.Usage = ResourceUsage.Default;
+            textureDesc.SampleDescription.Count = 1;
+
+            ShaderResourceViewDescription resourceViewDesc = new ShaderResourceViewDescription();
+            resourceViewDesc.Format = textureDesc.Format;
+            resourceViewDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
+            resourceViewDesc.Texture2D.MostDetailedMip = 0;
+            resourceViewDesc.Texture2D.MipLevels = 1;
+
+            RenderTargetViewDescription renderTargetViewDesc = new RenderTargetViewDescription();
+            renderTargetViewDesc.Format = textureDesc.Format;
+            renderTargetViewDesc.Dimension = RenderTargetViewDimension.Texture2D;
+            renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+            SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
+            samplerStateDesc.Filter = Filter.MinMagMipLinear;
+            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+            samplerStateDesc.AddressV = TextureAddressMode.Clamp;
+            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+
+            //InputTexture (Sampler State)
+            //------------            
+            _inputTextureSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
+
+            //H-Blur
+            //------
+            Texture2D _hBlurTexture = new Texture2D(GraphicsDevice, textureDesc);
+            _hBlurShaderResourceView = new ShaderResourceView(GraphicsDevice, _hBlurTexture, resourceViewDesc);
+            _hBlurRenderTargetView = new RenderTargetView(GraphicsDevice, _hBlurTexture, renderTargetViewDesc);
+            _hBlurSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
+
+            //HV-Blur
+            //-------
+            Texture2D _hvBlurTexture = new Texture2D(GraphicsDevice, textureDesc);
+            _hvBlurShaderResourceView = new ShaderResourceView(GraphicsDevice, _hvBlurTexture, resourceViewDesc);
+            _hvBlurRenderTargetView = new RenderTargetView(GraphicsDevice, _hvBlurTexture, renderTargetViewDesc);
+            _hvBlurSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
+
+            //GlowMap
+            //--------
+            Texture2D _glowMapTexture = new Texture2D(GraphicsDevice, textureDesc);
+            _glowMapShaderResourceView = new ShaderResourceView(GraphicsDevice, _glowMapTexture, resourceViewDesc);
+            _glowMapRenderTargetView = new RenderTargetView(GraphicsDevice, _glowMapTexture, renderTargetViewDesc);
+            _glowMapSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);         
+        }
+
+        private void CreateConstantBuffers()
+        {
+            _constantBuffer1 = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize1, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _constantBuffer2 = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize2, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _constantBuffer3 = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize3, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
         private void WriteConstants()

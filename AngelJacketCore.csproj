@@ -79,7 +79,6 @@
     <Compile Include="Effects\PixelVelocityBlurPostEffect.cs" />
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
     <Compile Include="Effects\SSAOPostEffect.cs" />
-    <Compile Include="Effects\BlendMapPostEffect.cs" />
     <Compile Include="Kinetics\Animation\ParticleAnimationBuilder.cs" />
     <Compile Include="Animation\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />
