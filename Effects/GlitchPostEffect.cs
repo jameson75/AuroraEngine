@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    class GlitchPostEffect : PostEffect
-    {
+    //public class GlitchPostEffect : PostEffect
+    //{
 
-    }
+    //}
 }

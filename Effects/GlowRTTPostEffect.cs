@@ -58,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public float Glowness { get; set; }
 
-        public void Apply()
+        public override void Apply()
         {
             /////////////////
             //Setup
