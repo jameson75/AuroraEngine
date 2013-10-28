@@ -190,8 +190,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     if (this.SelectedItem != null)
                     {
                         this.OnItemClicked((MenuItem)this.SelectedItem);
+                        
                         if (SelectedItem.CommandName != null)
-                            this.OnCommand(SelectedItem.CommandName);  
+                            this.OnCommand(SelectedItem.CommandName);
+
+                        if (this._submenus.ContainsKey(SelectedItem.CommandName))
+                            this.ShowSubmenu(SelectedItem.CommandName);
                     }                       
                 }
             }
