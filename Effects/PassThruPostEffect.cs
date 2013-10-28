@@ -37,7 +37,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             string psFileName = "Content\\Shaders\\postpassthru-ps.cso";
             string vsFileName = "Content\\Shaders\\postpassthru-vs.cso";
-            string vsFixFileName = "Content\\Shaders\\postpassthru-fix-vs.cos";
+            string vsFixFileName = "Content\\Shaders\\postpassthru-fix-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
             _samplerState = new SamplerState(graphicsDevice, SamplerStateDescription.Default());
             VertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
