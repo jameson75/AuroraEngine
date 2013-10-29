@@ -251,6 +251,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new DrawingPointF(s.X + s2.X, s.Y + s2.Y);
         }
 
+        public static DrawingPointF Subtract(this DrawingPointF s, DrawingPointF s2)
+        {
+            return new DrawingPointF(s.X - s2.X, s.Y - s2.Y);
+        }
+
         public static Vector2 ToVector2(this DrawingPointF pointF)
         {
             return new Vector2(pointF.X, pointF.Y);

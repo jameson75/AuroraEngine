@@ -160,19 +160,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             subMenu.Visible = true;
             subMenu.HasFocus = hasFocus;
             subMenu.Owner = this;
-
+            
+            DrawingPointF subMenuRelativePosition = DrawingPointFExtension.Zero;
+            
             switch (subMenu.DisplaySide)
             {
                 case SubmenuDisplaySide.Left:
+                    subMenuRelativePosition = new DrawingPointF(this.Position.X - subMenu.Bounds.Width, this.Position.Y);
                     break;
                 case SubmenuDisplaySide.Above:
+                    subMenuRelativePosition = new DrawingPointF(this.Position.X, this.Position.Y - subMenu.Bounds.Height);
                     break;
                 case SubmenuDisplaySide.Right:
+                    subMenuRelativePosition = new DrawingPointF(this.Bounds.Left, this.Position.Y);
                     break;
                 case SubmenuDisplaySide.Bottom:
+                    subMenuRelativePosition = new DrawingPointF(this.Bounds.X, this.Bounds.Bottom);
                     break;
             }
-
+            
+            subMenu.Position = subMenu.PositionToLocal(this.PositionToSurface(subMenuRelativePosition));
+           
             if (subMenu.HasFocus && subMenu.Items.Count > 0)
                 subMenu.SelectedItemIndex = 0;
         }
@@ -367,7 +375,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public delegate void ItemClickedEventHandler(object sender, ItemClickedEventArgs args);
 
-
     public class Submenu : Menu, Components.ICustomFocusManager
     {
         public Submenu(IUIRoot visualRoot)
@@ -386,10 +393,30 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             if (this.HasFocus)
             {
+                //**********************************************
                 // if back button pressed                
                     // close this submenu.
                     // return focus to owner.
                     // null owner.
+                //**********************************************
+                
+                Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
+                if (inputServices == null)
+                    throw new InvalidOperationException("Input services not available.");
+
+                InputState inputState = inputServices.GetInputState();
+
+                bool closeButtonPressed = (inputState.IsKeyHit(Key.Escape)) ||
+                                          //(Orienation == MenuOrientation.Horizontal && inputState.IsKeyHit(Key.Left)) ||
+                                          (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.Back)) ||
+                                          (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.B));
+                
+                if (closeButtonPressed)
+                {
+                    this.Visible = false;
+                    this.Owner.HasFocus = true;
+                    this.Owner = null;
+                }
             }
             base.OnUpdate(gameTime);
         }

@@ -49,6 +49,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Size = font.MeasureString(text).Add(DefaultItemTextMargin);
         }
 
+        public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 itemFontColor, Color4 selectFontColor, Submenu subMenu)
+            : base(visualRoot)
+        {
+            Name = name;
+            Submenu = subMenu;
+            TextContent itemContent = new TextContent(text, font, itemFontColor);
+            ItemContent = itemContent;
+            TextContent selectContent = new TextContent(text, font, selectFontColor);
+            SelectContent = selectContent;
+            Size = font.MeasureString(text).Add(DefaultItemTextMargin);
+        }
+
         public UIContent ItemContent
         {
             get { return _itemContent; }

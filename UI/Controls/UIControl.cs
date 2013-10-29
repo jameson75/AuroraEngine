@@ -238,7 +238,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             if (template.Size != null)
                 this.Size = template.Size.Value;
-
             OnStyleChanged();
         }
 
@@ -256,6 +255,25 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             while (root != null)
             {
                 transformedPosition = DrawingPointFExtension.Add(transformedPosition, root.Position);
+                root = root.Parent;
+            }
+            return transformedPosition;
+        }
+
+        public RectangleF BoundsToLocal(RectangleF surfaceBounds)
+        {
+            DrawingPointF surfaceBoundsOrigin = new DrawingPointF(surfaceBounds.Left, surfaceBounds.Top);
+            DrawingPointF boundsOrigin = PositionToLocal(surfaceBoundsOrigin);
+            return RectangleFExtension.CreateLTWH(boundsOrigin.X, boundsOrigin.Y, surfaceBounds.Width, surfaceBounds.Height);
+        }
+
+        public DrawingPointF PositionToLocal(DrawingPointF position)
+        {
+            DrawingPointF transformedPosition = position;
+            UIControl root = this.Parent;
+            while (root != null)
+            {
+                transformedPosition = DrawingPointFExtension.Subtract(transformedPosition, root.Position);
                 root = root.Parent;
             }
             return transformedPosition;
