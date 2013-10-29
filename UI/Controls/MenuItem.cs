@@ -75,6 +75,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
+        public Submenu Submenu { get; set; }
+
         protected UIContent ActiveContent
         {
             get

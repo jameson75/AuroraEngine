@@ -13,6 +13,7 @@ using CipherPark.AngelJacket.Core.UI.Components;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
+    [Obsolete]
     public class DropList : UIControl, ICustomFocusManager
     {
         SplitterPanel _childPanel = null;

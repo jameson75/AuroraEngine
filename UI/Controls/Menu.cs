@@ -152,6 +152,45 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         
         public LabelTemplate DefaultItemTemplate { get; set; }
 
+        public void OpenSubmenu(Submenu subMenu)
+        {
+            if (subMenu.Owner != null && subMenu.Owner != this)
+                throw new InvalidOperationException("Submenu cannot be opened while owned by another menu.");
+
+            subMenu.Visible = true;
+            subMenu.HasFocus = true;
+            subMenu.Owner = this;
+
+            switch (subMenu.DisplaySide)
+            {
+                case SubmenuDisplaySide.Left:
+                    break;
+                case SubmenuDisplaySide.Above:
+                    break;
+                case SubmenuDisplaySide.Right:
+                    break;
+                case SubmenuDisplaySide.Bottom:
+                    break;
+            }
+        }
+
+        public void AddMenuItem(MenuItem item)
+        {
+            this.Items.Add(item);
+        }
+
+        public void AddMenuItem(string text, string name = null, SpriteFont font = null, Color? fontColor = null, Color? bgColor = null, Color? selectColor = null)
+        {
+            LabelTemplate itemTemplate = this.DefaultItemTemplate != null ? this.DefaultItemTemplate : DefaultTheme.Instance.Label;
+            MenuItem item = new MenuItem(this.VisualRoot,
+                                                       name,
+                                                       text,
+                                                       font != null ? font : itemTemplate.CaptionStyle.Font,
+                                                       fontColor != null ? fontColor.Value : itemTemplate.CaptionStyle.FontColor.Value,
+                                                       selectColor != null ? selectColor.Value : fontColor != null ? fontColor.Value : itemTemplate.CaptionStyle.FontColor.Value);
+            AddMenuItem(item);
+        }
+
         protected override void OnDraw(long gameTime)
         {
             foreach (MenuItem item in Items)
@@ -192,10 +231,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         this.OnItemClicked((MenuItem)this.SelectedItem);
                         
                         if (SelectedItem.CommandName != null)
-                            this.OnCommand(SelectedItem.CommandName);
-
-                        if (this._submenus.ContainsKey(SelectedItem.CommandName))
-                            this.ShowSubmenu(SelectedItem.CommandName);
+                            this.OnCommand(SelectedItem.CommandName);                        
                     }                       
                 }
             }
@@ -275,7 +311,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             ItemClickedEventHandler handler = this.ItemClicked;
             if (handler != null)
                 handler(this, new ItemClickedEventArgs(item));
-        }      
+            
+            if (item.Submenu != null && item.Submenu.Activation == SubmenuActivation.Click)
+                OpenSubmenu(item.Submenu);
+        }
+
+        protected override void OnSelectedItemChanged()
+        {
+            base.OnSelectedItemChanged();
+
+            if (SelectedItem != null)
+            {
+                Submenu itemSubmenu = ((MenuItem)SelectedItem).Submenu;
+                if (itemSubmenu != null && itemSubmenu.Activation == SubmenuActivation.Select)
+                    OpenSubmenu(itemSubmenu);
+            }
+        }    
 
         public event ItemClickedEventHandler ItemClicked = null;
 
@@ -290,23 +341,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Menu menu = new Menu(visualRoot);
             menu.ApplyTemplate(menuTemplate);
             return menu;
-        }
-
-        public void AddMenuItem(MenuItem item)
-        {
-            this.Items.Add(item);
-        }
-
-        public void AddMenuItem(string text, string name = null, SpriteFont font = null, Color? fontColor = null, Color? bgColor = null, Color? selectColor = null )                     
-        {
-            LabelTemplate itemTemplate = this.DefaultItemTemplate != null ? this.DefaultItemTemplate : DefaultTheme.Instance.Label;
-            MenuItem item = new MenuItem(this.VisualRoot,
-                                                       name,
-                                                       text,
-                                                       font != null ? font : itemTemplate.CaptionStyle.Font,
-                                                       fontColor != null ? fontColor.Value : itemTemplate.CaptionStyle.FontColor.Value,                                                       
-                                                       selectColor != null ? selectColor.Value : fontColor != null ? fontColor.Value : itemTemplate.CaptionStyle.FontColor.Value);
-            AddMenuItem(item);
         }
     } 
 
@@ -329,4 +363,60 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     }
 
     public delegate void ItemClickedEventHandler(object sender, ItemClickedEventArgs args);
+
+
+    public class Submenu : Menu, Components.ICustomFocusManager
+    {
+        public Submenu(IUIRoot visualRoot)
+            : base(visualRoot)
+        {
+
+        }
+
+        public Menu Owner { get; set; }
+
+        public SubmenuActivation Activation { get; set; }
+
+        public SubmenuDisplaySide DisplaySide { get; set; }
+
+        protected override void OnUpdate(long gameTime)
+        {
+            if (this.HasFocus)
+            {
+                // if back button pressed                
+                    // close this submenu.
+                    // return focus to owner.
+                    // null owner.
+            }
+            base.OnUpdate(gameTime);
+        }
+
+        #region ICustomFocusManager
+
+        public void SetNextFocus(UIControl focusedControl)
+        {
+            //NOTE: By doing nothing, we effectively disable forward-tabbing out of a submenu.
+        }
+
+        public void SetPreviousFocus(UIControl focusedControl)
+        {
+            //NOTE: By doing nothing, we effectively disable backward-tabbing out of a submenu.
+        }
+
+        #endregion
+    }
+
+    public enum SubmenuActivation
+    {
+        Click,
+        Select
+    }
+
+    public enum SubmenuDisplaySide
+    {
+        Left,
+        Above,
+        Right,
+        Bottom
+    }
 }
