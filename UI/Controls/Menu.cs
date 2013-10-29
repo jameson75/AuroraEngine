@@ -152,13 +152,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         
         public LabelTemplate DefaultItemTemplate { get; set; }
 
-        public void OpenSubmenu(Submenu subMenu)
+        public void OpenSubmenu(Submenu subMenu, bool hasFocus)
         {
             if (subMenu.Owner != null && subMenu.Owner != this)
                 throw new InvalidOperationException("Submenu cannot be opened while owned by another menu.");
 
             subMenu.Visible = true;
-            subMenu.HasFocus = true;
+            subMenu.HasFocus = hasFocus;
             subMenu.Owner = this;
 
             switch (subMenu.DisplaySide)
@@ -172,6 +172,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 case SubmenuDisplaySide.Bottom:
                     break;
             }
+
+            if (subMenu.HasFocus && subMenu.Items.Count > 0)
+                subMenu.SelectedItemIndex = 0;
         }
 
         public void AddMenuItem(MenuItem item)
@@ -313,7 +316,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 handler(this, new ItemClickedEventArgs(item));
             
             if (item.Submenu != null && item.Submenu.Activation == SubmenuActivation.Click)
-                OpenSubmenu(item.Submenu);
+                OpenSubmenu(item.Submenu, true);
         }
 
         protected override void OnSelectedItemChanged()
@@ -324,7 +327,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 Submenu itemSubmenu = ((MenuItem)SelectedItem).Submenu;
                 if (itemSubmenu != null && itemSubmenu.Activation == SubmenuActivation.Select)
-                    OpenSubmenu(itemSubmenu);
+                    OpenSubmenu(itemSubmenu, false);
             }
         }    
 
@@ -341,7 +344,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Menu menu = new Menu(visualRoot);
             menu.ApplyTemplate(menuTemplate);
             return menu;
-        }
+        }  
     } 
 
     public enum MenuOrientation
