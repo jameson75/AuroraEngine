@@ -37,6 +37,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             OnCommand(args.CommandName);
             MaxRowSize = ListControl.SizeInfinite;
         }
+     
 
         public override bool CanFocus
         {
@@ -67,6 +68,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             foreach (ItemControl item in this.Items)
                 item.Draw(gameTime);
+
             base.OnDraw(gameTime);
         }
 
@@ -95,15 +97,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }    
     }
 
-    public class PropertyGridItem : ItemControl
+    public abstract class PropertyGridItem : ItemControl
     {
         private CommandControlWireUp _wireUp = null;
         private Guid childLabelId;
 
-        public PropertyGridItem(string text, SpriteFont font, Color4 fontColor, UIControl control)
+        protected PropertyGridItem(TextContent text, UIControl control)
             : base(control.VisualRoot)
         {
-            Label childLabel = new Label(control.VisualRoot, new TextContent(text, font, fontColor));
+            Label childLabel = new Label(control.VisualRoot, text);
             childLabelId = Guid.NewGuid();
             childLabel.Id = childLabelId;
             childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Left;
@@ -134,4 +136,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnLayoutChanged();
         }
     }
+
+    public class TogglePropertyGridItem : PropertyGridItem
+    {
+        public TogglePropertyGridItem() : base(
+    }
+
+
 }
