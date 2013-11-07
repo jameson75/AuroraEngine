@@ -57,6 +57,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }                    
         }      
 
+        public void AddMProperty(PropertyGridItem item)
+        {
+            this.Items.Add(item);
+        }
+
         protected override void OnUpdate(long gameTime)
         {
             foreach (ItemControl item in this.Items)
@@ -137,10 +142,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
     }
 
-    public class TogglePropertyGridItem : PropertyGridItem
+    public class BooleanPropertyGridItem : PropertyGridItem
     {
-        public TogglePropertyGridItem() : base(
+        public BooleanPropertyGridItem(string caption) : base(
     }
-
-
 }

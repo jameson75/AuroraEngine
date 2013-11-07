@@ -15,7 +15,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 // Copyright © 2010-2013
 // Angel Jacket by Cipher Park is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
@@ -95,6 +95,46 @@ namespace CipherPark.AngelJacket.Core.Effects
         public void SetTextureEnabled(bool enabled)
         {
             _effect.SetTextureEnabled(enabled);
+        }
+
+        public void SetAmbientLightColor(Color color)
+        {
+            _effect.SetAmbientLightColor(color);
+        }
+
+        public void SetDiffuseLightColor(Color color)
+        {
+            _effect.SetDiffuseColor(color);
+        }
+
+        public void SetEmissive(Color color)
+        {
+            _effect.SetEmissiveColor(color);
+        }
+
+        public void SetLightDirection(int index, Vector3 dir)
+        {
+            _effect.SetLightDirection(index, dir);
+        }
+
+        public void SetLightEnabled(int index, bool enabled)
+        {
+            _effect.SetLightEnabled(index, enabled);
+        }
+
+        public void EnableCustomLighting(bool enabled)
+        {
+            _effect.SetLightingEnabled(enabled);
+        }
+
+        public void SetSpecularColor(Color color)
+        {
+            _effect.SetSpecularColor(color);
+        }
+
+        public void SetSpecularPower(float power)
+        {
+            _effect.SetSpecularPower(power);
         }
     }
 }
