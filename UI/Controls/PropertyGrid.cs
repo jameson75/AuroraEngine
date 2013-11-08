@@ -107,6 +107,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private CommandControlWireUp _wireUp = null;
         private Guid childLabelId;
 
+        protected PropertyGrid(string textContent, UIControl control)
+        {
+
+        }
+
         protected PropertyGridItem(TextContent text, UIControl control)
             : base(control.VisualRoot)
         {

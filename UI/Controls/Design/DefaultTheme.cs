@@ -29,36 +29,60 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private MenuItemTemplate _menuItem = null;
         private bool isInitialized = false;
 
+        /// <summary>
+        /// Background color for all applicable control templates in this theme.
+        /// </summary>
+        private Color ControlBackgroundColor { get; set; }
+        /// <summary>
+        /// Font for all control applicable templates in this theme.
+        /// </summary>
+        private SpriteFont ControlFont { get; set; }
+        /// <summary>
+        /// Font color for all applicable control templates in this theme.
+        /// </summary>        
+        private Color ControlFontColor { get; set; }
+        /// <summary>
+        /// "Selected Item" font color for all applicable control templates in this theme.
+        /// </summary>
+        private Color ControlFontSelectedColor { get; set; }
+        /// <summary>
+        /// Foreground color for all applicable control templates in this theme.
+        /// </summary>
+        private Color ControlForegroundColor { get; set; }
+        /// <summary>
+        /// The "checked" image for all applicable control templates in this theme.
+        /// </summary>
+        private Texture2D DefaultCheckTexture { get; set; }
+        /// <summary>
+        /// The "unchecked" image for all applicable control templates in this theme.
+        /// </summary>
+        private Texture2D DefaultUncheckTexture { get; set; }
+        /// <summary>
+        /// The default background image for all applicable control templates in this theme.
+        /// </summary>
+        /// <remarks>
+        /// Typically used by the image control, when no texture is specified.
+        /// </remarks>
+        private Texture2D NoImageTexture { get; set; }
+        /// <summary>
+        /// The "checked" image for all applicable control templates in this theme.
+        /// </summary>
+        private Texture2D DropDownImageTexture { get; set; }
+        /// <summary>
+        /// The font for all editor control templates in this theme.
+        /// </summary>
+        private SpriteFont EditorFont { get; set; }
+        /// <summary>
+        /// The font color for all editor control templates in this theme.
+        /// </summary>
+        private Color EditorFontColor { get; set; }
+        /// <summary>
+        /// The background color for all editor control templates in this theme.
+        /// </summary>
+        private Color EditorColor { get; set; }
+
         private DefaultTheme()
-        {
-            
-        }
-
-        public static DefaultTheme Instance
-        {
-            get
-            {
-                lock (_instanceLock)
-                {
-                    if (_instance == null)
-                        _instance = new DefaultTheme();
-                }
-                return _instance;
-            }
-        }
-
-        public Color ControlColor { get; set; }
-        public SpriteFont ControlFont { get; set; }
-        public Color ControlFontColor { get; set; }
-        public Color ControlFontHightlightColor { get; set; }
-        public Color ButtonColor { get; set; }
-        public Texture2D DefaultCheckTexture { get; set; }
-        public Texture2D DefaultUncheckTexture { get; set; }
-        public Texture2D EmptyImageTexture { get; set; }
-        public Texture2D DropDownImageTexture { get; set; }
-        public SpriteFont EditorFont { get; set; }
-        public Color EditorFontColor { get; set; }
-        public Color EditorColor { get; set; }
+        { }
 
         public ButtonTemplate Button
         {
@@ -69,7 +93,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
                 if (_button == null)
                 {
-                    _button = new ButtonTemplate(null, ControlFont, ControlFontColor, ButtonColor);
+                    _button = new ButtonTemplate(null, ControlFont, ControlFontColor, ControlForegroundColor);
                     _button.Size = new DrawingSizeF(30, 10);
                 }
                 return _button;                
@@ -122,7 +146,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
                 if (_imageControl == null)
                 {
-                    _imageControl = new ImageControlTemplate(EmptyImageTexture);
+                    _imageControl = new ImageControlTemplate(NoImageTexture);
                     _imageControl.Size = new DrawingSizeF(20, 20);
                 }
                 return _imageControl;
@@ -223,7 +247,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     {
                         Content = new LabelTemplate(null, ControlFont, ControlFontColor, null),
                         ItemTemplate = new LabelTemplate(null, ControlFont, ControlFontColor, null),
-                        SelectTemplate = new LabelTemplate(null, ControlFont, ControlFontHightlightColor, null)
+                        SelectTemplate = new LabelTemplate(null, ControlFont, ControlFontSelectedColor, null)
                     };
                     _listControlItem.Size = new DrawingSizeF(30, 20);
                 }
@@ -240,7 +264,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
                 if (_listControl == null)
                 {
-                    _listControl = new ListControlTemplate(ControlColor)
+                    _listControl = new ListControlTemplate(ControlBackgroundColor)
                     {
                     };
                     _listControl.Size = new DrawingSizeF(30, 20);
@@ -285,26 +309,34 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             }
         }
 
-        public void Initialize(Device graphicsDevice, string configFilePath)
+        /// <summary>
+        /// Returns an instance of the DefaultTheme singleton.
+        /// </summary>
+        /// <remarks>
+        /// The DefaultTheme instance is created on the first call.
+        /// </remarks>
+        /// <param name="graphicsDevice"></param>
+        /// <returns>An instance of the DefaultTheme singleton.</returns>
+        public static DefaultTheme Create(Device graphicsDevice)
         {
-            if (configFilePath != null)
+            lock (_instanceLock)
             {
-
+                if (_instance == null)
+                {
+                    _instance = new DefaultTheme();
+                    _instance.ControlBackgroundColor = Color.DarkGray;
+                    _instance.ControlFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\ControlFont10.font");
+                    _instance.ControlFontColor = Color.White;
+                    _instance.ControlFontSelectedColor = Color.Orange;
+                    _instance.ControlForegroundColor = Color.Gray;
+                    _instance.DefaultCheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Contnet\UI\DefaultTheme\Check.png");
+                    _instance.DefaultUncheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Content\UI\DefaultTheme\Uncheck.png");
+                    _instance.EditorColor = Color.White;
+                    _instance.EditorFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\EditorFont10.font");
+                    _instance.EditorFontColor = Color.DarkGray;
+                }
             }
-            else
-            {
-                this.ControlColor = Color.DarkGray;
-                this.ControlFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\ControlFont10.font");
-                this.ControlFontColor = Color.White;
-                this.ControlFontHightlightColor = Color.Orange;
-                this.ButtonColor = Color.Gray;
-                this.DefaultCheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Contnet\UI\DefaultTheme\Check.png");
-                this.DefaultUncheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Content\UI\DefaultTheme\Uncheck.png");
-                this.EditorColor = Color.White;
-                this.EditorFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\EditorFont10.font");
-                this.EditorFontColor = Color.DarkGray;
-            }
-            isInitialized = true;
+            return _instance;
         }
     }
 }
