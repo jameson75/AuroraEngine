@@ -68,12 +68,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Range Range { get; set; }
 
-        public float Value
+        public double Value
         {
             get
             {
-                float result = 0;
-                if (!float.TryParse(_textBox.Content.Text, out result))
+                double result = 0;
+                if (!double.TryParse(_textBox.Content.Text, out result))
                     return 0;
                 else
                     return result;
@@ -105,7 +105,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _downButton.Size = new DrawingSizeF(this.Size.Width - 5.0f, this.Size.Height);
         }
 
-        protected virtual void OnValueChanged(float value)
+        protected virtual void OnValueChanged(double value)
         {
             EventHandler handler = ValueChanged;
             if (handler != null)

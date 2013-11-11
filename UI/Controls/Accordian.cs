@@ -15,11 +15,11 @@ using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class ToolMenu : ItemsControl
+    public class Accordian : ItemsControl
     {
         private bool isLayoutUpdating = false;
         
-        public ToolMenu(IUIRoot visualRoot)
+        public Accordian(IUIRoot visualRoot)
             : base(visualRoot)
         { }     
 

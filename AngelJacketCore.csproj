@@ -172,7 +172,7 @@
     <Compile Include="UI\Controls\Slider.cs" />
     <Compile Include="UI\Controls\TextBox.cs" />
     <Compile Include="UI\Controls\TextContent.cs" />
-    <Compile Include="UI\Controls\ToolMenu.cs" />
+    <Compile Include="UI\Controls\Accordian.cs" />
     <Compile Include="UI\Controls\UIContent.cs" />
     <Compile Include="UI\Controls\UIControl.cs" />
     <Compile Include="UI\Serialization\ColorStyleParser.cs" />
