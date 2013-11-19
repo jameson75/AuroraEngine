@@ -73,6 +73,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public void SizeToContent()
         {
+            //TODO: Drop image control and replace usage with content control.
+            //      Then change this method so that, if the content (ie: image) returns
+            //      a non-empty smallest-bounding-rect, we size this control to it,
+            //      otherwise THE CONTROL REMAINS THE SAME SIZE.
+
             if (this._content != null)
                 this.Size = this.Content.CalculateSmallestBoundingRect().Size();
             else

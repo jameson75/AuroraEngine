@@ -18,6 +18,10 @@ using CipherPark.AngelJacket.Core.UI.Components;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
+    //TODO: Change this control into a layout manager
+    //      Then use it help create reusable layouts for 
+    //      sanboxes.
+
     public class DockPanel : UIControl
     {
         public DockPanel(IUIRoot visualRoot)
