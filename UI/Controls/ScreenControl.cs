@@ -15,6 +15,9 @@ using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
+    //TODO: Refactor this control (and the ScreenPanel) to act as layers INSTEAD    
+    //
+
     public class ScreenControl : SelectControl
     {
         private Dictionary<UIControl, UIControl> CachedFocusedElements = new Dictionary<UIControl, UIControl>();
