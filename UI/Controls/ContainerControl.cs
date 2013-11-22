@@ -64,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             int startAfterIndex = Array.IndexOf(tabOrderedControls, fromControl);            
             for (int i = startAfterIndex + 1; i < tabOrderedControls.Length; i++)
             {
-                if (tabOrderedControls[i].Visible && tabOrderedControls[i].Enabled && tabOrderedControls[i].CanFocus)
+                if (tabOrderedControls[i].Visible && tabOrderedControls[i].Enabled && tabOrderedControls[i].CanReceiveFocus)
                     return tabOrderedControls[i];
             }
 

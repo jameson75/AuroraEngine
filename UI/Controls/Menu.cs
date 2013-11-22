@@ -20,7 +20,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public abstract class SelectControl : ItemsControl
     {
         private int _selectedIndex = -1;
-        public SelectControl(Components.IUIRoot visualRoot) : base(visualRoot)
+        public SelectControl(Components.IUIRoot visualRoot)
+            : base(visualRoot)
         {
 
         }
@@ -122,7 +123,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class Menu : SelectControl
     {
         private MenuOrientation _orientation = MenuOrientation.Vertical;
-       
 
         public Menu(Components.IUIRoot visualRoot)
             : base(visualRoot)
@@ -130,7 +130,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             AutoSize = true;
         }
 
-        public override bool CanFocus
+        public override bool CanReceiveFocus
         {
             get
             {
@@ -149,7 +149,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public bool AutoSize { get; set; }
-        
+
         public LabelTemplate DefaultItemTemplate { get; set; }
 
         public void OpenSubmenu(Submenu subMenu, bool hasFocus)
@@ -160,27 +160,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             subMenu.Visible = true;
             subMenu.HasFocus = hasFocus;
             subMenu.Owner = this;
-            
+
             DrawingPointF subMenuRelativePosition = DrawingPointFExtension.Zero;
-            
+
             switch (subMenu.DisplaySide)
             {
-                case SubmenuDisplaySide.Left:
+                case ContextControlDisplaySide.Left:
                     subMenuRelativePosition = new DrawingPointF(this.Position.X - subMenu.Bounds.Width, this.Position.Y);
                     break;
-                case SubmenuDisplaySide.Above:
+                case ContextControlDisplaySide.Above:
                     subMenuRelativePosition = new DrawingPointF(this.Position.X, this.Position.Y - subMenu.Bounds.Height);
                     break;
-                case SubmenuDisplaySide.Right:
+                case ContextControlDisplaySide.Right:
                     subMenuRelativePosition = new DrawingPointF(this.Bounds.Left, this.Position.Y);
                     break;
-                case SubmenuDisplaySide.Bottom:
+                case ContextControlDisplaySide.Bottom:
                     subMenuRelativePosition = new DrawingPointF(this.Bounds.X, this.Bounds.Bottom);
                     break;
             }
-            
+
             subMenu.Position = subMenu.PositionToLocal(this.PositionToSurface(subMenuRelativePosition));
-           
+
             if (subMenu.HasFocus && subMenu.Items.Count > 0)
                 subMenu.SelectedItemIndex = 0;
         }
@@ -205,7 +205,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnDraw(long gameTime)
         {
             foreach (MenuItem item in Items)
-                item.Draw(gameTime);           
+                item.Draw(gameTime);
             base.OnDraw(gameTime);
         }
 
@@ -216,10 +216,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
                 if (inputServices == null)
                     throw new InvalidOperationException("Input services not available.");
-               
+
                 InputState inputState = inputServices.GetInputState();
-                
-                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && inputState.IsKeyHit(Key.UpArrow)) || 
+
+                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && inputState.IsKeyHit(Key.UpArrow)) ||
                                              (Orienation == MenuOrientation.Horizontal && inputState.IsKeyHit(Key.Left)) ||
                                              (Orienation == MenuOrientation.Vertical && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp)) ||
                                              (Orienation == MenuOrientation.Horizontal && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadLeft));
@@ -240,10 +240,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     if (this.SelectedItem != null)
                     {
                         this.OnItemClicked((MenuItem)this.SelectedItem);
-                        
+
                         if (SelectedItem.CommandName != null)
-                            this.OnCommand(SelectedItem.CommandName);                        
-                    }                       
+                            this.OnCommand(SelectedItem.CommandName);
+                    }
                 }
             }
 
@@ -259,15 +259,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         protected override void OnItemAdded(ItemControl item)
-        {           
+        {
             if (item is MenuItem == false)
                 throw new ArgumentException("item", "item must be of type or derivative of MenuItem");
             if (AutoSize)
-            {              
+            {
                 if (this.Items.Count == 1)
                     this.Size = item.Size;
                 else
-                    this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);                
+                    this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
             }
             base.OnItemAdded(item);
         }
@@ -281,7 +281,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     this.Size = DrawingSizeFExtension.Zero;
                 else
                     this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
-            }            
+            }
             SelectedItemIndex = -1;
         }
 
@@ -322,8 +322,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             ItemClickedEventHandler handler = this.ItemClicked;
             if (handler != null)
                 handler(this, new ItemClickedEventArgs(item));
-            
-            if (item.Submenu != null && item.Submenu.Activation == SubmenuActivation.Click)
+
+            if (item.Submenu != null && item.Submenu.Activation == ContextControlActivation.Click)
                 OpenSubmenu(item.Submenu, true);
         }
 
@@ -334,10 +334,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (SelectedItem != null)
             {
                 Submenu itemSubmenu = ((MenuItem)SelectedItem).Submenu;
-                if (itemSubmenu != null && itemSubmenu.Activation == SubmenuActivation.Select)
+                if (itemSubmenu != null && itemSubmenu.Activation == ContextControlActivation.Select)
                     OpenSubmenu(itemSubmenu, false);
             }
-        }    
+        }
 
         public event ItemClickedEventHandler ItemClicked = null;
 
@@ -352,8 +352,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Menu menu = new Menu(visualRoot);
             menu.ApplyTemplate(menuTemplate);
             return menu;
-        }  
-    } 
+        }
+    }
 
     public enum MenuOrientation
     {
@@ -366,87 +366,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private MenuItem _item = null;
 
         public ItemClickedEventArgs(MenuItem menuItem)
-        {            
+        {
             _item = menuItem;
-        }      
+        }
 
         public MenuItem Item { get { return _item; } }
     }
 
     public delegate void ItemClickedEventHandler(object sender, ItemClickedEventArgs args);
-
-    public class Submenu : Menu, Components.ICustomFocusManager
-    {
-        public Submenu(IUIRoot visualRoot)
-            : base(visualRoot)
-        {
-
-        }
-
-        public Menu Owner { get; set; }
-
-        public SubmenuActivation Activation { get; set; }
-
-        public SubmenuDisplaySide DisplaySide { get; set; }
-
-        protected override void OnUpdate(long gameTime)
-        {
-            if (this.HasFocus)
-            {
-                //**********************************************
-                // if back button pressed                
-                    // close this submenu.
-                    // return focus to owner.
-                    // null owner.
-                //**********************************************
-                
-                Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
-                if (inputServices == null)
-                    throw new InvalidOperationException("Input services not available.");
-
-                InputState inputState = inputServices.GetInputState();
-
-                bool closeButtonPressed = (inputState.IsKeyHit(Key.Escape)) ||
-                                          //(Orienation == MenuOrientation.Horizontal && inputState.IsKeyHit(Key.Left)) ||
-                                          (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.Back)) ||
-                                          (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.B));
-                
-                if (closeButtonPressed)
-                {
-                    this.Visible = false;
-                    this.Owner.HasFocus = true;
-                    this.Owner = null;
-                }
-            }
-            base.OnUpdate(gameTime);
-        }
-
-        #region ICustomFocusManager
-
-        public void SetNextFocus(UIControl focusedControl)
-        {
-            //NOTE: By doing nothing, we effectively disable forward-tabbing out of a submenu.
-        }
-
-        public void SetPreviousFocus(UIControl focusedControl)
-        {
-            //NOTE: By doing nothing, we effectively disable backward-tabbing out of a submenu.
-        }
-
-        #endregion
-    }
-
-    public enum SubmenuActivation
-    {
-        Click,
-        Select
-    }
-
-    public enum SubmenuDisplaySide
-    {
-        Left,
-        Above,
-        Right,
-        Bottom
-    }
 }

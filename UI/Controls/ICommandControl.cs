@@ -78,11 +78,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     ICommandControl iChildCommandControl = control as ICommandControl;
                     if (iChildCommandControl != null)
                     {
-                        //NOTE: It is possible that a child control being removed from the container control may have
-                        //been added to the container control BEFORE this object started listening the container control's 
+                        //**************************************************************************************************
+                        //NOTE: It is possible that a child control being removed from the command-dispatcher control may have
+                        //been added to the container control BEFORE this object started listening the command-dispather control's 
                         //children collection. In which case, we would not have been listening to the child's ControlComand
                         //event. We ensure that we only stop listening to ControlCommand events for children we started
                         //listening to. We do this be examining the _wiredUpChildren list.
+                        //**************************************************************************************************
+
                         if (_wiredUpChildren.Contains(iChildCommandControl))
                         {
                             iChildCommandControl.ControlCommand -= CommandControl_Child_ControlCommand;

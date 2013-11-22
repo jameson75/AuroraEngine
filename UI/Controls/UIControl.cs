@@ -135,7 +135,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public virtual bool CanFocus { get { return false; } }
+        public virtual bool CanReceiveFocus { get { return false; } }
 
         public bool EnableFocus { get; set; }
 

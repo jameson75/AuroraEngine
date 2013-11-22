@@ -91,7 +91,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public string CommandName { get; set; }
 
-        public override bool CanFocus
+        public override bool CanReceiveFocus
         {
             get
             {

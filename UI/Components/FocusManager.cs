@@ -127,37 +127,12 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             {
                 UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
                 if (tabOrderedControls.Length > 0)
-                    nextFocusControl = GetFirstInTabOrder(tabOrderedControls[0]);
+                    nextFocusControl = GetFirstEligibleInTabOrder(tabOrderedControls[0]);
             }
 
             if (nextFocusControl != null)
                 SetFocus(nextFocusControl);
         }
-
-        //public void SetNextFocus(UIControl focusedControl, bool includeChildren = true)
-        //{
-        //    UIControl startFromControl = null;
-        //    if (focusedControl != null)
-        //    {
-        //        if (focusedControl.CustomFocusManager != null)
-        //            focusedControl.CustomFocusManager.SetNextFocus(focusedControl);
-        //        else
-        //            startFromControl = GetNextInTabOrder(focusedControl, includeChildren);
-        //    }
-
-        //    else
-        //    {
-        //        UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
-        //        if (tabOrderedControls.Length > 0)
-        //            startFromControl = tabOrderedControls[0];
-        //    }
-
-        //    if (startFromControl != null)
-        //    {
-        //        UIControl focusTarget = FindFirstFocusableTarget(startFromControl);   
-        //        SetFocus(focusTarget);
-        //    
-        //}
 
         public UIControl GetNextInTabOrder(UIControl previousControl, bool searchAncestors = true, bool searchChildren = true)
         {
@@ -198,84 +173,12 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             }
 
             if( startFromControl != null )
-                return GetFirstInTabOrder(startFromControl, searchAncestors, true, searchChildren);
+                return GetFirstEligibleInTabOrder(startFromControl, searchAncestors, true, searchChildren);
             else
                 return null;
         }
-    
-        //public UIControl GetNextInTabOrder(UIControl previousControl, bool includeChildren = true)
-        //{
-        //    if (includeChildren && previousControl.Children.Count > 0)
-        //        return previousControl.Children[0];
-        //    else
-        //    {
-        //        UIControl[] tabOrderedSiblingsAndSelf = null;
-        //        if (previousControl.Parent != null)
-        //            tabOrderedSiblingsAndSelf = ToTabOrderedControlArray(previousControl.Parent.Children);
-        //        else
-        //            tabOrderedSiblingsAndSelf = ToTabOrderedControlArray(previousControl.VisualRoot.Controls);
-        //        int startIndex = Array.IndexOf(tabOrderedSiblingsAndSelf, previousControl);
-        //        if (startIndex >= 0 && startIndex > tabOrderedSiblingsAndSelf.Length - 1)
-        //            return tabOrderedSiblingsAndSelf[startIndex + 1];
-        //        else
-        //            return null;
-        //    }
-        //}
 
-        //public UIControl GetNextInTabOrder(UIControl previousControl, bool searchAncestors = true, bool searchChildren = true)
-        //{
-        //    if (previousControl == null)
-        //        throw new ArgumentNullException("previousControl");
-
-        //    UIControl[] previousControlSiblingsAndPrevious = null;     
-        //    previousControlSiblingsAndPrevious = (previousControl.Parent != null) ?
-        //              FocusManager.ToTabOrderedControlArray(previousControl.Parent.Children) : FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
-        
-        //    int previousControlIndex = Array.IndexOf(previousControlSiblingsAndPrevious, previousControl);
-        //    if (previousControlIndex == -1)
-        //        throw new InvalidOperationException("previous control did not have a parent nor was it a top level control of the visual root.");
-
-        //    for (int i = previousControlIndex + 1; i < previousControlSiblingsAndPrevious.Length; i++)
-        //    {
-        //        if (IsEligibleForFocus(previousControlSiblingsAndPrevious[i]))
-        //            return previousControlSiblingsAndPrevious[i];
-        //        else
-        //        {
-        //            if (searchChildren && IsVisibleAndEnabled(previousControlSiblingsAndPrevious[i]))
-        //            {
-        //                UIControl[] children = FocusManager.ToTabOrderedControlArray(previousControlSiblingsAndPrevious[i].Children);
-        //                if (children.Length > 0 && IsEligibleForFocus(children[0]))
-        //                    return children[0];
-        //                else
-        //                {
-        //                    for (int j = 0; j < children.Length; j++)
-        //                    {
-        //                        UIControl focusableChild = GetNextInTabOrder(children[j], false);
-        //                        if (focusableChild != null)
-        //                            return focusableChild;
-        //                    }
-        //                }
-        //            }                    
-        //        }
-        //    }
-
-        //    //***********************************************************************************************************************
-        //    //NOTE: What we want to do is start searching up the tree only after we've finished searching down the original subtree.
-        //    //***********************************************************************************************************************
-        //    if (searchAncestors && previousControl.Parent != null)
-        //    {
-        //        UIControl[] parentSiblingsAndParent = (previousControl.Parent.Parent != null) ?
-        //            FocusManager.ToTabOrderedControlArray(previousControl.Parent.Parent.Children) : FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
-        //        int parentIndex = Array.IndexOf(parentSiblingsAndParent, previousControl.Parent);
-        //        if (parentIndex == -1)
-        //            throw new InvalidOperationException("prevous control's parent did not have a parent nor was it's parent a top level control of the visual root.");
-        //        return GetNextInTabOrder(parentSiblingsAndParent[parentIndex]);
-        //    }
-
-        //    return null;
-        //}
-
-        public UIControl GetFirstInTabOrder (UIControl startFromControl, bool searchUpwards = true, bool searchSiblings = true, bool searchChildren = true)
+        public UIControl GetFirstEligibleInTabOrder (UIControl startFromControl, bool searchUpwards = true, bool searchSiblings = true, bool searchChildren = true)
         {
             if (startFromControl == null)
                 throw new ArgumentNullException();
@@ -306,7 +209,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                         UIControl[] startFromChildren = FocusManager.ToTabOrderedControlArray(startFromControlSiblingsAndSelf[i].Children);
                         for (int j = 0; j < startFromChildren.Length; j++)
                         {
-                            UIControl focusableChild = GetFirstInTabOrder(startFromChildren[j], false);
+                            UIControl focusableChild = GetFirstEligibleInTabOrder(startFromChildren[j], false);
                             if (focusableChild != null)
                                 return focusableChild;
                         }
@@ -325,7 +228,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if (parentIndex == -1)
                     throw new InvalidOperationException("control's parent did not have a parent nor was it's parent a top level control of the visual root.");
                 if (parentIndex + 1 < parentSiblingsAndParent.Length)
-                    return GetFirstInTabOrder(parentSiblingsAndParent[parentIndex + 1]);
+                    return GetFirstEligibleInTabOrder(parentSiblingsAndParent[parentIndex + 1]);
             }
             
             return null;
@@ -333,47 +236,20 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public static bool IsEligibleForFocus(UIControl control)
         {
-            return control.Visible && control.Enabled && control.CanFocus && control.EnableFocus;
+            return control.Visible && control.Enabled && control.CanReceiveFocus && control.EnableFocus;
         }
 
         public static bool IsVisibleAndEnabled(UIControl control)
         {
             return control.Visible && control.Enabled;
         }
+       
 
-        //[Obsolete]
-        //private static UIControl _GetNextTabTarget(UIControl fromControl)
-        //{
-        //    //NOTE: Unlike WinForms, we don't use the concept of a focus container.
-        //    //instead. We allow a controls parent to determine how to navigate 
-        //    //items.
-        //    if (fromControl == null || fromControl.Parent == null)
-        //    {
-        //        UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(fromControl.VisualRoot.Controls);
-        //        int K = 0;
-        //        if (fromControl != null)
-        //        {
-        //            int fromControlIndex = Array.IndexOf(tabOrderedControls, fromControl);
-        //            if (fromControlIndex == -1)
-        //                throw new InvalidOperationException("fromControl must either have a parent or be be an immediate child of the root");
-        //            K = fromControlIndex + 1;
-        //        }                  
-        //        for (int i = K; i < tabOrderedControls.Length; i++)
-        //        {
-        //            if (tabOrderedControls[i].Visible && tabOrderedControls[i].Enabled && tabOrderedControls[i].CanFocus)
-        //                return tabOrderedControls[i];
-        //        }
-        //        return null;
-        //    }
-        //    else
-        //        return fromControl.Parent._GetNextFocusableChild(fromControl);          
-        //}
-
-        public static UIControl GetFirstHitSibling(IEnumerable<UIControl> siblings, DrawingPoint mouseLocation, bool mustBeVisible = true)
+        public static UIControl GetFirstHitSibling(IEnumerable<UIControl> siblings, DrawingPoint mouseLocation, bool mustBeVisible = true, bool mustBeEnabled = true)
         {
             UIControl[] zOrderedSiblings = FocusManager.ToZOrderedControlArray(siblings);
             for (int i = 0; i < zOrderedSiblings.Length; i++)
-                if ((zOrderedSiblings[i].Visible || !mustBeVisible) && zOrderedSiblings[i].Bounds.Contains(mouseLocation.ToDrawingPointF()))
+                if ((zOrderedSiblings[i].Visible || !mustBeVisible) && (zOrderedSiblings[i].Enabled|| !mustBeEnabled) && zOrderedSiblings[i].Bounds.Contains(mouseLocation.ToDrawingPointF()))
                     return zOrderedSiblings[i];
             return null;
         }          
@@ -388,7 +264,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     return focusTarget;          
                 else
                 {
-                    if (hitSibling.Enabled && hitSibling.CanFocus)
+                    if (hitSibling.CanReceiveFocus && hitSibling.EnableFocus)
                     {
                         if (hitSibling.Bounds.Contains(mouseLocation.ToDrawingPointF()))
                             return hitSibling;

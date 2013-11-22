@@ -38,7 +38,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             MaxRowSize = ListControl.SizeInfinite;
         }     
 
-        public override bool CanFocus
+        public override bool CanReceiveFocus
         {
             get
             {

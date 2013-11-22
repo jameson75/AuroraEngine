@@ -143,7 +143,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }                
         }
 
-        public override bool CanFocus
+        public override bool CanReceiveFocus
         {
             get
             {

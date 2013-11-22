@@ -118,6 +118,7 @@
     <Compile Include="UI\Animation\UIContentAnimationController.cs" />
     <Compile Include="UI\Controls\AlertBox.cs" />
     <Compile Include="UI\Controls\CheckBox.cs" />
+    <Compile Include="UI\Controls\ContextControl.cs" />
     <Compile Include="UI\Controls\Design\DefaultTheme.cs" />
     <Compile Include="UI\Controls\Design\ImageStyle.cs" />
     <Compile Include="UI\Controls\Design\IUITheme.cs" />
@@ -228,6 +229,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\Resources\DefaultTheme\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Properties\Docs\FocusManagerBehavior.txt" />
+    <Content Include="Properties\Docs\HandlingControlInput.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
