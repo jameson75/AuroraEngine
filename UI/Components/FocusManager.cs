@@ -22,15 +22,22 @@ namespace CipherPark.AngelJacket.Core.UI.Components
     {
         private UIControl _focusedControl = null;
         private IUIRoot _visualRoot = null;
+        private UIControlCollection _hitList = null;
 
         public FocusManager(IUIRoot visualRoot)
         {
             _visualRoot = visualRoot;
+            _hitList = new UIControlCollection();
         }
 
         public UIControl FocusedControl
         {
             get { return _focusedControl; }
+        }
+
+        public UIControlCollection HitList
+        {
+            get { return _hitList; }
         }
 
         public void SetFocus(UIControl control)
@@ -69,6 +76,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             FocusChangedEventHandler handler = ControlLostFocus;
             if(handler != null)
                 handler(this, new FocusChangedEventArgs(control));
+            ListenForFocusEligibilityChange(false, control);
         }
 
         protected void OnSetFocus(UIControl control)
@@ -76,11 +84,17 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             FocusChangedEventHandler handler = ControlReceivedFocus;
             if (handler != null)
                 handler(this, new FocusChangedEventArgs(control));
+            ListenForFocusEligibilityChange(true, control);
         }
 
         public event FocusChangedEventHandler ControlLostFocus;
 
         public event FocusChangedEventHandler ControlReceivedFocus;
+   
+        public static bool IsEligibleForFocus(UIControl control)
+        {
+            return control.VisibleInTree && control.EnabledInTree && control.CanReceiveFocus && control.EnableFocus;
+        }
 
         /// <summary>
         /// 
@@ -93,8 +107,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             IInputService inputService = (IInputService)_visualRoot.Game.Services.GetService(typeof(IInputService));
             BufferedInputState state = inputService.GetBufferedInputState();
             InputState.MouseButton[] buttonsDown = state.InputState.GetMouseButtonsDown();
+            _hitList.Clear();
             if (buttonsDown.Any(x => x == InputState.MouseButton.Left || x == InputState.MouseButton.Right))
             {
+                PopulateHitList(_visualRoot.Controls, state.InputState.GetMouseLocation(), _hitList);
                 UIControl focusTarget = GetHitFocusTarget(_visualRoot.Controls, state.InputState.GetMouseLocation());
                 if (focusTarget != null && focusTarget != _focusedControl)
                     SetFocus(focusTarget);
@@ -178,7 +194,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 return null;
         }
 
-        public UIControl GetFirstEligibleInTabOrder (UIControl startFromControl, bool searchUpwards = true, bool searchSiblings = true, bool searchChildren = true)
+        private UIControl GetFirstEligibleInTabOrder (UIControl startFromControl, bool searchUpwards = true, bool searchSiblings = true, bool searchChildren = true)
         {
             if (startFromControl == null)
                 throw new ArgumentNullException();
@@ -201,10 +217,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             {
                 if (IsEligibleForFocus(startFromControlSiblingsAndSelf[i]))
                     return startFromControlSiblingsAndSelf[i];
-
                 else
                 {
-                    if (searchChildren && IsVisibleAndEnabled(startFromControlSiblingsAndSelf[i]))
+                    if (searchChildren && IsVisibleAndEnabledInTree(startFromControlSiblingsAndSelf[i]))
                     {
                         UIControl[] startFromChildren = FocusManager.ToTabOrderedControlArray(startFromControlSiblingsAndSelf[i].Children);
                         for (int j = 0; j < startFromChildren.Length; j++)
@@ -232,49 +247,73 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             }
             
             return null;
-        }
+        }     
 
-        public static bool IsEligibleForFocus(UIControl control)
+        private static bool IsVisibleAndEnabledInTree(UIControl control)
         {
-            return control.Visible && control.Enabled && control.CanReceiveFocus && control.EnableFocus;
-        }
+            return control.VisibleInTree && control.EnabledInTree;
+        }       
 
-        public static bool IsVisibleAndEnabled(UIControl control)
-        {
-            return control.Visible && control.Enabled;
-        }
-       
-
-        public static UIControl GetFirstHitSibling(IEnumerable<UIControl> siblings, DrawingPoint mouseLocation, bool mustBeVisible = true, bool mustBeEnabled = true)
+        private static UIControl GetFirstHitInZOrder(IEnumerable<UIControl> siblings, DrawingPoint mouseLocation, bool mustBeVisible = true, bool mustBeEnabled = true)
         {
             UIControl[] zOrderedSiblings = FocusManager.ToZOrderedControlArray(siblings);
             for (int i = 0; i < zOrderedSiblings.Length; i++)
-                if ((zOrderedSiblings[i].Visible || !mustBeVisible) && (zOrderedSiblings[i].Enabled|| !mustBeEnabled) && zOrderedSiblings[i].Bounds.Contains(mouseLocation.ToDrawingPointF()))
+                if ((zOrderedSiblings[i].Visible || !mustBeVisible) && (zOrderedSiblings[i].Enabled|| !mustBeEnabled) && zOrderedSiblings[i].Bounds.ToSurface().Contains(mouseLocation.ToDrawingPointF()))
                     return zOrderedSiblings[i];
             return null;
         }          
 
-        public static UIControl GetHitFocusTarget(IEnumerable<UIControl> siblings, DrawingPoint mouseLocation)
+        //public static UIControl GetHitFocusTarget(IEnumerable<UIControl> controls, DrawingPoint mouseLocation)
+        //{
+        //    UIControl hitControl = FocusManager.GetFirstHitInZOrder(controls, mouseLocation); //NOTE: we get the first VISIBLE hit sibling.
+        //    if( hitControl != null )
+        //    {
+        //        if (hitControl.CustomFocusManager != null)
+        //            return hitControl.CustomFocusManager.GetHitFocusTarget(mouseLocation);
+        //        else
+        //        {
+        //            UIControl hitChildControl = GetHitFocusTarget(hitControl.Children, mouseLocation);
+        //            if (hitChildControl != null)
+        //                return hitChildControl;
+        //            else
+        //            {
+        //                if (hitControl.CanReceiveFocus && hitControl.EnableFocus)
+        //                {
+        //                    if (hitControl.Bounds.Contains(mouseLocation.ToDrawingPointF()))
+        //                        return hitControl;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return null;
+        //}
+
+        private static UIControl GetHitFocusTarget(IList<UIControl> hitList, DrawingPoint mouseLocation)
         {
-            UIControl hitSibling = FocusManager.GetFirstHitSibling(siblings, mouseLocation); //NOTE: we get the first VISIBLE hit sibling.
-            if( hitSibling != null )
-            {                               
-                UIControl focusTarget = GetHitFocusTarget(hitSibling.Children, mouseLocation);
-                if (focusTarget != null)
-                    return focusTarget;          
+            UIControl focusManagingControl = hitList.FirstOrDefault(c => c.CustomFocusManager != null);
+            if (focusManagingControl != null)
+                return focusManagingControl.CustomFocusManager.GetHitFocusTarget(mouseLocation);
+            else
+            {
+                UIControl innerMostHitControl = hitList.Last();
+                if (innerMostHitControl.CanReceiveFocus && innerMostHitControl.EnableFocus)
+                    return innerMostHitControl;
                 else
-                {
-                    if (hitSibling.CanReceiveFocus && hitSibling.EnableFocus)
-                    {
-                        if (hitSibling.Bounds.Contains(mouseLocation.ToDrawingPointF()))
-                            return hitSibling;
-                    }
-                }
+                    return null;
             }
-            return null;
         }
 
-        public static UIControl[] ToZOrderedControlArray(IEnumerable<UIControl> controls)
+        private static void PopulateHitList(IEnumerable<UIControl> controls, DrawingPoint mouseLocation, IList<UIControl> hitList)
+        {
+            UIControl hitControl = FocusManager.GetFirstHitInZOrder(controls, mouseLocation); //NOTE: we get the first VISIBLE hit sibling.
+            if (hitControl != null)
+            {
+                hitList.Add(hitControl);
+                PopulateHitList(hitControl.Children, mouseLocation, hitList);
+            }
+        }
+
+        private static UIControl[] ToZOrderedControlArray(IEnumerable<UIControl> controls)
         {
             SortedList<float, List<UIControl>> table = new SortedList<float, List<UIControl>>();
             foreach (UIControl control in controls)
@@ -292,7 +331,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             return zOrderedList.ToArray();
         }
 
-        public static UIControl[] ToTabOrderedControlArray(IEnumerable<UIControl> controls)
+        private static UIControl[] ToTabOrderedControlArray(IEnumerable<UIControl> controls)
         {
             SortedList<float, List<UIControl>> table = new SortedList<float, List<UIControl>>();
 
@@ -310,6 +349,28 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
             return tabOrderedList.ToArray();
         }
+
+        private void ListenForFocusEligibilityChange(bool listening, UIControl control)
+        {
+            if (listening)
+            {
+                control.VisibleInTreeChanged += FocusControl_EligibilityPropertyChanged;
+                control.EnabledInTreeChanged += FocusControl_EligibilityPropertyChanged;
+                control.EnableFocusChanged += FocusControl_EligibilityPropertyChanged;
+            }
+            else 
+            {
+                control.VisibleInTreeChanged -= FocusControl_EligibilityPropertyChanged;
+                control.EnabledInTreeChanged -= FocusControl_EligibilityPropertyChanged;
+                control.EnableFocusChanged -= FocusControl_EligibilityPropertyChanged;
+            }
+        }
+
+        private void FocusControl_EligibilityPropertyChanged(object sender, EventArgs args)
+        {
+            if (!IsEligibleForFocus(this.FocusedControl))
+                LeaveFocus(this.FocusedControl);
+        }
     }
 
     public interface ICustomFocusManager
@@ -317,6 +378,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         void SetNextFocus(UIControl focusedControl);
 
         void SetPreviousFocus(UIControl focusedControl);
+
+        UIControl GetHitFocusTarget(DrawingPoint mouseLocation);
     } 
 
     public delegate void FocusChangedEventHandler(object sender, FocusChangedEventArgs args);

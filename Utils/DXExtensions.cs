@@ -99,6 +99,12 @@ namespace CipherPark.AngelJacket.Core.Utils
                    r.Y <= point.Y && r.Y + r.Height >= point.Y;
         }
 
+        public static bool Contains(this RectangleF r, DrawingPoint point)
+        {
+            return r.X <= point.X && r.X + r.Width >= point.X &&
+                   r.Y <= point.Y && r.Y + r.Height >= point.Y;
+        }
+
         public static DrawingSizeF Size(this RectangleF r)
         {
             return new DrawingSizeF(r.Right - r.Left, r.Bottom - r.Top);

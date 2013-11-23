@@ -112,28 +112,37 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnUpdate(long gameTime)
         {
+            Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
+            
+            if (inputServices == null)
+                throw new InvalidOperationException("Input services not available.");
+            
             if (this.HasFocus)
-            {
-                Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
-                if (inputServices == null)
-                    throw new InvalidOperationException("Input services not available.");
-                BufferedInputState cim = inputServices.GetBufferedInputState();
-
-                if (cim.IsKeyReleased(Key.Return))
-                {
+            {         
+                BufferedInputState bInputState = inputServices.GetBufferedInputState();
+                if (bInputState.IsKeyReleased(Key.Return))
                     OnClick();
-                    if (this.CommandName != null)
-                        this.OnCommand(this.CommandName);
-                }
             }
+            
+            if( this.IsHit )
+            {
+                InputState inputState = inputServices.GetInputState();
+                if( inputState.IsMouseButtonDown(InputState.MouseButton.Left) )            
+                    OnClick();
+            }
+            
             base.OnUpdate(gameTime);
         }
 
         protected virtual void OnClick()
         {
             EventHandler handler = Click;
+            
             if (handler != null)
                 handler(this, EventArgs.Empty);
+
+            if (this.CommandName != null)
+                this.OnCommand(this.CommandName);
         }
 
         protected virtual void OnCommand(string commandName)

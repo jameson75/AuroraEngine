@@ -215,13 +215,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class NumericPropertyGridItem : PropertyGridItem
     {
-        NumericSelect _numericSelect = new NumericSelect();
+        Spinner _spinner = null;
         public NumericPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, IEnumerable<string> itemCaptions, double value = 0)
             : base(visualRoot, caption, font, fontColor)
         {
-            _numericSelect = new NumericSelect(visualRoot);
-            _numericSelect.Value = value;
-            this.Children.Add(_numericSelect);
+            _spinner = new Spinner(visualRoot);
+            _spinner.Value = value;
+            this.Children.Add(_spinner);
         }
     }
 

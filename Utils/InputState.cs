@@ -585,14 +585,14 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         private void SetMouseCurrentPosition(MouseState state)
         {
-            DrawingPoint mousePos = this.GetMousePosition();
+            DrawingPoint mousePos = this.GetSystemCursorPosition();
             state.X = mousePos.X;
             state.Y = mousePos.Y;
             state.Z = _messageHook.LastMouseWheelDelta;
             _messageHook.LastMouseWheelDelta = 0;
         }
         
-        public DrawingPoint GetMousePosition()
+        private DrawingPoint GetSystemCursorPosition()
         {         
             UnsafeNativeMethods.WIN32_POINT point;
             if (!UnsafeNativeMethods.GetCursorPos(out point))

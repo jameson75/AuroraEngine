@@ -28,7 +28,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private DrawingSizeF _size = DrawingSizeFExtension.Zero;
         private DrawingPointF _position = DrawingPointFExtension.Zero;
         private UIControl _parent = null;
-       
+        private bool _visible = false;
+        private bool _enabled = false;
+        private ICustomFocusManager _customFocusManager = null;
+        private bool _enableFocus = false;
         #endregion
 
         #region Constructors
@@ -63,7 +66,28 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected virtual IControlLayoutManager LayoutManager { get { return null; } }
 
-        public ICustomFocusManager CustomFocusManager { get; set; }
+        /// <summary>
+        /// Sets the custom focus manager for this control and all descendants which
+        /// don't have a CustomFocusManager explicitly set.
+        /// Gets the custom focus manager for this control. If none was set this property
+        /// returns the first custom focus manager found while search up the control's lineage.
+        /// </summary>       
+        public ICustomFocusManager CustomFocusManager 
+        {            
+            get
+            {
+                if (_customFocusManager != null)
+                    return _customFocusManager;
+                else if( this.Parent != null)
+                    return this._parent.CustomFocusManager;
+                else 
+                    return null;
+            }
+            set
+            {
+                _customFocusManager = value;
+            }
+        }
 
         public Guid Id { get; set; }
 
@@ -114,12 +138,37 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 return fnBuilder.ToString();   
             }
         }
+        
         public IGameApp Game { get { return _game; } }
-        public bool Enabled { get; set; }
-        public bool Visible { get; set; }     
-        public SpriteBatch ControlSpriteBatch { get { return _spriteBatch; } }
+        
+        public bool Enabled 
+        { 
+            get { return _enabled; }
+            set { 
+                _enabled = value;
+                OnEnabledChanged();
+            } 
+        }
+        
+        public bool Visible
+        {
+            get { return _visible; }
+            set { 
+                _visible = false;
+                OnVisibleChanged();
+            }
+        }
+        
+        public SpriteBatch ControlSpriteBatch 
+        { 
+            get { return _spriteBatch; } 
+        }
+        
         public float ZOrder { get; set; }
+
         public float TabOrder { get; set; }
+
+        //Determines whether this control instance currently has input (keyboard/gamepad) focus.
         public bool HasFocus
         {
             get
@@ -135,10 +184,39 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
+        public bool IsHit
+        {
+            get
+            {
+                return this.VisualRoot.FocusManager.HitList.Contains(this);
+            }
+        }
+        /// <summary>
+        /// Determines whether this type (class) of control can receive focus.
+        /// </summary>
+        /// <remarks>
+        /// Unlike UIControl.EnableFocus, this value will be the same for all instances of this control-type.
+        /// </remarks>
         public virtual bool CanReceiveFocus { get { return false; } }
 
-        public bool EnableFocus { get; set; }
+        /// <summary>
+        /// Determines whether this control-instance is able to receive focus.
+        /// </summary>
+        public bool EnableFocus 
+        {
+            get { return _enableFocus; }
+            set
+            {
+                _enableFocus = value;
+                OnEnableFocusChanged();
+            }                
+        }
 
+        /// <summary>
+        /// Determines if the specified control is a descendant of this control.
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
         public bool IsDescendant(UIControl control)
         {
             if (Children.Contains(control))
@@ -152,6 +230,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }                   
         }
 
+        /// <summary>
+        /// Determines if the specified control is an ancestor of this control.
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
         public bool IsAncestor(UIControl control)
         {
             if (control == null)
@@ -165,6 +248,42 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             else
                 return this.Parent.IsAncestor(control);
+        }
+
+        /// <summary>
+        /// Determines if this control and all its ancestors are visible.
+        /// </summary>
+        public bool VisibleInTree
+        {
+            get
+            {
+                UIControl c = this;
+                while (c != null)
+                {
+                    if (c.Visible == false)
+                        return false;
+                    c = c.Parent;
+                }
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Determins if this control and all its ancestors are enabled.
+        /// </summary>
+        public bool EnabledInTree
+        {
+            get
+            {
+                UIControl c = this;
+                while (c != null)
+                {
+                    if (c.Enabled == false)
+                        return false;
+                    c = c.Parent;
+                }
+                return true;
+            }
         }
 
 #region deprecated
@@ -412,6 +531,53 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 handler(this, EventArgs.Empty);
         }
 
+        protected virtual void OnVisibleChanged()
+        {
+            EventHandler handler = VisibleChanged;
+            
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+            
+            Action<UIControl> notify = null;
+            notify  = new Action<UIControl>( (c) => 
+            {
+                EventHandler _handler = c.VisibleInTreeChanged;
+                if (handler != null)
+                    handler(this, EventArgs.Empty);
+                foreach (UIControl child in c.Children)
+                    notify(child);
+            });
+
+            notify(this);
+        }
+
+        protected virtual void OnEnabledChanged()
+        {
+            EventHandler handler = EnabledChanged;
+            
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+
+            Action<UIControl> notify = null;
+            notify = new Action<UIControl>((c) =>
+            {
+                EventHandler _handler = c.EnabledInTreeChanged;
+                if (handler != null)
+                    handler(this, EventArgs.Empty);
+                foreach (UIControl child in c.Children)
+                    notify(child);
+            });
+
+            notify(this);
+        }
+
+        protected virtual void OnEnableFocusChanged()
+        {
+            EventHandler handler = EnableFocusChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
         public event EventHandler LayoutChanged;
         public event EventHandler SizeChanging;
         public event EventHandler SizeChanged;
@@ -421,6 +587,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public event EventHandler MarginChanged;
         public event EventHandler EffectChanged;
         public event EventHandler ParentChanged;
+        public event EventHandler VisibleChanged;
+        public event EventHandler EnabledChanged;
+        public event EventHandler VisibleInTreeChanged;
+        public event EventHandler EnabledInTreeChanged;
+        public event EventHandler EnableFocusChanged;
 
         #endregion
     }

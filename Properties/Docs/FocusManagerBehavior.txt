@@ -3,13 +3,15 @@
 As a pre-process, the children of all nodes, as well as all root-level nodes,
 are z-ordered before traversal.
 
-Hit-testing is an In-order tree traversal process which begins at first, ordered sibling
-at the root level of the UI control tree. 
+Hit-testing is an In-order tree traversal process which begins at first sibling
+at the root level of the UI control tree. The inner-most control which satisfies
+the conditions of the hit test is placed in focus.
 
 To satisfy the conditions of a successful hit test, the following conditions must be met...
 1. the mouse-click coords must exist within the uicontrol's bounds.
-2. the control must be visible, enabled, can-recieve-focus and have focusing enabled.
-3. all ancestors of the control must be visible and enabled.
+2. all ancestors of the control must be visible and enabled.
+
+After a successful hit test is performed, the inner-most control
 
 Therefore, it is not possible to set a control (nor any of it's children) with 
 focus, via mouse, if the control does not satisfy all of these conditions.
@@ -55,8 +57,13 @@ Currently, there are no rules for setting the focus control programatically.
 
 IV. Focus management override.
 ------------------------------
+[Tabbing]
 When tabbing, if the current control with focus has is associated with a CustomFocusManager, that CustomFocusManager is invoked
 to return the next control in tab order.
+
+[Mouse Clicking]
+When searching for the innermost control hit by the mouse, if a control is found with a CustomFocusManager, that CustomFocusManager is
+invoked to return the hit control.
 
 V. Current flaws and short commings.
 ------------------------------------
@@ -64,11 +71,12 @@ V. Current flaws and short commings.
    in a control recieving focus which is not visible nor enabled nor can-receive focus 
    nor has focusing enabled.
    - Could be solved by having an external version of Set/Leave Focus
-     which checks for eligibility.
+     which checks for eligibility. Right now, manually setting focus needs
+	 to be done judiciously (the control ought to be known to have focus).
 
 2. If the focus control's visible, enabled, focusenabled properties change, the control
    is no longer eligible for focus but it still remains in focus.
    - Could be solved by listening to the respective properties of a control once it goes into
      focus. We'd stop listening when it leaves focus.
-
-
+   * FIXED (11.22.2013), using the above solution. Needs testing. This text will be updated
+     after successful test.
