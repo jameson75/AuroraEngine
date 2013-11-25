@@ -211,7 +211,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
             int startFromControlIndex = Array.IndexOf(startFromControlSiblingsAndSelf, startFromControl);
             if (startFromControlIndex == -1)
-                throw new InvalidOperationException("control did not have a parent nor was it a top level control of the visual root.");
+                throw new InvalidOperationException("control did not have a parent nor was it a top level contrfol of the visual root.");
 
             for (int i = startFromControlIndex; i < startFromControlSiblingsAndSelf.Length; i++)
             {
