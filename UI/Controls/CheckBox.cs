@@ -32,7 +32,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             _checkContentControl = new ContentControl(visualRoot);
             _uncheckedContentControl = new ContentControl(visualRoot);
-            _label = new Label(visualRoot);
+            _label = new Label(visualRoot, );
             Children.Add(_checkContentControl);
             Children.Add(_uncheckedContentControl);
             Children.Add(_label);

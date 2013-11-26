@@ -46,7 +46,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             childSplitter.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             childSplitter.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             Guid textContentCellId = Guid.NewGuid();
-            childSplitter.Splitters.Add(new SplitterLayoutDivision(textContentCellId, 0, SplitterLayoutFixedSide.One));
+            childSplitter.Splitters.Add(new SplitterLayoutDivision(textContentCellId, 0, SplitterLayoutAnchorSide.One));
            
             childTextContent.LayoutId = textContentCellId;
             childSplitter.Children.Add(childIconContent);

@@ -124,20 +124,20 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             }            
         }
 
-        public void SetPreviousFocus(UIControl focusedControl)
+        public void SetPreviousFocus(UIControl nextControl)
         {
 
         }
 
-        public void SetNextFocus(UIControl previousFocusedControl, bool includeChildren = true)
+        public void SetNextFocus(UIControl previousControl, bool includeChildren = true)
         {
             UIControl nextFocusControl = null;
-            if (previousFocusedControl != null)
+            if (previousControl != null)
             {
-                if (previousFocusedControl.CustomFocusManager != null)
-                    previousFocusedControl.CustomFocusManager.SetNextFocus(previousFocusedControl);
+                if (previousControl.CustomFocusManager != null)
+                    previousControl.CustomFocusManager.SetNextFocus(previousControl);
                 else
-                    nextFocusControl = GetNextInTabOrder(previousFocusedControl, true, includeChildren);
+                    nextFocusControl = GetNextInTabOrder(previousControl, true, includeChildren);
             }
             else
             {
@@ -292,7 +292,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             UIControl focusManagingControl = hitList.FirstOrDefault(c => c.CustomFocusManager != null);
             if (focusManagingControl != null)
-                return focusManagingControl.CustomFocusManager.GetHitFocusTarget(mouseLocation);
+                return focusManagingControl.CustomFocusManager.GetHitFocusTarget(focusManagingControl, mouseLocation);
             else
             {
                 UIControl innerMostHitControl = hitList.Last();
@@ -375,11 +375,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
     public interface ICustomFocusManager
     {
-        void SetNextFocus(UIControl focusedControl);
+        void SetNextFocus(UIControl owner);
 
-        void SetPreviousFocus(UIControl focusedControl);
+        void SetPreviousFocus(UIControl owner);
 
-        UIControl GetHitFocusTarget(DrawingPoint mouseLocation);
+        UIControl GetHitFocusTarget(UIControl owner, DrawingPoint mouseLocation);
     } 
 
     public delegate void FocusChangedEventHandler(object sender, FocusChangedEventArgs args);

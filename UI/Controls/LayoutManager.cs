@@ -126,74 +126,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     }
 
     public class SplitterContainerLayoutManger : IControlLayoutManager
-    {
-        #region IControlLayoutManager Members
+    {        
         private SplitterLayoutDivisions _splitterDivisions = new SplitterLayoutDivisions();
         private UIControl _container = null;
         private RectangleF _cachedBounds = RectangleF.Empty;
         public SplitterLayoutOrientation Orientation { get; set; } 
-
+        public SplitterLayoutDivisions LayoutDivisions { get { return _splitterDivisions; } }
+        
         public SplitterContainerLayoutManger(UIControl container)
         {
             _container = container;
             _container.SizeChanging += Container_SizeChanging;
             _container.SizeChanged += Container_SizeChanged;
-        }
-
-        private void Container_SizeChanging(object sender, EventArgs args)
-        {
-            _cachedBounds = _container.Bounds;
-        }
-
-        private void Container_SizeChanged(object sender, EventArgs args)
-        {
-
-        }
-
-        private RectangleF GetCellFromId(Guid id)
-        {
-            if (id == Guid.Empty)
-            {
-                if (_splitterDivisions.Count == 0)
-                    return _container.ClientRectangle;
-                else
-                {
-                    RectangleF cellRect = _container.ClientRectangle;
-                    if (Orientation == SplitterLayoutOrientation.Horizontal)
-                        cellRect.Bottom = _splitterDivisions[0].Distance;
-                    else
-                        cellRect.Right = _splitterDivisions[0].Distance;
-                    return cellRect;
-                }
-            }
-            else
-            {
-                foreach (SplitterLayoutDivision division in _splitterDivisions)
-                {
-                    if (division.DivisionId == id)
-                    {
-                        int i = _splitterDivisions.IndexOf(division);
-                        RectangleF cellRect = _container.ClientRectangle;
-                        if (Orientation == SplitterLayoutOrientation.Horizontal)
-                        {
-                            cellRect.Top = division.Distance;
-                            if (i != _splitterDivisions.Count - 1)
-                                cellRect.Bottom = _splitterDivisions[i + 1].Distance;
-                        }
-                        else
-                        {
-                            cellRect.Left = division.Distance;
-                            if (i != _splitterDivisions.Count - 1)
-                                cellRect.Right = _splitterDivisions[i + 1].Distance;
-                        }
-                        return cellRect;
-                    }
-                }
-
-                throw new InvalidOperationException("No layout splitter found with specified guid.");
-            }
-        }
-
+        }     
+        
+        #region IControlLayoutManager Members
         public void UpdateLayout(LayoutUpdateReason reason)
         {          
             foreach (UIControl child in this._container.Children)
@@ -262,29 +209,115 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }            
         }
 
-        public SplitterLayoutDivisions LayoutDivisions { get { return _splitterDivisions; } }
-        #endregion
+        
+        #endregion   
+        
+        private void Container_SizeChanging(object sender, EventArgs args)
+        {
+            _cachedBounds = _container.Bounds;
+        }
+
+        private void Container_SizeChanged(object sender, EventArgs args)
+        {
+
+        }
+      
+        private RectangleF GetCellFromId(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                if (_splitterDivisions.Count == 0)
+                    return _container.ClientRectangle;
+                else
+                {
+                    RectangleF cellRect = _container.ClientRectangle;
+                    if (Orientation == SplitterLayoutOrientation.Horizontal)
+                        cellRect.Bottom = GetNormalizedDistance(_splitterDivisions[0]);
+                    else
+                        cellRect.Right = GetNormalizedDistance(_splitterDivisions[0]);
+                    return cellRect;
+                }
+            }
+            else
+            {
+                foreach (SplitterLayoutDivision division in _splitterDivisions)
+                {
+                    if (division.DivisionId == id)
+                    {
+                        int i = _splitterDivisions.IndexOf(division);
+                        RectangleF cellRect = _container.ClientRectangle;
+                        if (Orientation == SplitterLayoutOrientation.Horizontal)
+                        {
+                            cellRect.Top = GetNormalizedDistance(division);
+                            if (i != _splitterDivisions.Count - 1)
+                                cellRect.Bottom = GetNormalizedDistance(_splitterDivisions[i + 1]);
+                        }
+                        else
+                        {
+                            cellRect.Left = GetNormalizedDistance(division);
+                            if (i != _splitterDivisions.Count - 1)
+                                cellRect.Right = GetNormalizedDistance(_splitterDivisions[i + 1]);
+                        }
+                        return cellRect;
+                    }
+                }
+
+                throw new InvalidOperationException("No layout splitter found with specified guid.");
+            }
+        }
+
+        private float GetNormalizedDistance(SplitterLayoutDivision division)
+        {       
+            float distanceInPixels = 0;
+            if (division.IsDistancePercentage)
+            {
+               if(this.Orientation == SplitterLayoutOrientation.Verticle)
+                   distanceInPixels = division.Distance / 100.0f * _container.Bounds.Width;
+               else 
+                   distanceInPixels = division.Distance / 100.0f * _container.Bounds.Height;
+            }
+            else 
+                distanceInPixels = division.Distance;
+          
+            //if the fixed side is One, then return the distance from the left side of the container.
+            if (division.AnchorSide == SplitterLayoutAnchorSide.One)
+                return distanceInPixels;
+            //otherwise, return the distance from the right side of the container.
+            else
+                return _container.Bounds.Right - distanceInPixels;          
+        }
     }
 
     public class SplitterLayoutDivision
     {
         private Guid _divisionId;
         public float Distance { get; set; }
-        public SplitterLayoutFixedSide FixedSide { get; set; }
+        public SplitterLayoutAnchorSide AnchorSide { get; set; }
+        public bool IsDistancePercentage { get; set; }
         public Guid DivisionId { get { return _divisionId; } }
         public SplitterLayoutDivision(Guid id) { _divisionId = id; }
-        public SplitterLayoutDivision(Guid id, float distance, SplitterLayoutFixedSide fixedSide)
+        public SplitterLayoutDivision(Guid id, float distance, SplitterLayoutAnchorSide fixedSide, bool isDistancePercentage = false)
         {
             _divisionId = id;
             Distance = distance;
-            FixedSide = fixedSide;
+            AnchorSide = fixedSide;
+            IsDistancePercentage = isDistancePercentage;
         }
     }
 
-    public enum SplitterLayoutFixedSide
+    public enum SplitterLayoutAnchorSide
     {
+        /// <summary>
+        /// None specified, same effect as One
+        /// </summary>
         None,
-        One,
+        /// <summary>
+        /// Left or Top
+        /// </summary>
+        One = None,
+        /// <summary>
+        /// Right or Bottom
+        /// </summary>
         Two
     }
 

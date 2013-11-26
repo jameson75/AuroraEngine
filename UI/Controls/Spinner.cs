@@ -22,47 +22,82 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class Spinner : UIControl
     {
-        private TextBox _textBox = null;        
+        private Label _textArea = null;        
         private Button _upButton = null;
-        private Button _downButton = null;
+        private Button _downButton = null;        
+        private SplitterPanel _mainPanel = null;      
+        
+        private const int RightPanelFixedLength = 15;
+        private const int ButtonsHorzOffset = 4;
+        private const int ButtonsVerticalOffset = 4;
+        private const int RightLowerDivisionDistance = 50;
+        private const string RightDivisionGuid = "FCBFE554-1781-4B88-8C45-720D2082622D";
+        private const string RightLowerDivisionGuid = "61686D6A-2D62-491F-A86E-4BD2624BBEBF";  
+       
 
         private Spinner(IUIRoot visualRoot)
             : base(visualRoot)
         { }
 
-        public Spinner(IUIRoot visualRoot, SpriteFont font, Color fontColor, Color editorBgColor, ImageContent upButtonRendering, ImageContent downButtonRendering)
+        public Spinner(IUIRoot visualRoot, SpriteFont font, Color fontColor, Color backgroundColor)
             : base(visualRoot)
-        {
-            //SplitterPanel splitterPanel1 = new SplitterPanel(visualRoot);
-            //splitterPanel1.Orientation = SplitterLayoutOrientation.Verticle;                     
-            //Guid splitter1Guid = Guid.NewGuid();
-            //SplitterLayoutDivision splitter1 = new SplitterLayoutDivision(splitter1Guid);
-            //splitter1.FixedSide = SplitterLayoutFixedSide.Two;
-            //splitterPanel1.Splitters.Add(splitter1);
+        {            
+            _mainPanel = new SplitterPanel(visualRoot);
+            _mainPanel.Splitters.Add(new SplitterLayoutDivision(new Guid(RightDivisionGuid), RightPanelFixedLength, SplitterLayoutAnchorSide.Two));            
+            _mainPanel.Orientation = SplitterLayoutOrientation.Verticle;            
+           
+            SplitterPanel _rightSubPanel = new SplitterPanel(visualRoot);
+            _rightSubPanel.Splitters.Add(new SplitterLayoutDivision(new Guid(RightLowerDivisionGuid), RightLowerDivisionDistance, SplitterLayoutAnchorSide.None, true));
+            _rightSubPanel.Orientation = SplitterLayoutOrientation.Horizontal;
+            _rightSubPanel.LayoutId = new Guid(RightDivisionGuid);
+            _rightSubPanel.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            _rightSubPanel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            _mainPanel.Children.Add(_rightSubPanel);
 
-            //SplitterPanel splitterPanel2 = new SplitterPanel(visualRoot);
-            //splitterPanel2.Orientation = SplitterLayoutOrientation.Horizontal;
-            //Guid splitter2Guid = Guid.NewGuid();
-            //SplitterLayoutDivision splitter2 = new SplitterLayoutDivision(splitter2Guid);
-            //splitterPanel2.Splitters.Add(splitter2);
+            _textArea = new Label(visualRoot, string.Empty, font, fontColor, backgroundColor);
+            _textArea.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            _textArea.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            _mainPanel.Children.Add(_textArea);
 
-            _textBox = new TextBox(visualRoot, string.Empty, font, fontColor, editorBgColor);
-            _textBox.EditComplete+= TextBox_EditComplete;
-            _upButton = new Button(visualRoot, upButtonRendering);
+            _upButton = new Button(visualRoot) { BackgroundContent = new ColorContent(backgroundColor) };
             _upButton.Click += UpButton_Click;
-            _downButton = new Button(visualRoot, downButtonRendering);
+            _upButton.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            _upButton.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            _rightSubPanel.Children.Add(_upButton);
+
+            _downButton = new Button(visualRoot) { BackgroundContent = new ColorContent(backgroundColor) };
             _downButton.Click += DownButton_Click;
-            Children.Add(_textBox);
-            Children.Add(_upButton);
-            Children.Add(_downButton);
+            _downButton.LayoutId = new Guid(RightLowerDivisionGuid);
+            _downButton.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            _downButton.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            _rightSubPanel.Children.Add(_downButton);
+
+            this.CustomFocusManager = new SpinnerControlCustomerFocusManager();
+
+            visualRoot.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
+
+            Children.Add(_mainPanel);
             UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }
 
-        public string Format
+        void FocusManager_ControlReceivedFocus(object sender, FocusChangedEventArgs args)
         {
-            get { return _textBox.Content.Format; }
-            set { _textBox.Content.Format = value; }
+            //re-route focus of children (textarea is a label, which can't receive focus).
+            if (args.Control == _upButton ||
+                args.Control == _downButton)
+                this.HasFocus = true;
         }
+
+     
+        public override bool CanReceiveFocus
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public string DisplayFormat { get; set; }
   
         public float Increment { get; set; }
 
@@ -73,36 +108,34 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             get
             {
                 double result = 0;
-                if (!double.TryParse(_textBox.Content.Text, out result))
+                if (!double.TryParse(_textArea.Text.Text, out result))
                     return 0;
                 else
                     return result;
             }
             set
             {
-                _textBox.Content.Text = value.ToString();
+                _textArea.Text.Text = value.ToString();
                 OnValueChanged(Value);
             }                    
         }
 
+        protected override void OnUpdate(long gameTime)
+        {            
+            _mainPanel.Update(gameTime);
+            base.OnUpdate(gameTime);
+        }
+
         protected override void OnDraw(long gameTime)
-        {
-            _textBox.Draw(gameTime);
-            _upButton.Draw(gameTime);
-            _downButton.Draw(gameTime);
+        {           
+            _mainPanel.Draw(gameTime);
             base.OnDraw(gameTime);
         }
 
         protected override void OnLayoutChanged()
-        {
-            _textBox.Position = new DrawingPointF(0, 0);
-            _textBox.Size = new DrawingSizeF(this.Size.Width - 5.0f, this.Size.Height);
-
-            _upButton.Position = new DrawingPointF(this.Size.Width - 5.0f, 0);
-            _upButton.Size = new DrawingSizeF(5.0f, 5.0f);
-
-            _downButton.Position = new DrawingPointF(this.Size.Width - 5.0f, 5.0f);
-            _downButton.Size = new DrawingSizeF(this.Size.Width - 5.0f, this.Size.Height);
+        {           
+            _mainPanel.Position = DrawingPointFExtension.Zero;
+            _mainPanel.Size = this.Size;
         }
 
         protected virtual void OnValueChanged(double value)
@@ -110,12 +143,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             EventHandler handler = ValueChanged;
             if (handler != null)
                 handler(this, EventArgs.Empty);
-        }
-
-        private void TextBox_EditComplete(object sender, EventArgs args)
-        {
-            OnValueChanged(Value);
-        }
+        }              
 
         private void DownButton_Click(object sender, EventArgs args)
         {
@@ -146,6 +174,27 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             return spinner;
         }
     }
+
+    internal class SpinnerControlCustomerFocusManager : ICustomFocusManager
+    {        
+        public void SetNextFocus(UIControl owner)
+        {
+            UIControl nextFocusControl = owner.VisualRoot.FocusManager.GetNextInTabOrder(owner, false, false);
+            if (nextFocusControl != null)
+                nextFocusControl.HasFocus = true;
+        }
+
+        public void SetPreviousFocus(UIControl owner)
+        {
+            throw new NotImplementedException();
+        }
+
+        public UIControl GetHitFocusTarget(UIControl owner, DrawingPoint mouseLocation)
+        {
+            return owner;
+        }
+    }
+
 
     //public class FieldValueChangedEventArgs<T> : EventArgs
     //{

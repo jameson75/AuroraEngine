@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Button(IUIRoot visualRoot)
             : base(visualRoot)
         {
-                  }
+        }
 
         public Button(IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 bgColor)
             : base(visualRoot)
@@ -52,13 +52,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(visualRoot)
         {
             BackgroundContent = image;
-        }
-
-        public static Button FromTemplate(IUIRoot visualRoot, ButtonTemplate template)
-        {
-            Button button = new Button(visualRoot);
-            button.ApplyTemplate(template);
-            return button;
         }
 
         public UIContent Content
@@ -170,5 +163,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public event EventHandler ForegroundContentChanged;
         public event EventHandler Click;
         public event ControlCommandHandler ControlCommand;
+
+        public static Button FromTemplate(IUIRoot visualRoot, ButtonTemplate template)
+        {
+            Button button = new Button(visualRoot);
+            button.ApplyTemplate(template);
+            return button;
+        }
     }
 }

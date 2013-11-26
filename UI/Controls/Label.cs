@@ -18,39 +18,31 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class Label : UIControl
     {
         private TextContent _textContent = null;
-        //private ColorContent _backgroundContent = null;
+        private ColorContent _backgroundContent = null;
 
         public Label(Components.IUIRoot visualRoot)
             : base(visualRoot)
         {
-            _textContent = new TextContent();
-            _textContent.Container = this;
+           
         }
-
-        //public Label(Components.IUIRoot visualRoot, TextContent content)
-        //    : base(visualRoot)
-        //{
-        //    _textContent = content;
-        //    _textContent.Container = this;
-        //    _backgroundContent = new ColorContent();
-        //    _backgroundContent.Container = this;
-        //    this.Size = visualRoot.Theme.Label.Size.Value;
-        //}
-        
-        public Label(Components.IUIRoot visualRoot, TextContent content)
+       
+        public Label(Components.IUIRoot visualRoot, TextContent text, ColorContent background = null)
             : base(visualRoot)
         {
-            _textContent = content;
+            _textContent = text;
             _textContent.Container = this;
         }
 
-        public Label(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor)
+        public Label(Components.IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4? backgroundColor = null)
             : base(visualRoot)
         {
             _textContent = new TextContent(text, font, fontColor);
             _textContent.Container = this;
-            //_backgroundContent = new ColorContent(backgroundColor);
-            //_backgroundContent.Container = this;           
+            if (backgroundColor != null)
+            {
+                _backgroundContent = new ColorContent(backgroundColor.Value);
+                _backgroundContent.Container = this;
+            }
         }
     
 
@@ -61,17 +53,48 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             return label;
         }
 
-        public TextContent Text { get { return _textContent; } set { _textContent = value; } }
+        public TextContent Text
+        {
+            get
+            {
+                return _textContent;
+            }
+            set
+            {
+                _textContent = value;
+                if (value == null && _textContent != null)
+                    _textContent.Container = null;
+                _textContent = value;
+                if (_textContent != null)
+                    _textContent.Container = this;
+            }
+        }
 
-        //public ColorContent Background { get { return _backgroundContent; } set { _backgroundContent = value; }  }
+        public ColorContent Background
+        {
+            get
+            {
+                return _backgroundContent;
+            }
+            set
+            { 
+                _backgroundContent = value;
+                if (value == null && _backgroundContent != null)
+                    _backgroundContent.Container = null;
+                _backgroundContent = value;
+                if (_backgroundContent != null)
+                    _backgroundContent.Container = this;
+            }
+        }
 
         protected override void OnDraw(long gameTime)
-        {
-            //Background.Draw(gameTime);
-           // if (Background != null)
-            //    Background.Draw(gameTime);
+        {          
+            if (Background != null)
+                Background.Draw(gameTime);
+            
             if(Text != null)
                 Text.Draw(gameTime);
+            
             base.OnDraw(gameTime);
         }
 
@@ -84,17 +107,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (labelTemplate.CaptionStyle != null)
                 Text.ApplyStyle(labelTemplate.CaptionStyle);
 
-            //if (labelTemplate.BackgroundColor != null)
-                //Background.ApplyStyle(labelTemplate.BackgroundColor);
+            if (labelTemplate.BackgroundColor != null)
+                _backgroundContent.ApplyStyle(labelTemplate.BackgroundColor);
 
             base.ApplyTemplate(template);
         }
 
         public void SizeToContent()
-        {
-            //RectangleF smallestBounds = Content.CalculateSmallestBoundingRect();
-            //Vector2 smallestSize = smallestBounds.Size();
-            //this.Size = new DrawingSizeF(smallestSize.X, smallestSize.Y);
+        {            
             if (Text != null)
                 this.Size = Text.CalculateSmallestBoundingRect().Size();
             else

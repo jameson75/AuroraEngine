@@ -11,7 +11,7 @@ To satisfy the conditions of a successful hit test, the following conditions mus
 1. the mouse-click coords must exist within the uicontrol's bounds.
 2. all ancestors of the control must be visible and enabled.
 
-After a successful hit test is performed, the inner-most control
+After a successful hit test is performed, the inner-most control is returned.
 
 Therefore, it is not possible to set a control (nor any of it's children) with 
 focus, via mouse, if the control does not satisfy all of these conditions.
