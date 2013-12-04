@@ -23,6 +23,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public const int SizeInfinite = -1;      
         private int _maxRowSize = PropertyGrid.SizeInfinite;
         private CommandControlWireUp _controlWireUp = null;
+        private int _selectedIndex = -1;
 
         public PropertyGrid(IUIRoot root)
             : base(root)
@@ -59,6 +60,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public void AddProperty(PropertyGridItem item)
         {
             this.Items.Add(item);
+        }
+
+        public int SelectedIndex
+        {
+            get { return _selectedIndex; }
+            set
+            {
+                OnSelectedIndexChanging();
+                _selectedIndex = value;
+                OnSelectedIndexChanged();
+            }
         }
 
         protected override void OnUpdate(long gameTime)
@@ -99,6 +111,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 }
             }
         }    
+
+        protected virtual void OnSelectedIndexChanging()
+        {}
+
+        protected virtual void OnSelectedIndexChanged()
+        {}
     }
 
     public abstract class PropertyGridItem : ItemControl
@@ -106,14 +124,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private CommandControlWireUp _wireUp = null;
         private Guid childLabelId;
 
-        protected PropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor)
+        public bool IsActive
+        { }
+
+        public PropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor)
             : this(visualRoot, new TextContent(caption, font, fontColor))
         {  }
 
-        protected PropertyGridItem(IUIRoot visualRoot, TextContent text)
+        public PropertyGridItem(IUIRoot visualRoot, TextContent description, )
             : base(visualRoot)
         {
-            Label childLabel = new Label(visualRoot, text);
+            Label childLabel = new Label(visualRoot, description);
             childLabelId = Guid.NewGuid();
             childLabel.Id = childLabelId;
             childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Left;
@@ -122,7 +143,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Children.Add(childLabel);           
             _wireUp = new CommandControlWireUp(this);
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
-        }
+        }        
 
         private void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
         {
@@ -144,11 +165,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
     }
 
-    public class BooleanPropertyGridItem : PropertyGridItem
+    public class CheckboxPropertyGridItem : PropertyGridItem
     {
         private CheckBox _checkBox = null;
 
-        public BooleanPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, bool value = false) 
+        public CheckboxPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, bool value = false) 
             : base(visualRoot, caption, font, fontColor)
         {
             _checkBox = new CheckBox(visualRoot);
@@ -201,39 +222,39 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
     }
 
-    public class SelectPropertyGridItem : PropertyGridItem
-    {
-        ListSelect _listSelect = new ListSelect();
-        public SelectPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, IEnumerable<string> itemCaptions, int selectedIndex = 0)
-            : base(visualRoot, caption, font, fontColor)
-        {
-            _listSelect = new _listSelect(visualRoot);
-            _listSelect.Choices.AddRange(itemCaptions.Select(c => new ListSelectItem(visualRoot, c, font, fontColor)));
-            this.Children.Add(_listSelect);
-        }
-    }
+    //public class SelectPropertyGridItem : PropertyGridItem
+    //{
+    //    ListSelect _listSelect = new ListSelect();
+    //    public SelectPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, IEnumerable<string> itemCaptions, int selectedIndex = 0)
+    //        : base(visualRoot, caption, font, fontColor)
+    //    {
+    //        _listSelect = new _listSelect(visualRoot);
+    //        _listSelect.Choices.AddRange(itemCaptions.Select(c => new ListSelectItem(visualRoot, c, font, fontColor)));
+    //        this.Children.Add(_listSelect);
+    //    }
+    //}
 
-    public class NumericPropertyGridItem : PropertyGridItem
-    {
-        Spinner _spinner = null;
-        public NumericPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, IEnumerable<string> itemCaptions, double value = 0)
-            : base(visualRoot, caption, font, fontColor)
-        {
-            _spinner = new Spinner(visualRoot);
-            _spinner.Value = value;
-            this.Children.Add(_spinner);
-        }
-    }
+    //public class NumericPropertyGridItem : PropertyGridItem
+    //{
+    //    Spinner _spinner = null;
+    //    public NumericPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, IEnumerable<string> itemCaptions, double value = 0)
+    //        : base(visualRoot, caption, font, fontColor)
+    //    {
+    //        _spinner = new Spinner(visualRoot);
+    //        _spinner.Value = value;
+    //        this.Children.Add(_spinner);
+    //    }
+    //}
 
-    public class SubPropertyGrid : PropertyGridItem
-    {
-        private PropertyGrid _innerGrid = null;
-        public SubPropertyGrid(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, PropertyGrid innerGrid)
-             : base(visualRoot, caption, font, fontColor)
-        {
+    //public class SubPropertyGrid : PropertyGridItem
+    //{
+    //    private PropertyGrid _innerGrid = null;
+    //    public SubPropertyGrid(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, PropertyGrid innerGrid)
+    //         : base(visualRoot, caption, font, fontColor)
+    //    {
             
-        }
+    //    }
 
-        public PropertyGrid InnerGrid { get { return _innerGrid; } set { _innerGrid = value; } }
-    }
+    //    public PropertyGrid InnerGrid { get { return _innerGrid; } set { _innerGrid = value; } }
+    //}
 }

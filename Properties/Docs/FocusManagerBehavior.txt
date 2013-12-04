@@ -72,7 +72,7 @@ V. Current flaws and short commings.
    nor has focusing enabled.
    - Could be solved by having an external version of Set/Leave Focus
      which checks for eligibility. Right now, manually setting focus needs
-	 to be done judiciously (the control ought to be known to have focus).
+	 to be done judiciously (the control ought to be known to have focus).	 
 
 2. If the focus control's visible, enabled, focusenabled properties change, the control
    is no longer eligible for focus but it still remains in focus.
@@ -80,3 +80,11 @@ V. Current flaws and short commings.
      focus. We'd stop listening when it leaves focus.
    * FIXED (11.22.2013), using the above solution. Needs testing. This text will be updated
      after successful test.
+
+VI. New Ideas
+--------------
+To simply focus management...
+1. Implement protected Control.HandleInput() which is called from a control's Update() method
+when it has focus or from a parent control from which it's managed.
+2. Create rule where a control can only override tabbing for it's immediate children.
+3. Implment EnableChildFocus so that focus management can know whether to search/pick a contro's children.
