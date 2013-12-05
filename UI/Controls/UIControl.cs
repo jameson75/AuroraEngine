@@ -30,7 +30,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private UIControl _parent = null;
         private bool _visible = false;
         private bool _enabled = false;
-        private ICustomFocusManager _customFocusManager = null;
         private bool _enableFocus = false;
         #endregion
 
@@ -66,28 +65,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected virtual IControlLayoutManager LayoutManager { get { return null; } }
 
-        /// <summary>
-        /// Sets the custom focus manager for this control and all descendants which
-        /// don't have a CustomFocusManager explicitly set.
-        /// Gets the custom focus manager for this control. If none was set this property
-        /// returns the first custom focus manager found while search up the control's lineage.
-        /// </summary>       
-        public ICustomFocusManager CustomFocusManager 
-        {            
-            get
-            {
-                if (_customFocusManager != null)
-                    return _customFocusManager;
-                else if( this.Parent != null)
-                    return this._parent.CustomFocusManager;
-                else 
-                    return null;
-            }
-            set
-            {
-                _customFocusManager = value;
-            }
-        }
+        ///// <summary>
+        ///// Sets the custom focus manager for this control and all descendants which
+        ///// don't have a CustomFocusManager explicitly set.
+        ///// Gets the custom focus manager for this control. If none was set this property
+        ///// returns the first custom focus manager found while search up the control's lineage.
+        ///// </summary>       
+        //public UIControl CustomFocusContainer 
+        //{
+        //    get
+        //    {
+        //        if (this is ICustomFocusContainer)
+        //            return this;
+        //        else if (this.Parent != null)
+        //            return this.Parent.CustomFocusContainer;
+        //    }
+        //}
 
         public Guid Id { get; set; }
 
@@ -168,7 +161,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public float TabOrder { get; set; }
 
-        //Determines whether this control instance currently has input (keyboard/gamepad) focus.
+        /// <summary>
+        /// Determines whether this control instance currently has input (keyboard/gamepad) focus.
+        /// </summary>
         public bool HasFocus
         {
             get
@@ -184,6 +179,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
+        /// <summary>
+        /// Determines whether the focus control is a child of this control.
+        /// </summary>
+        public bool ContainsFocus
+        {
+            get
+            {
+                return (VisualRoot.FocusManager.FocusedControl != null &&
+                        IsDescendant(VisualRoot.FocusManager.FocusedControl));
+            }
+        }
+
+        /// <summary>
+        /// Determines whether this control is part of the current control-hit-list.
+        /// </summary>
         public bool IsHit
         {
             get
@@ -191,6 +201,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 return this.VisualRoot.FocusManager.HitList.Contains(this);
             }
         }
+
         /// <summary>
         /// Determines whether this type (class) of control can receive focus.
         /// </summary>
@@ -219,8 +230,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         /// <returns></returns>
         public bool IsDescendant(UIControl control)
         {
-            if (Children.Contains(control))
+            if (control == null)
+                return false; 
+
+            else  if (Children.Contains(control))
                 return true;
+
             else
             {
                 foreach (UIControl child in Children)
@@ -238,7 +253,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public bool IsAncestor(UIControl control)
         {
             if (control == null)
-                throw new ArgumentNullException();
+                return false;
 
             else if (this.Parent == null)
                 return false;

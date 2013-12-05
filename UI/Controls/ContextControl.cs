@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public abstract class ContextControl<T> : ContainerControl, Components.ICustomFocusManager 
+    public abstract class ContextControl<T> : ContainerControl, ICustomFocusContainer
         where T : UIControl
     {
         private T _subControl = null;
@@ -25,64 +25,86 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected ContextControl(IUIRoot visualRoot, System.Func<IUIRoot,T> controlCreator)
             : base(visualRoot)
         {
+            HandleCloseKey = true;
             _subControl = controlCreator(visualRoot);
             _subControl.VerticalAlignment = Controls.VerticalAlignment.Stretch;
-            _subControl.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
-            Children.Add(_subControl);
+            _subControl.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;           
+            Children.Add(_subControl);          
         }
 
-        public UIControl Owner { get; set; }
+        public UIControl Owner { get; private set; }
 
         public ContextControlActivation Activation { get; set; }
 
         public ContextControlDisplaySide DisplaySide { get; set; }
 
+        public bool HandleCloseKey { get; set; }
+
+        public void BeginContext(UIControl owner)
+        {
+            this.Owner = owner;
+            this.Visible = true;
+            this.VisualRoot.FocusManager.SetNextFocus(this, true, false, false);  
+            VisualRoot.FocusManager.ControlLostFocus += FocusManager_ControlLostFocus;
+        }   
+
+        public void EndContext()
+        {
+            VisualRoot.FocusManager.ControlLostFocus -= FocusManager_ControlLostFocus;            
+            this.Visible = false;
+            this.Owner.HasFocus = true;
+            this.Owner = null;  
+        }
+
         protected override void OnUpdate(long gameTime)
         {
-            if (this.HasFocus || _subControl.HasFocus)
-            {
-                //**********************************************
-                // if back button pressed                
-                // close this submenu.
-                // return focus to owner.
-                // null owner.
-                //**********************************************
-
-                Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
-                if (inputServices == null)
-                    throw new InvalidOperationException("Input services not available.");
-
-                InputState inputState = inputServices.GetInputState();
-
-                bool closeButtonPressed = (inputState.IsKeyHit(Key.Back)) ||
-                    //(Orienation == MenuOrientation.Horizontal && inputState.IsKeyHit(Key.Left)) ||
-                                          (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.Back)) ||
-                                          (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.B));
-
-                if (closeButtonPressed)
+            if (this.ContainsFocus)
+            {               
+                if (HandleCloseKey)
                 {
-                    this.Visible = false;
-                    this.Owner.HasFocus = true;
-                    this.Owner = null;
+                    //**********************************************
+                    // if back button pressed                
+                    // close this submenu.
+                    // return focus to owner.
+                    // null owner.
+                    //**********************************************
+                    Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
+                    if (inputServices == null)
+                        throw new InvalidOperationException("Input services not available.");
+
+                    InputState inputState = inputServices.GetInputState();
+
+                    bool closeButtonPressed = (inputState.IsKeyHit(Key.Back)) ||
+                                              (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.Back)) ||
+                                              (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.B));
+
+                    if (closeButtonPressed)
+                        EndContext();
                 }
             }
             base.OnUpdate(gameTime);
         }
-
-        #region ICustomFocusManager
-
-        public void SetNextFocus(UIControl owner)
+   
+        private void FocusManager_ControlLostFocus(object sender, FocusChangedEventArgs args)
         {
-            //NOTE: By doing nothing, we effectively disable forward-tabbing out of a submenu.
-            //The goal is to make sure the submenu can't lose focus unless it's closed.
+            if (!IsDescendant(args.Control))
+                this.EndContext();
         }
 
-        public void SetPreviousFocus(UIControl owner)
+        bool ICustomFocusContainer.CanMoveToChild
         {
-            //NOTE: By doing nothing, we effectively disable backward-tabbing out of a submenu.
+            get { return true; }
         }
 
-        #endregion
+        bool ICustomFocusContainer.CanMoveToSibling
+        {
+            get { return false; }
+        }
+
+        bool ICustomFocusContainer.CanMoveToAncestorNext
+        {
+            get { return false; }
+        }
     }
 
     public enum ContextControlActivation
@@ -98,6 +120,5 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         Right,
         Bottom
     }
-
-    
+  
 }

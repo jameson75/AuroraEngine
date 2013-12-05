@@ -20,7 +20,7 @@ using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class Spinner : UIControl
+    public class Spinner : UIControl, ICustomFocusContainer
     {
         private Label _textArea = null;        
         private Button _upButton = null;
@@ -32,8 +32,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private const int ButtonsVerticalOffset = 4;
         private const int RightLowerDivisionDistance = 50;
         private const string RightDivisionGuid = "FCBFE554-1781-4B88-8C45-720D2082622D";
-        private const string RightLowerDivisionGuid = "61686D6A-2D62-491F-A86E-4BD2624BBEBF";  
-       
+        private const string RightLowerDivisionGuid = "61686D6A-2D62-491F-A86E-4BD2624BBEBF";      
 
         private Spinner(IUIRoot visualRoot)
             : base(visualRoot)
@@ -70,9 +69,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _downButton.LayoutId = new Guid(RightLowerDivisionGuid);
             _downButton.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             _downButton.VerticalAlignment = Controls.VerticalAlignment.Stretch;
-            _rightSubPanel.Children.Add(_downButton);
-
-            this.CustomFocusManager = new SpinnerControlCustomerFocusManager();
+            _rightSubPanel.Children.Add(_downButton);            
 
             visualRoot.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
 
@@ -87,7 +84,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 args.Control == _downButton)
                 this.HasFocus = true;
         }
-
      
         public override bool CanReceiveFocus
         {
@@ -158,9 +154,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private void IncrementValue(float increment)
         {
             Value += increment;
-        }
-
-        public event EventHandler ValueChanged;
+        }        
 
         public override void ApplyTemplate(UIControlTemplate template)
         {
@@ -173,35 +167,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             spinner.ApplyTemplate(template);
             return spinner;
         }
-    }
 
-    internal class SpinnerControlCustomerFocusManager : ICustomFocusManager
-    {        
-        public void SetNextFocus(UIControl owner)
+        public event EventHandler ValueChanged;
+
+        bool ICustomFocusContainer.CanMoveToChild
         {
-            UIControl nextFocusControl = owner.VisualRoot.FocusManager.GetNextInTabOrder(owner, false, false);
-            if (nextFocusControl != null)
-                nextFocusControl.HasFocus = true;
+            get { return false; }
         }
 
-        public void SetPreviousFocus(UIControl owner)
+        bool ICustomFocusContainer.CanMoveToSibling
         {
-            throw new NotImplementedException();
+            get { return true; }
         }
 
-        public UIControl GetHitFocusTarget(UIControl owner, DrawingPoint mouseLocation)
+        bool ICustomFocusContainer.CanMoveToAncestorNext
         {
-            return owner;
+            get { return true; }
         }
     }
-
-
-    //public class FieldValueChangedEventArgs<T> : EventArgs
-    //{
-    //    private object _value = 0.0f;
-    //    public FieldValueChangedEventArgs(object value) { _value = value; }
-    //    public object Value { get { return _value; } }
-    //}
-
-    //public delegate void FieldValueChangedHandler<T>(object sender, FieldValueChangedEventArgs<T> args);
 }

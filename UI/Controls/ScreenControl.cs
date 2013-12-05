@@ -108,7 +108,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 }
                 else if (EnableDefaultFocus)
                 {
-                    UIControl defaultFocusTarget = VisualRoot.FocusManager.GetFirstEligibleInTabOrder(ActiveScreen, false, false);
+                    UIControl defaultFocusTarget = VisualRoot.FocusManager.GetFirstInTabOrder(ActiveScreen, false, false);
                     if (defaultFocusTarget != null)
                         VisualRoot.FocusManager.SetFocus(defaultFocusTarget);
                     //VisualRoot.FocusManager.SetNextFocus(ActiveScreen);
