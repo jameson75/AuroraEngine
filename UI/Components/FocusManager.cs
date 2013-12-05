@@ -100,14 +100,14 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         /// 
         /// </summary>
         /// <remarks>
-        /// This method isn't meant to be called from application code. Calling this method may result in a stack flow from recursion.
+        /// This method isn't meant to be called from application code. Avoid calling this method from game logic.
         /// </remarks>
         public void Update()
         {
             IInputService inputService = (IInputService)_visualRoot.Game.Services.GetService(typeof(IInputService));
             BufferedInputState state = inputService.GetBufferedInputState();
             InputState.MouseButton[] buttonsDown = state.InputState.GetMouseButtonsDown();
-            _hitList.Clear();
+            _hitList.Clear();            
             if (buttonsDown.Any(x => x == InputState.MouseButton.Left || x == InputState.MouseButton.Right))
             {
                 PopulateHitList(_visualRoot.Controls, state.InputState.GetMouseLocation(), _hitList);
@@ -160,9 +160,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             //if the previous control override focus management, determine if can start from firstChild, nextSibling, or firstUncle.
             if (previousControl is ICustomFocusContainer)
             {
-                canStartFromFirstChild = ((ICustomFocusContainer)previousControl).CanMoveToChild;
-                canStartFromNextSibling = ((ICustomFocusContainer)previousControl).CanMoveToSibling;
-                canStartFromAncestorNext = ((ICustomFocusContainer)previousControl).CanMoveToAncestorNext;
+                canStartFromFirstChild = ((ICustomFocusContainer)previousControl).CanFocusMoveInward;
+                //canStartFromNextSibling = ((ICustomFocusContainer)previousControl).CanMoveToSibling;
+                canStartFromAncestorNext = ((ICustomFocusContainer)previousControl).CanFocusMoveOutward;
             }
 
             //if we're searching children, use the previous control's first-sibling (in tab order).
@@ -241,7 +241,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     return startFromControlSiblingsAndSelf[i];
                 else
                 {
-                    bool canSearchChildren = (focusContainer == null) ? true : focusContainer.CanMoveToChild;
+                    bool canSearchChildren = (focusContainer == null) ? true : focusContainer.CanFocusMoveInward;                    
                     if (canSearchChildren && IsVisibleAndEnabledInTree(startFromControlSiblingsAndSelf[i]))
                     {
                         UIControl[] startFromChildren = FocusManager.ToTabOrderedControlArray(startFromControlSiblingsAndSelf[i].Children);
@@ -254,14 +254,14 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     }                    
                 }
 
-                if (focusContainer != null && !focusContainer.CanMoveToSibling)
-                    break;
+                //if (focusContainer != null && !focusContainer.CanMoveToSibling)
+                //    break;
             }
              
             //***********************************************************************************************************************
             //NOTE: What we want to do is start searching up the tree only after we've finished searching down the original subtree.
             //***********************************************************************************************************************
-            bool canSearchAncestorNext = (startFromControl is ICustomFocusContainer) ? ((ICustomFocusContainer)startFromControl).CanMoveToAncestorNext : true;
+            bool canSearchAncestorNext = (startFromControl is ICustomFocusContainer) ? ((ICustomFocusContainer)startFromControl).CanFocusMoveOutward : true;
             if (searchUpwards && canSearchAncestorNext && startFromControl.Parent != null)
             {
                 UIControl[] parentSiblingsAndParent = (startFromControl.Parent.Parent != null) ?
@@ -336,17 +336,19 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         private static UIControl GetHitFocusTarget(IList<UIControl> hitList, DrawingPoint mouseLocation)
         {
-            UIControl outerMostRestrictedControl = hitList.FirstOrDefault(c => c is ICustomFocusContainer && ((ICustomFocusContainer)c).CanMoveToChild == false);
+            UIControl targetControl = null;
+            
+            UIControl outerMostRestrictedControl = hitList.FirstOrDefault(c => c is ICustomFocusContainer && ((ICustomFocusContainer)c).CanFocusMoveInward == false);
+            
             if (outerMostRestrictedControl != null)
-                return outerMostRestrictedControl;
+                targetControl = outerMostRestrictedControl;
+            else            
+                targetControl = hitList.Last();
+
+            if (targetControl.CanReceiveFocus && targetControl.EnableFocus)
+                return targetControl;
             else
-            {
-                UIControl innerMostHitControl = hitList.Last();
-                if (innerMostHitControl.CanReceiveFocus && innerMostHitControl.EnableFocus)
-                    return innerMostHitControl;
-                else
-                    return null;
-            }
+                return null;            
         }
 
         private static void PopulateHitList(IEnumerable<UIControl> controls, DrawingPoint mouseLocation, IList<UIControl> hitList)
@@ -423,9 +425,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
     public interface ICustomFocusContainer
     {
-        bool CanMoveToChild { get; }
-        bool CanMoveToSibling { get; }
-        bool CanMoveToAncestorNext { get; }
+        bool CanFocusMoveOutward { get; }
+        bool CanFocusMoveInward { get; }
     } 
 
     public delegate void FocusChangedEventHandler(object sender, FocusChangedEventArgs args);

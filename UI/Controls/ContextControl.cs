@@ -91,17 +91,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 this.EndContext();
         }
 
-        bool ICustomFocusContainer.CanMoveToChild
+        bool ICustomFocusContainer.CanFocusMoveInward
         {
             get { return true; }
-        }
+        }    
 
-        bool ICustomFocusContainer.CanMoveToSibling
-        {
-            get { return false; }
-        }
-
-        bool ICustomFocusContainer.CanMoveToAncestorNext
+        bool ICustomFocusContainer.CanFocusMoveOutward
         {
             get { return false; }
         }

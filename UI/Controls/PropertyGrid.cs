@@ -125,13 +125,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private Guid childLabelId;
 
         public bool IsActive
-        { }
+        { get; set; }
 
         public PropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor)
             : this(visualRoot, new TextContent(caption, font, fontColor))
         {  }
 
-        public PropertyGridItem(IUIRoot visualRoot, TextContent description, )
+        public PropertyGridItem(IUIRoot visualRoot, TextContent description)
             : base(visualRoot)
         {
             Label childLabel = new Label(visualRoot, description);
@@ -165,43 +165,43 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
     }
 
-    public class CheckboxPropertyGridItem : PropertyGridItem
-    {
-        private CheckBox _checkBox = null;
+    //public class CheckboxPropertyGridItem : PropertyGridItem
+    //{
+    //    private CheckBox _checkBox = null;
 
-        public CheckboxPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, bool value = false) 
-            : base(visualRoot, caption, font, fontColor)
-        {
-            _checkBox = new CheckBox(visualRoot);
-            _checkBox.IsChecked = value;
-            this.Children.Add(_checkBox);
-        }
+    //    public CheckboxPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, bool value = false) 
+    //        : base(visualRoot, caption, font, fontColor)
+    //    {
+    //        _checkBox = new CheckBox(visualRoot);
+    //        _checkBox.IsChecked = value;
+    //        this.Children.Add(_checkBox);
+    //    }
 
-        public bool Value
-        {
-            get { return _checkBox.IsChecked; }
-            set { _checkBox.IsChecked = value; }
-        }
-    }
+    //    public bool Value
+    //    {
+    //        get { return _checkBox.IsChecked; }
+    //        set { _checkBox.IsChecked = value; }
+    //    }
+    //}
 
-    public class ColorPropertyGridItem : PropertyGridItem
-    {
-        ColorSelect _colorSelect = null;
+    //public class ColorPropertyGridItem : PropertyGridItem
+    //{
+    //    ColorSelect _colorSelect = null;
 
-        public ColorPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, Color color = Color.Transparent)
-            : base(visualRoot, caption, font, fontColor)
-        {
-            _colorSelect = new ColorSelect(visualRoot);
-            _colorSelect.Color = color;
-            this.Children.Add(_colorSelect);
-        }
+    //    public ColorPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, Color color = Color.Transparent)
+    //        : base(visualRoot, caption, font, fontColor)
+    //    {
+    //        _colorSelect = new ColorSelect(visualRoot);
+    //        _colorSelect.Color = color;
+    //        this.Children.Add(_colorSelect);
+    //    }
 
-        public Color Value
-        {
-            get { return _colorSelect.Color; }
-            set { _colorSelect.Color = value; }
-        }
-    }
+    //    public Color Value
+    //    {
+    //        get { return _colorSelect.Color; }
+    //        set { _colorSelect.Color = value; }
+    //    }
+    //}
 
     public class SpinnerPropertyGridItem : PropertyGridItem
     {

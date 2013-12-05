@@ -20,7 +20,7 @@ using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class Spinner : UIControl, ICustomFocusContainer
+    public class Spinner : UIControl
     {
         private Label _textArea = null;        
         private Button _upButton = null;
@@ -62,6 +62,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _upButton.Click += UpButton_Click;
             _upButton.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             _upButton.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            _upButton.EnableFocus = false;
             _rightSubPanel.Children.Add(_upButton);
 
             _downButton = new Button(visualRoot) { BackgroundContent = new ColorContent(backgroundColor) };
@@ -69,6 +70,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _downButton.LayoutId = new Guid(RightLowerDivisionGuid);
             _downButton.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             _downButton.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            _downButton.EnableFocus = false;
             _rightSubPanel.Children.Add(_downButton);            
 
             visualRoot.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
@@ -169,20 +171,5 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public event EventHandler ValueChanged;
-
-        bool ICustomFocusContainer.CanMoveToChild
-        {
-            get { return false; }
-        }
-
-        bool ICustomFocusContainer.CanMoveToSibling
-        {
-            get { return true; }
-        }
-
-        bool ICustomFocusContainer.CanMoveToAncestorNext
-        {
-            get { return true; }
-        }
     }
 }

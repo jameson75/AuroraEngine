@@ -5,6 +5,7 @@ using CipherPark.AngelJacket.Core.UI.Animation;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using CipherPark.AngelJacket.Core.Module;
+using System.Linq;
 using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -192,13 +193,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         /// <summary>
-        /// Determines whether this control is part of the current control-hit-list.
+        /// Determines whether this control was the innermost control to be hit.
         /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
         public bool IsHit
         {
             get
             {
-                return this.VisualRoot.FocusManager.HitList.Contains(this);
+                return this.VisualRoot.FocusManager.HitList.Last() == this;
             }
         }
 
@@ -221,7 +225,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _enableFocus = value;
                 OnEnableFocusChanged();
             }                
-        }
+        }      
 
         /// <summary>
         /// Determines if the specified control is a descendant of this control.

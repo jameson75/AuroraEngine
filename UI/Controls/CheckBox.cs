@@ -32,7 +32,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             _checkContentControl = new ContentControl(visualRoot);
             _uncheckedContentControl = new ContentControl(visualRoot);
-            _label = new Label(visualRoot, );
+            _label = new Label(visualRoot);
             Children.Add(_checkContentControl);
             Children.Add(_uncheckedContentControl);
             Children.Add(_label);
@@ -55,14 +55,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : this(visualRoot, checkedRendering, uncheckedRendering)
         {
             this.Caption = caption;
-        }
-
-        public static CheckBox FromTemplate(IUIRoot visualRoot, CheckBoxTemplate template)
-        {
-            CheckBox checkBox = new CheckBox(visualRoot);
-            checkBox.ApplyTemplate(template);
-            return checkBox;
-        }
+        }    
 
         public bool IsChecked
         {
@@ -135,6 +128,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _uncheckedContentControl.ApplyTemplate(cbTemplate.UncheckContentTemplate);
 
             base.ApplyTemplate(template);
+        }
+
+        public static CheckBox FromTemplate(IUIRoot visualRoot, CheckBoxTemplate template)
+        {
+            CheckBox checkBox = new CheckBox(visualRoot);
+            checkBox.ApplyTemplate(template);
+            return checkBox;
         }
     }
 
