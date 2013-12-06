@@ -44,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             this.Owner = owner;
             this.Visible = true;
-            this.VisualRoot.FocusManager.SetNextFocus(this, true, false, false);  
+            this.VisualRoot.FocusManager.SetNextFocus(this);  
             VisualRoot.FocusManager.ControlLostFocus += FocusManager_ControlLostFocus;
         }   
 
@@ -115,5 +115,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         Right,
         Bottom
     }
-  
+
+    public abstract class ContextMenu : ContextControl<Menu>
+    {
+        ContextMenu(IUIRoot visualRoot)
+            : base(visualRoot, ConstructMenu)
+        {
+
+        }
+
+        private static Menu ConstructMenu(IUIRoot visualRoot)
+        {
+            return new Menu(visualRoot);
+        }
+    }
 }

@@ -152,7 +152,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public LabelTemplate DefaultItemTemplate { get; set; }
 
-        public void OpenSubmenu(Submenu subMenu, bool hasFocus)
+        public void OpenContextMenu(ContextMenu subMenu, bool hasFocus)
         {
             if (subMenu.Owner != null && subMenu.Owner != this)
                 throw new InvalidOperationException("Submenu cannot be opened while owned by another menu.");
@@ -323,8 +323,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (handler != null)
                 handler(this, new ItemClickedEventArgs(item));
 
-            if (item.Submenu != null && item.Submenu.Activation == ContextControlActivation.Click)
-                OpenSubmenu(item.Submenu, true);
+            if (item.SubMenu != null && item.SubMenu.Activation == ContextControlActivation.Click)
+                OpenContextMenu(item.SubMenu, true);
         }
 
         protected override void OnSelectedItemChanged()
@@ -333,9 +333,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             if (SelectedItem != null)
             {
-                Submenu itemSubmenu = ((MenuItem)SelectedItem).Submenu;
+                ContextMenu itemSubmenu = ((MenuItem)SelectedItem).SubMenu;
                 if (itemSubmenu != null && itemSubmenu.Activation == ContextControlActivation.Select)
-                    OpenSubmenu(itemSubmenu, false);
+                    OpenContextMenu(itemSubmenu, false);
             }
         }
 
