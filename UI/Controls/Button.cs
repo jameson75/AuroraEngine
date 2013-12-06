@@ -92,6 +92,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
+        public void FireClick()
+        {
+            OnClick();
+        }
+
         protected override void OnDraw(long gameTime)
         {
             if (BackgroundContent != null)

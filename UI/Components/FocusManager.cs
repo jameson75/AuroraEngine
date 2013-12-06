@@ -42,15 +42,18 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public void SetFocus(UIControl control)
         {
-            if (!IsEligibleForFocus(control))
-                throw new InvalidOperationException("Control is not eligible for receiving focus");
-
-            UIControl p = control.Parent;
-            while (p != null)
+            if (control != null)
             {
-                ICustomFocusContainer c = p as ICustomFocusContainer;
-                if (c.CanMoveToChild == false)
-                    throw new InvalidOperationException("Control has a custom focus container which prohibits focus");
+                if (!IsEligibleForFocus(control))
+                    throw new InvalidOperationException("Control is not eligible for receiving focus");
+
+                UIControl p = control.Parent;
+                while (p != null)
+                {
+                    ICustomFocusContainer c = p as ICustomFocusContainer;
+                    if (c.CanFocusMoveInward == false && p.IsDescendant(control) == false)
+                        throw new InvalidOperationException("Control has a custom focus container which prohibits focus");
+                }
             }
             
             _SetFocus(control);
@@ -62,7 +65,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 throw new ArgumentNullException("control");
 
             if (_focusedControl == control)
-            {
+            {                
                 _focusedControl = null;
                 OnLeaveFocus(control);
             }                
@@ -132,14 +135,14 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public void SetNextFocus(UIControl previousControl)
         {
             UIControl nextFocusControl = null;
-            if (previousControl != null)
-            {
-                if (previousControl.CustomFocusContainer != null)
-                    ((ICustomFocusContainer)previousControl.CustomFocusContainer).SetNextFocus(previousControl);
-                else
-                    nextFocusControl = GetNextInTabOrder(previousControl);
-            }
-            else
+            //if (previousControl != null)
+            //{
+            //    if (previousControl.CustomFocusContainer != null)
+            //        ((ICustomFocusContainer)previousControl.CustomFocusContainer).SetNextFocus(previousControl);
+            //    else
+            //        nextFocusControl = GetNextInTabOrder(previousControl);
+            //}
+            //else
             {
                 UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
                 if (tabOrderedControls.Length > 0)

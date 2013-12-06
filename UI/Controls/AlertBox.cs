@@ -113,7 +113,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public static void ShowAlert(IUIRoot ui, string text, Texture2D icon, Color backgroundColor, ulong displayTime)
-        {
+        {            
             ShowAlert(ui, 
                       new TextContent(text, DefaultTheme.Instance.ControlFont, DefaultTheme.Instance.ControlFontColor),
                       (icon != null) ? new ImageContent(icon) : null,

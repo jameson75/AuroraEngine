@@ -32,54 +32,54 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         /// <summary>
         /// Background color for all applicable control templates in this theme.
         /// </summary>
-        private Color ControlBackgroundColor { get; set; }
+        public Color ControlBackgroundColor { get; private set; }
         /// <summary>
         /// Font for all control applicable templates in this theme.
         /// </summary>
-        private SpriteFont ControlFont { get; set; }
+        public SpriteFont ControlFont { get; private set; }
         /// <summary>
         /// Font color for all applicable control templates in this theme.
         /// </summary>        
-        private Color ControlFontColor { get; set; }
+        public Color ControlFontColor { get; private set; }
         /// <summary>
         /// "Selected Item" font color for all applicable control templates in this theme.
         /// </summary>
-        private Color ControlFontSelectedColor { get; set; }
+        public Color ControlFontSelectedColor { get; private set; }
         /// <summary>
         /// Foreground color for all applicable control templates in this theme.
         /// </summary>
-        private Color ControlForegroundColor { get; set; }
+        public Color ControlForegroundColor { get; private set; }
         /// <summary>
         /// The "checked" image for all applicable control templates in this theme.
         /// </summary>
-        private Texture2D DefaultCheckTexture { get; set; }
+        public Texture2D DefaultCheckTexture { get; private set; }
         /// <summary>
         /// The "unchecked" image for all applicable control templates in this theme.
         /// </summary>
-        private Texture2D DefaultUncheckTexture { get; set; }
+        public Texture2D DefaultUncheckTexture { get; private set; }
         /// <summary>
         /// The default background image for all applicable control templates in this theme.
         /// </summary>
         /// <remarks>
         /// Typically used by the image control, when no texture is specified.
         /// </remarks>
-        private Texture2D NoImageTexture { get; set; }
+        public Texture2D NoImageTexture { get; private set; }
         /// <summary>
         /// The "checked" image for all applicable control templates in this theme.
         /// </summary>
-        private Texture2D DropDownImageTexture { get; set; }
+        public Texture2D DropDownImageTexture { get; private set; }
         /// <summary>
         /// The font for all editor control templates in this theme.
         /// </summary>
-        private SpriteFont EditorFont { get; set; }
+        public SpriteFont EditorFont { get; private set; }
         /// <summary>
         /// The font color for all editor control templates in this theme.
         /// </summary>
-        private Color EditorFontColor { get; set; }
+        public Color EditorFontColor { get; private set; }
         /// <summary>
         /// The background color for all editor control templates in this theme.
         /// </summary>
-        private Color EditorColor { get; set; }
+        public Color EditorColor { get; private set; }
 
         private DefaultTheme()
         { }
@@ -319,24 +319,32 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         /// <returns>An instance of the DefaultTheme singleton.</returns>
         public static DefaultTheme Create(Device graphicsDevice)
         {
-            lock (_instanceLock)
+            return Instance;
+        }
+
+        public static DefaultTheme Instance
+        {
+            get
             {
-                if (_instance == null)
+                lock (_instanceLock)
                 {
-                    _instance = new DefaultTheme();
-                    _instance.ControlBackgroundColor = Color.DarkGray;
-                    _instance.ControlFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\ControlFont10.font");
-                    _instance.ControlFontColor = Color.White;
-                    _instance.ControlFontSelectedColor = Color.Orange;
-                    _instance.ControlForegroundColor = Color.Gray;
-                    _instance.DefaultCheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Contnet\UI\DefaultTheme\Check.png");
-                    _instance.DefaultUncheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Content\UI\DefaultTheme\Uncheck.png");
-                    _instance.EditorColor = Color.White;
-                    _instance.EditorFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\EditorFont10.font");
-                    _instance.EditorFontColor = Color.DarkGray;
+                    if (_instance == null)
+                    {
+                        _instance = new DefaultTheme();
+                        _instance.ControlBackgroundColor = Color.DarkGray;
+                        _instance.ControlFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\ControlFont10.font");
+                        _instance.ControlFontColor = Color.White;
+                        _instance.ControlFontSelectedColor = Color.Orange;
+                        _instance.ControlForegroundColor = Color.Gray;
+                        _instance.DefaultCheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Contnet\UI\DefaultTheme\Check.png");
+                        _instance.DefaultUncheckTexture = ContentImporter.LoadTexture(graphicsDevice.ImmediateContext, @"Content\UI\DefaultTheme\Uncheck.png");
+                        _instance.EditorColor = Color.White;
+                        _instance.EditorFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\EditorFont10.font");
+                        _instance.EditorFontColor = Color.DarkGray;
+                    }
                 }
+                return _instance;
             }
-            return _instance;
         }
     }
 }
