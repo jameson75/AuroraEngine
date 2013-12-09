@@ -42,9 +42,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _game = visualRoot.Game;
             Padding = BoundaryF.Zero;
             Margin = BoundaryF.Zero;            
-            Enabled = true;
-            EnableFocus = true;
-            Visible = true;
+            _enabled = true;
+            _enableFocus = true;
+            _visible = true;
             _spriteBatch = new SpriteBatch(visualRoot.Game.GraphicsDeviceContext);
             _children = new UIControlCollection();
             _children.CollectionChanged += Children_CollectionChanged;            
@@ -148,7 +148,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             get { return _visible; }
             set { 
-                _visible = false;
+                _visible = value;
                 OnVisibleChanged();
             }
         }

@@ -210,7 +210,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public SpinnerPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, double value = 0)
             : base(visualRoot, caption, font, fontColor)
         {
-            _spinner = new Spinner(visualRoot);
+            _spinner = new Spinner(visualRoot, font, fontColor, Color.Transparent);
             _spinner.Value = value;
             this.Children.Add(_spinner);
         }

@@ -55,6 +55,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             set { SelectedItem = value; }
         }
 
+        public override void Initialize()
+        {
+            foreach (MenuItem item in Items)
+                item.Initialize();
+            base.Initialize();
+        }
+      
         protected override void OnUpdate(long gameTime)
         {
             IInputService inputServices = (IInputService)Game.Services.GetService(typeof(IInputService));
@@ -108,7 +115,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 }
                 else if (EnableDefaultFocus)
                 {
-                    UIControl defaultFocusTarget = VisualRoot.FocusManager.GetFirstInTabOrder(ActiveScreen, false, false);
+                    UIControl defaultFocusTarget = VisualRoot.FocusManager.GetFirstInTabOrder(ActiveScreen);
                     if (defaultFocusTarget != null)
                         VisualRoot.FocusManager.SetFocus(defaultFocusTarget);
                     //VisualRoot.FocusManager.SetNextFocus(ActiveScreen);
@@ -128,7 +135,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //}
     }
 
-    public class ScreenPanel : ListControlItem, ICommandControl
+    public class ScreenPanel : ListControlItem, ICommandControl, Components.ICustomFocusContainer
     {
         CommandControlWireUp _wireUp = null;
 
@@ -142,6 +149,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
         {
             OnCommand(args.CommandName);
-        }       
+        }
+
+        public bool CanTabOutward
+        {
+            get { return false; }
+        }
+
+        public bool CanTabInward
+        {
+            get { return true; }
+        }
     }    
 }

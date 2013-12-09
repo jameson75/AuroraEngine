@@ -152,37 +152,32 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public LabelTemplate DefaultItemTemplate { get; set; }
 
-        public void OpenContextMenu(ContextMenu subMenu, bool hasFocus)
+        public void OpenContextMenu(ContextMenu subMenu)
         {
             if (subMenu.Owner != null && subMenu.Owner != this)
                 throw new InvalidOperationException("Submenu cannot be opened while owned by another menu.");
 
-            subMenu.Visible = true;
-            subMenu.HasFocus = hasFocus;
-            subMenu.Owner = this;
+            subMenu.BeginContext(this);
 
             DrawingPointF subMenuRelativePosition = DrawingPointFExtension.Zero;
 
             switch (subMenu.DisplaySide)
             {
-                case ContextControlDisplaySide.Left:
+                case ContextMenuDisplaySide.Left:
                     subMenuRelativePosition = new DrawingPointF(this.Position.X - subMenu.Bounds.Width, this.Position.Y);
                     break;
-                case ContextControlDisplaySide.Above:
+                case ContextMenuDisplaySide.Above:
                     subMenuRelativePosition = new DrawingPointF(this.Position.X, this.Position.Y - subMenu.Bounds.Height);
                     break;
-                case ContextControlDisplaySide.Right:
+                case ContextMenuDisplaySide.Right:
                     subMenuRelativePosition = new DrawingPointF(this.Bounds.Left, this.Position.Y);
                     break;
-                case ContextControlDisplaySide.Bottom:
+                case ContextMenuDisplaySide.Bottom:
                     subMenuRelativePosition = new DrawingPointF(this.Bounds.X, this.Bounds.Bottom);
                     break;
             }
 
-            subMenu.Position = subMenu.PositionToLocal(this.PositionToSurface(subMenuRelativePosition));
-
-            if (subMenu.HasFocus && subMenu.Items.Count > 0)
-                subMenu.SelectedItemIndex = 0;
+            subMenu.Position = subMenu.PositionToLocal(this.PositionToSurface(subMenuRelativePosition));            
         }
 
         public void AddMenuItem(MenuItem item)
@@ -202,6 +197,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             AddMenuItem(item);
         }
 
+        public override void Initialize()
+        {
+            foreach (MenuItem item in Items)
+                item.Initialize();
+            base.Initialize();
+        }
+
         protected override void OnDraw(long gameTime)
         {
             foreach (MenuItem item in Items)
@@ -217,17 +219,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 if (inputServices == null)
                     throw new InvalidOperationException("Input services not available.");
 
-                InputState inputState = inputServices.GetInputState();
+                BufferedInputState bufferedInputState = inputServices.GetBufferedInputState();
 
-                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && inputState.IsKeyHit(Key.UpArrow)) ||
-                                             (Orienation == MenuOrientation.Horizontal && inputState.IsKeyHit(Key.Left)) ||
-                                             (Orienation == MenuOrientation.Vertical && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp)) ||
-                                             (Orienation == MenuOrientation.Horizontal && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadLeft));
+                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && bufferedInputState.IsKeyDown(Key.UpArrow)) ||
+                                             (Orienation == MenuOrientation.Horizontal && bufferedInputState.IsKeyDown(Key.Left)) ||
+                                             (Orienation == MenuOrientation.Vertical && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp)) ||
+                                             (Orienation == MenuOrientation.Horizontal && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadLeft));
 
-                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && inputState.IsKeyDown(Key.Down)) ||
-                                         (Orienation == MenuOrientation.Horizontal && inputState.IsKeyDown(Key.Right)) ||
-                                         (Orienation == MenuOrientation.Vertical && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadDown)) ||
-                                         (Orienation == MenuOrientation.Horizontal && inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadRight));
+                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && bufferedInputState.IsKeyDown(Key.Down)) ||
+                                         (Orienation == MenuOrientation.Horizontal && bufferedInputState.IsKeyDown(Key.Right)) ||
+                                         (Orienation == MenuOrientation.Vertical && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadDown)) ||
+                                         (Orienation == MenuOrientation.Horizontal && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadRight));
 
                 if (selectPreviousKeyDown)
                     this.SelectPreviousItem();
@@ -235,12 +237,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 else if (selectNextKeyDown)
                     this.SelectNextItem();
 
-                else if (inputState.IsKeyReleased(Key.Return) || inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.A))
+                else if (bufferedInputState.IsKeyReleased(Key.Return) || bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.A))
                 {
                     if (this.SelectedItem != null)
                     {
                         this.OnItemClicked((MenuItem)this.SelectedItem);
-
                         if (SelectedItem.CommandName != null)
                             this.OnCommand(SelectedItem.CommandName);
                     }
@@ -323,21 +324,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (handler != null)
                 handler(this, new ItemClickedEventArgs(item));
 
-            if (item.SubMenu != null && item.SubMenu.Activation == ContextControlActivation.Click)
-                OpenContextMenu(item.SubMenu, true);
-        }
-
-        protected override void OnSelectedItemChanged()
-        {
-            base.OnSelectedItemChanged();
-
-            if (SelectedItem != null)
-            {
-                ContextMenu itemSubmenu = ((MenuItem)SelectedItem).SubMenu;
-                if (itemSubmenu != null && itemSubmenu.Activation == ContextControlActivation.Select)
-                    OpenContextMenu(itemSubmenu, false);
-            }
-        }
+            if (item.SubMenu != null)
+                OpenContextMenu(item.SubMenu);
+        }   
 
         public event ItemClickedEventHandler ItemClicked = null;
 

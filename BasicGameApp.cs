@@ -87,7 +87,10 @@ namespace CipherPark.AngelJacket.Core
         { }
 
         protected virtual void Uninitialize()
-        { }
+        {
+            _masteringVoice.DestroyVoice();
+            _masteringVoice.Dispose();
+        }
 
         protected void Exit()
         {

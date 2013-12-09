@@ -317,16 +317,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         /// </remarks>
         /// <param name="graphicsDevice"></param>
         /// <returns>An instance of the DefaultTheme singleton.</returns>
-        public static DefaultTheme Create(Device graphicsDevice)
+        public static void Initialize(Device graphicsDevice)
         {
-            return Instance;
-        }
-
-        public static DefaultTheme Instance
-        {
-            get
-            {
-                lock (_instanceLock)
+            lock (_instanceLock)
                 {
                     if (_instance == null)
                     {
@@ -343,6 +336,15 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                         _instance.EditorFontColor = Color.DarkGray;
                     }
                 }
+        }
+
+        public static DefaultTheme Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    throw new InvalidOperationException("Default theme was not initialized");
+
                 return _instance;
             }
         }

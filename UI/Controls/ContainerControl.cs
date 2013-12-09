@@ -46,30 +46,37 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnUpdate(gameTime);
         }
 
+        public override void Initialize()
+        {
+            foreach (UIControl child in this.Children)
+                child.Initialize();
+            base.Initialize();
+        }
+
         public override void ApplyTemplate(UIControlTemplate template)
         {          
             base.ApplyTemplate(template);
         }
 
-        [Obsolete]
-        public override UIControl _GetNextFocusableChild(UIControl fromControl)
-        {
-            if (fromControl == null)
-                throw new ArgumentNullException("fromControl");
+        //[Obsolete]
+        //public override UIControl _GetNextFocusableChild(UIControl fromControl)
+        //{
+        //    if (fromControl == null)
+        //        throw new ArgumentNullException("fromControl");
 
-            if (fromControl.Parent != this)
-                throw new InvalidOperationException("starting control is not an immediate child of this control");
+        //    if (fromControl.Parent != this)
+        //        throw new InvalidOperationException("starting control is not an immediate child of this control");
 
-            UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(Children);
-            int startAfterIndex = Array.IndexOf(tabOrderedControls, fromControl);            
-            for (int i = startAfterIndex + 1; i < tabOrderedControls.Length; i++)
-            {
-                if (tabOrderedControls[i].Visible && tabOrderedControls[i].Enabled && tabOrderedControls[i].CanReceiveFocus)
-                    return tabOrderedControls[i];
-            }
+        //    UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(Children);
+        //    int startAfterIndex = Array.IndexOf(tabOrderedControls, fromControl);            
+        //    for (int i = startAfterIndex + 1; i < tabOrderedControls.Length; i++)
+        //    {
+        //        if (tabOrderedControls[i].Visible && tabOrderedControls[i].Enabled && tabOrderedControls[i].CanReceiveFocus)
+        //            return tabOrderedControls[i];
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         protected override void OnChildAdded(UIControl child)
         {

@@ -28,20 +28,26 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             HandleCloseKey = true;
             _subControl = controlCreator(visualRoot);
             _subControl.VerticalAlignment = Controls.VerticalAlignment.Stretch;
-            _subControl.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;           
+            _subControl.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            _subControl.SizeChanged += SubControl_SizeChanged;
             Children.Add(_subControl);          
         }
 
-        public UIControl Owner { get; private set; }
+        private void SubControl_SizeChanged(object sender, EventArgs e)
+        {
+            this.SuspendLayout = true;
+            this.Size = _subControl.Size;
+            this.SuspendLayout = false;
+        }
 
-        public ContextControlActivation Activation { get; set; }
-
-        public ContextControlDisplaySide DisplaySide { get; set; }
+        public UIControl Owner { get; private set; }        
 
         public bool HandleCloseKey { get; set; }
 
+        public T SubControl { get { return _subControl; } }
+
         public void BeginContext(UIControl owner)
-        {
+        {            
             this.Owner = owner;
             this.Visible = true;
             this.VisualRoot.FocusManager.SetNextFocus(this);  
@@ -52,8 +58,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             VisualRoot.FocusManager.ControlLostFocus -= FocusManager_ControlLostFocus;            
             this.Visible = false;
-            this.Owner.HasFocus = true;
-            this.Owner = null;  
+            if(this.ContainsFocus)
+                this.Owner.HasFocus = true;
+            this.Owner = null;          
         }
 
         protected override void OnUpdate(long gameTime)
@@ -91,24 +98,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 this.EndContext();
         }
 
-        bool ICustomFocusContainer.CanFocusMoveInward
+        bool ICustomFocusContainer.CanTabInward
         {
             get { return true; }
         }    
 
-        bool ICustomFocusContainer.CanFocusMoveOutward
+        bool ICustomFocusContainer.CanTabOutward
         {
             get { return false; }
         }
     }
 
-    public enum ContextControlActivation
-    {
-        Click,
-        Select
-    }
-
-    public enum ContextControlDisplaySide
+    public enum ContextMenuDisplaySide
     {
         Left,
         Above,
@@ -116,13 +117,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         Bottom
     }
 
-    public abstract class ContextMenu : ContextControl<Menu>
+    public class ContextMenu : ContextControl<Menu>
     {
-        ContextMenu(IUIRoot visualRoot)
+        public ContextMenuDisplaySide DisplaySide { get; set; }
+
+        public ContextMenu(IUIRoot visualRoot)
             : base(visualRoot, ConstructMenu)
         {
 
-        }
+        }   
 
         private static Menu ConstructMenu(IUIRoot visualRoot)
         {
