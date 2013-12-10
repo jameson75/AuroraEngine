@@ -18,6 +18,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         private UIControl _container = null;
         private bool _beginDrawCallOpen = false;
+        private bool _restoreRasterizerState = false;
+        private bool _restoreBlendState = false;
        
     #region Rasterizer state/variable cache
         private Rectangle[] oldScissorRectangles = null;
@@ -123,6 +125,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     newRSDescription.IsMultisampleEnabled = true;                   
                     this.RasterizerState = new RasterizerState(game.GraphicsDevice, newRSDescription);
                     game.GraphicsDeviceContext.Rasterizer.SetScissorRectangle((int)bounds.Left, (int)bounds.Top, (int)bounds.Right, (int)bounds.Bottom);
+                    _restoreRasterizerState = true;
                 }
             }
 
@@ -146,6 +149,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseBlendFactor;
                     this.BlendState = new BlendState(game.GraphicsDevice, blendDesc);
                     this.BlendFactor = new Color4(clampedOpacity);
+                    _restoreBlendState = true;
                 }
             }
 
@@ -164,16 +168,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             Container.ControlSpriteBatch.End();
 
-            if (oldRasterizerState != null)
-            {
+            if (_restoreRasterizerState)
+            {                
                 this.Container.Game.GraphicsDeviceContext.Rasterizer.State = oldRasterizerState;
                 this.Container.Game.GraphicsDeviceContext.Rasterizer.SetScissorRectangles(oldScissorRectangles);
                 oldRasterizerState = null;
                 oldScissorRectangles = null;
                 this.RasterizerState = null;
+                _restoreRasterizerState = false;
             }
 
-            if (oldBlendState != null)
+            if (_restoreBlendState)
             {
                 this.Container.Game.GraphicsDeviceContext.OutputMerger.BlendState = oldBlendState;
                 this.Container.Game.GraphicsDeviceContext.OutputMerger.BlendFactor = oldBlendFactor;
@@ -181,6 +186,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 oldBlendFactor = Color.Transparent;
                 this.BlendState = null;
                 this.BlendFactor = null;
+                _restoreBlendState = false;
             }      
 
             _beginDrawCallOpen = false;

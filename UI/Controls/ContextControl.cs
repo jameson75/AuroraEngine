@@ -50,8 +50,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {            
             this.Owner = owner;
             this.Visible = true;
-            this.VisualRoot.FocusManager.SetNextFocus(this);  
+            this.VisualRoot.FocusManager.SetNextFocus(this);             
             VisualRoot.FocusManager.ControlLostFocus += FocusManager_ControlLostFocus;
+            OnBeginContext();
         }   
 
         public void EndContext()
@@ -61,6 +62,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if(this.ContainsFocus)
                 this.Owner.HasFocus = true;
             this.Owner = null;          
+            OnEndContext();
         }
 
         protected override void OnUpdate(long gameTime)
@@ -91,6 +93,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
             base.OnUpdate(gameTime);
         }
+
+        protected virtual void OnBeginContext() { }
+
+        protected virtual void OnEndContext() { }
    
         private void FocusManager_ControlLostFocus(object sender, FocusChangedEventArgs args)
         {
@@ -124,12 +130,23 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public ContextMenu(IUIRoot visualRoot)
             : base(visualRoot, ConstructMenu)
         {
+            SubControl.ControlCommand+= MenuSubControl_ControlCommand; 
+        }
 
+        private void MenuSubControl_ControlCommand(object sender, ControlCommandArgs args)
+        {
+ 	        this.EndContext();
         }   
 
         private static Menu ConstructMenu(IUIRoot visualRoot)
         {
             return new Menu(visualRoot);
+        }
+
+        protected override void OnBeginContext()
+        {
+            if( this.SubControl.Items.Count > 0 )
+                this.SubControl.SelectedItemIndex = 0;
         }
     }
 }

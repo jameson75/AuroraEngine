@@ -557,17 +557,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (handler != null)
                 handler(this, EventArgs.Empty);
             
-            Action<UIControl> notify = null;
-            notify  = new Action<UIControl>( (c) => 
+            Action<UIControl> notifyVisibleInTreeChanged = null;
+            notifyVisibleInTreeChanged  = new Action<UIControl>( (c) => 
             {
                 EventHandler _handler = c.VisibleInTreeChanged;
                 if (handler != null)
                     handler(this, EventArgs.Empty);
                 foreach (UIControl child in c.Children)
-                    notify(child);
+                    notifyVisibleInTreeChanged(child);
             });
-
-            notify(this);
+            notifyVisibleInTreeChanged(this);
         }
 
         protected virtual void OnEnabledChanged()

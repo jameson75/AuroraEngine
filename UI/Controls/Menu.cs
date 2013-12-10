@@ -170,7 +170,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     subMenuRelativePosition = new DrawingPointF(this.Position.X, this.Position.Y - subMenu.Bounds.Height);
                     break;
                 case ContextMenuDisplaySide.Right:
-                    subMenuRelativePosition = new DrawingPointF(this.Bounds.Left, this.Position.Y);
+                    subMenuRelativePosition = new DrawingPointF(this.Bounds.Right, this.Position.Y);
                     break;
                 case ContextMenuDisplaySide.Bottom:
                     subMenuRelativePosition = new DrawingPointF(this.Bounds.X, this.Bounds.Bottom);
