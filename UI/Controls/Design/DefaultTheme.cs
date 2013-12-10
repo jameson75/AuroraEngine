@@ -334,6 +334,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                         _instance.EditorColor = Color.White;
                         _instance.EditorFont = ContentImporter.LoadFont(graphicsDevice, @"Content\UI\DefaultTheme\EditorFont10.font");
                         _instance.EditorFontColor = Color.DarkGray;
+                        _instance.isInitialized = true;
                     }
                 }
         }

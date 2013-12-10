@@ -202,7 +202,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             get
             {
-                return this.VisualRoot.FocusManager.HitList.Last() == this;
+                return this.VisualRoot.FocusManager.HitList.LastOrDefault() == this;
             }
         }
 
