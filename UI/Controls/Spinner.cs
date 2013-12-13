@@ -25,8 +25,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private Label _textArea = null;        
         private Button _upButton = null;
         private Button _downButton = null;        
-        private SplitterPanel _mainPanel = null;      
-        
+        private SplitterPanel _mainPanel = null;
+        private SplitterPanel _rightSubPanel = null;
+
         private const int RightPanelFixedLength = 15;
         private const int ButtonsHorzOffset = 4;
         private const int ButtonsVerticalOffset = 4;
@@ -42,10 +43,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(visualRoot)
         {            
             _mainPanel = new SplitterPanel(visualRoot);
+            _mainPanel.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
+            _mainPanel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             _mainPanel.Splitters.Add(new SplitterLayoutDivision(new Guid(RightDivisionGuid), RightPanelFixedLength, SplitterLayoutAnchorSide.Two));            
             _mainPanel.Orientation = SplitterLayoutOrientation.Verticle;            
            
-            SplitterPanel _rightSubPanel = new SplitterPanel(visualRoot);
+            _rightSubPanel = new SplitterPanel(visualRoot);
             _rightSubPanel.Splitters.Add(new SplitterLayoutDivision(new Guid(RightLowerDivisionGuid), RightLowerDivisionDistance, SplitterLayoutAnchorSide.None, true));
             _rightSubPanel.Orientation = SplitterLayoutOrientation.Horizontal;
             _rightSubPanel.LayoutId = new Guid(RightDivisionGuid);
@@ -58,14 +61,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _textArea.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             _mainPanel.Children.Add(_textArea);
 
-            _upButton = new Button(visualRoot) { BackgroundContent = new ColorContent(backgroundColor) };
+            _upButton = new Button(visualRoot) { Content = new ColorContent(fontColor) };
             _upButton.Click += UpButton_Click;
             _upButton.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             _upButton.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             _upButton.EnableFocus = false;
             _rightSubPanel.Children.Add(_upButton);
 
-            _downButton = new Button(visualRoot) { BackgroundContent = new ColorContent(backgroundColor) };
+            _downButton = new Button(visualRoot) { Content = new ColorContent(fontColor) };
             _downButton.Click += DownButton_Click;
             _downButton.LayoutId = new Guid(RightLowerDivisionGuid);
             _downButton.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
@@ -75,6 +78,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             visualRoot.FocusManager.ControlReceivedFocus += FocusManager_ControlReceivedFocus;
 
+            Value = 0;
             Children.Add(_mainPanel);
             UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }
