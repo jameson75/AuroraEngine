@@ -23,39 +23,35 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class CheckBox : UIControl, ICommandControl
     {
         bool _isChecked = false;
-        ContentControl _checkContentControl = null;
+        ContentControl _checkedContentControl = null;
         ContentControl _uncheckedContentControl = null;
         Label _label = null;
 
         private CheckBox(IUIRoot visualRoot)
             : base(visualRoot)
         {
-            _checkContentControl = new ContentControl(visualRoot);
+            _checkedContentControl = new ContentControl(visualRoot);
             _uncheckedContentControl = new ContentControl(visualRoot);
             _label = new Label(visualRoot);
-            Children.Add(_checkContentControl);
+            Children.Add(_checkedContentControl);
             Children.Add(_uncheckedContentControl);
             Children.Add(_label);
             UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }
         
-        public CheckBox(IUIRoot visualRoot, UIContent checkedRendering, UIContent uncheckedRendering)
+        public CheckBox(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, Color checkedColor)
             : base(visualRoot)
-        {   
-            _checkContentControl = new ContentControl(visualRoot, checkedRendering);
-            _uncheckedContentControl = new ContentControl(visualRoot, uncheckedRendering);
-            _label = new Label(visualRoot);
-            Children.Add(_checkContentControl);
+        {
+            UIContent checkedContent = new ColorContent(checkedColor);
+            UIContent uncheckedContent = new ColorContent(Color.Transparent);
+            _checkedContentControl = new ContentControl(visualRoot, checkedContent);
+            _uncheckedContentControl = new ContentControl(visualRoot, uncheckedContent);
+            _label = new Label(visualRoot, caption, font, fontColor);
+            Children.Add(_checkedContentControl);
             Children.Add(_uncheckedContentControl);
             Children.Add(_label);
             UpdateLayout(LayoutUpdateReason.ChildCountChanged);
         }
-
-        public CheckBox(IUIRoot visualRoot, string caption, UIContent checkedRendering, UIContent uncheckedRendering)
-            : this(visualRoot, checkedRendering, uncheckedRendering)
-        {
-            this.Caption = caption;
-        }    
 
         public bool IsChecked
         {
@@ -70,7 +66,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnDraw(long gameTime)
         {
             if (IsChecked)
-                _checkContentControl.Draw(gameTime);
+                _checkedContentControl.Draw(gameTime);
             else
                 _uncheckedContentControl.Draw(gameTime);
             base.OnDraw(gameTime);
@@ -79,8 +75,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnLayoutChanged()
         {
             _label.Position = new DrawingPointF(0, this.Bounds.Bottom - _label.Size.Height);
-            _checkContentControl.Position = new DrawingPointF(this.Bounds.Left - this.Size.Width, this.Bounds.Bottom - _checkContentControl.Size.Height);
-            _uncheckedContentControl.Position = _checkContentControl.Position;
+            _checkedContentControl.Position = new DrawingPointF(this.Bounds.Left - this.Size.Width, this.Bounds.Bottom - _checkedContentControl.Size.Height);
+            _uncheckedContentControl.Position = _checkedContentControl.Position;
         }
 
         protected virtual void OnIsCheckedChanged()
@@ -122,7 +118,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _label.ApplyTemplate(cbTemplate.CaptionTemplate);
             
             if (cbTemplate.CheckContentTemplate != null)
-                _checkContentControl.ApplyTemplate(cbTemplate.CheckContentTemplate);
+                _checkedContentControl.ApplyTemplate(cbTemplate.CheckContentTemplate);
 
             if (cbTemplate.UncheckContentTemplate != null)
                 _uncheckedContentControl.ApplyTemplate(cbTemplate.UncheckContentTemplate);
