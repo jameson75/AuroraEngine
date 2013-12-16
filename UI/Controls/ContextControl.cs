@@ -94,9 +94,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnUpdate(gameTime);
         }
 
-        protected virtual void OnBeginContext() { }
+        protected virtual void OnBeginContext()
+        {
+            EventHandler handler = ContextStarted;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
 
-        protected virtual void OnEndContext() { }
+        protected virtual void OnEndContext()
+        {
+            EventHandler handler = ContextClosed;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
    
         private void FocusManager_ControlLostFocus(object sender, FocusChangedEventArgs args)
         {
@@ -113,6 +123,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             get { return false; }
         }
+
+        public event EventHandler ContextStarted;
+
+        public event EventHandler ContextClosed;
     }
 
     public enum ContextMenuDisplaySide

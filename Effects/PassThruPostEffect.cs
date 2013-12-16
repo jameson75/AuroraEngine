@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             VertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
             PixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
             FixVertexShader = new VertexShader(GraphicsDevice, System.IO.File.ReadAllBytes(vsFixFileName));
-            _quad = ContentBuilder.BuildViewportQuad(game, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildBasicViewportQuad(game, _vertexShaderByteCode);
         }
 
         public override void Apply()

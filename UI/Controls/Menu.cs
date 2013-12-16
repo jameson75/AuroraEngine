@@ -152,8 +152,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public LabelTemplate DefaultItemTemplate { get; set; }
 
-        public void OpenContextMenu(ContextMenu subMenu)
+        public void OpenContextMenu(MenuItem item)
         {
+            ContextMenu subMenu = item.SubMenu;
+
             if (subMenu.Owner != null && subMenu.Owner != this)
                 throw new InvalidOperationException("Submenu cannot be opened while owned by another menu.");
 
@@ -325,7 +327,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 handler(this, new ItemClickedEventArgs(item));
 
             if (item.SubMenu != null)
-                OpenContextMenu(item.SubMenu);
+                OpenContextMenu(item);
         }   
 
         public event ItemClickedEventHandler ItemClicked = null;
@@ -363,4 +365,104 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     }
 
     public delegate void ItemClickedEventHandler(object sender, ItemClickedEventArgs args);
+
+    public class ChoiceControl : ContentControl        
+    {        
+        ContextMenu _contextMenu = null;
+        
+        public ChoiceControl(IUIRoot visualRoot)
+            : base(visualRoot)
+        {
+            _contextMenu = new ContextMenu(visualRoot);
+            _contextMenu.ContextClosed += ContextMenu_ContextClosed;
+            _contextMenu.DisplaySide = ContextMenuDisplaySide.Right;
+            visualRoot.Controls.Add(_contextMenu);
+        }
+
+        public UIItemControlCollection Items
+        {
+            get { return _contextMenu.SubControl.Items; }
+        }
+
+        public int SelectedItemIndex
+        {
+            get { return _contextMenu.SubControl.SelectedItemIndex; }
+            set 
+            { 
+                _contextMenu.SubControl.SelectedItemIndex = value;
+                UpdateContent();
+            }
+        }
+
+        public void OpenContextMenu()
+        {
+            if (_contextMenu.Owner != null && _contextMenu.Owner != this)
+                throw new InvalidOperationException("Context menu cannot be opened while owned by another control.");
+
+            _contextMenu.BeginContext(this);
+
+            DrawingPointF subMenuRelativePosition = DrawingPointFExtension.Zero;
+
+            switch (_contextMenu.DisplaySide)
+            {
+                case ContextMenuDisplaySide.Left:
+                    subMenuRelativePosition = new DrawingPointF(this.Position.X - _contextMenu.Bounds.Width, this.Position.Y);
+                    break;
+                case ContextMenuDisplaySide.Above:
+                    subMenuRelativePosition = new DrawingPointF(this.Position.X, this.Position.Y - _contextMenu.Bounds.Height);
+                    break;
+                case ContextMenuDisplaySide.Right:
+                    subMenuRelativePosition = new DrawingPointF(this.Bounds.Right, this.Position.Y);
+                    break;
+                case ContextMenuDisplaySide.Bottom:
+                    subMenuRelativePosition = new DrawingPointF(this.Bounds.X, this.Bounds.Bottom);
+                    break;
+            }
+
+            _contextMenu.Position = _contextMenu.PositionToLocal(this.PositionToSurface(subMenuRelativePosition));
+        }
+
+        protected override void OnUpdate(long gameTime)
+        {
+            Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
+
+            if (inputServices == null)
+                throw new InvalidOperationException("Input services not available.");
+
+            if (this.HasFocus)
+            {
+                BufferedInputState bInputState = inputServices.GetBufferedInputState();
+                if (bInputState.IsKeyReleased(Key.Return))
+                    OpenContextMenu();
+            }
+
+            if (this.IsHit)
+            {
+                InputState inputState = inputServices.GetInputState();
+                if (inputState.IsMouseButtonDown(InputState.MouseButton.Left))
+                    OpenContextMenu();
+            }
+
+            base.OnUpdate(gameTime);
+        }
+
+        private void ContextMenu_ContextClosed(object sender, EventArgs e)
+        {
+            UpdateContent();
+        }
+
+        private void UpdateContent()
+        {
+            if (_contextMenu.SubControl.SelectedItem != null)
+            {
+                //TODO: Implement the ability to clone content.
+                //Right now, we relegate to copying text from text content.
+                TextContent t = ((MenuItem)_contextMenu.SubControl.SelectedItem).ItemContent as TextContent
+                if( t != null)
+                    this.Content = new TextContent(t.Text, t.Font, t.FontColor);
+                else
+                    this.Content = null;      
+            }
+        }
+    }
 }

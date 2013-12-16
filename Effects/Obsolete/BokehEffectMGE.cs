@@ -66,7 +66,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             _constantBufferSize = 80;
             _constantsBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, _constantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
 
-            _quad = ContentBuilder.BuildViewportQuad(game, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildBasicViewportQuad(game, _vertexShaderByteCode);
 
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;

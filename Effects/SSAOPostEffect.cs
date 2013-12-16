@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateShaderTargets()
         {             
-            _quad = ContentBuilder.BuildViewportQuad(_game, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildBasicViewportQuad(_game, _vertexShaderByteCode);
 
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
