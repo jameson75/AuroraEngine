@@ -118,6 +118,24 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     SetNextFocus(_focusedControl);
             }            
         }
+        
+        private UIControl _postFocusControl = null;
+        
+        public void PostUpdate()
+        {
+            if(_postFocusControl != null)
+            {
+                _SetFocus(_postFocusControl);
+                _postFocusControl = null;
+            }
+        }
+
+        public void PostFocus(UIControl control)
+        {
+            if (!IsEligibleForFocus(control))
+                throw new InvalidOperationException();
+            _postFocusControl = control;
+        }
 
         public void SetPreviousFocus(UIControl nextControl)
         {

@@ -155,6 +155,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
             foreach (UIControl control in this.controls)
                 control.Update(gameTime);
+
+            focusManager.PostUpdate();
         }
 
         public void Draw(long gameTime)

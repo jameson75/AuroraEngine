@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CipherPark.AngelJacket.Core.UI.Components;
-
+using CipherPark.AngelJacket.Core.Utils;
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
 // Company: Cipher Park
@@ -58,6 +58,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 if (_content != null)
                     _content.Container = this;
             }
+        }
+
+        public virtual void SizeToContent()
+        {
+            if (this.Content != null)
+                this.Size = this.Content.CalculateSmallestBoundingRect().Size();           
         }
 
         public override void ApplyTemplate(UIControlTemplate template)

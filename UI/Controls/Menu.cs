@@ -376,6 +376,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _contextMenu = new ContextMenu(visualRoot);
             _contextMenu.ContextClosed += ContextMenu_ContextClosed;
             _contextMenu.DisplaySide = ContextMenuDisplaySide.Right;
+            _contextMenu.Visible = false;
             visualRoot.Controls.Add(_contextMenu);
         }
 
@@ -422,6 +423,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _contextMenu.Position = _contextMenu.PositionToLocal(this.PositionToSurface(subMenuRelativePosition));
         }
 
+        public override bool CanReceiveFocus
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         protected override void OnUpdate(long gameTime)
         {
             Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
@@ -448,7 +457,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private void ContextMenu_ContextClosed(object sender, EventArgs e)
         {
-            UpdateContent();
+            if(_contextMenu.Result == ContextControlResult.SelectOK)              
+                UpdateContent();
         }
 
         private void UpdateContent()
@@ -457,12 +467,25 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 //TODO: Implement the ability to clone content.
                 //Right now, we relegate to copying text from text content.
-                TextContent t = ((MenuItem)_contextMenu.SubControl.SelectedItem).ItemContent as TextContent
-                if( t != null)
+                TextContent t = ((MenuItem)_contextMenu.SubControl.SelectedItem).ItemContent as TextContent;
+                if (t != null)
                     this.Content = new TextContent(t.Text, t.Font, t.FontColor);
                 else
-                    this.Content = null;      
+                    this.Content = null;
             }
+            else
+                this.Content = null;
+
+            OnSelectedContentChanged();
         }
+
+        protected virtual void OnSelectedContentChanged()
+        {
+            EventHandler handler = SelectedContentChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        public event EventHandler SelectedContentChanged;
     }
 }

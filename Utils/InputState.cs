@@ -35,7 +35,18 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
 
         public long StateUpdateTime { get { return _stateUpdateTime; } }
-       
+
+        public void Clear()
+        {
+            controllerStateWindows = null;
+            keyboardStateWindow = null;
+            mouseStateWindow = null;
+            _releasedKeys = null;
+            _mouseButtonsDown = null;
+            _mouseButtonsReleased = null;
+            _mouseButtonsPressed = null;
+        }
+          
         public void UpdateState()
         {
             _stateUpdateTime = Environment.TickCount;

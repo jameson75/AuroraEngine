@@ -40,6 +40,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.SuspendLayout = false;
         }
 
+        public ContextControlResult Result { get; set; }
+
         public UIControl Owner { get; private set; }        
 
         public bool HandleCloseKey { get; set; }
@@ -55,13 +57,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             OnBeginContext();
         }   
 
-        public void EndContext()
+        public void EndContext(ContextControlResult result)
         {
             VisualRoot.FocusManager.ControlLostFocus -= FocusManager_ControlLostFocus;            
             this.Visible = false;
-            if(this.ContainsFocus)
-                this.Owner.HasFocus = true;
-            this.Owner = null;          
+            if (this.ContainsFocus)
+                this.VisualRoot.FocusManager.PostFocus(this.Owner);
+            this.Owner = null;
+            this.Result = result;
             OnEndContext();
         }
 
@@ -83,12 +86,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
                     InputState inputState = inputServices.GetInputState();
 
-                    bool closeButtonPressed = (inputState.IsKeyHit(Key.Back)) ||
+                    bool cancelButtonPressed = (inputState.IsKeyHit(Key.Back)) ||
                                               (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.Back)) ||
                                               (inputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.B));
 
-                    if (closeButtonPressed)
-                        EndContext();
+                    if (cancelButtonPressed)                    
+                        EndContext(ContextControlResult.SelectCancel);                    
                 }
             }
             base.OnUpdate(gameTime);
@@ -110,8 +113,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
    
         private void FocusManager_ControlLostFocus(object sender, FocusChangedEventArgs args)
         {
-            if (!IsDescendant(args.Control))
-                this.EndContext();
+            if (IsDescendant(args.Control))
+                this.EndContext(ContextControlResult.SelectCancel);
         }
 
         bool ICustomFocusContainer.CanTabInward
@@ -127,19 +130,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public event EventHandler ContextStarted;
 
         public event EventHandler ContextClosed;
-    }
-
-    public enum ContextMenuDisplaySide
-    {
-        Left,
-        Above,
-        Right,
-        Bottom
-    }
+    }  
 
     public class ContextMenu : ContextControl<Menu>
     {
-        public ContextMenuDisplaySide DisplaySide { get; set; }
+        public ContextMenuDisplaySide DisplaySide { get; set; }       
 
         public ContextMenu(IUIRoot visualRoot)
             : base(visualRoot, ConstructMenu)
@@ -148,8 +143,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         private void MenuSubControl_ControlCommand(object sender, ControlCommandArgs args)
-        {
- 	        this.EndContext();
+        {            
+ 	        this.EndContext(ContextControlResult.SelectOK);
         }   
 
         private static Menu ConstructMenu(IUIRoot visualRoot)
@@ -162,5 +157,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if( this.SubControl.Items.Count > 0 )
                 this.SubControl.SelectedItemIndex = 0;
         }
+    }
+
+    public enum ContextMenuDisplaySide
+    {
+        Left,
+        Above,
+        Right,
+        Bottom
+    }
+
+    public enum ContextControlResult
+    {
+        SelectOK,
+        SelectCancel
     }
 }
