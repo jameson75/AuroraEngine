@@ -106,7 +106,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             if (buttonsDown.Any(x => x == InputState.MouseButton.Left || x == InputState.MouseButton.Right))
             {
                 PopulateHitList(_visualRoot.Controls, state.InputState.GetMouseLocation(), _hitList);
-                UIControl focusTarget = GetHitFocusTarget(_visualRoot.Controls, state.InputState.GetMouseLocation());
+                UIControl focusTarget = GetHitFocusTarget(_hitList);
                 if (focusTarget != null && focusTarget != _focusedControl)
                     _SetFocus(focusTarget);
             }
@@ -320,48 +320,27 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if ((zOrderedSiblings[i].Visible || !mustBeVisible) && (zOrderedSiblings[i].Enabled|| !mustBeEnabled) && zOrderedSiblings[i].BoundsToSurface(zOrderedSiblings[i].Bounds).Contains(mouseLocation.ToDrawingPointF()))
                     return zOrderedSiblings[i];
             return null;
-        }          
+        }                
 
-        //public static UIControl GetHitFocusTarget(IEnumerable<UIControl> controls, DrawingPoint mouseLocation)
-        //{
-        //    UIControl hitControl = FocusManager.GetFirstHitInZOrder(controls, mouseLocation); //NOTE: we get the first VISIBLE hit sibling.
-        //    if( hitControl != null )
-        //    {
-        //        if (hitControl.CustomFocusManager != null)
-        //            return hitControl.CustomFocusManager.GetHitFocusTarget(mouseLocation);
-        //        else
-        //        {
-        //            UIControl hitChildControl = GetHitFocusTarget(hitControl.Children, mouseLocation);
-        //            if (hitChildControl != null)
-        //                return hitChildControl;
-        //            else
-        //            {
-        //                if (hitControl.CanReceiveFocus && hitControl.EnableFocus)
-        //                {
-        //                    if (hitControl.Bounds.Contains(mouseLocation.ToDrawingPointF()))
-        //                        return hitControl;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return null;
-        //}
-
-        private static UIControl GetHitFocusTarget(IList<UIControl> hitList, DrawingPoint mouseLocation)
+        private static UIControl GetHitFocusTarget(IList<UIControl> hitList)
         {
-            UIControl targetControl = null;
-            
-            UIControl outerMostRestrictedControl = hitList.FirstOrDefault(c => c is ICustomFocusContainer && ((ICustomFocusContainer)c).CanTabInward == false);
-            
-            if (outerMostRestrictedControl != null)
-                targetControl = outerMostRestrictedControl;
-            else            
-                targetControl = hitList.Last();
+            if (hitList.Count > 0)
+            {
+                UIControl targetControl = null;
+                UIControl outerMostRestrictedControl = hitList.FirstOrDefault(c => c is ICustomFocusContainer && ((ICustomFocusContainer)c).CanTabInward == false);
 
-            if (targetControl.CanReceiveFocus && targetControl.EnableFocus)
-                return targetControl;
+                if (outerMostRestrictedControl != null)
+                    targetControl = outerMostRestrictedControl;
+                else
+                    targetControl = hitList.Last();
+
+                if (targetControl.CanReceiveFocus && targetControl.EnableFocus)
+                    return targetControl;
+                else
+                    return null;
+            }
             else
-                return null;            
+                return null;
         }
 
         private static void PopulateHitList(IEnumerable<UIControl> controls, DrawingPoint mouseLocation, IList<UIControl> hitList)
