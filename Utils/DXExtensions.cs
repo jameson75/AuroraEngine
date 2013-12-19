@@ -29,14 +29,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static Vector2 Position(this Rectangle r)
         {
             return new Vector2(r.X, r.Y);
-        }
+        }       
 
-        public static Vector2 Size(this Rectangle r)
-        {
-            return new Vector2(r.Width, r.Height);
-        }
-
-        public static DrawingSize DrawingSize(this Rectangle r)
+        public static DrawingSize Size(this Rectangle r)
         {
             return new DrawingSize(r.Right - r.Left, r.Bottom - r.Top);
         }
