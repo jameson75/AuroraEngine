@@ -206,9 +206,8 @@
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
     <Compile Include="World\Geometry\RiggedModel.cs" />
-    <Compile Include="World\Geometry\RingForm.cs" />
+    <Compile Include="World\Geometry\ConcentricForm.cs" />
     <Compile Include="World\Geometry\TerrainForm.cs" />
-    <Compile Include="World\Geometry\TurbineForm.cs" />
     <Compile Include="Kinetics\IRigidBody.cs" />
     <Compile Include="Kinetics\Emitter.cs" />
     <Compile Include="Kinetics\ForceField.cs" />
