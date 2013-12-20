@@ -137,11 +137,28 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             _postFocusControl = control;
         }
 
-        public void SetPreviousFocus(UIControl nextControl)
-        {
-
-        }      
-      
+        //public void SetPreviousFocus(UIControl nextControl)
+        //{
+        //    UIControl previousFocusControl = null;
+        //    if (nextControl != null)
+        //    {
+        //        previousFocusControl = GetPreviousInTabOrder(nextControl);
+        //        if (previousFocusControl != null)
+        //            _SetFocus(previousFocusControl);
+        //    }
+        //    else
+        //    {
+        //        UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
+        //        UIControl lastChild = tabOrderedControls.LastOrDefault();
+        //        if (lastChild != null)
+        //        {
+        //            while (lastChild.Children.Count > 0)
+        //                lastChild = FocusManager.ToTabOrderedControlArray(lastChild.Children).LastOrDefault();
+        //        }
+        //        _SetFocus(lastChild);
+        //    }
+        //}            
+        
         public void SetNextFocus(UIControl previousControl)
         {
             UIControl nextFocusControl = null;

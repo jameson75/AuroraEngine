@@ -298,11 +298,14 @@ namespace CipherPark.AngelJacket.Core.Animation
 
             long elapsedTime = gameTime - _animationStartTime.Value;
 
-            if (Solver != null)
+            Particle[] allParticles = _emitterControllers.SelectMany(p => p.Target.Particles).ToArray();
+            for (int i = 0; i < allParticles.Length; i++)
             {
-                Particle[] allParticles = _emitterControllers.SelectMany(p => p.Target.Particles).ToArray();
-                for (int i = 0; i < allParticles.Length; i++)
+                if (Solver != null)
                     Solver.UpdateParticleTransform((ulong)elapsedTime, allParticles[i]);
+                
+                allParticles[i].Color = allParticles[i].SharedAttributes.ColorOverLife.GetValueAtAge(elapsedTime);
+                allParticles[i].Opacity = allParticles[i].SharedAttributes.OpacityOverLife.GetValueAtAge(elapsedTime);
             }
         }
     }

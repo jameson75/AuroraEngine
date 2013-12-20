@@ -54,19 +54,18 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
 
         public Form(IGameApp game) : base(game)
-        { }       
+        { }
 
         public override void Draw(long gameTime)
-        {            
-            //Matrix formTransform = this.Effect.World;
-            Matrix formTransform = ((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
+        {                       
+            Matrix formTransform = this.WorldTransform().ToMatrix(); //((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
             List<Matrix> particleInstanceWorldTransforms = new List<Matrix>();
             foreach (FormElement element in _elements)
-            {                             
+            {
                 this.Effect.World = formTransform * element.Transform;
-                this.Effect.Apply();                
+                this.Effect.Apply();
                 this.Mesh.Draw(gameTime);
-                
+
                 if (Emitter != null)
                 {
                     Transform cachedTransform = Emitter.Transform;
@@ -75,14 +74,14 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                         particleInstanceWorldTransforms.Add(p.WorldTransform().ToMatrix());
                     Emitter.Transform = cachedTransform;
                 }
-                    
-                if (Emitter != null && ParticleRenderer != null)
-                {                    
-                    ParticleRenderer.ParticleEffect.View = this.Effect.View;
-                    ParticleRenderer.ParticleEffect.Projection = this.Effect.Projection;                  
-                    //ParticleRenderer.Draw(gameTime, Emitter.Particles);     
-                    ParticleRenderer.DrawInstanced(gameTime, particleInstanceWorldTransforms);               
-                }
+            }
+            
+            if (Emitter != null && ParticleRenderer != null)
+            {
+                ParticleRenderer.ParticleEffect.View = this.Effect.View;
+                ParticleRenderer.ParticleEffect.Projection = this.Effect.Projection;
+                //ParticleRenderer.Draw(gameTime, Emitter.Particles);     
+                ParticleRenderer.DrawInstanced(gameTime, particleInstanceWorldTransforms);
             }
             //this.Effect.World = formTransform;
             //this.Effect.Apply();
