@@ -34,7 +34,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             TextContent textContent = new TextContent(text, font, fontColor);
             ItemContent = textContent;
             //SelectContent = textContent;
-            Size = font.MeasureString(text).Add(DefaultItemTextMargin); 
+            Size = font.MeasureString(text); //.Add(DefaultItemTextMargin); 
         }
 
         public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 itemFontColor, Color4 selectFontColor, string commandName = null)
@@ -46,7 +46,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             ItemContent = itemContent;
             TextContent selectContent = new TextContent(text, font, selectFontColor);
             SelectContent = selectContent;
-            Size = font.MeasureString(text).Add(DefaultItemTextMargin);
+            Size = font.MeasureString(text); //.Add(DefaultItemTextMargin);
         }
 
         public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 itemFontColor, Color4 selectFontColor, string commandName, ContextMenu subMenu)

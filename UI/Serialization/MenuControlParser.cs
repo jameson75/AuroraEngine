@@ -35,7 +35,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                 newMenu.SelectedItemIndex = int.Parse(element.Attribute(SelectedIndexAttributeName).Value);
 
             if (element.Attribute(OrientationAttributeName) != null)
-                newMenu.Orienation = UIControlPropertyParser.ParseEnum<MenuOrientation>(element.Attribute(OrientationAttributeName).Value);
+                newMenu.Orientation = UIControlPropertyParser.ParseEnum<MenuOrientation>(element.Attribute(OrientationAttributeName).Value);
             
             base.Parse(tree, element, newMenu);
         }   

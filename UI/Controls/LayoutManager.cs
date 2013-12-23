@@ -125,7 +125,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         ChildCountChanged     
     }
 
-    public class SplitterContainerLayoutManger : IControlLayoutManager
+    public class SplitterContainerLayoutManager : IControlLayoutManager
     {        
         private SplitterLayoutDivisions _splitterDivisions = new SplitterLayoutDivisions();
         private UIControl _container = null;
@@ -133,7 +133,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public SplitterLayoutOrientation Orientation { get; set; } 
         public SplitterLayoutDivisions LayoutDivisions { get { return _splitterDivisions; } }
         
-        public SplitterContainerLayoutManger(UIControl container)
+        public SplitterContainerLayoutManager(UIControl container)
         {
             _container = container;
             _container.SizeChanging += Container_SizeChanging;
@@ -330,7 +330,58 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class SplitterLayoutDivisions : List<SplitterLayoutDivision>
     { }
-   
+
+    public class StackLayoutManager : IControlLayoutManager
+    {
+        private UIControl _container = null;
+        
+        public StackLayoutOrientation Orientation { get; set; }       
+
+        public StackLayoutManager(UIControl container)
+        {
+            _container = container;           
+        }
+
+        public void UpdateLayout(LayoutUpdateReason reason)
+        {
+            float offset = 0f;
+            UIControlCollection Items = _container.Children;
+
+            if (Orientation == StackLayoutOrientation.Vertical)
+            {
+                for (int i = 0; i < Items.Count; i++)
+                {
+                    if (i == 0)
+                        offset += _container.Margin.Top;
+                    else
+                        offset += Items[i - 1].Padding.Bottom;
+                    Items[i].Position = new DrawingPointF(_container.Margin.Left, offset);
+                    Items[i].Size = new DrawingSizeF(_container.Size.Width - _container.Margin.Right, Items[i].Size.Height);
+                    offset += Items[0].Size.Height;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < Items.Count; i++)
+                {
+                    if (i == 0)
+                        offset += _container.Margin.Left;
+                    else
+                        offset += Items[i - 1].Padding.Right;
+                    Items[i].Position = new DrawingPointF(offset, _container.Margin.Top);
+                    Items[i].Size = new DrawingSizeF(Items[i].Size.Width, _container.Size.Height - _container.Margin.Bottom);
+                    offset += Items[0].Size.Width;
+                }
+            }
+        }
+    }
+
+    public enum StackLayoutOrientation
+    {
+        Vertical,
+        Horizontal
+    }
+
     //public class DivLayoutManager : IControlLayoutManager
     //{
     //    private LayoutDivCollection _divs = null;

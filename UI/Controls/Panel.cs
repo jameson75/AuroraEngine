@@ -18,17 +18,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {       
         public Panel(IUIRoot visualRoot)
             : base(visualRoot)
-        { }   
+        { }           
     }
 
     public class SplitterPanel : Panel
     {
-        private SplitterContainerLayoutManger _layoutManager = null;
+        private SplitterContainerLayoutManager _layoutManager = null;
 
         public SplitterPanel(IUIRoot visualRoot)
             : base(visualRoot)
         {
-            _layoutManager = new SplitterContainerLayoutManger(this);
+            _layoutManager = new SplitterContainerLayoutManager(this);
         }
 
         protected override IControlLayoutManager LayoutManager
@@ -46,5 +46,31 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public SplitterLayoutDivisions Splitters { get { return _layoutManager.LayoutDivisions; } }       
+    }
+
+    public class StackPanel : Panel
+    {
+        private StackLayoutManager _layoutManager = null;
+
+        public StackPanel(IUIRoot visualRoot)
+            : base(visualRoot)
+        {
+            _layoutManager = new StackLayoutManager(this);
+            Orientation = StackLayoutOrientation.Vertical;
+        }
+
+        protected override IControlLayoutManager LayoutManager
+        {
+            get
+            {
+                return _layoutManager;
+            }
+        }
+
+        public StackLayoutOrientation Orientation
+        {
+            get { return _layoutManager.Orientation; }
+            set { _layoutManager.Orientation = value; }
+        }
     }
 }

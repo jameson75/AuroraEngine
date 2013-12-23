@@ -138,7 +138,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public MenuOrientation Orienation
+        public MenuOrientation Orientation
         {
             get { return _orientation; }
             set
@@ -223,15 +223,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
                 BufferedInputState bufferedInputState = inputServices.GetBufferedInputState();
 
-                bool selectPreviousKeyDown = (Orienation == MenuOrientation.Vertical && bufferedInputState.IsKeyDown(Key.UpArrow)) ||
-                                             (Orienation == MenuOrientation.Horizontal && bufferedInputState.IsKeyDown(Key.Left)) ||
-                                             (Orienation == MenuOrientation.Vertical && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp)) ||
-                                             (Orienation == MenuOrientation.Horizontal && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadLeft));
+                bool selectPreviousKeyDown = (Orientation == MenuOrientation.Vertical && bufferedInputState.IsKeyDown(Key.UpArrow)) ||
+                                             (Orientation == MenuOrientation.Horizontal && bufferedInputState.IsKeyDown(Key.Left)) ||
+                                             (Orientation == MenuOrientation.Vertical && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp)) ||
+                                             (Orientation == MenuOrientation.Horizontal && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadLeft));
 
-                bool selectNextKeyDown = (Orienation == MenuOrientation.Vertical && bufferedInputState.IsKeyDown(Key.Down)) ||
-                                         (Orienation == MenuOrientation.Horizontal && bufferedInputState.IsKeyDown(Key.Right)) ||
-                                         (Orienation == MenuOrientation.Vertical && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadDown)) ||
-                                         (Orienation == MenuOrientation.Horizontal && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadRight));
+                bool selectNextKeyDown = (Orientation == MenuOrientation.Vertical && bufferedInputState.IsKeyDown(Key.Down)) ||
+                                         (Orientation == MenuOrientation.Horizontal && bufferedInputState.IsKeyDown(Key.Right)) ||
+                                         (Orientation == MenuOrientation.Vertical && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadDown)) ||
+                                         (Orientation == MenuOrientation.Horizontal && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadRight));
 
                 if (selectPreviousKeyDown)
                     this.SelectPreviousItem();
@@ -270,7 +270,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 if (this.Items.Count == 1)
                     this.Size = item.Size;
                 else
-                    this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
+                    this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
             }
             base.OnItemAdded(item);
         }
@@ -283,7 +283,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 if (this.Items.Count == 0)
                     this.Size = DrawingSizeFExtension.Zero;
                 else
-                    this.Size = (this.Orienation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
+                    this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
             }
             SelectedItemIndex = -1;
         }
@@ -291,7 +291,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnLayoutChanged()
         {
             float offset = 0f;
-            if (Orienation == MenuOrientation.Vertical)
+            if (Orientation == MenuOrientation.Vertical)
             {
                 for (int i = 0; i < Items.Count; i++)
                 {
