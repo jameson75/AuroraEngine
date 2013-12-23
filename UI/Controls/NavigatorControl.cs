@@ -22,40 +22,40 @@ using SharpDX.Direct3D11;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public enum EditorMode
+    public enum ActionMode
     {
         None,
         Select,
         Navigate      
     }
 
-    public enum NavigationMode
+    public enum CameraMode
     {
         None,
         Rotate,
         Pan
     }
 
-    public class SceneControl : UIControl
+    public class NavigatorControl : UIControl
     {
         //private Camera _defaultCamera = null;
         //private Camera _currentCamera = null;
-        private EditorMode EditorMode = EditorMode.None;
-        private NavigationMode NavigationMode = NavigationMode.None;
+        private ActionMode actionMode = ActionMode.None;
+        private CameraMode cameraMode = CameraMode.None;
         private RectangleF rotationRectangle = RectangleF.Empty;
         private float rotationEllipseDiameter = 0f;
         private DrawingPoint mouseMoveFrom = new DrawingPoint(0, 0);
         private bool rotateAboutZ = false;
         private SceneNode _selectedNode = null;
 
-        public SceneControl(IUIRoot visualRoot) : base(visualRoot)
+        public NavigatorControl(IUIRoot visualRoot) : base(visualRoot)
         {
            // _defaultCamera = new Camera(visualRoot.Game,
            //                             Matrix.LookAtLH(new Vector3(0, 50, 100), new Vector3(0, 0, 0), Vector3.UnitY),
            //                             Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(45), this.DeviceAspectRatio, 1.0f, 1000.0f));
             //_currentCamera = _defaultCamera;
-            this.EditorMode = EditorMode.Navigate;
-            this.NavigationMode = Controls.NavigationMode.Rotate;
+            this.actionMode = ActionMode.Navigate;
+            this.cameraMode = Controls.CameraMode.Rotate;
         }
 
         public Scene Scene { get; set; }
@@ -107,9 +107,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected void OnMouseDown(InputState.MouseButton mouseButton, DrawingPoint location)
         {          
-            switch (this.EditorMode)
+            switch (this.actionMode)
             {
-                case EditorMode.Navigate:
+                case ActionMode.Navigate:
                     if (mouseButton == InputState.MouseButton.Left)
                     {                        
                         this.Capture = true;
@@ -120,7 +120,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         rotateAboutZ = (distance > rotationEllipseDiameter / 2);
                     }
                     break;
-                case EditorMode.Select:
+                case ActionMode.Select:
                     if (mouseButton == InputState.MouseButton.Left)
                     {
                         Viewport vp = Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0];
@@ -132,7 +132,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         mouseRay.Normalize();
                         System.Diagnostics.Trace.WriteLine(mousePointNear);
                         System.Diagnostics.Trace.WriteLine(mousePointFar);
-                        _selectedNode = SceneControl.PickNode(Scene.Nodes, mousePointNear, mousePointFar);
+                        _selectedNode = NavigatorControl.PickNode(Scene.Nodes, mousePointNear, mousePointFar);
                         OnSelectedNodesChanged(null, new[] { _selectedNode });
                     }
                     break;
@@ -143,7 +143,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {           
             foreach(SceneNode node in nodes )
             {
-                if (SceneControl.HitTestNode(node, near, far))
+                if (NavigatorControl.HitTestNode(node, near, far))
                     return node;
                 else
                 {
@@ -189,12 +189,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected void OnMouseMove(InputState.MouseButton[] mouseButtonsDown, DrawingPoint location)
         {         
-            switch (EditorMode)
+            switch (actionMode)
             {
-                case EditorMode.Navigate:
-                    switch (NavigationMode)
+                case ActionMode.Navigate:
+                    switch (cameraMode)
                     {
-                        case NavigationMode.Rotate:
+                        case CameraMode.Rotate:
                             //this.Cursor = Cursors.Cross;
                             if (mouseButtonsDown.Contains(InputState.MouseButton.Left))
                             {
@@ -235,7 +235,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                 mouseMoveFrom = location;                                
                             }
                             break;
-                        case NavigationMode.Pan:
+                        case CameraMode.Pan:
                             //this.Cursor = Cursors.Hand;
                             if (mouseButtonsDown.Contains(InputState.MouseButton.Left))
                             {
@@ -248,12 +248,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                 mouseMoveFrom = location;                               
                             }
                             break;
-                        case NavigationMode.None:
+                        case CameraMode.None:
                             //this.Cursor = Cursors.Default;
                             break;
                     }
                     break;
-                case EditorMode.Select:
+                case ActionMode.Select:
 
                     break;
             }

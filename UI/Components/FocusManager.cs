@@ -137,27 +137,33 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             _postFocusControl = control;
         }
 
-        //public void SetPreviousFocus(UIControl nextControl)
-        //{
-        //    UIControl previousFocusControl = null;
-        //    if (nextControl != null)
-        //    {
-        //        previousFocusControl = GetPreviousInTabOrder(nextControl);
-        //        if (previousFocusControl != null)
-        //            _SetFocus(previousFocusControl);
-        //    }
-        //    else
-        //    {
-        //        UIControl[] tabOrderedControls = FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
-        //        UIControl lastChild = tabOrderedControls.LastOrDefault();
-        //        if (lastChild != null)
-        //        {
-        //            while (lastChild.Children.Count > 0)
-        //                lastChild = FocusManager.ToTabOrderedControlArray(lastChild.Children).LastOrDefault();
-        //        }
-        //        _SetFocus(lastChild);
-        //    }
-        //}            
+        public void SetPreviousFocus(UIControl nextControl)
+        {
+            UIControl previousFocusControl = null;
+            if (nextControl != null)
+            {
+                UIControl[] tabOrderedSelfAndSiblings = (nextControl.Parent != null) ? FocusManager.ToTabOrderedControlArray(nextControl.Parent.Children) :
+                                                                                        FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
+                int startIndex = Array.IndexOf(tabOrderedSelfAndSiblings, nextControl) - 1;
+                for (int i = startIndex; i >= 0; i--)
+                {
+                    UIControl c = tabOrderedSelfAndSiblings[i];
+                    if (IsEligibleForFocus(c))
+                    {
+                        previousFocusControl = c;
+                        break;
+                    }
+                }
+
+                if (previousFocusControl == null)
+                {
+                    if (nextControl.Parent != null)
+                        SetPreviousFocus(nextControl.Parent);
+                }
+                else
+                     _SetFocus(previousFocusControl);
+            }           
+        }            
         
         public void SetNextFocus(UIControl previousControl)
         {

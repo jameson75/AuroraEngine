@@ -136,5 +136,10 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             _effect.SetSpecularPower(power);
         }
+
+        public void SetPerPixelLighting(bool enabled)
+        {
+            _effect.SetPerPixelLighting(enabled);
+        }
     }
 }

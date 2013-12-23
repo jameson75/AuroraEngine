@@ -168,7 +168,7 @@
     <Compile Include="UI\Controls\Menu.cs" />
     <Compile Include="UI\Controls\MenuItem.cs" />
     <Compile Include="UI\Controls\Panel.cs" />
-    <Compile Include="UI\Controls\SceneControl.cs" />
+    <Compile Include="UI\Controls\NavigatorControl.cs" />
     <Compile Include="UI\Controls\ScreenControl.cs" />
     <Compile Include="UI\Controls\Slider.cs" />
     <Compile Include="UI\Controls\TextBox.cs" />
