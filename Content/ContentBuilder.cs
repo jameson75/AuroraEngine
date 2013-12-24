@@ -492,7 +492,7 @@ namespace CipherPark.AngelJacket.Core.Content
         public static Mesh BuildBasicLitHexagon3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {            
             BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[60];
-            Vector3[] positions = CreateHexagonPoints3D(dimension);
+            Vector3[] positions = CreateHexagonPoints3DNI(dimension);
             Vector3[] normals = GenerateNormals(positions, null);
             for (int i = 0; i < positions.Length; i++)
                 verts[i] = new BasicVertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
@@ -525,7 +525,7 @@ namespace CipherPark.AngelJacket.Core.Content
         public static Mesh BuildBasicLitTexturedHexagon3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {    
             BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[60];
-            Vector3[] positions = CreateHexagonPoints3D(dimension);
+            Vector3[] positions = CreateHexagonPoints3DNI(dimension);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateHexagonTextureCoords3D();
             Vector3[] normals = GenerateNormals(positions, null);
             for (int i = 0; i < positions.Length; i++)
@@ -571,6 +571,13 @@ namespace CipherPark.AngelJacket.Core.Content
                                               4, 3, 9, 9, 10, 4, //SIDE 5
                                               5, 4, 10, 10, 11, 5 //SIDE 6
         };
+        }
+
+        private static Vector3[] CreateHexagonPoints3DNI(BoundingBox dimension)
+        {
+            Vector3[] positions = CreateHexagonPoints3D(dimension);
+            short[] indices = CreateHexagonIndices3D();
+            return indices.Select((i) => positions[i]).ToArray();
         }
 
         #endregion

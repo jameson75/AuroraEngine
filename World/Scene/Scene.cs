@@ -79,10 +79,13 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         }
 
         private void _DrawNodeHierarchy(long gameTime, SceneNode node)
-        {            
-            node.Draw(gameTime);           
-            foreach (SceneNode child in node.Children)
-                _DrawNodeHierarchy(gameTime, child);
+        {
+            if (node.IsVisible)
+            {
+                node.Draw(gameTime);
+                foreach (SceneNode child in node.Children)
+                    _DrawNodeHierarchy(gameTime, child);
+            }
         }
 
         protected virtual void OnBeginDraw()

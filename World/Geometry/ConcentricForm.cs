@@ -14,18 +14,36 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class ConcentricForm : Form
     {
         float _radius = 0;
-        int _count = 0;
+        int _steps = 0;
 
         public ConcentricForm(IGameApp game)
             : base(game)
         { }
 
-        public ConcentricForm(IGameApp game, float radius, int count) 
+        public ConcentricForm(IGameApp game, float radius, int steps) 
             : base(game)
         {
             _radius = radius;
-            _count = count;
+            _steps = steps;
             GenerateElements();
+        }
+
+        public float Radius
+        {
+            get { return _radius; }
+            set {
+                _radius = value;
+                OnLayoutChanged();
+            }
+        }
+
+        public int Steps
+        {
+            get { return _steps; }
+            set {
+                _steps = value;
+                GenerateElements();
+            }
         }
 
         protected void OnLayoutChanged()
@@ -44,7 +62,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private void GenerateElements()
         {
             Elements.Clear();
-            for (int i = 0; i < _count; i++)
+            for (int i = 0; i < _steps; i++)
                 Elements.Add(new FormElement(this));
             OnLayoutChanged();
         }

@@ -40,6 +40,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             _children = new SceneNodes();
             _children.CollectionChanged += Children_CollectionChanged;
             Transform = Transform.Identity;
+            IsVisible = true;
         }
 
         public SceneNode(IGameApp game, string name)
@@ -50,9 +51,12 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public virtual string Name { get; set; }
 
-        public Scene Scene { get { return _scene; } set { _scene = value; OnSceneChanged(); } }
-
-        //public SceneNode Parent { get { return _parent; } set { _parent = value; } }
+        public Scene Scene 
+        { 
+            get { return _scene; } 
+            set { _scene = value; OnSceneChanged(); } 
+        }
+        
         public SceneNode Parent
         {
             get { return _parent; }
@@ -69,12 +73,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public SceneNodes Children { get { return _children; } }
         
-        public virtual Transform Transform { get; set; }
-
-        //public virtual BoundingBox Bounds { get { return new BoundingBox(Transform.Translation, Transform.Translation); } }
-
-        [Obsolete]
-        public ISceneObject SceneObject { get; set; }
+        public virtual Transform Transform { get; set; }        
 
         public virtual void Draw(long gameTime) { }
 
@@ -82,20 +81,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         {
             if (NodeEffector != null)
                 NodeEffector.Update(gameTime, this);
-        }
-
-        //public Matrix LocalToWorld(Matrix localTransform)
-        //{
-        //    MatrixStack stack = new MatrixStack();
-        //    stack.Push(localTransform);
-        //    SceneNode node = this.Parent;
-        //    while (node != null)
-        //    {
-        //        stack.Push(node.Transform.ToMatrix());
-        //        node = node.Parent;
-        //    }
-        //    return stack.Transform;
-        //}
+        }     
 
         public virtual ITransformable TransformableParent
         {
@@ -110,7 +96,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                     _transformableParent = value;
                 }
             }
-        }              
+        }
+
+        public bool IsVisible { get; set; }
 
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
         {
