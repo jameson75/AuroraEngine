@@ -122,12 +122,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class Menu : SelectControl
     {
-        private MenuOrientation _orientation = MenuOrientation.Vertical;
+        //private MenuOrientation _orientation = MenuOrientation.Vertical;
+        private StackLayoutManager _layoutManager = null;
 
         public Menu(Components.IUIRoot visualRoot)
             : base(visualRoot)
         {
             AutoSize = true;
+            _layoutManager = new StackLayoutManager(this);
+        }
+
+        protected override IControlLayoutManager LayoutManager
+        {
+            get
+            {
+                return _layoutManager;
+            }
         }
 
         public override bool CanReceiveFocus
@@ -140,10 +150,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public MenuOrientation Orientation
         {
-            get { return _orientation; }
+            get { return (MenuOrientation)_layoutManager.Orientation; }
             set
             {
-                _orientation = value;
+                _layoutManager.Orientation = (StackLayoutOrientation)value;
                 OnOrientationChanged();
             }
         }
@@ -204,6 +214,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             foreach (MenuItem item in Items)
                 item.Initialize();
             base.Initialize();
+        }
+
+        public void SetItemsPadding(BoundaryF padding)
+        {
+            foreach (ItemControl item in this.Items)
+                item.Padding = padding;
+            UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
+        }
+
+        public void SetItemsMargin(BoundaryF margin)
+        {
+            foreach(ItemControl item in this.Items)
+                item.Margin = margin;
+            UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
         }
 
         protected override void OnDraw(long gameTime)
@@ -267,10 +291,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 throw new ArgumentException("item", "item must be of type or derivative of MenuItem");
             if (AutoSize)
             {
-                if (this.Items.Count == 1)
-                    this.Size = item.Size;
-                else
-                    this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
+                //if (this.Items.Count == 1)
+                //    this.Size = item.Size;
+                //else
+                //    this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
+                this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Items.Max(x => x.Size.Width) , this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Items.Max(x => x.Size.Height));
             }
             base.OnItemAdded(item);
         }
@@ -278,47 +303,47 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnItemRemoved(ItemControl item)
         {
             base.OnItemRemoved(item);
-            if (AutoSize)
-            {
-                if (this.Items.Count == 0)
-                    this.Size = DrawingSizeFExtension.Zero;
-                else
-                    this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
-            }
+            //if (AutoSize)
+            //{
+            //    if (this.Items.Count == 0)
+            //        this.Size = DrawingSizeFExtension.Zero;
+            //    else
+            //        this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
+            //}
             SelectedItemIndex = -1;
         }
 
-        protected override void OnLayoutChanged()
-        {
-            float offset = 0f;
-            if (Orientation == MenuOrientation.Vertical)
-            {
-                for (int i = 0; i < Items.Count; i++)
-                {
-                    if (i == 0)
-                        offset += this.Margin.Top;
-                    else
-                        offset += Items[i - 1].Padding.Bottom;
-                    Items[i].Position = new DrawingPointF(this.Margin.Left, offset);
-                    Items[i].Size = new DrawingSizeF(this.Size.Width - this.Margin.Right, Items[i].Size.Height);
-                    offset += Items[0].Size.Height;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < Items.Count; i++)
-                {
-                    if (i == 0)
-                        offset += this.Margin.Left;
-                    else
-                        offset += Items[i - 1].Padding.Right;
-                    Items[i].Position = new DrawingPointF(offset, this.Margin.Top);
-                    Items[i].Size = new DrawingSizeF(Items[i].Size.Width, this.Size.Height - this.Margin.Bottom);
-                    offset += Items[0].Size.Width;
-                }
-            }
-            base.OnLayoutChanged();
-        }
+        //protected override void OnLayoutChanged()
+        //{
+        //    float offset = 0f;
+        //    if (Orientation == MenuOrientation.Vertical)
+        //    {
+        //        for (int i = 0; i < Items.Count; i++)
+        //        {
+        //            if (i == 0)
+        //                offset += this.Margin.Top;
+        //            else
+        //                offset += Items[i - 1].Padding.Bottom;
+        //            Items[i].Position = new DrawingPointF(this.Margin.Left, offset);
+        //            Items[i].Size = new DrawingSizeF(this.Size.Width - this.Margin.Right, Items[i].Size.Height);
+        //            offset += Items[0].Size.Height;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        for (int i = 0; i < Items.Count; i++)
+        //        {
+        //            if (i == 0)
+        //                offset += this.Margin.Left;
+        //            else
+        //                offset += Items[i - 1].Padding.Right;
+        //            Items[i].Position = new DrawingPointF(offset, this.Margin.Top);
+        //            Items[i].Size = new DrawingSizeF(Items[i].Size.Width, this.Size.Height - this.Margin.Bottom);
+        //            offset += Items[0].Size.Width;
+        //        }
+        //    }
+        //    base.OnLayoutChanged();
+        //}
 
         protected virtual void OnItemClicked(MenuItem item)
         {

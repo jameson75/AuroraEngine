@@ -352,12 +352,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += _container.Margin.Top;
+                        offset += _container.Padding.Top;
                     else
-                        offset += Items[i - 1].Padding.Bottom;
-                    Items[i].Position = new DrawingPointF(_container.Margin.Left, offset);
+                        offset += (Items[i - 1].Size.Height + Items[i - 1].Margin.Bottom + Items[i].Margin.Top);
+                    Items[i].Position = new DrawingPointF(_container.Padding.Left, offset);
                     Items[i].Size = new DrawingSizeF(_container.Size.Width - _container.Margin.Right, Items[i].Size.Height);
-                    offset += Items[0].Size.Height;
+                    //offset += Items[i].Size.Height;
                 }
             }
             else
@@ -365,12 +365,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += _container.Margin.Left;
-                    else
-                        offset += Items[i - 1].Padding.Right;
-                    Items[i].Position = new DrawingPointF(offset, _container.Margin.Top);
+                        offset += _container.Padding.Left;
+                    else                    
+                        offset += (Items[i - 1].Size.Width + Items[i - 1].Margin.Right + Items[i].Margin.Left);
+                    Items[i].Position = new DrawingPointF(offset, _container.Padding.Top);
                     Items[i].Size = new DrawingSizeF(Items[i].Size.Width, _container.Size.Height - _container.Margin.Bottom);
-                    offset += Items[0].Size.Width;
+                    //offset += Items[i].Size.Width;
                 }
             }
         }
@@ -380,210 +380,5 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         Vertical,
         Horizontal
-    }
-
-    //public class DivLayoutManager : IControlLayoutManager
-    //{
-    //    private LayoutDivCollection _divs = null;
-    //    private UIControl _container = null;
-    //    private RectangleF _cachedBounds = RectangleF.Empty;
-
-    //    public DivLayoutManager(UIControl container)
-    //    {
-    //        _container = container;
-    //        _container.SizeChanging += Container_SizeChanging;
-    //        _divs = new LayoutDivCollection();
-    //    }
-
-    //    public LayoutDivCollection Divs { get { return _divs; } }
-
-    //    private void Container_SizeChanging(object sender, EventArgs e)
-    //    {
-    //        _cachedBounds = _container.Bounds;
-    //    }
-
-    //    #region IControlLayoutManager Members
-
-    //    public void UpdateLayout(LayoutUpdateReason reason)
-    //    {
-    //        _UpdateLayout(_divs, reason);         
-    //    }
-
-    //    private void _UpdateLayout(LayoutDivCollection divs, LayoutUpdateReason reason)
-    //    {
-    //        RectangleF[] divBoundsArray = DivLayoutManager.CalculateDivBounds(_container.Bounds.GetSize(), _divs);
-    //        for (int i = 0; i < divs.Count; i++)
-    //        {
-    //            ApplyDivContainership(divs[i], divBoundsArray[i], reason);
-    //            if( divs[i].Children.Count > 0 )
-    //                _UpdateLayout(divs[i].Children, reason);
-    //        }
-    //    }
-
-    //    private void ApplyDivContainership(LayoutDiv div, RectangleF divBounds, LayoutUpdateReason reason)
-    //    {
-    //        float newPositionX = 0f;
-    //        float newPositionY = 0f;
-    //        float newWidth = 0f;
-    //        float newHeight = 0f;
-    //        foreach (UIControl child in _container.Children)
-    //        {
-    //            if (child.Id == div.Id)
-    //            {                   
-    //                newPositionX = divBounds.Left + div.Padding.X + child.Margin.Width;
-    //                newWidth = divBounds.Width - (div.Padding.X * 2f);                  
-    //                newPositionY = divBounds.Top + div.Padding.Y + child.Margin.Width;
-    //                newHeight = divBounds.Height - (div.Padding.Y * 2f);                    
-    //                child.Position = new DrawingPointF(newPositionX, newPositionY);      
-    //                child.Size = new DrawingSizeF(newWidth, newHeight);                   
-    //            }
-    //        }
-    //    }
-
-    //    public static RectangleF[] CalculateDivBounds(DrawingSizeF containerSize, LayoutDivCollection divs)
-    //    {
-    //        int currentRow = 0;
-    //        int currentColumn = 0;
-    //        float currentDivOriginX = 0;
-    //        float currentDivOriginY = 0;
-    //        float currentRowOffsetY = 0;
-    //        RectangleF[] divBoundsArray = new RectangleF[divs.Count];
-
-    //        for (int i = 0; i < divs.Count; i++)
-    //        {
-    //            if (currentColumn != 0 && currentDivOriginX >= containerSize.Width)
-    //            {
-    //                currentRow++;
-    //                currentColumn = 0;
-    //                currentDivOriginX = 0;
-    //                currentDivOriginY += currentRowOffsetY;
-    //                currentRowOffsetY = 0;
-    //            }
-                
-    //            DrawingSizeF divSize = CalculateDivSizeInPixels(containerSize, divs, i, currentDivOriginX, currentDivOriginY);
-    //            RectangleF currentDivBounds = RectangleFExtension.CreateLTWH(currentDivOriginX, currentDivOriginY, divSize.Width, divSize.Height);
-    //            currentDivOriginX += currentDivBounds.Width;
-    //            currentRowOffsetY = Math.Max(currentRowOffsetY, currentDivBounds.Height);
-    //            currentColumn++;
-
-    //            divBoundsArray[i] = currentDivBounds;
-    //        }
-
-    //        return divBoundsArray;
-    //    }
-     
-    //    private static DrawingSizeF CalculateDivSizeInPixels(DrawingSizeF containerSize, LayoutDivCollection divs, int divIndex, float divOriginX, float divOriginY)
-    //    {
-    //        LayoutDiv div = divs[divIndex];
-    //        float divWidth = 0;
-    //        float divHeight = 0;
-
-    //        if (div.WidthUnits == LayoutDivUnits.Span)
-    //        {
-    //            float availableRowSpace = containerSize.Width - divOriginX;
-    //            if (divIndex == divs.Count - 1)
-    //                divWidth = availableRowSpace;
-    //            else
-    //            {                    
-    //                for (int i = divIndex + 1; i < divs.Count; i++)
-    //                {
-    //                    if (divs[i].WidthUnits == LayoutDivUnits.Span)
-    //                        break;
-    //                    else
-    //                    {
-    //                        float divLength = ToPixels(containerSize.Width, divs[i].Width, divs[i].WidthUnits);
-    //                        if (divLength >= availableRowSpace)
-    //                            break;
-    //                        else
-    //                            availableRowSpace -= divLength;
-    //                    }
-    //                }
-    //                divWidth = availableRowSpace;
-    //            } 
-    //        }
-    //        else
-    //            divWidth = ToPixels(containerSize.Width, div.Width, div.WidthUnits);
-
-    //        if (div.HeightUnits == LayoutDivUnits.Span)          
-    //            divHeight = containerSize.Height - Math.Min(divOriginY, containerSize.Height);     
-    //        else
-    //            divHeight = ToPixels(containerSize.Height, div.Height, div.HeightUnits);
-
-          
-    //        return new DrawingSizeF(divWidth, divHeight);
-    //    }
-
-    //    private static float ToPixels(float containerLength, float divLength, LayoutDivUnits units)
-    //    {
-    //        switch( units )
-    //        {
-    //            case LayoutDivUnits.Pixels:
-    //                return divLength;
-    //            case LayoutDivUnits.Percentage:
-    //                return containerLength * divLength / 100.0f;
-    //            default:
-    //                throw new ArgumentException("Unsupported units specified", "units");
-    //        }
-    //    }
-
-    //    #endregion
-    //}
-
-    //public class LayoutDiv
-    //{
-    //    private LayoutDivCollection _children = new LayoutDivCollection();
-
-    //    public LayoutDivCollection Children = new LayoutDivCollection();
-    //    public Guid Id { get; set; }
-    //    public float Height { get; set; }
-    //    public float Width { get; set; }
-    //    public LayoutDivUnits HeightUnits { get; set; }
-    //    public LayoutDivUnits WidthUnits { get; set; }
-    //    public DrawingPoint Padding { get; set; }
-    //    public DrawingPoint Margin { get; set; }
-
-    //    public LayoutDiv(Guid divId, int width, int height)
-    //    {
-    //        Id = divId;
-    //        Width = width;
-    //        Height = height;
-    //        HeightUnits = LayoutDivUnits.Pixels;
-    //        WidthUnits = LayoutDivUnits.Pixels;
-    //    }
-
-    //    public LayoutDiv(Guid divId, float width, LayoutDivUnits widthUnits, float height, LayoutDivUnits heightUnits)
-    //    {
-    //        Id = divId;
-    //        Width = width;
-    //        Height = height;
-    //        HeightUnits = heightUnits;
-    //        WidthUnits = widthUnits;
-    //    }
-
-    //    public void SetWidthAndUnits(float width, LayoutDivUnits units)
-    //    {
-    //        Width = width;
-    //        WidthUnits = units;
-    //    }
-
-    //    public void SetHeightAndUnits(float height, LayoutDivUnits units)
-    //    {
-    //        Height = height;
-    //        HeightUnits = units;
-    //    }       
-
-    //    public bool IsWidthFixed { get { return WidthUnits == LayoutDivUnits.Pixels; } }
-
-    //    public bool IsHeightFixed { get { return HeightUnits == LayoutDivUnits.Pixels; } }
-    //}
-
-    //public enum LayoutDivUnits
-    //{
-    //    Pixels = 0,
-    //    Percentage,
-    //    Span
-    //}
-
-    //public class LayoutDivCollection : List<LayoutDiv>
-    //{ }
+    }   
 }

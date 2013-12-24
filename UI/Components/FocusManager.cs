@@ -23,6 +23,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private UIControl _focusedControl = null;
         private IUIRoot _visualRoot = null;
         private UIControlCollection _hitList = null;
+        private UIControl _pendingFocusControl = null;
 
         public FocusManager(IUIRoot visualRoot)
         {
@@ -83,7 +84,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public event FocusChangedEventHandler ControlReceivedFocus;
    
-        public static bool IsEligibleForFocus(UIControl control)
+        private static bool IsEligibleForFocus(UIControl control)
         {
             return control.VisibleInTree &&
                    control.EnabledInTree &&
@@ -113,20 +114,26 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             else if (state.GetKeysDown().Contains(Key.Tab))
             {
                 if (state.GetKeysDown().Any(k => k == Key.LeftShift || k == Key.RightShift))
-                    SetPreviousFocus(_focusedControl);
+                {
+                    UIControl previousControl = GetPrevious(_focusedControl);
+                    if (previousControl != null)
+                        _SetFocus(previousControl);
+                }
                 else
-                    SetNextFocus(_focusedControl);
+                {
+                    UIControl nextControl = GetNext(_focusedControl);
+                    if (nextControl != null)
+                        _SetFocus(nextControl);
+                }
             }            
-        }
-        
-        private UIControl _postFocusControl = null;
+        }       
         
         public void PostUpdate()
         {
-            if(_postFocusControl != null)
+            if(_pendingFocusControl != null)
             {
-                _SetFocus(_postFocusControl);
-                _postFocusControl = null;
+                _SetFocus(_pendingFocusControl);
+                _pendingFocusControl = null;
             }
         }
 
@@ -134,17 +141,17 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             if (!IsEligibleForFocus(control))
                 throw new InvalidOperationException();
-            _postFocusControl = control;
+            _pendingFocusControl = control;
         }
 
-        public void SetPreviousFocus(UIControl nextControl)
+        public UIControl GetPrevious(UIControl fromControl)
         {
             UIControl previousFocusControl = null;
-            if (nextControl != null)
+            if (fromControl != null)
             {
-                UIControl[] tabOrderedSelfAndSiblings = (nextControl.Parent != null) ? FocusManager.ToTabOrderedControlArray(nextControl.Parent.Children) :
+                UIControl[] tabOrderedSelfAndSiblings = (fromControl.Parent != null) ? FocusManager.ToTabOrderedControlArray(fromControl.Parent.Children) :
                                                                                         FocusManager.ToTabOrderedControlArray(_visualRoot.Controls);
-                int startIndex = Array.IndexOf(tabOrderedSelfAndSiblings, nextControl) - 1;
+                int startIndex = Array.IndexOf(tabOrderedSelfAndSiblings, fromControl) - 1;
                 for (int i = startIndex; i >= 0; i--)
                 {
                     UIControl c = tabOrderedSelfAndSiblings[i];
@@ -157,15 +164,15 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
                 if (previousFocusControl == null)
                 {
-                    if (nextControl.Parent != null)
-                        SetPreviousFocus(nextControl.Parent);
-                }
-                else
-                     _SetFocus(previousFocusControl);
-            }           
+                    if (fromControl.Parent != null)
+                        previousFocusControl = GetPrevious(fromControl.Parent);
+                }                
+            }
+
+            return previousFocusControl;
         }            
         
-        public void SetNextFocus(UIControl previousControl)
+        public UIControl GetNext(UIControl previousControl)
         {
             UIControl nextFocusControl = null;
             if (previousControl != null)
@@ -182,11 +189,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     nextFocusControl = GetFirstInTabOrder(tabOrderedControls[0]);
             }
 
-            if (nextFocusControl != null)
-                _SetFocus(nextFocusControl);
+            return nextFocusControl;
         }
 
-        public UIControl GetNextInTabOrder(UIControl previousControl)
+        private UIControl GetNextInTabOrder(UIControl previousControl)
         {
             UIControl startFromControl = null;
             bool canStartFromFirstChild = true;
@@ -241,7 +247,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 return null;
         }
 
-        public UIControl GetFirstInTabOrder(UIControl startFromControl)
+        private UIControl GetFirstInTabOrder(UIControl startFromControl)
         {
             return GetFirstInTabOrder(startFromControl, true);
         }

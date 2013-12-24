@@ -234,19 +234,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         /// <returns></returns>
         public bool IsDescendant(UIControl control)
         {
-            if (control == null)
-                return false; 
+            //if (control == null)
+            //    return false; 
 
-            else  if (Children.Contains(control))
-                return true;
+            //else  if (Children.Contains(control))
+            //    return true;
 
-            else
-            {
-                foreach (UIControl child in Children)
-                    if (child.IsDescendant(control))
-                        return true;                
-                return false;
-            }                   
+            //else
+            //{
+            //    foreach (UIControl child in Children)
+            //        if (child.IsDescendant(control))
+            //            return true;                
+            //    return false;
+            //}           
+            return control.IsAncestor(this);
         }
 
         /// <summary>

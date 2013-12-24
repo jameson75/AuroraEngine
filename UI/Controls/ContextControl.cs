@@ -52,7 +52,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {            
             this.Owner = owner;
             this.Visible = true;
-            this.VisualRoot.FocusManager.SetNextFocus(this);             
+            UIControl nextFocusableControl = this.VisualRoot.FocusManager.GetNext(this);
+            if (nextFocusableControl != null && this.IsDescendant(nextFocusableControl))
+                this.VisualRoot.FocusManager.PostFocus(nextFocusableControl);
             VisualRoot.FocusManager.ControlLostFocus += FocusManager_ControlLostFocus;
             OnBeginContext();
         }   

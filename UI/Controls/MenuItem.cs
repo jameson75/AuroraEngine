@@ -17,7 +17,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class MenuItem : ItemControl
     {
-        public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10f, 10f);
+        //public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10f, 10f);
         private UIContent _itemContent = null;
         private UIContent _selectContent = null;
 
@@ -58,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             ItemContent = itemContent;
             TextContent selectContent = new TextContent(text, font, selectFontColor);
             SelectContent = selectContent;
-            Size = font.MeasureString(text).Add(DefaultItemTextMargin);
+            Size = font.MeasureString(text); //.Add(DefaultItemTextMargin);
         }
 
         public UIContent ItemContent

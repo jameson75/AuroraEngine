@@ -115,7 +115,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 }
                 else if (EnableDefaultFocus)
                 {
-                    UIControl defaultFocusTarget = VisualRoot.FocusManager.GetFirstInTabOrder(ActiveScreen);
+                    //UIControl defaultFocusTarget = VisualRoot.FocusManager.GetFirstInTabOrder(ActiveScreen);
+                    UIControl defaultFocusTarget = VisualRoot.FocusManager.GetNext(ActiveScreen);
                     if (defaultFocusTarget != null)
                         VisualRoot.FocusManager.SetFocus(defaultFocusTarget);
                     //VisualRoot.FocusManager.SetNextFocus(ActiveScreen);
@@ -149,6 +150,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
         {
             OnCommand(args.CommandName);
+        }
+
+        public override bool CanReceiveFocus
+        {
+            get
+            {
+                return false;
+            }
         }
 
         public bool CanTabOutward
