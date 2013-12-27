@@ -15,9 +15,6 @@ using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    //TODO: Refactor this control (and the ScreenPanel) to act as layers INSTEAD    
-    //
-
     public class ScreenControl : SelectControl
     {
         private Dictionary<UIControl, UIControl> CachedFocusedElements = new Dictionary<UIControl, UIControl>();
@@ -32,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnItemAdded(ItemControl item)
         {
-            if (item is ScreenPanel == false)
+            if (item is UIScreen == false)
                 throw new ArgumentException("item", "item must be of type or derivative of ScreenControl");          
             base.OnItemAdded(item);           
         }
@@ -49,9 +46,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             set { SelectedItemIndex = value; }
         }
 
-        public ScreenPanel ActiveScreen
+        public UIScreen ActiveScreen
         {
-            get { return (ScreenPanel)SelectedItem; }
+            get { return (UIScreen)SelectedItem; }
             set { SelectedItem = value; }
         }
 
@@ -124,23 +121,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
                     
             base.OnSelectedItemChanged();
-        }
-
-        //[Obsolete]
-        //public override UIControl _GetNextFocusableChild(UIControl fromControl)
-        //{
-        //    if (ActiveScreen != null)
-        //        return ActiveScreen._GetNextFocusableChild(fromControl);
-        //    else
-        //        return null;
-        //}
+        }      
     }
 
-    public class ScreenPanel : ListControlItem, ICommandControl, Components.ICustomFocusContainer
+    public class UIScreen : ListControlItem, ICommandControl, Components.ICustomFocusContainer
     {
         CommandControlWireUp _wireUp = null;
 
-        public ScreenPanel(Components.IUIRoot visualRoot)
+        public UIScreen(Components.IUIRoot visualRoot)
             : base(visualRoot)
         {
             _wireUp = new CommandControlWireUp(this);

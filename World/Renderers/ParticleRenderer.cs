@@ -72,23 +72,7 @@ namespace CipherPark.AngelJacket.Core.World.Renderers
         }
 
         public void Draw(long gameTime, IEnumerable<Particle> particles)
-        {      
-            //if (_particleMesh.IsInstanced)
-            //{
-            //    List<Matrix> matrices = new List<Matrix>();
-            //    foreach (Particle p in particles)
-            //        matrices.Add(Matrix.Transpose(p.WorldTransform().ToMatrix() * _particleEffect.View * _particleEffect.Projection));                
-            //    //Flawed design: The data type of the instanced data is being
-            //    //assumed here... for now it's just a world transformation matrix.
-            //    //TODO: Figure out a way to infer the data type of the instance data.   
-            //    if (matrices.Count > 0)
-            //    {                    
-            //        _particleMesh.Update<Matrix>(matrices.ToArray());
-            //        _particleEffect.Apply();
-            //        _particleMesh.Draw(gameTime);
-            //    }
-            //}
-            //else
+        {         
             if (!_particleMesh.IsInstanced)
             {
                 foreach (Particle p in particles)

@@ -58,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public override void Draw(long gameTime)
         {                       
-            Matrix formTransform = this.WorldTransform().ToMatrix(); //((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
+            Matrix formTransform = this.WorldTransform().ToMatrix(); 
             List<Matrix> particleInstanceWorldTransforms = new List<Matrix>();
             foreach (FormElement element in _elements)
             {
@@ -79,12 +79,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             if (Emitter != null && ParticleRenderer != null)
             {
                 ParticleRenderer.ParticleEffect.View = this.Effect.View;
-                ParticleRenderer.ParticleEffect.Projection = this.Effect.Projection;
-                //ParticleRenderer.Draw(gameTime, Emitter.Particles);     
+                ParticleRenderer.ParticleEffect.Projection = this.Effect.Projection;                  
                 ParticleRenderer.DrawInstanced(gameTime, particleInstanceWorldTransforms);
-            }
-            //this.Effect.World = formTransform;
-            //this.Effect.Apply();
+            }           
         }
 
         protected virtual void OnEmitterChanging()
