@@ -16,10 +16,10 @@ using CipherPark.AngelJacket.Core.Animation;
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     //TODO: Refactor this class so that it 1. Inherits + Leverages ComplexModel and uses InstanceRenderer (class used to render instances).
-    public abstract class Form : Model
+    public abstract class Form  /*: Model*/
     {
         private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();
-        private Emitter _emitter = null;
+        //private Emitter _emitter = null;
         private Mesh _mesh = null;
         
         public Mesh Mesh 
@@ -31,22 +31,22 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
         
-        public Emitter Emitter 
-        { 
-            get { return _emitter; } 
-            set {
-                OnEmitterChanging();
-                _emitter = value; 
-                OnEmitterChanged(); 
-            }
-        }
+        //public Emitter Emitter 
+        //{ 
+        //    get { return _emitter; } 
+        //    set {
+        //        OnEmitterChanging();
+        //        _emitter = value; 
+        //        OnEmitterChanged(); 
+        //    }
+        //}
 
         public override BoundingBox BoundingBox
         {
             get { return (Mesh != null) ? Mesh.BoundingBox : BoundingBoxExtension.Empty; }
         }
 
-        public ParticleRenderer ParticleRenderer { get; set; }
+        //public ParticleRenderer ParticleRenderer { get; set; }
 
         protected ObservableCollection<FormElement> Elements 
         {
