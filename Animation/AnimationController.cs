@@ -304,8 +304,8 @@ namespace CipherPark.AngelJacket.Core.Animation
                 if (Solver != null)
                     Solver.UpdateParticleTransform((ulong)elapsedTime, allParticles[i]);
                 
-                allParticles[i].Color = allParticles[i].SharedAttributes.ColorOverLife.GetValueAtAge(elapsedTime);
-                allParticles[i].Opacity = allParticles[i].SharedAttributes.OpacityOverLife.GetValueAtAge(elapsedTime);
+                allParticles[i].Color = allParticles[i].InstanceAttributes.ColorOverLife.GetValueAtAge(elapsedTime);
+                allParticles[i].Opacity = allParticles[i].InstanceAttributes.OpacityOverLife.GetValueAtAge(elapsedTime);
             }
         }
     }

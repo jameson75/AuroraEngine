@@ -4,7 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using SharpDX;
+using SharpDX.Direct3D11;
+using DXBuffer = SharpDX.Direct3D11.Buffer;
+using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.AngelJacket.Core.Effects;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -18,8 +24,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 {
     public class ParticleSystem : ITransformable
     {      
-        private List<Particle> _particles = new List<Particle>();
-       
+        private List<Particle> _particles = new List<Particle>();       
         public List<Emitter> _emitters = new List<Emitter>();
         
         public List<Emitter> Emitters { get; set; }      
@@ -32,11 +37,11 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         public void Emit(int index)
         {
-            ParticleDescription desc = _emitters[index].DefaultParticleDescription;
+            ParticleInstanceAttributes desc = _emitters[index].DefaultParticleDescription;
             Emit(index, desc);
         }
 
-        public void Emit(int index, ParticleDescription customParticleDescription)
+        public void Emit(int index, ParticleInstanceAttributes customParticleDescription)
         {
             List<Particle> pList = _emitters[index].Spawn(customParticleDescription);
             _particles.AddRange(pList);
@@ -54,8 +59,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         {
             List<Particle> auxParticles = new List<Particle>(_particles);
             _particles.Clear();
-            OnParticlesReset();
-            
+            OnParticlesReset();            
         }
 
         public void Kill(Particle p)
@@ -85,6 +89,48 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         protected virtual void OnParticlesReset()
         {
             _particles.ForEach(p => p.TransformableParent = null);
+        }
+
+        public virtual void Draw(long gameTime)
+        {
+            var particleGroupings = _particles.GroupBy(p => p.InstanceAttributes);
+            foreach (IGrouping<ParticleInstanceAttributes, Particle> particleGrouping in particleGroupings)
+            {
+                if (particleGrouping.Key.Mesh.IsInstanced)
+                    DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());
+                else
+                    DrawParticles(gameTime, particleGrouping.ToArray());
+            }
+        }
+
+        private void DrawInstancedParticles(long gameTime, Mesh mesh, Effect effect, IEnumerable<Particle> particles)
+        {
+            if( mesh.IsInstanced == false || mesh.IsDynamic == false)
+                throw new InvalidOperationException("Particle mesh is not dynamic and instanced.");
+            
+            if (particles.Count() > 0)
+            {
+                IEnumerable<InstanceData> instanceData = particles.Select( p => new InstanceData { Matrix = p.WorldTransform().ToMatrix(), Color = p.Color });
+                mesh.Update<InstanceData>(instanceData.ToArray());
+                effect.Apply();
+                mesh.Draw(gameTime);
+            }          
+        }
+
+        private void DrawParticles(long gameTime, IEnumerable<Particle> particles)
+        {        
+            foreach (Particle p in particles)
+            {
+                p.InstanceAttributes.Effect.World = p.WorldTransform().ToMatrix();                   
+                p.InstanceAttributes.Effect.Apply();
+                p.InstanceAttributes.Mesh.Draw(gameTime);;
+            }                      
+        }
+
+        private struct InstanceData
+        {
+            public Matrix Matrix;
+            public Color Color;
         }
     }
 
@@ -127,6 +173,37 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         {
             _links.Clear();
             base.OnParticlesReset();
+        }
+
+        public override void Draw(long gameTime)
+        {
+            //TODO: Implement wire frame rendering.
+            //-------------------------------------
+
+            //List<BasicVertexPositionColor> linkVertices = new List<BasicVertexPositionColor>();
+            //foreach (ParticleLink link in pLinks)
+            //{
+            //    BasicVertexPositionColor v1 = new BasicVertexPositionColor();
+            //    v1.Color = Color.White.ToVector4();
+            //    v1.Position = new Vector4((emitterTransform * link.P1.Transform.ToMatrix()).TranslationVector, 1.0f);
+            //    BasicVertexPositionColor v2 = new BasicVertexPositionColor();
+            //    v2.Color = Color.White.ToVector4();
+            //    v2.Position = new Vector4((emitterTransform * link.P2.Transform.ToMatrix()).TranslationVector, 1.0f);
+            //    linkVertices.Add(v1);
+            //    linkVertices.Add(v2);
+            //}
+
+            //if (linkVertices.Count > 0)
+            //{
+            //    linkEffect.World = Matrix.Identity;
+            //    linkEffect.View = view;
+            //    linkEffect.Projection = projection;
+            //    linkEffect.Apply();
+            //    _linkMesh.Update<BasicVertexPositionColor>(linkVertices.ToArray());
+            //    _linkMesh.Draw(gameTime);
+            //}
+
+            base.Draw(gameTime);
         }
     }
 }
