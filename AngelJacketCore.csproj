@@ -83,7 +83,6 @@
     <Compile Include="Animation\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />
     <Compile Include="Animation\AnimationKeyFrame.cs" />
-    <Compile Include="Animation\BoneAnimation.cs" />
     <Compile Include="Animation\BooleanAnimation.cs" />
     <Compile Include="Animation\Color4Animation.cs" />
     <Compile Include="Animation\DrawingPointAnimation.cs" />
@@ -200,7 +199,6 @@
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="Animation\Animation.cs" />
-    <Compile Include="World\Deformer.cs" />
     <Compile Include="World\Geometry\Edge.cs" />
     <Compile Include="World\Geometry\Form.cs" />
     <Compile Include="World\Geometry\GridForm.cs" />
@@ -220,6 +218,7 @@
     <Compile Include="World\Geometry\Mesh.cs" />
     <Compile Include="World\Geometry\VertexTypes.cs" />
     <Compile Include="World\Scene\NullSceneNode.cs" />
+    <Compile Include="World\Scene\FormSceneNode.cs" />
     <Compile Include="World\Scene\Scene.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
     <Compile Include="Sandbox\TestEffect.cs" />

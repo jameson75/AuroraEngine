@@ -14,108 +14,64 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
-{
-    //TODO: Refactor this class so that it 1. Inherits + Leverages ComplexModel and uses InstanceRenderer (class used to render instances).
-    public abstract class Form  /*: Model*/
-    {
-        private ObservableCollection<FormElement> _elements = new ObservableCollection<FormElement>();
-        //private Emitter _emitter = null;
-        private Mesh _mesh = null;
-        
-        public Mesh Mesh 
-        { 
-            get { return _mesh; }
-            set { 
-                _mesh = value; 
-                OnMeshChanged(); 
+{    
+    public abstract class Form : ParticleSystem 
+    {      
+        private Emitter _elementEmitter = null;
+        private ParticleDescription _elementDescription = null;
+
+        protected Form(IGameApp game)
+            : base(game)
+        {
+            _elementEmitter = new Emitter();
+            _elementDescription = new ParticleDescription();
+            _elementEmitter.DefaultParticleDescription = _elementDescription;
+            Emitters.Add(_elementEmitter);
+        }
+
+        public Mesh ElementMesh
+        {
+            get { return _elementDescription.Mesh; }
+            set
+            {
+                _elementDescription.Mesh = value;
+                OnMeshChanged();
             }
         }
-        
-        //public Emitter Emitter 
-        //{ 
-        //    get { return _emitter; } 
-        //    set {
-        //        OnEmitterChanging();
-        //        _emitter = value; 
-        //        OnEmitterChanged(); 
-        //    }
-        //}
 
-        public override BoundingBox BoundingBox
+        public Effect ElementEffect
         {
-            get { return (Mesh != null) ? Mesh.BoundingBox : BoundingBoxExtension.Empty; }
-        }
-
-        //public ParticleRenderer ParticleRenderer { get; set; }
-
-        protected ObservableCollection<FormElement> Elements 
-        {
-            get { return _elements; }
-        }
-
-        public Form(IGameApp game) : base(game)
-        { }
-
-        public override void Draw(long gameTime)
-        {                       
-            Matrix formTransform = this.WorldTransform().ToMatrix(); 
-            List<Matrix> particleInstanceWorldTransforms = new List<Matrix>();
-            foreach (FormElement element in _elements)
+            get { return _elementDescription.Effect; }
+            set
             {
-                this.Effect.World = formTransform * element.Transform;
-                this.Effect.Apply();
-                this.Mesh.Draw(gameTime);
-
-                if (Emitter != null)
-                {
-                    Transform cachedTransform = Emitter.Transform;
-                    Emitter.Transform = new Transform(formTransform * element.Transform * cachedTransform.ToMatrix());
-                    foreach (Particle p in Emitter.Particles)
-                        particleInstanceWorldTransforms.Add(p.WorldTransform().ToMatrix());
-                    Emitter.Transform = cachedTransform;
-                }
+                _elementDescription.Effect = value;
+                OnEffectChanged();
             }
-            
-            if (Emitter != null && ParticleRenderer != null)
-            {
-                ParticleRenderer.ParticleEffect.View = this.Effect.View;
-                ParticleRenderer.ParticleEffect.Projection = this.Effect.Projection;                  
-                ParticleRenderer.DrawInstanced(gameTime, particleInstanceWorldTransforms);
-            }           
-        }
+        }      
 
-        protected virtual void OnEmitterChanging()
+        public BoundingBox BoundingBox
         {
-            if (this.Emitter != null)
-                ((ITransformable)this.Emitter).TransformableParent = null;
-        }
+            //TODO: Calculate Bounding Box size.
+            get { return BoundingBoxExtension.Empty; }
+        }              
 
-        protected virtual void OnEmitterChanged()
-        {
-            if (this.Emitter != null)
-                ((ITransformable)this.Emitter).TransformableParent = this;
-        }
+        protected void ClearElements() { KillAll(); }
 
-        protected virtual void OnLayoutChanged()
-        {
-          
-        }
-
-        protected virtual void OnMeshChanged()
+        protected List<Particle> CreateElements(int count) 
         { 
-
+            List<Particle> newElements = _elementEmitter.CreateParticles(count);
+            newElements.ForEach(e => e.Description = _elementDescription);
+            return newElements;
         }
-    }   
 
-    public class FormElement
-    {
-        public Form _form = null;
-        public FormElement(Form form)
-        {
-            _form = form;
-            Transform = Matrix.Identity;
-        }
-        public Form Form { get { return _form; } }
-        public Matrix Transform { get; set; }
-    }
+        protected void AddElements(IEnumerable<Particle> elements) { Add(elements); }
+
+        protected int ElementCount { get { return Particles.Count; } }
+
+        protected virtual void OnLayoutChanged() { }
+
+        protected virtual void OnMeshChanged() { }
+
+        protected virtual void OnEffectChanged() { }
+    }  
 }

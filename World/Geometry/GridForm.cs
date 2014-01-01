@@ -8,6 +8,8 @@ using SharpDX.Direct3D11;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Kinetics;
+
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
@@ -51,21 +53,21 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         protected override void OnLayoutChanged()
         {
             int i = 0;
-            foreach (FormElement element in Elements)
+            foreach (Particle element in Particles)
             {
-                if (Mesh != null)
+                if (ElementMesh != null)
                 {
                     int xIndex = i % (int)Dimensions.X;
                     int zIndex = i / (int)Dimensions.X;
                     int yIndex = i / ((int)Dimensions.X * (int)Dimensions.Z);
                     Vector3 elementOrigin = new Vector3();
-                    elementOrigin.X = (xIndex * ((CellSpacing.X * 2) + Mesh.BoundingBox.GetLengthX())) + (CellSpacing.X + (Mesh.BoundingBox.GetLengthX() * 0.5f));
-                    elementOrigin.Y = (yIndex * ((CellSpacing.Y * 2) + Mesh.BoundingBox.GetLengthY())) + (CellSpacing.Y + (Mesh.BoundingBox.GetLengthY() * 0.5f));
-                    elementOrigin.Z = (zIndex * ((CellSpacing.Z * 2) + Mesh.BoundingBox.GetLengthZ())) + (CellSpacing.Z + (Mesh.BoundingBox.GetLengthZ() * 0.5f));
-                    element.Transform = Matrix.Translation(elementOrigin);
+                    elementOrigin.X = (xIndex * ((CellSpacing.X * 2) + ElementMesh.BoundingBox.GetLengthX())) + (CellSpacing.X + (ElementMesh.BoundingBox.GetLengthX() * 0.5f));
+                    elementOrigin.Y = (yIndex * ((CellSpacing.Y * 2) + ElementMesh.BoundingBox.GetLengthY())) + (CellSpacing.Y + (ElementMesh.BoundingBox.GetLengthY() * 0.5f));
+                    elementOrigin.Z = (zIndex * ((CellSpacing.Z * 2) + ElementMesh.BoundingBox.GetLengthZ())) + (CellSpacing.Z + (ElementMesh.BoundingBox.GetLengthZ() * 0.5f));
+                    element.Transform = new Animation.Transform(Matrix.Translation(elementOrigin));
                 }
                 else
-                    element.Transform = Matrix.Identity;
+                    element.Transform = Animation.Transform.Identity;
                 i++;
             }
         }
@@ -78,22 +80,26 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         private void GenerateElements()
         {
-            Elements.Clear();
+            //Elements.Clear();
+            //int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);
+            //for (int i = 0; i < elementCount; i++)
+            //    Elements.Add(new FormElement(this));
+            ClearElements();
             int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);
-            for (int i = 0; i < elementCount; i++)
-                Elements.Add(new FormElement(this));
+            List<Particle> elements = CreateElements(elementCount);
+            AddElements(elements);
             OnLayoutChanged();
         }
 
         public Vector3 CalculateRenderedDimensions()
         {
-            if (Mesh == null)
+            if (ElementMesh == null)
                 return Vector3.Zero;
             else
             {
-                return new Vector3((Mesh.BoundingBox.GetLengthX() + CellSpacing.X * 2) * Dimensions.X,
-                                   (Mesh.BoundingBox.GetLengthY() + CellSpacing.Y * 2) * Dimensions.Y,
-                                   (Mesh.BoundingBox.GetLengthZ() + CellSpacing.Z * 2) * Dimensions.Z);
+                return new Vector3((ElementMesh.BoundingBox.GetLengthX() + CellSpacing.X * 2) * Dimensions.X,
+                                   (ElementMesh.BoundingBox.GetLengthY() + CellSpacing.Y * 2) * Dimensions.Y,
+                                   (ElementMesh.BoundingBox.GetLengthZ() + CellSpacing.Z * 2) * Dimensions.Z);
             }
         }
     }

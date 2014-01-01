@@ -27,16 +27,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// 
     /// </summary>
     public class Emitter : ITransformable
-    {              
-        private ParticleSystem _system = null;
-        
-        public Emitter(ParticleSystem system)
-        {
-            _system = system;
-        }
-
-        //private Mesh _dynamicInstancedMesh = null;
-
+    {      
         #region ITransformable Members
         public Transform Transform { get; set; }
         public ITransformable TransformableParent { get; set; }
@@ -50,9 +41,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         
         public EmitterBehavior Behavior { get; set; }
 
-        public ParticleInstanceAttributes DefaultParticleDescription { get; set; }     
-
-        public Effect Effect { get; set; }                
+        public ParticleDescription DefaultParticleDescription { get; set; }                     
 
         public List<Particle> CreateParticles(int count)
         {
@@ -61,18 +50,16 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             {              
                 Particle p = new Particle();
                 p.Life = 0;
-                p.Color = Color.Transparent;
-                p.Opacity = 0;
                 p.Age = 0;
                 p.Velocity = 0;
                 p.Transform = this.Transform;
-                p.InstanceAttributes = null;
+                p.Description = null;
                 pList.Add(p);
             }
             return pList;           
         }       
 
-        public List<Particle> Spawn(ParticleInstanceAttributes description)
+        public List<Particle> Spawn(ParticleDescription description)
         {
             Random randomGen = new Random();
             List<Particle> pList = new List<Particle>();
@@ -85,13 +72,11 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 float randomVelocity = (Behavior.InitialVelocityRandomness == 0) ? Behavior.InitialVelocity :
                     Behavior.InitialVelocity + (float)randomGen.Next(Behavior.InitialVelocityRandomness);               
                 Particle p = new Particle();
-                p.Life = randomLife;
-                p.Color = description.ColorOverLife.GetValueAtAge(0);
-                p.Opacity = description.OpacityOverLife.GetValueAtAge(0);
+                p.Life = randomLife;              
                 p.Age = 0;
                 p.Velocity = randomVelocity;
                 p.Transform = this.Transform;
-                p.InstanceAttributes = description;
+                p.Description = description;                
                 pList.Add(p);
             }
             return pList;
@@ -130,14 +115,14 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         //public float PointSize { get; set; }
         //public int RandomSeed { get; set; }
     }
-
+    
     /// <summary>
     /// 
     /// </summary>
-    public class ParticleInstanceAttributes
-    {
+    public class ParticleDescription
+    {        
         public Mesh Mesh;
-        public Effect Effect;    
+        public Effect Effect;         
     }
 
     /// <summary>
@@ -145,9 +130,6 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// </summary>
     public class Particle : IRigidBody
     {
-        private ColorOverLife _colorOverLife = new ColorOverLife();
-        private FloatOverLife _opacityOverLife = new FloatOverLife();
-
         #region ITransformable Members
         public Transform Transform { get; set; }
         public ITransformable TransformableParent { get; set; }
@@ -160,17 +142,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         
         #region Particle Attributes
         public ulong Age { get; set; }
-        public ulong Life { get; set; }        
-        public Color Color { get; set; }
-        public float Opacity { get; set; }
-        public Vector2 Size { get; set; }
-        public ColorOverLife ColorOverLife { get; set; }
-        public FloatOverLife OpacityOverLife { get; set; } 
-        #endregion    
-
-        #region Shared Attributes     
-        public ParticleInstanceAttributes InstanceAttributes { get; set; }
-        #endregion
+        public ulong Life { get; set; }
+        public ParticleDescription Description { get; set; }
+        #endregion          
     }
 
     /// <summary>
@@ -180,11 +154,11 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     {
         public EmitterAction() { }
         public EmitterAction(ulong time, EmitterTask task) { Time = time; Task = task; }
-        public EmitterAction(ulong time, ParticleInstanceAttributes customParticleDescription) { Time = time; CustomParticleDescriptionArg = customParticleDescription; Task = EmitterTask.EmitCustom; }
+        public EmitterAction(ulong time, ParticleDescription customParticleDescription) { Time = time; CustomParticleDescriptionArg = customParticleDescription; Task = EmitterTask.EmitCustom; }
         public EmitterAction(ulong time, IEnumerable<Particle> particleArgs, EmitterTask task) { Time = time; ParticleArgs = particleArgs; Task = task; }
         public EmitterAction(ulong time, Transform transform) { Time = time; Transform = transform; Task = EmitterTask.Transform; }
         public ulong Time { get; set; }
-        public ParticleInstanceAttributes CustomParticleDescriptionArg { get; set; }
+        public ParticleDescription CustomParticleDescriptionArg { get; set; }
         public IEnumerable<Particle> ParticleArgs { get; set; }
         public Transform Transform { get; set; }
         public enum EmitterTask

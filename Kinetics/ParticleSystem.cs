@@ -23,49 +23,57 @@ using CipherPark.AngelJacket.Core.Effects;
 namespace CipherPark.AngelJacket.Core.Kinetics
 {
     public class ParticleSystem : ITransformable
-    {      
-        private List<Particle> _particles = new List<Particle>();       
-        public List<Emitter> _emitters = new List<Emitter>();
-        
-        public List<Emitter> Emitters { get; set; }      
-        public ReadOnlyCollection<Particle> Particles { get { return _particles.ToList().AsReadOnly(); } }        
-        
+    {
+        private IGameApp _game = null;
+        private List<Emitter> _emitters = new List<Emitter>();
+        private List<Particle> _particles = new List<Particle>();
+
+        public ParticleSystem(IGameApp game)
+        {
+            _game = game;
+        }
+
+        public IGameApp Game { get { return _game; } }
+
+        public List<Emitter> Emitters { get { return _emitters; } }
+
+        public ReadOnlyCollection<Particle> Particles { get { return _particles.ToList().AsReadOnly(); } }
+
         #region ITransformable Members
         public Transform Transform { get; set; }
         public ITransformable TransformableParent { get; set; }
-        #endregion    
+        #endregion
 
         public void Emit(int index)
         {
-            ParticleInstanceAttributes desc = _emitters[index].DefaultParticleDescription;
+            ParticleDescription desc = _emitters[index].DefaultParticleDescription;
             Emit(index, desc);
         }
 
-        public void Emit(int index, ParticleInstanceAttributes customParticleDescription)
+        public void Emit(int index, ParticleDescription customParticleDescription)
         {
             List<Particle> pList = _emitters[index].Spawn(customParticleDescription);
             _particles.AddRange(pList);
-            OnParticlesAdded(pList);            
+            OnParticlesAdded(pList);
         }
 
-        public List<Particle> Emit(IEnumerable<Particle> particles)
+        public void Add(IEnumerable<Particle> particles)
         {
             _particles.AddRange(particles);
             OnParticlesAdded(particles);
-            return particles.ToList();
         }
 
         public void KillAll()
         {
             List<Particle> auxParticles = new List<Particle>(_particles);
             _particles.Clear();
-            OnParticlesReset();            
+            OnParticlesReset();
         }
 
         public void Kill(Particle p)
         {
             _particles.Remove(p);
-            OnParticlesRemoved(new Particle[] { p });           
+            OnParticlesRemoved(new Particle[] { p });
         }
 
         public void Kill(IEnumerable<Particle> pList)
@@ -81,7 +89,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         }
 
         protected virtual void OnParticlesRemoved(IEnumerable<Particle> particles)
-        {           
+        {
             foreach (Particle p in particles)
                 p.TransformableParent = null;
         }
@@ -93,9 +101,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         public virtual void Draw(long gameTime)
         {
-            var particleGroupings = _particles.GroupBy(p => p.InstanceAttributes);
-            foreach (IGrouping<ParticleInstanceAttributes, Particle> particleGrouping in particleGroupings)
-            {
+            var particleGroupings = _particles.GroupBy(p => p.Description);
+            foreach (IGrouping<ParticleDescription, Particle> particleGrouping in particleGroupings)
+            {                  
                 if (particleGrouping.Key.Mesh.IsInstanced)
                     DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());
                 else
@@ -103,39 +111,37 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             }
         }
 
-        private void DrawInstancedParticles(long gameTime, Mesh mesh, Effect effect, IEnumerable<Particle> particles)
+        private void DrawInstancedParticles(long gameTime, Mesh instanceMesh, Effect instanceEffect, IEnumerable<Particle> particles)
         {
-            if( mesh.IsInstanced == false || mesh.IsDynamic == false)
+            if (instanceMesh.IsInstanced == false || instanceMesh.IsDynamic == false)
                 throw new InvalidOperationException("Particle mesh is not dynamic and instanced.");
-            
+
             if (particles.Count() > 0)
             {
-                IEnumerable<InstanceData> instanceData = particles.Select( p => new InstanceData { Matrix = p.WorldTransform().ToMatrix(), Color = p.Color });
-                mesh.Update<InstanceData>(instanceData.ToArray());
-                effect.Apply();
-                mesh.Draw(gameTime);
-            }          
+                IEnumerable<Matrix> instanceData = particles.Select(p => p.WorldTransform().ToMatrix());
+                instanceMesh.Update<Matrix>(instanceData.ToArray());
+                instanceEffect.Apply();
+                instanceMesh.Draw(gameTime);
+            }
         }
 
         private void DrawParticles(long gameTime, IEnumerable<Particle> particles)
-        {        
-            foreach (Particle p in particles)
-            {
-                p.InstanceAttributes.Effect.World = p.WorldTransform().ToMatrix();                   
-                p.InstanceAttributes.Effect.Apply();
-                p.InstanceAttributes.Mesh.Draw(gameTime);;
-            }                      
-        }
-
-        private struct InstanceData
         {
-            public Matrix Matrix;
-            public Color Color;
+            foreach (Particle p in particles)
+            {               
+                p.Description.Effect.World = p.WorldTransform().ToMatrix();
+                p.Description.Effect.Apply();
+                p.Description.Mesh.Draw(gameTime);                
+            }
         }
     }
 
     public class PlexSystem : ParticleSystem
     {
+        public PlexSystem(IGameApp game)
+            : base(game)
+        { }
+
         private List<ParticleLink> _links = new List<ParticleLink>();
         
         public ReadOnlyCollection<ParticleLink> Links { get { return _links.AsReadOnly(); } }    
@@ -163,9 +169,15 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             _links.RemoveAll(e => e.P1 == p || e.P2 == p);
         }
 
+        public void Unlink(IEnumerable<Particle> particles)
+        {
+            foreach (Particle p in particles)
+                Unlink(p);
+        }
+
         protected override void OnParticlesRemoved(IEnumerable<Particle> particles)
         {
-            Unlink(p);
+            Unlink(particles);
             base.OnParticlesRemoved(particles);
         }
 

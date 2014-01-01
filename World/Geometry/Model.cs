@@ -178,13 +178,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {
         private List<Mesh> _meshes = new List<Mesh>();
         
-        private List<Emitter> _emitters = new List<Emitter>();
+        //private List<Emitter> _emitters = new List<Emitter>();
 
         public List<Mesh> Meshes { get { return _meshes; } }        
         
-        public List<Emitter> Emitters { get { return _emitters; } }
+        //public List<Emitter> Emitters { get { return _emitters; } }
 
-        public ParticleRenderer ParticleRenderer { get; set; }
+        //public ParticleRenderer ParticleRenderer { get; set; }
         
         #region IAnimatedModel
         public Frame FrameTree { get; set; }        
