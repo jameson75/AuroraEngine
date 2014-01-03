@@ -381,7 +381,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 riggedModel.Mesh = mesh;
                 riggedModel.SkinOffsets.AddRange(skinOffsets);
                 riggedModel.FrameTree = rootFrame;
-                riggedModel.Animation.AddRange(animationControllers);
+                riggedModel.AnimationRig.AddRange(animationControllers);
                 result = riggedModel;
             }
             

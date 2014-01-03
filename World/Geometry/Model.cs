@@ -188,7 +188,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         
         #region IAnimatedModel
         public Frame FrameTree { get; set; }        
-        public List<KeyframeAnimationController> Animation { get; set; }
+        public List<KeyframeAnimationController> AnimationRig { get; set; }
         #endregion        
         
         public List<MeshTextures> MeshTextures { get; set; }
@@ -261,7 +261,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public interface IAnimatedModel
     {
         Frame FrameTree { get; set; }
-        List<KeyframeAnimationController> Animation { get; }
+        List<KeyframeAnimationController> AnimationRig { get; }
     }
 
     /// <summary>
@@ -290,7 +290,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                         AnimationKeyFrame startPoseKeyFrame = new AnimationKeyFrame(0, frame.Transform);
                         transitionAnimation.SetKeyFrame(startPoseKeyFrame);
                     }
-                    Transform endPoseTransform = (Transform)model.Animation.Find(a => a.Target == frame).Animation.GetActiveKeyFrameAtT(poseKeyTime).Value;
+                    Transform endPoseTransform = (Transform)model.AnimationRig.Find(a => a.Target == frame).Animation.GetActiveKeyFrameAtT(poseKeyTime).Value;
                     AnimationKeyFrame endPoseKeyFrame = new AnimationKeyFrame(transitionTimeSpan, endPoseTransform);
                     transitionAnimation.SetKeyFrame(endPoseKeyFrame);
                     KeyframeAnimationController frameController = new KeyframeAnimationController(transitionAnimation, frame);

@@ -120,9 +120,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// 
     /// </summary>
     public class ParticleDescription
-    {        
-        public Mesh Mesh;
-        public Effect Effect;         
+    {
+        public Mesh Mesh { get; set; }
+        public Effect Effect { get; set; }
     }
 
     /// <summary>

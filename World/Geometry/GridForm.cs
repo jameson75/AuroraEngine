@@ -10,13 +10,20 @@ using System.Collections.Specialized;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Kinetics;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public class GridForm : Form
     {
         private Vector3 _dimensions = Vector3.Zero;
-        private Vector3 _cellSpacining = Vector3.Zero;       
+        private Vector3 _cellPadding = Vector3.Zero;       
 
         public GridForm(IGameApp game)
             : base(game)
@@ -26,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             : base(game)
         {
             _dimensions = dimensions;
-            _cellSpacining = cellSpacing;
+            _cellPadding = cellSpacing;
             GenerateElements();
         }
 
@@ -40,13 +47,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public Vector3 CellSpacing
+        public Vector3 CellPadding
         {
-            get { return _cellSpacining; }
+            get { return _cellPadding; }
             set
             {
-                _cellSpacining = value;
-                //GenerateElements();
+                _cellPadding = value;
+                OnLayoutChanged();
             }
         }
 
@@ -61,9 +68,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     int zIndex = i / (int)Dimensions.X;
                     int yIndex = i / ((int)Dimensions.X * (int)Dimensions.Z);
                     Vector3 elementOrigin = new Vector3();
-                    elementOrigin.X = (xIndex * ((CellSpacing.X * 2) + ElementMesh.BoundingBox.GetLengthX())) + (CellSpacing.X + (ElementMesh.BoundingBox.GetLengthX() * 0.5f));
-                    elementOrigin.Y = (yIndex * ((CellSpacing.Y * 2) + ElementMesh.BoundingBox.GetLengthY())) + (CellSpacing.Y + (ElementMesh.BoundingBox.GetLengthY() * 0.5f));
-                    elementOrigin.Z = (zIndex * ((CellSpacing.Z * 2) + ElementMesh.BoundingBox.GetLengthZ())) + (CellSpacing.Z + (ElementMesh.BoundingBox.GetLengthZ() * 0.5f));
+                    elementOrigin.X = (xIndex * ((CellPadding.X * 2) + ElementMesh.BoundingBox.GetLengthX())) + (CellPadding.X + (ElementMesh.BoundingBox.GetLengthX() * 0.5f));
+                    elementOrigin.Y = (yIndex * ((CellPadding.Y * 2) + ElementMesh.BoundingBox.GetLengthY())) + (CellPadding.Y + (ElementMesh.BoundingBox.GetLengthY() * 0.5f));
+                    elementOrigin.Z = (zIndex * ((CellPadding.Z * 2) + ElementMesh.BoundingBox.GetLengthZ())) + (CellPadding.Z + (ElementMesh.BoundingBox.GetLengthZ() * 0.5f));
                     element.Transform = new Animation.Transform(Matrix.Translation(elementOrigin));
                 }
                 else
@@ -79,11 +86,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
 
         private void GenerateElements()
-        {
-            //Elements.Clear();
-            //int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);
-            //for (int i = 0; i < elementCount; i++)
-            //    Elements.Add(new FormElement(this));
+        {          
             ClearElements();
             int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);
             List<Particle> elements = CreateElements(elementCount);
@@ -97,9 +100,21 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 return Vector3.Zero;
             else
             {
-                return new Vector3((ElementMesh.BoundingBox.GetLengthX() + CellSpacing.X * 2) * Dimensions.X,
-                                   (ElementMesh.BoundingBox.GetLengthY() + CellSpacing.Y * 2) * Dimensions.Y,
-                                   (ElementMesh.BoundingBox.GetLengthZ() + CellSpacing.Z * 2) * Dimensions.Z);
+                return new Vector3((ElementMesh.BoundingBox.GetLengthX() + CellPadding.X * 2) * Dimensions.X,
+                                   (ElementMesh.BoundingBox.GetLengthY() + CellPadding.Y * 2) * Dimensions.Y,
+                                   (ElementMesh.BoundingBox.GetLengthZ() + CellPadding.Z * 2) * Dimensions.Z);
+            }
+        }
+
+        public Vector3 CalculateRenderedCellDimensions()
+        {
+            if (ElementMesh == null)
+                return Vector3.Zero;
+            else
+            {
+                return new Vector3((ElementMesh.BoundingBox.GetLengthX() + CellPadding.X * 2),
+                                   (ElementMesh.BoundingBox.GetLengthY() + CellPadding.Y * 2),
+                                   (ElementMesh.BoundingBox.GetLengthZ() + CellPadding.Z * 2));
             }
         }
     }

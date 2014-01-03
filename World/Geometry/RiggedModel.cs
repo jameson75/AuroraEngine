@@ -52,38 +52,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// <summary>
         /// 
         /// </summary>
-        public List<KeyframeAnimationController> Animation
+        public List<KeyframeAnimationController> AnimationRig
         { get { return _animationControllers; } }
-        #endregion 
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="poseTime"></param>
-        ///// <returns></returns>
-        //public CompositeAnimationController CreatePoseAnimation(ulong poseKeyTime, ulong transitionTimeSpan = 0)
-        //{           
-        //    List<KeyframeAnimationController> result = new List<KeyframeAnimationController>();
-        //    if (FrameTree != null)
-        //    {
-        //        List<Frame> frameList = FrameTree.FlattenToList();
-        //        foreach (Frame frame in frameList)
-        //        {
-        //            TransformAnimation transitionAnimation = new TransformAnimation();
-        //            if (transitionTimeSpan > 0)
-        //            {
-        //                AnimationKeyFrame startPoseKeyFrame = new AnimationKeyFrame(0, frame.Transform);
-        //                transitionAnimation.SetKeyFrame(startPoseKeyFrame);
-        //            }
-        //            Transform endPoseTransform = (Transform)Animation.Find(a => a.Target == frame).Animation.GetActiveKeyFrameAtT(poseKeyTime).Value;
-        //            AnimationKeyFrame endPoseKeyFrame = new AnimationKeyFrame(transitionTimeSpan, endPoseTransform);
-        //            transitionAnimation.SetKeyFrame(endPoseKeyFrame);
-        //            KeyframeAnimationController frameController = new KeyframeAnimationController(transitionAnimation, frame);
-        //            result.Add(frameController);
-        //        }
-        //    }
-        //    return new CompositeAnimationController(result);
-        //}      
+        #endregion      
 
         protected override void OnApplyingEffect()
         {
@@ -193,33 +164,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             List<Frame> results = new List<Frame>();
             _BuildFlattenedTree(this, results);
             return results;
-        }
-       
-        //public Transform LocalToWorld(Transform localTransform)
-        //{
-        //    TransformStack stack = new TransformStack();
-        //    stack.Push(localTransform);
-        //    Frame frame = this.Parent;
-        //    while (frame != null)
-        //    {
-        //        stack.Push(frame.Transform);
-        //        frame = frame.Parent;
-        //    }
-        //    return stack.Transform;
-        //}
-
-        //public Transform WorldToLocal(Transform worldTransform)
-        //{
-        //    TransformStack stack = new TransformStack();
-        //    stack.Push(worldTransform);
-        //    Frame frame = this.Parent;
-        //    while (frame != null)
-        //    {
-        //        stack.Push(Animation.Transform.Invert(frame.Transform));
-        //        frame = frame.Parent;
-        //    }
-        //    return stack.ReverseTransform;
-        //}
+        }  
 
         private static void _BuildFlattenedTree(Frame frame, List<Frame> results)
         {
