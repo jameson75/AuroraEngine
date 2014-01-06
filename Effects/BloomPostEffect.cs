@@ -212,7 +212,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             //************************************************************************
             //CREDITS:
-            //The code in this method is borrowed from the Microsoft XNA Bloom Sample
+            //The code in this method was ported from the Microsoft XNA Bloom Sample
             //Link: http://xbox.create.msdn.com/en-US/education/catalog/sample/bloom
             //************************************************************************
 
@@ -287,7 +287,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             //************************************************************************
             //CREDITS:
-            //The code in this method is borrowed from the Microsoft XNA Bloom Sample
+            //The code in this method was ported from the Microsoft XNA Bloom Sample
             //Link: http://xbox.create.msdn.com/en-US/education/catalog/sample/bloom
             //************************************************************************
 
