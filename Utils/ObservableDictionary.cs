@@ -9,6 +9,11 @@ using System.Xml.Serialization;
 // Copyright © 2010-2013
 // Angel Jacket by Cipher Park is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+//
+// CREDITS
+// I ported this class from somewhere but forgot where. It's been in my 
+// toolbox for quite some time. The author posted it on CodeProject.com
+// Anyway... Credits to the author... who ever you are.
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.AngelJacket.Core.Utils

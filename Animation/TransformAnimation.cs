@@ -140,8 +140,16 @@ namespace CipherPark.AngelJacket.Core.Animation
     //                x = Vector3.Lerp(frameVal0.Translation, frameVal1.Translation, pctStep);
 
     //            Transform tx = new Transform { Rotation = r, Translation = x };
-
+    //              
+    //            //TODO: 
+    //            //1. comment the next line and use the second return statement so that
+    //            //instead of returning the world space transform when a LocalConverter isn't
+    //            //specified, we return the transform of the transformable in in frame0.
+    //            //That way, not specifying a LocalConverter would have the same result as
+    //            //using a TransformAnimation object.
+    //            //2. Rename this class to TransformableAnimation.
     //            return (LocalConverter != null) ? LocalConverter.WorldToParent(tx) : tx;
+    //            //return (LocalConverter != null) ? LocalConverter.WorldToParent(tx) : ((ITransformable)f0.Value).WorldToParent(tx);
     //        }
     //    }
     //}
