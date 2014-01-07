@@ -295,6 +295,15 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static BoundingBox Empty { get { return _empty; } }    
     }
 
+    public static class Vector3Extension
+    {
+        public static Vector3 CatmullRomEx(Vector3 value1, Vector3 value2, Vector3 value3, Vector3 value4, float amount)
+        {
+            float correctedAmount = amount;
+            return Vector3.CatmullRom(value1, value2, value3, value4, correctedAmount);
+        }
+    }
+
     public static class MathUtilExtension
     {
         public static short Clamp(short value, short min, short max)

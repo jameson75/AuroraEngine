@@ -62,7 +62,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                         fb = f1;
                     Transform frameVala = (fa.Value != null) ? (Transform)fa.Value : Transform.Identity;
                     Transform frameValb = (fb.Value != null) ? (Transform)fb.Value : Transform.Identity;
-                    x = Vector3.CatmullRom(frameVala.Translation, frameVal0.Translation, frameVal1.Translation, frameValb.Translation, pctStep);
+                    x = Vector3.CatmullRom(frameVala.Translation, frameVal0.Translation, frameVal1.Translation, frameValb.Translation, pctStep);                    
                 }
                 else
                     x = Vector3.Lerp(frameVal0.Translation, frameVal1.Translation, pctStep);

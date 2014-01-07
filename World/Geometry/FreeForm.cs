@@ -70,7 +70,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     PathNode n0 = (n1 != _nodes.First()) ? _nodes[i - 2] : n1;
                     PathNode n3 = (n2 != _nodes.Last()) ? _nodes[i + 1] : n2;
                     Vector3 p0 = n1.Transform.Translation;
-                    float step = stepSize;                   
+                    float step = stepSize;
                     float totalLength = 0;
                     for (int j = 0; j < nSamplesPerSegment; j++)
                     {
@@ -83,12 +83,10 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                                                        n1.Transform.Translation,
                                                        n2.Transform.Translation,
                                                        n3.Transform.Translation, step);
-                        totalLength += Vector3.Distance(p0, p);
-                        System.Diagnostics.Trace.WriteLine(Vector3.Distance(p0, p));
+                        totalLength += Vector3.Distance(p0, p);                        
                         step += stepSize;
                         p0 = p;
-                    }
-                    System.Diagnostics.Trace.WriteLine("-------");
+                    }                    
                     _approximateSegmentLengths.Add(totalLength);
                 }               
             }
