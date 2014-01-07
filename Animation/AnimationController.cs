@@ -204,6 +204,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         private long? _animationStartTime = null;         
 
         public IRigidBody Target { get; set; }
+
         public Motion Delta { get; set; }        
 
         public RigidBodyAnimationController()

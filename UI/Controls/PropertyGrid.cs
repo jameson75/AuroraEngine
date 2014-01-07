@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
+using SharpDX.DirectInput;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
@@ -18,19 +19,20 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class PropertyGrid : ItemsControl
+    public class PropertyGrid : SelectControl
     {       
         public const int SizeInfinite = -1;      
         private int _maxRowSize = PropertyGrid.SizeInfinite;
         private CommandControlWireUp _controlWireUp = null;
         private int _selectedIndex = -1;
+        private StackLayoutManager _layoutManager = null;
 
         public PropertyGrid(IUIRoot root)
             : base(root)
-        {          
-
+        {         
             _controlWireUp = new CommandControlWireUp(this);
             _controlWireUp.ChildControlCommand += ControlWireUp_ChildControlCommand;
+            _layoutManager = new StackLayoutManager(this);
         }      
 
         private void ControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
@@ -38,6 +40,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             OnCommand(args.CommandName);
             MaxRowSize = ListControl.SizeInfinite;
         }     
+        
+        protected override IControlLayoutManager LayoutManager
+        {
+            get
+            {
+                return _layoutManager;
+            }
+        }
 
         public override bool CanReceiveFocus
         {
@@ -45,7 +55,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 return true;
             }
-        }
+        }      
 
         public int MaxRowSize 
         {
@@ -62,22 +72,33 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Items.Add(item);
         }
 
-        public int SelectedIndex
-        {
-            get { return _selectedIndex; }
-            set
-            {
-                OnSelectedIndexChanging();
-                _selectedIndex = value;
-                OnSelectedIndexChanged();
-            }
-        }
-
         protected override void OnUpdate(long gameTime)
-        {
+        {             
+            if (this.HasFocus || this.ContainsFocus)
+            {
+                Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
+                if (inputServices == null)
+                    throw new InvalidOperationException("Input services not available.");
+
+                BufferedInputState bufferedInputState = inputServices.GetBufferedInputState();
+
+                bool selectPreviousKeyDown = (bufferedInputState.IsKeyDown(Key.UpArrow)) ||                                            
+                                             (bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp));
+
+                bool selectNextKeyDown = (bufferedInputState.IsKeyDown(Key.Down)) ||
+                                         (bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadDown));                                      
+
+                if (selectPreviousKeyDown)
+                    this.SelectPreviousItem();
+
+                else if (selectNextKeyDown)
+                    this.SelectNextItem();               
+            }          
+        
             foreach (ItemControl item in this.Items)
                 item.Update(gameTime);
-            base.OnUpdate(gameTime);
+            
+             base.OnUpdate(gameTime);
         }
 
         protected override void OnDraw(long gameTime)
@@ -88,62 +109,71 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnDraw(gameTime);
         }
 
-        protected override void OnLayoutChanged()
-        {
-            int currentRowIndex = 0;
-            int currentColumnIndex = 0;         
+        //protected override void OnLayoutChanged()
+        //{
+        //    //int currentRowIndex = 0;
+        //    //int currentColumnIndex = 0;         
            
-            float previousItemsTotalWidth = 0;
-            float previousColumnsHeight = 0;
-            float maxItemHeight = 0;
-            foreach (PropertyGridItem item in this.Items)
-            {
-                item.Position = new DrawingPointF(previousItemsTotalWidth, previousColumnsHeight);
-                previousItemsTotalWidth += item.Size.Width;
-                maxItemHeight = Math.Max(maxItemHeight, item.Size.Width);
-                currentColumnIndex++;
-                if (MaxRowSize != PropertyGrid.SizeInfinite && currentColumnIndex >= MaxRowSize)
-                {
-                    currentRowIndex++;
-                    previousColumnsHeight = maxItemHeight;
-                    maxItemHeight = 0;
-                    currentColumnIndex = 0;
-                }
-            }
-        }    
-
-        protected virtual void OnSelectedIndexChanging()
-        {}
-
-        protected virtual void OnSelectedIndexChanged()
-        {}
+        //    //float previousItemsTotalWidth = 0;
+        //    //float previousColumnsHeight = 0;
+        //    //float maxItemHeight = 0;
+        //    //foreach (PropertyGridItem item in this.Items)
+        //    //{
+        //    //    item.Position = new DrawingPointF(previousItemsTotalWidth, previousColumnsHeight);
+        //    //    previousItemsTotalWidth += item.Size.Width;
+        //    //    maxItemHeight = Math.Max(maxItemHeight, item.Size.Width);
+        //    //    currentColumnIndex++;
+        //    //    if (MaxRowSize != PropertyGrid.SizeInfinite && currentColumnIndex >= MaxRowSize)
+        //    //    {
+        //    //        currentRowIndex++;
+        //    //        previousColumnsHeight = maxItemHeight;
+        //    //        maxItemHeight = 0;
+        //    //        currentColumnIndex = 0;
+        //    //    }
+        //    //}
+        //}    
     }
 
-    public abstract class PropertyGridItem : ItemControl
+    public class PropertyGridItem : ItemControl
     {
-        private CommandControlWireUp _wireUp = null;
-        private Guid childLabelId;
+        private CommandControlWireUp _wireUp = null;      
+        private Label childLabel = null;
+        private Label selectedChildLabel = null;
 
-        public bool IsActive
-        { get; set; }
-
-        public PropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor)
-            : this(visualRoot, new TextContent(caption, font, fontColor))
-        {  }
-
-        public PropertyGridItem(IUIRoot visualRoot, TextContent description)
+        public PropertyGridItem(IUIRoot visualRoot, TextContent nameContent, TextContent selectNameContent)
             : base(visualRoot)
         {
-            Label childLabel = new Label(visualRoot, description);
-            childLabelId = Guid.NewGuid();
-            childLabel.Id = childLabelId;
+            childLabel = new Label(visualRoot, nameContent);    
             childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Left;
             childLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             childLabel.Size = new DrawingSizeF(100.0f, 1.0f);
-            this.Children.Add(childLabel);           
+            this.Children.Add(childLabel);
+            selectedChildLabel = new Label(visualRoot, selectNameContent);
+            selectedChildLabel.HorizontalAlignment = Controls.HorizontalAlignment.Left;
+            selectedChildLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
+            selectedChildLabel.Size = new DrawingSizeF(100.0f, 1.0f);
+            selectedChildLabel.Visible = false;
+            this.Children.Add(selectedChildLabel);
+            this.Size = nameContent.Font.MeasureString(nameContent.Text);
             _wireUp = new CommandControlWireUp(this);
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
-        }        
+        }
+       
+        public PropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, Color selectedFontColor)
+            : this(visualRoot, new TextContent(caption, font, fontColor), new TextContent(caption, font, selectedFontColor))
+        {  }        
+        
+        public PropertyGridItem(UIControl valueControl, string caption, SpriteFont font, Color fontColor, Color selectedFontColor)
+            : this(valueControl.VisualRoot, caption, font, fontColor, selectedFontColor)
+        { 
+            this.Children.Add(valueControl);
+        }
+
+        public PropertyGridItem(UIControl valueControl, TextContent nameContent, TextContent selectedDescription)
+            : this(valueControl.VisualRoot, nameContent, selectedDescription)
+        {
+            this.Children.Add(valueControl);
+        }
 
         private void CommandControlWireUp_ChildControlCommand(object sender, ControlCommandArgs args)
         {
@@ -152,16 +182,40 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnLayoutChanged()
         {
-            UIControl childLabel = Children.First(c => c.Id == childLabelId);
-            foreach (UIControl child in Children)
+            DrawingSizeF nameControlSize = childLabel.Size;
+            UIControl valueControl = Children.FirstOrDefault(c => c != childLabel && c != selectedChildLabel);
+            if (valueControl != null)
             {
-                if (child != childLabel)
-                {
-                    child.Position = new DrawingPointF(childLabel.Size.Width, 0.0f);
-                    child.Size = new DrawingSizeF(this.Size.Width - child.Size.Width, this.Size.Height);
-                }
+                valueControl.Position = new DrawingPointF(nameControlSize.Width, 0.0f);
+                valueControl.Size = new DrawingSizeF(this.Size.Width - nameControlSize.Width, this.Size.Height);
             }
             base.OnLayoutChanged();
+        }       
+     
+        protected override void OnSelected()
+        {
+            if (!this.ContainsFocus)
+            {
+                UIControl nextFocusableControl = this.VisualRoot.FocusManager.GetNext(this);
+                if (nextFocusableControl != null && IsDescendant(nextFocusableControl))
+                    this.VisualRoot.FocusManager.SetFocus(nextFocusableControl);
+            }            
+            
+            childLabel.Visible = false;
+            selectedChildLabel.Visible = true;
+
+ 	        base.OnSelected();
+        }
+
+        protected override void OnUnselected()
+        {
+            if (this.ContainsFocus)
+                this.VisualRoot.FocusManager.SetFocus(null);
+            
+            childLabel.Visible = true;
+            selectedChildLabel.Visible = false;
+            
+            base.OnUnselected();
         }
     }
 
@@ -203,24 +257,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     //    }
     //}
 
-    public class SpinnerPropertyGridItem : PropertyGridItem
-    {
-        Spinner _spinner = null;
+    //public class SpinnerPropertyGridItem : PropertyGridItem
+    //{
+    //    Spinner _spinner = null;
 
-        public SpinnerPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, double value = 0)
-            : base(visualRoot, caption, font, fontColor)
-        {
-            _spinner = new Spinner(visualRoot, font, fontColor, Color.Transparent);
-            _spinner.Value = value;
-            this.Children.Add(_spinner);
-        }
+    //    public SpinnerPropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, double value = 0)
+    //        : base(visualRoot, caption, font, fontColor)
+    //    {
+    //        _spinner = new Spinner(visualRoot, font, fontColor, Color.Transparent);
+    //        _spinner.Value = value;
+    //        this.Children.Add(_spinner);
+    //    }
 
-        public double Value
-        {
-            get { return _spinner.Value; }
-            set { _spinner.Value = value; }
-        }
-    }
+    //    public double Value
+    //    {
+    //        get { return _spinner.Value; }
+    //        set { _spinner.Value = value; }
+    //    }
+    //}
 
     //public class SelectPropertyGridItem : PropertyGridItem
     //{

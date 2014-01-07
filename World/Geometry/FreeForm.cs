@@ -75,9 +75,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     for (int j = 0; j < nSamplesPerSegment; j++)
                     {
                         //**************************************************************
-                        //NOTE: Important quirk for future reference. I've found that
-                        //Vector3.CatmullRom does not step evenly for the first
-                        //and last segments of a piece-wise curve. 
+                        //NOTE: Important for future reference - the catmull algorithm
+                        //does not produce equidistant points.
                         //**************************************************************
                         Vector3 p = Vector3.CatmullRom(n0.Transform.Translation,
                                                        n1.Transform.Translation,
