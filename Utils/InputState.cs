@@ -522,7 +522,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             if (mouseStateWindow == null)
                 return 0;
             else
-                return mouseStateWindow.NewState.Z - mouseStateWindow.OldState.Z;
+                return mouseStateWindow.NewState.Z;
         }
 
         private static MouseButton[] _GetMouseButtonsInState(MouseState mouseState, ButtonState buttonState)
@@ -652,7 +652,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 switch (msg)
                 {
                     case WM_MOUSEWHEEL:
-                        LastMouseWheelDelta = ((short)((int)wParam >> 16));
+                        LastMouseWheelDelta = ((short)((int)wParam >> 16));                       
                         break;
                 }
                 return (IntPtr)_originalWndProcDelegate.DynamicInvoke(hWnd, msg, wParam, lParam);

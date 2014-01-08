@@ -94,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             OnLayoutChanged();
         }
 
-        public Vector3 CalculateRenderedDimensions()
+        public Vector3 CalculateRenderedSize()
         {
             if (ElementMesh == null)
                 return Vector3.Zero;
@@ -106,7 +106,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public Vector3 CalculateRenderedCellDimensions()
+        public Vector3 CalculateRenderedCellSize()
         {
             if (ElementMesh == null)
                 return Vector3.Zero;

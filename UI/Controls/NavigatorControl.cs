@@ -184,7 +184,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected void OnMouseWheel(float mouseWheelDelta)
         {
-            CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(0, 0, mouseWheelDelta / 5);          
+            System.Diagnostics.Trace.WriteLine("OnMouseWheel " + mouseWheelDelta);
+            CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(0, 0, mouseWheelDelta / 5);            
         }
 
         protected void OnMouseMove(InputState.MouseButton[] mouseButtonsDown, DrawingPoint location)

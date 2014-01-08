@@ -176,23 +176,30 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             : base(game)
         { }
 
-        public static FreeForm CreateFrom(GridForm gridForm, Path path)
+        public static FreeForm CreateFromGrid(GridForm gridForm, Path path)
         {
-            Vector3 renderedCellDimension = gridForm.CalculateRenderedCellDimensions();
-            Vector3 renderedGridDimension = gridForm.CalculateRenderedDimensions();
+            //Vector3 renderedCellDimension = gridForm.CalculateRenderedCellSize();
+            Vector3 renderedGridSize = gridForm.CalculateRenderedSize();
             Vector3 gridDimension = gridForm.Dimensions;
             FreeForm newForm = new FreeForm(gridForm.Game);
             newForm.ElementMesh = gridForm.ElementMesh;
             newForm.ElementEffect = gridForm.ElementEffect;
             List<Particle> elements = newForm.CreateElements(gridForm.Particles.Count);
+            float rowOffset = -0.5f * renderedGridSize.X;
+            float heightOffset = -0.5f * renderedGridSize.Y;
             for (int i = 0; i < gridDimension.Z; i++)
-            {
-                float distanceZ = renderedCellDimension.Z * i + renderedCellDimension.Z * 0.5f;
-                PathNode node = path.GetNodeAtDistance(distanceZ);                
+            {                
+                int zIndex = i;
+                float zOrigin = (zIndex * ((gridForm.CellPadding.Z * 2) + gridForm.ElementMesh.BoundingBox.GetLengthZ())) + (gridForm.CellPadding.Z + (gridForm.ElementMesh.BoundingBox.GetLengthZ() * 0.5f));
+                PathNode node = path.GetNodeAtDistance(zOrigin);                
                 for (int j = 0; j < gridDimension.X; j++)
-                {
-                    float xOffset = -0.5f * renderedGridDimension.X + j * renderedCellDimension.X;
-                    elements[i * (int)gridDimension.Z + j].Transform = new Transform(node.Transform.ToMatrix() * Matrix.Translation(new Vector3(xOffset, 0, 0)));
+                {                    
+                    int k = i * (int)gridDimension.X + j;
+                    int xIndex = j;                   
+                    int yIndex = k / ((int)gridDimension.X * (int)gridDimension.Z);
+                    float yOrigin = heightOffset + (yIndex * ((gridForm.CellPadding.Y * 2) + gridForm.ElementMesh.BoundingBox.GetLengthY())) + (gridForm.CellPadding.Y + (gridForm.ElementMesh.BoundingBox.GetLengthY() * 0.5f));
+                    float xOrigin = rowOffset + (xIndex * ((gridForm.CellPadding.X * 2) + gridForm.ElementMesh.BoundingBox.GetLengthX())) + (gridForm.CellPadding.X + (gridForm.ElementMesh.BoundingBox.GetLengthX() * 0.5f)); 
+                    elements[k].Transform = new Transform(Matrix.Translation(new Vector3(xOrigin, yOrigin, 0)) * node.Transform.ToMatrix());
                 }
             }
             newForm.AddElements(elements);
