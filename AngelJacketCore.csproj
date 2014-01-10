@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation\DynamicTransformAnimation.cs" />
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\FlexboardEffect.cs" />
@@ -80,7 +81,7 @@
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
     <Compile Include="Effects\SSAOPostEffect.cs" />
     <Compile Include="Kinetics\Animation\ParticleAnimationBuilder.cs" />
-    <Compile Include="Animation\AnimationController.cs" />
+    <Compile Include="Animation\Controllers\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />
     <Compile Include="Animation\AnimationKeyFrame.cs" />
     <Compile Include="Animation\BooleanAnimation.cs" />
@@ -110,7 +111,10 @@
     <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Effects\SkysphereEffect.cs" />
     <Compile Include="Kinetics\Force.cs" />
+    <Compile Include="Kinetics\Particle.cs" />
+    <Compile Include="Kinetics\ParticleCluster.cs" />
     <Compile Include="Kinetics\ParticleSystem.cs" />
+    <Compile Include="Kinetics\Solver.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
     <Compile Include="UI\Animation\UIAnimationBuilder.cs" />
