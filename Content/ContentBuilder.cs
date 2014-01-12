@@ -189,7 +189,7 @@ namespace CipherPark.AngelJacket.Core.Content
         public static Mesh BuildBasicLitTexturedQuad3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[36];
-            Vector3[] positions = CreateQuadPoints3D(dimension);
+            Vector3[] positions = CreateQuadPoints3DNI(dimension);
             Vector3[] normals = GenerateNormals(positions, null);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateQuadTextureCoords3D();
             for (int i = 0; i < positions.Length; i++)

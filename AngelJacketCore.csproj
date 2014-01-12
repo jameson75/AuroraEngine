@@ -74,6 +74,7 @@
     <Compile Include="Animation\DynamicTransformAnimation.cs" />
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
+    <Compile Include="Effects\CookTorrenceEffect.cs" />
     <Compile Include="Effects\FlexboardEffect.cs" />
     <Compile Include="Effects\CameraMotionBlur.cs" />
     <Compile Include="Effects\GlitchPostEffect.cs" />
@@ -98,7 +99,6 @@
     <Compile Include="Animation\TransformAnimation.cs" />
     <Compile Include="BasicGameApp.cs" />
     <Compile Include="Effects\BasicEffectEx.cs" />
-    <Compile Include="Effects\CookTorrenceEffect.cs" />
     <Compile Include="Effects\Obsolete\BokehEffectMGE.cs" />
     <Compile Include="Effects\DofEffect.cs" />
     <Compile Include="Effects\Effect.cs" />

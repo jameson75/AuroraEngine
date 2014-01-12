@@ -44,7 +44,15 @@ namespace CipherPark.AngelJacket.Core.World
         public Matrix ViewMatrix { get; set; }
 
         //public Model LockonTarget { get; set; }        
-       
+        
+        public Vector3 Location
+        {
+            get
+            {
+                return Camera.ViewToTransform(this.ViewMatrix).Translation;
+            }
+        }
+
         public Matrix ProjectionMatrix { get; set; }
 
         public PostEffectChain PostEffectChain { get { return _postEffectChain; } }
@@ -66,5 +74,8 @@ namespace CipherPark.AngelJacket.Core.World
             Matrix viewTranslation = Matrix.Translation(-transform.Translation);
             return viewTranslation * viewRotation;
         }
+
+       
+
     }    
 }

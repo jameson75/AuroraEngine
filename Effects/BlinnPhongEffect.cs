@@ -20,31 +20,56 @@ namespace CipherPark.AngelJacket.Core.Effects
 {
     public class BlinnPhongEffect : Effect
     {
-        private SharpDX.Direct3D11.Buffer _constantsBuffer = null;
-        private int ConstantBufferSize = 160;
+        private SharpDX.Direct3D11.Buffer _vertexConstantsBuffer = null;
+        private SharpDX.Direct3D11.Buffer _pixelConstantsBuffer = null;
+        private int VertexConstantBufferSize = 1040;
+        private int PixelConstantBufferSize = 208;
         private PixelShader _pixelShader = null;
         private VertexShader _vertexShader = null;
         private byte[] _vertexShaderByteCode = null;
 
-        public Matrix WorldViewProjection { get { return World * View * Projection; } }
-        public Vector4 VectorLightDirection { get; set; }
-        public Vector4 VectorEye { get; set; }
+        public Matrix WorldInverseTranspose
+        {
+            get { return Matrix.Invert(Matrix.Transpose(this.World)); }
+        }
+
+        public Matrix ViewInverse
+        {
+            get { return Matrix.Invert(this.View); }
+        }
+
+        public Matrix WorldViewProjection
+        {
+            get { return World * View * Projection; }
+        }
+
+        public Vector3 LampDirPos { get; set; }
+
+        public Color LampColor { get; set; }
+
+        public Color AmbientColor { get; set; }
+
+        public float SpecularPower { get; set; }
+
+        public float Eccentricity { get; set; }
 
         public BlinnPhongEffect(Device graphicsDevice)
             : base(graphicsDevice)
         {
             _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\blinnphong-vs.cso", out _vertexShader);
             LoadPixelShader("Content\\Shaders\\blinnphong-ps.cso", out _pixelShader);
-            _constantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _vertexConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _pixelConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, PixelConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
         public override void Apply()
         {
-            WriteConstants();
-            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
+            WriteVertexConstants();
+            WritePixelConstants();
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
+            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _vertexConstantsBuffer);            
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _pixelConstantsBuffer);            
         }
 
         public override byte[] SelectShaderByteCode()
@@ -52,19 +77,44 @@ namespace CipherPark.AngelJacket.Core.Effects
             return _vertexShaderByteCode;
         }
 
-        private void WriteConstants()
+        private void WriteVertexConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
-            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, ConstantBufferSize);
+            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_vertexConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, VertexConstantBufferSize);
             int offset = 0;
-            dataBuffer.Set(offset, WorldViewProjection);
+            Matrix worldITXf = this.WorldInverseTranspose;
+            worldITXf.Transpose();
+            dataBuffer.Set(offset, worldITXf);
             offset += sizeof(float) * 64;
-            dataBuffer.Set(offset, World);
+            Matrix world = this.World;
+            world.Transpose();
+            dataBuffer.Set(offset, world);
             offset += sizeof(float) * 64;
-            dataBuffer.Set(offset, VectorLightDirection);
+            Matrix viewIXf = this.ViewInverse;
+            viewIXf.Transpose();
+            dataBuffer.Set(offset, viewIXf);
+            offset += sizeof(float) * 64;            
+            Matrix wvpXf = this.WorldViewProjection;
+            wvpXf.Transpose();            
+            dataBuffer.Set(offset, wvpXf);
+            offset += sizeof(float) * 64;
+            dataBuffer.Set(offset, new Vector4(LampDirPos, 1.0f));            
+            GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBuffer, 0);
+        }
+
+        private void WritePixelConstants()
+        {
+            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_pixelConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, PixelConstantBufferSize);
+            int offset = 0;         
+            dataBuffer.Set(offset, LampColor.ToVector4());
+            offset += sizeof(float) * 16;                        
+            dataBuffer.Set(offset, AmbientColor.ToVector4());
+            offset += sizeof(float) * 16;            
+            dataBuffer.Set(offset, SpecularPower);
             offset += sizeof(float) * 16;
-            dataBuffer.Set(offset, VectorEye);
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);
+            dataBuffer.Set(offset, Eccentricity);
+            GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
         }
     }
 }

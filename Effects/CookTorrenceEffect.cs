@@ -26,8 +26,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         private PixelShader _pixelShader = null;
         private VertexShader _vertexShader = null;
         private byte[] _vertexShaderByteCode = null;
-
-        public Matrix WorldViewProjection { get { return World * View * Projection; } }
+       
         public Vector4 VectorLightDirection { get; set; }
         public Vector4 VectorEye { get; set; }
 
@@ -58,9 +57,13 @@ namespace CipherPark.AngelJacket.Core.Effects
             DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, ConstantBufferSize);
             int offset = 0;
-            dataBuffer.Set(offset, WorldViewProjection);
+            Matrix worldViewProjection = this.World * this.View * this.Projection;
+            worldViewProjection.Transpose();       
+            dataBuffer.Set(offset, worldViewProjection);
             offset += sizeof(float) * 64;
-            dataBuffer.Set(offset, World);
+            Matrix world = this.World;
+            world.Transpose();       
+            dataBuffer.Set(offset, world);
             offset += sizeof(float) * 64;
             dataBuffer.Set(offset, VectorLightDirection);
             offset += sizeof(float) * 16;
