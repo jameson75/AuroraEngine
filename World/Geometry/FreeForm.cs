@@ -184,7 +184,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             FreeForm newForm = new FreeForm(gridForm.Game);
             newForm.ElementMesh = gridForm.ElementMesh;
             newForm.ElementEffect = gridForm.ElementEffect;
-            List<Particle> elements = newForm.CreateElements(gridForm.Particles.Count);
+            List<Particle> elements = newForm.EmitElements(gridForm.Particles.Count);
             float rowOffset = -0.5f * renderedGridSize.X;
             float heightOffset = -0.5f * renderedGridSize.Y;
             for (int i = 0; i < gridDimension.Z; i++)
@@ -202,8 +202,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     elements[k].Transform = new Transform(Matrix.Translation(new Vector3(xOrigin, yOrigin, 0)) * node.Transform.ToMatrix());
                 }
             }
-            newForm.AddElements(elements);
+            //newForm.AddElements(elements);
             return newForm;
         }
-    }
+    }   
 }

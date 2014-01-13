@@ -38,67 +38,61 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public float EmissionRangePitch { get; set; }
         
         public float EmissionRangeYaw { get; set; }
+
+        public int BirthRate { get; set; }
         
-        public EmitterBehavior Behavior { get; set; }
+        public int BirthRateRandomness { get; set; }
+        
+        public ulong Life { get; set; }
+        
+        public int LifeRandomness { get; set; }
+        
+        public float InitialVelocity { get; set; }
+        
+        public int InitialVelocityRandomness { get; set; }   
 
         public ParticleDescription DefaultParticleDescription { get; set; }                     
 
-        public List<Particle> CreateParticles(int count)
-        {
-            List<Particle> pList = new List<Particle>();
-            for (int i = 0; i < count; i++)
-            {              
-                Particle p = new Particle();
-                p.Life = 0;
-                p.Age = 0;
-                p.Velocity = 0;
-                p.Transform = this.Transform;
-                p.Description = null;
-                pList.Add(p);
-            }
-            return pList;           
-        }       
+        //public List<Particle> CreateParticles(int count)
+        //{
+        //    List<Particle> pList = new List<Particle>();
+        //    for (int i = 0; i < count; i++)
+        //    {              
+        //        Particle p = new Particle();
+        //        p.Life = 0;
+        //        p.Age = 0;
+        //        p.Velocity = 0;
+        //        p.Transform = this.Transform;
+        //        p.Description = null;
+        //        pList.Add(p);
+        //    }
+        //    return pList;           
+        //}       
 
-        public List<Particle> Spawn(ParticleDescription description)
+        public List<Particle> Spawn(ParticleDescription description, int count = 0)
         {
+            ParticleDescription particleDesc = (description != null) ? description : this.DefaultParticleDescription;            
             Random randomGen = new Random();
-            List<Particle> pList = new List<Particle>();
-            int randomBirthCount = (Behavior.BirthRateRandomness == 0) ? Behavior.BirthRate : 
-                randomGen.Next(Behavior.BirthRate, Behavior.BirthRateRandomness);                
-            for (int i = 0; i < randomBirthCount; i++)
+            List<Particle> pList = new List<Particle>();            
+            int birthCount = (count != 0) ? count : (this.BirthRateRandomness == 0) ? this.BirthRate : 
+                randomGen.Next(this.BirthRate, this.BirthRateRandomness);                
+            for (int i = 0; i < birthCount; i++)
             {
-                ulong randomLife = (Behavior.LifeRandomness == 0) ? Behavior.Life :
-                    Behavior.Life + (ulong)randomGen.Next(Behavior.LifeRandomness);
-                float randomVelocity = (Behavior.InitialVelocityRandomness == 0) ? Behavior.InitialVelocity :
-                    Behavior.InitialVelocity + (float)randomGen.Next(Behavior.InitialVelocityRandomness);               
+                ulong randomLife = (this.LifeRandomness == 0) ? this.Life :
+                    this.Life + (ulong)randomGen.Next(this.LifeRandomness);
+                float randomVelocity = (this.InitialVelocityRandomness == 0) ? this.InitialVelocity :
+                    this.InitialVelocity + (float)randomGen.Next(this.InitialVelocityRandomness);               
                 Particle p = new Particle();
                 p.Life = randomLife;              
                 p.Age = 0;
                 p.Velocity = randomVelocity;
                 p.Transform = this.Transform;
-                p.Description = description;                
+                p.Description = particleDesc;                
                 pList.Add(p);
             }
             return pList;
         }       
-    }     
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class EmitterBehavior
-    {
-        public int BirthRate { get; set; }
-        public int BirthRateRandomness { get; set; }
-        public ulong Life { get; set; }
-        public int LifeRandomness { get; set; }
-        public float InitialVelocity { get; set; }
-        public int InitialVelocityRandomness { get; set; }       
-        //public float Scale { get; set; }
-        //public float ScaleRandomness { get; set; }
-        //public float PointSize { get; set; }
-        //public int RandomSeed { get; set; }
-    }  
+    }        
 
     /// <summary>
     /// 

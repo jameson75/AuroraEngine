@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation\Controllers\ReactionController.cs" />
     <Compile Include="Animation\DynamicTransformAnimation.cs" />
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />

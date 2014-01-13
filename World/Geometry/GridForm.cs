@@ -89,8 +89,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         {          
             ClearElements();
             int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);
-            List<Particle> elements = CreateElements(elementCount);
-            AddElements(elements);
+            //List<Particle> elements = CreateElements(elementCount);
+            EmitElements(elementCount);
+            //AddElements(elements);
             OnLayoutChanged();
         }
 

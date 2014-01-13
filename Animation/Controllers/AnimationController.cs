@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         void Start();
         void UpdateAnimation(long gameTime);
         bool IsAnimationComplete { get; }
-        void SetComplete(bool complete = true);
+        void SetComplete();
         event EventHandler AnimationComplete;
     }
 
@@ -43,11 +43,9 @@ namespace CipherPark.AngelJacket.Core.Animation
             get { return _isAnimationComplete; }
         }
 
-        public void SetComplete(bool complete = true)
+        public void SetComplete()
         {
-            _isAnimationComplete = complete;
-            if (complete)
-                OnAnimationComplete();
+            OnAnimationComplete();
         }
 
         public abstract void Start();
@@ -56,7 +54,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         
         public event EventHandler AnimationComplete;
 
-        protected  virtual void OnAnimationComplete()
+        protected virtual void OnAnimationComplete()
         {
             _isAnimationComplete = true;
             EventHandler handler = AnimationComplete;
@@ -116,85 +114,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         public ITransformable Target { get; set; }
 
         public TransformAnimation Animation { get; set; }
-    }
-
-    ///// <summary>
-    ///// 
-    ///// </summary>
-    //public class EmitterAnimationController : AnimationController
-    //{
-    //    private long? _animationStartTime = null;
-    //    private long? _lastEmitTime = null;
-    //    private const int EmissionRate = 1000;
-
-    //    public Emitter Target { get; set; }
-    //    public List<EmitterAction> ExplicitTasks { get; set; }
-    //    public bool IsExplicitMode { get; set; }
-
-    //    public override void Start() { }
-
-    //    public override void UpdateAnimation(long gameTime)
-    //    {
-    //        if (Target == null)
-    //            throw new InvalidOperationException("Target not specified");
-
-    //        else if (IsExplicitMode && ExplicitTasks == null)
-    //            throw new InvalidOperationException("Actions not specified");
-
-    //        if (_animationStartTime == null)
-    //            _animationStartTime = gameTime;
-
-    //        if (_lastEmitTime == null)
-    //            _lastEmitTime = gameTime;
-
-    //        long elapsedTime = gameTime - _animationStartTime.Value;
-    //        long elapsedEmitTime = gameTime - _lastEmitTime.Value;
-
-    //        if (!IsExplicitMode)
-    //        {
-    //            if (elapsedEmitTime > EmissionRate)
-    //                Target.Emit();
-    //        }
-    //        else
-    //        {
-    //            foreach (EmitterAction action in this.ExplicitTasks)
-    //            {
-    //                if (action.Time <= (ulong)elapsedTime)
-    //                {
-    //                    switch (action.Task)
-    //                    {
-    //                        case EmitterAction.EmitterTask.KillAll:
-    //                            Target.KillAll();
-    //                            break;
-    //                        case EmitterAction.EmitterTask.Kill:
-    //                            Target.Kill(action.ParticleArgs);
-    //                            break;
-    //                        case EmitterAction.EmitterTask.Emit:
-    //                            Target.Emit();
-    //                            break;
-    //                        case EmitterAction.EmitterTask.EmitCustom:
-    //                            Target.Emit(action.CustomParticleDescriptionArg);
-    //                            break;
-    //                        case EmitterAction.EmitterTask.EmitExplicit:
-    //                            Target.Emit(action.ParticleArgs);
-    //                            break;
-    //                        case EmitterAction.EmitterTask.Link:
-    //                            Target.Link(action.ParticleArgs);
-    //                            break;
-    //                        case EmitterAction.EmitterTask.Transform:
-    //                            Target.Transform = action.Transform;
-    //                            break;
-    //                    }
-    //                }
-    //            }
-
-    //            this.ExplicitTasks.RemoveAll(a => a.Time <= (ulong)elapsedTime);
-                
-    //            if (ExplicitTasks.Count == 0)
-    //                OnAnimationComplete();
-    //        }           
-    //    }
-    //}
+    }   
 
     /// <summary>
     /// 
@@ -308,6 +228,84 @@ namespace CipherPark.AngelJacket.Core.Animation
     //            allParticles[i].Color = allParticles[i].InstanceAttributes.ColorOverLife.GetValueAtAge(elapsedTime);
     //            allParticles[i].Opacity = allParticles[i].InstanceAttributes.OpacityOverLife.GetValueAtAge(elapsedTime);
     //        }
+    //    }
+    //}
+
+    ///// <summary>
+    ///// 
+    ///// </summary>
+    //public class EmitterAnimationController : AnimationController
+    //{
+    //    private long? _animationStartTime = null;
+    //    private long? _lastEmitTime = null;
+    //    private const int EmissionRate = 1000;
+
+    //    public Emitter Target { get; set; }
+    //    public List<EmitterAction> ExplicitTasks { get; set; }
+    //    public bool IsExplicitMode { get; set; }
+
+    //    public override void Start() { }
+
+    //    public override void UpdateAnimation(long gameTime)
+    //    {
+    //        if (Target == null)
+    //            throw new InvalidOperationException("Target not specified");
+
+    //        else if (IsExplicitMode && ExplicitTasks == null)
+    //            throw new InvalidOperationException("Actions not specified");
+
+    //        if (_animationStartTime == null)
+    //            _animationStartTime = gameTime;
+
+    //        if (_lastEmitTime == null)
+    //            _lastEmitTime = gameTime;
+
+    //        long elapsedTime = gameTime - _animationStartTime.Value;
+    //        long elapsedEmitTime = gameTime - _lastEmitTime.Value;
+
+    //        if (!IsExplicitMode)
+    //        {
+    //            if (elapsedEmitTime > EmissionRate)
+    //                Target.Emit();
+    //        }
+    //        else
+    //        {
+    //            foreach (EmitterAction action in this.ExplicitTasks)
+    //            {
+    //                if (action.Time <= (ulong)elapsedTime)
+    //                {
+    //                    switch (action.Task)
+    //                    {
+    //                        case EmitterAction.EmitterTask.KillAll:
+    //                            Target.KillAll();
+    //                            break;
+    //                        case EmitterAction.EmitterTask.Kill:
+    //                            Target.Kill(action.ParticleArgs);
+    //                            break;
+    //                        case EmitterAction.EmitterTask.Emit:
+    //                            Target.Emit();
+    //                            break;
+    //                        case EmitterAction.EmitterTask.EmitCustom:
+    //                            Target.Emit(action.CustomParticleDescriptionArg);
+    //                            break;
+    //                        case EmitterAction.EmitterTask.EmitExplicit:
+    //                            Target.Emit(action.ParticleArgs);
+    //                            break;
+    //                        case EmitterAction.EmitterTask.Link:
+    //                            Target.Link(action.ParticleArgs);
+    //                            break;
+    //                        case EmitterAction.EmitterTask.Transform:
+    //                            Target.Transform = action.Transform;
+    //                            break;
+    //                    }
+    //                }
+    //            }
+
+    //            this.ExplicitTasks.RemoveAll(a => a.Time <= (ulong)elapsedTime);
+
+    //            if (ExplicitTasks.Count == 0)
+    //                OnAnimationComplete();
+    //        }           
     //    }
     //}
 }

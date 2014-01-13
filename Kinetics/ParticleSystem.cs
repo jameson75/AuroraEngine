@@ -44,17 +44,17 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public ITransformable TransformableParent { get; set; }
         #endregion
 
-        public void Emit(int index)
-        {
-            ParticleDescription desc = _emitters[index].DefaultParticleDescription;
-            Emit(index, desc);
-        }
+        //public List<Particle> Emit(int index)
+        //{
+        //    ParticleDescription desc = _emitters[index].DefaultParticleDescription;
+        //    return Emit(index, desc);
+        //}
 
-        public void Emit(int index, ParticleDescription customParticleDescription)
+        public List<Particle> Emit(int index = 0, ParticleDescription particleDescription = null, int count = 0)
         {
-            List<Particle> pList = _emitters[index].Spawn(customParticleDescription);
-            _particles.AddRange(pList);
-            OnParticlesAdded(pList);
+            List<Particle> pList = _emitters[index].Spawn(particleDescription, count);
+            Add(pList);
+            return pList;
         }
 
         public void Add(IEnumerable<Particle> particles)

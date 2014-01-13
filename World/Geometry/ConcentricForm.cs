@@ -70,13 +70,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
 
         private void GenerateElements()
-        {
-            //Elements.Clear();
-            //for (int i = 0; i < _steps; i++)
-            //    Elements.Add(new FormElement(this));
+        {        
             ClearElements();          
-            AddElements(CreateElements(_steps));
+            //AddElements(CreateElements(_steps));
+            EmitElements(_steps);
             OnLayoutChanged();
         }
     }
 }
+
