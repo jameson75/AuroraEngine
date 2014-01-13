@@ -22,15 +22,18 @@ namespace CipherPark.AngelJacket.Core.Effects
     {
         private SharpDX.Direct3D11.Buffer _vertexConstantsBuffer = null;
         private SharpDX.Direct3D11.Buffer _pixelConstantsBuffer = null;
-        private int VertexConstantBufferSize = 1040;
-        private int PixelConstantBufferSize = 208;
+        private int VertexConstantBufferSize = 272;
+        private int PixelConstantBufferSize = 64;
         private PixelShader _pixelShader = null;
         private VertexShader _vertexShader = null;
         private byte[] _vertexShaderByteCode = null;
 
         public Matrix WorldInverseTranspose
         {
-            get { return Matrix.Invert(Matrix.Transpose(this.World)); }
+            get
+            { //return Matrix.Invert(Matrix.Transpose(this.World)); }
+                return Matrix.Transpose(Matrix.Invert(this.World));
+            }
         }
 
         public Matrix ViewInverse
@@ -85,20 +88,20 @@ namespace CipherPark.AngelJacket.Core.Effects
             Matrix worldITXf = this.WorldInverseTranspose;
             worldITXf.Transpose();
             dataBuffer.Set(offset, worldITXf);
-            offset += sizeof(float) * 64;
+            offset += sizeof(float) * 16;
             Matrix world = this.World;
             world.Transpose();
             dataBuffer.Set(offset, world);
-            offset += sizeof(float) * 64;
+            offset += sizeof(float) * 16;
             Matrix viewIXf = this.ViewInverse;
             viewIXf.Transpose();
             dataBuffer.Set(offset, viewIXf);
-            offset += sizeof(float) * 64;            
+            offset += sizeof(float) * 16;            
             Matrix wvpXf = this.WorldViewProjection;
             wvpXf.Transpose();            
             dataBuffer.Set(offset, wvpXf);
-            offset += sizeof(float) * 64;
-            dataBuffer.Set(offset, new Vector4(LampDirPos, 1.0f));            
+            offset += sizeof(float) * 16;
+            dataBuffer.Set(offset, new Vector4(LampDirPos, 1));            
             GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBuffer, 0);
         }
 
@@ -108,11 +111,11 @@ namespace CipherPark.AngelJacket.Core.Effects
             DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, PixelConstantBufferSize);
             int offset = 0;         
             dataBuffer.Set(offset, LampColor.ToVector4());
-            offset += sizeof(float) * 16;                        
+            offset += sizeof(float) * 4;                        
             dataBuffer.Set(offset, AmbientColor.ToVector4());
-            offset += sizeof(float) * 16;            
+            offset += sizeof(float) * 4;            
             dataBuffer.Set(offset, SpecularPower);
-            offset += sizeof(float) * 16;
+            offset += sizeof(float) * 4;
             dataBuffer.Set(offset, Eccentricity);
             GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
         }
