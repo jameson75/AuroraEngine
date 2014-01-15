@@ -119,7 +119,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             if (particles.Count() > 0)
             {
                 IEnumerable<Matrix> instanceData = particles.Select(p => p.WorldTransform().ToMatrix());
-                instanceMesh.Update<Matrix>(instanceData.ToArray());
+                instanceMesh.UpdateMeshData<Matrix>(instanceData.ToArray());
                 instanceEffect.Apply();
                 instanceMesh.Draw(gameTime);
             }

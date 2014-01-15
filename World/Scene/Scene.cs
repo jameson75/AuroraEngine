@@ -23,13 +23,15 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     public class Scene
     {
         private IGameApp _game = null;
-        private SceneNodes _nodes = null;      
+        private SceneNodes _nodes = null;
+        private List<SpriteBatchContext> _spriteBatchContexts = null;
 
         public Scene(IGameApp game)
         {
             _game = game;
             _nodes = new SceneNodes();            
             _nodes.CollectionChanged += OnCollectionChanged;
+            _spriteBatchContexts = new List<SpriteBatchContext>();
         }
 
         public IGameApp Game { get { return _game; } }
@@ -39,6 +41,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public CameraSceneNode CameraNode { get; set; }
 
         public Model SkyModel { get; set; }
+
+        public List<SpriteBatchContext> SpriteBatchContexts { get { return _spriteBatchContexts; } }
 
         public void Update(long gameTime)
         {
@@ -50,13 +54,20 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public void Draw(long gameTime)
         {
-            //CameraNode.Camera.PostEffectChain.Begin(gameTime);
             OnBeginDraw();
+            CameraNode.Camera.PostEffectChain.Begin(gameTime);            
             _DrawSkyModel(gameTime);
             foreach (SceneNode node in Nodes)
-                _DrawNodeHierarchy(gameTime, node);
-            OnEndDraw();
-            //CameraNode.Camera.PostEffectChain.End(gameTime);
+                _DrawNodeHierarchy(gameTime, node);            
+            CameraNode.Camera.PostEffectChain.End(gameTime);
+            _DrawSprites(gameTime);
+            OnEndDraw();            
+        }
+
+        private void _DrawSprites(long gameTime)
+        {
+            foreach (SpriteBatchContext context in _spriteBatchContexts)
+                context.Draw();
         }
 
         private void _DrawSkyModel(long gameTime)

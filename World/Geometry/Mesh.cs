@@ -77,7 +77,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public void Update<T>(T[] data, int offset = 0) where T : struct
+        public void UpdateMeshData<T>(T[] data, int offset = 0) where T : struct
         {
             DXBuffer dynamicBuffer = (!IsInstanced) ? _vertexBuffer : _instanceBuffer;
             int dataStride = (!IsInstanced) ? _vertexStride : _instanceStride;

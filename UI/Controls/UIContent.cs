@@ -136,9 +136,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 float clampedOpacity = MathUtil.Clamp(Opacity, 0, 1);
                 if (clampedOpacity < 1.0f)
                 {
-                    //NOTE: Using "Non - Premultiplied" blend state. - TODO: Use Premultiplied state.
+                    //TODO: Currently, using "Non - Premultiplied" blend state - : Use Premultiplied state.
                     //NOTE: We're specifying the alpha channel (opacity) using the blend factor.
-
                     oldBlendState = game.GraphicsDeviceContext.OutputMerger.BlendState;
                     oldBlendFactor = game.GraphicsDeviceContext.OutputMerger.BlendFactor;
                     BlendStateDescription blendDesc = BlendStateDescription.Default();

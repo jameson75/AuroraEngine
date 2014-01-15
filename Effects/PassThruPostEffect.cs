@@ -57,7 +57,6 @@ namespace CipherPark.AngelJacket.Core.Effects
             if (!EnableTexelFix)
                 GraphicsDevice.ImmediateContext.VertexShader.Set(VertexShader);
             else
-
                 GraphicsDevice.ImmediateContext.VertexShader.Set(FixVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(PixelShader);            
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
