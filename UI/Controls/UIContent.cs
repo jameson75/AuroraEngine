@@ -120,7 +120,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 {
                     oldScissorRectangles = game.GraphicsDeviceContext.Rasterizer.GetScissorRectangles();
                     oldRasterizerState = game.GraphicsDeviceContext.Rasterizer.State;
-                    RasterizerStateDescription newRSDescription = RasterizerStateDescription.Default();
+                    RasterizerStateDescription newRSDescription = RasterizerStateDescription.Default();                    
                     newRSDescription.IsScissorEnabled = true;
                     newRSDescription.IsMultisampleEnabled = true;                   
                     this.RasterizerState = new RasterizerState(game.GraphicsDevice, newRSDescription);

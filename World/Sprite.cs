@@ -84,15 +84,21 @@ namespace CipherPark.AngelJacket.Core.World
         }
 
         private BlendState _cachedBlendState = null;
+        private DepthStencilState _cachedDepthStencilState = null;
+        private RasterizerState _cachedRasterizerState = null;
 
         protected virtual void OnBeginDraw()
         {
             _cachedBlendState = _graphicsDeviceContext.OutputMerger.BlendState;
+            _cachedDepthStencilState = _graphicsDeviceContext.OutputMerger.DepthStencilState;
+            _cachedRasterizerState = _graphicsDeviceContext.Rasterizer.State;
         }
 
         protected virtual void OnEndDraw()
         {
             _graphicsDeviceContext.OutputMerger.BlendState = _cachedBlendState;
+            _graphicsDeviceContext.OutputMerger.DepthStencilState = _cachedDepthStencilState;
+            _graphicsDeviceContext.Rasterizer.State = _cachedRasterizerState;
         }
     }
 
