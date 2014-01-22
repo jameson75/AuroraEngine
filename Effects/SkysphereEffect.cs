@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Content;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class SkysphereEffect : Effect
+    public class SkysphereEffect : ForwardEffect
     {
         private VertexShader _vertexShader = null;
         private PixelShader _pixelShader = null;
@@ -83,7 +83,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);            
         }
 
-        public override void RestoreGraphicsState()
+        public override void Restore()
         {
             if (_isRestoreRequired)
             {

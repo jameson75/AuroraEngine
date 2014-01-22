@@ -176,12 +176,7 @@ namespace CipherPark.AngelJacket.Core.Effects
                 GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(i, null);
                 //GraphicsDevice.ImmediateContext.PixelShader.SetSampler(i, null);
             }
-        }
-
-        public override byte[] SelectShaderByteCode()
-        {
-            return _vertexShaderByteCode;
-        }
+        }    
 
         private void SetShaderConstants()
         {

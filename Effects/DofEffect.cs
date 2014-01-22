@@ -172,6 +172,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Texture: ScreenImage
             //RenderTarget: LowRes
             ////////////////////////////            
+
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _screenImageSampler);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_lowResTarget);
@@ -280,7 +281,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         }
     }
 
-    public class DofLightingEffect : Effect
+    public class DofLightingEffect : ForwardEffect
     {
         private byte[] _vertexShaderByteCode = null;
         private VertexShader _vertexShader = null;
@@ -318,11 +319,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             _vsConstantsBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, VSConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _psConstantsBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, PSConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
-
-        public override byte[] SelectShaderByteCode()
-        {
-            return _vertexShaderByteCode;
-        }
+     
 
         public override void Apply()
         {

@@ -48,12 +48,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);        
-        }
-
-        public override byte[] SelectShaderByteCode()
-        {
-            return _vertexShaderByteCode;
-        }
+        }     
 
         private void WriteConstants()
         {

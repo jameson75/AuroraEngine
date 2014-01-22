@@ -20,31 +20,32 @@ using CipherPark.AngelJacket.Core.Utils;
 namespace CipherPark.AngelJacket.Core.Effects
 {
     public abstract class Effect
-    {
+    {      
         private Device _graphicsDevice = null;
-        
+        private List<EffectPass> _passes = new List<EffectPass>();        
+
         protected Effect(Device graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
-        }
-        
+        }       
+
         public Device GraphicsDevice { get { return _graphicsDevice; } }
 
-        public virtual Matrix World { get; set; }
-
-        public virtual Matrix View { get; set; }
-
-        public virtual Matrix Projection { get; set; }
-
-        public virtual byte[] SelectShaderByteCode()
-        {
-            return null;
-        }
+        public List<EffectPass> Passes { get { return _passes; } }
 
         public virtual void Apply()
+        {
+            OnBeginApply();
+            for (int i = 0; i < _passes.Count; i++)
+                if (_passes[i].Enabled)
+                    _passes[i].Execute();
+            OnEndApply();
+        }
+
+        protected virtual void OnBeginApply()
         { }
 
-        public virtual void RestoreGraphicsState()
+        protected virtual void OnEndApply()
         { }
 
         protected byte[] LoadVertexShader(string fileName, out VertexShader shader)
@@ -59,11 +60,30 @@ namespace CipherPark.AngelJacket.Core.Effects
             byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
             shader = new PixelShader(GraphicsDevice, shaderByteCode);
             return shaderByteCode;
+        }     
+    }
+
+    public abstract class ForwardEffect : Effect
+    {
+        protected ForwardEffect(Device graphicsDevice)
+            : base(graphicsDevice)
+        { }
+
+        public virtual Matrix World { get; set; }
+
+        public virtual Matrix View { get; set; }
+
+        public virtual Matrix Projection { get; set; }
+
+        public virtual byte[] SelectShaderByteCode()
+        {
+            return null;
         }
 
-        protected static int CalculateRequiredConstantBufferSize(int actualRequiredSize)
+        public virtual void Restore()
         {
-            return actualRequiredSize + (16 - (actualRequiredSize % 16));
+            for (int i = 0; i < Passes.Count; i++)
+                ((ForwardEffectPass)Passes[i]).CleanUp();
         }
     }
 }

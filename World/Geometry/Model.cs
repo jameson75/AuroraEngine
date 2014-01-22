@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
-using CoreEffect = CipherPark.AngelJacket.Core.Effects.Effect;
+using CoreEffect = CipherPark.AngelJacket.Core.Effects.ForwardEffect;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.Renderers;
 
@@ -104,7 +104,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 Effect.Apply();
                 if (Mesh != null)
                     Mesh.Draw(gameTime);
-                Effect.RestoreGraphicsState();
+                Effect.Restore();
             }      
         }
 
@@ -220,7 +220,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 Effect.Apply();
                 foreach (Mesh mesh in Meshes)
                     mesh.Draw(gameTime);
-                Effect.RestoreGraphicsState();
+                Effect.Restore();
             }
 
             //TODO: UnCommment and support instanced particles - Possibly by delegating the 

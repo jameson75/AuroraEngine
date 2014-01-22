@@ -35,7 +35,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     public class ParticleDescription
     {
         public Mesh Mesh { get; set; }
-        public Effect Effect { get; set; }
+        public ForwardEffect Effect { get; set; }
     }
 
     /// <summary>

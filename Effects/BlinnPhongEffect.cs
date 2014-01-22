@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class BlinnPhongEffect : Effect
+    public class BlinnPhongEffect : ForwardEffect
     {
         private SharpDX.Direct3D11.Buffer _vertexConstantsBuffer = null;
         private SharpDX.Direct3D11.Buffer _pixelConstantsBuffer = null;

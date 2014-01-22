@@ -53,6 +53,11 @@ namespace CipherPark.AngelJacket.Core.Effects
         private Matrix _previousView = Matrix.Identity;
         private Matrix _previousProjection = Matrix.Identity;
 
+        public virtual Matrix World { get; set; }
+
+        public virtual Matrix View { get; set; }
+
+        public virtual Matrix Projection { get; set; }
        
         public Color MaterialAmbient { get; set; }
 

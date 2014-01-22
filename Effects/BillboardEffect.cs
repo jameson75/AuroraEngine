@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class BillboardEffect : Effect
+    public class BillboardEffect : ForwardEffect
     {
         private VertexShader _vertexShader = null;
         private VertexShader _ivertexShader = null;

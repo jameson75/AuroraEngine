@@ -23,7 +23,7 @@ namespace CipherPark.AngelJacket.Core.Effects
     {
         Matrix[] BoneTransforms { get; set; }
     }
-    public class SkinnedEffectEx : Effect, ISkinEffect
+    public class SkinnedEffectEx : ForwardEffect, ISkinEffect
     {
         private SkinnedEffect _effect = null;
         private int _weightsPerVertex = 0;

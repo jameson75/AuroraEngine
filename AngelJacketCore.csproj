@@ -76,6 +76,7 @@
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\CookTorrenceEffect.cs" />
+    <Compile Include="Effects\EffectPass.cs" />
     <Compile Include="Effects\FlexboardEffect.cs" />
     <Compile Include="Effects\CameraMotionBlur.cs" />
     <Compile Include="Effects\GlitchPostEffect.cs" />

@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class CookTorrenceEffect : Effect
+    public class CookTorrenceEffect : ForwardEffect
     {
         private SharpDX.Direct3D11.Buffer _constantsBuffer = null;
         private int ConstantBufferSize = 160;

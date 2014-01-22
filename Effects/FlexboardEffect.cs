@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class FlexboardEffect : Effect
+    public class FlexboardEffect : ForwardEffect
     {
         private VertexShader _vertexShader = null;
         private PixelShader _pixelShader = null;

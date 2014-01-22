@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class BasicEffectEx : Effect
+    public class BasicEffectEx : ForwardEffect
     {
         private Matrix _world;
         private Matrix _view;

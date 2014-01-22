@@ -67,11 +67,6 @@ namespace CipherPark.AngelJacket.Core.Effects
             if (oldBlendState != null)            
                 GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;            
         }
-
-        public override byte[] SelectShaderByteCode()
-        {
-            return _vertexShaderByteCode;
-        }
     }
 
     public static class CommonBlendStates

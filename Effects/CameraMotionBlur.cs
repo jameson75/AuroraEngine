@@ -117,12 +117,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalDepthStencilView, originalRenderTarget);
         }
-
-        public override byte[] SelectShaderByteCode()
-        {
-            return _vertexShaderByteCode;   
-        }
-
+ 
         private void CreateConstantBuffers()
         {
             _passThruFixConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
