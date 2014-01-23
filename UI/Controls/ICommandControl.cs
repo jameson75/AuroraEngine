@@ -102,8 +102,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (handler != null)
                 handler(this, args);
         }
-    }
-
-   
+    }   
 }
 

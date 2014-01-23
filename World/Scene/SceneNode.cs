@@ -40,7 +40,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             _children = new SceneNodes();
             _children.CollectionChanged += Children_CollectionChanged;
             Transform = Transform.Identity;
-            IsVisible = true;
+            Visible = true;
         }
 
         public SceneNode(IGameApp game, string name)
@@ -98,7 +98,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
-        public bool IsVisible { get; set; }
+        public bool Visible { get; set; }
 
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
         {

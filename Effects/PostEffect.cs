@@ -23,7 +23,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         private DepthStencilView originalDepthStencilView = null;
         
         public bool Enabled { get; set; }
+
         public ShaderResourceView InputTexture { get; set; }
+
         public RenderTargetView OutputTexture { get; set; }
 
         protected PostEffect(Device graphicsDevice)

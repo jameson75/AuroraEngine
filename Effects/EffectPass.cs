@@ -28,8 +28,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         protected List<SharpDX.Direct3D11.Buffer> _pixelShaderConstantBuffers = new List<SharpDX.Direct3D11.Buffer>();
         protected Device _graphicsDevice = null;
 
-        public string Name { get; set; }
-        public bool Enabled { get; set; }
+        public string Name { get; set; }       
         public List<SharpDX.Direct3D11.Buffer> VertexShaderConstantBuffers { get { return _vertexShaderConstantBuffers; } }
         public List<SharpDX.Direct3D11.Buffer> PixelShaderConstantBuffers { get { return _pixelShaderConstantBuffers; } } 
         public List<ShaderResourceView> PixelShaderResources { get { return _pixelShaderResources; } }
@@ -46,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         protected EffectPass(Device graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;         
-            Enabled = true;
+            
         }
 
         public abstract void Execute();
@@ -114,6 +113,10 @@ namespace CipherPark.AngelJacket.Core.Effects
                 _graphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = DepthStencilState;
             }
 
+            //SETUP RENDER TARGET
+            //-------------------
+            _graphicsDevice.ImmediateContext.OutputMerger.SetTargets(RenderTarget);
+
             //EXECUTE SHADERS
             //---------------
             ScreenQuad.Draw(0);       
@@ -156,7 +159,11 @@ namespace CipherPark.AngelJacket.Core.Effects
                 _graphicsDevice.ImmediateContext.Rasterizer.State = _oldRasterizerState;            
             //DepthStencilState
             if (DepthStencilState != null)
-                _graphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = _oldDepthStencilState;                                    
+                _graphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = _oldDepthStencilState;
+
+            //CLEAN UP RENDER TARGET
+            //-----------------------
+            _graphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
         }
     }
 

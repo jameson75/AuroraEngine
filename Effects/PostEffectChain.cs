@@ -22,31 +22,34 @@ namespace CipherPark.AngelJacket.Core.Effects
     public class PostEffectChain : System.Collections.ObjectModel.ObservableCollection<PostEffect>
     {
         //private Texture2D _texture = null;
-        private RenderTargetView _textureRenderTarget = null;
-        private ShaderResourceView _textureShaderResource = null;
+        private RenderTargetView _tempRenderTarget = null;
+        private ShaderResourceView _tempShaderResource = null;
         //private Texture2D _auxTexture = null;
-        private RenderTargetView _auxTextureRenderTarget = null;
-        private ShaderResourceView _auxTextureShaderResource = null;
-        private ShaderResourceView _depthShaderResource = null;
+        private RenderTargetView _tempAuxRenderTarget = null;
+        private ShaderResourceView _tempAuxTextureShaderResource = null;
+        //private ShaderResourceView _depthShaderResource = null;
         private IGameApp _game = null;
-        private Matrix _quadTransform = Matrix.Zero;
-        private Matrix _viewMatrix = Matrix.Zero;
-        private Matrix _projectionMatrix = Matrix.Zero;
-        
+        //private Matrix _quadTransform = Matrix.Zero;
+        //private Matrix _viewMatrix = Matrix.Zero;
+        //private Matrix _projectionMatrix = Matrix.Zero;        
         private RenderTargetView _originalRenderView = null;
         private DepthStencilView _originalDepthStencilView = null;
-        private bool _isEffectInProgress = false;
-        private PassThruPostEffect passThruEffect = null;
-
+        //private bool _isEffectInProgress = false;
+        private PassThruPostEffect passThruEffect = null;        
+        
         private PostEffectChain(IGameApp game)
         {
-            _game = game;
+            _game = game;            
         }
 
-        public static PostEffectChain Create(IGameApp game)
-        {
-            //TODO: Validate this method call. 
+        public ShaderResourceView InputTexture { get; set; }
 
+        public RenderTargetView OutputTexture { get; set; }
+
+        public BlendState BlendState { get; set; }
+
+        public static PostEffectChain Create(IGameApp game)
+        {           
             PostEffectChain effectChain = new PostEffectChain(game);
 
             Texture2DDescription textureDesc = new Texture2DDescription();
@@ -67,55 +70,126 @@ namespace CipherPark.AngelJacket.Core.Effects
             targetDesc.Format = textureDesc.Format;
             targetDesc.Dimension = RenderTargetViewDimension.Texture2D;
             targetDesc.Texture2D.MipSlice = 0;
-            effectChain._textureRenderTarget = new RenderTargetView(game.GraphicsDevice, _texture, targetDesc);
-            effectChain._auxTextureRenderTarget = new RenderTargetView(game.GraphicsDevice, _auxTexture, targetDesc);
+            effectChain._tempRenderTarget = new RenderTargetView(game.GraphicsDevice, _texture, targetDesc);
+            effectChain._tempAuxRenderTarget = new RenderTargetView(game.GraphicsDevice, _auxTexture, targetDesc);
 
             ShaderResourceViewDescription resourceDesc = new ShaderResourceViewDescription();
             resourceDesc.Format = targetDesc.Format;
             resourceDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
             resourceDesc.Texture2D.MostDetailedMip = 0;
             resourceDesc.Texture2D.MipLevels = 1;
-            effectChain._textureShaderResource = new ShaderResourceView(game.GraphicsDevice, _texture, resourceDesc);
-            effectChain._auxTextureShaderResource = new ShaderResourceView(game.GraphicsDevice, _auxTexture, resourceDesc);
+            effectChain._tempShaderResource = new ShaderResourceView(game.GraphicsDevice, _texture, resourceDesc);
+            effectChain._tempAuxTextureShaderResource = new ShaderResourceView(game.GraphicsDevice, _auxTexture, resourceDesc);
 
-            ShaderResourceViewDescription depthResourceDesc = new ShaderResourceViewDescription();
-            depthResourceDesc.Format = SharpDX.DXGI.Format.R32_Float;
-            depthResourceDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
-            depthResourceDesc.Texture2D.MostDetailedMip = 0;
-            depthResourceDesc.Texture2D.MipLevels = 1;            
-            effectChain._depthShaderResource = new ShaderResourceView(game.GraphicsDevice, game.DepthStencil.ResourceAs<Texture2D>(), depthResourceDesc);
+            //ShaderResourceViewDescription depthResourceDesc = new ShaderResourceViewDescription();
+            //depthResourceDesc.Format = SharpDX.DXGI.Format.R32_Float;
+            //depthResourceDesc.Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture2D;
+            //depthResourceDesc.Texture2D.MostDetailedMip = 0;
+            //depthResourceDesc.Texture2D.MipLevels = 1;            
+            //effectChain._depthShaderResource = new ShaderResourceView(game.GraphicsDevice, game.DepthStencil.ResourceAs<Texture2D>(), depthResourceDesc);
 
             effectChain.passThruEffect = new PassThruPostEffect(game.GraphicsDevice, game);           
                  
             return effectChain;            
         }
 
-        public void Begin(long gameTime)
-        {
-            _originalRenderView = _game.GraphicsDeviceContext.OutputMerger.GetRenderTargets(1, out _originalDepthStencilView)[0];            
-            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _textureRenderTarget);
-            _game.GraphicsDeviceContext.ClearRenderTargetView(_textureRenderTarget, Color.Black);           
-            _isEffectInProgress = true;
-        }
+        //public void Begin(long gameTime)
+        //{
+        //    if (_isEffectInProgress == true)
+        //        throw new InvalidOperationException("Post effect was not properly ended. Require a call to PostEffectChain.End()");
 
-        public void End(long gameTime)
-        {
-            //TODO: Validate this method call.   
+        //    //1. Save orginal render targets.            
+        //    _originalRenderView = _game.GraphicsDeviceContext.OutputMerger.GetRenderTargets(1, out _originalDepthStencilView)[0];            
+
+        //    //2. Replace the original render targets in the graphics output with a temp target and clear it.
+        //    //(All rendering will drawn on the temp target. Later, in PostEffectChain.End(),
+        //    //these targets are set as input to the first post process effect.            
+        //    _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _textureRenderTarget);
+        //    _game.GraphicsDeviceContext.ClearRenderTargetView(_textureRenderTarget, Color.Black);           
+
+        //    //3. Since Begin() and End() need to be called in pairs... 
+        //    //We save a flag to indicate that a call to Begin() was made.
+        //    //In PostEffectChain.End(), we'll unset it when a matching call to End() is made.           
+        //    _isEffectInProgress = true;
+        //}
+
+        //public void End(long gameTime)
+        //{            
+        //    if (_isEffectInProgress == false)
+        //        throw new InvalidOperationException("Post effect was not properly started. Require a call to PostEffectChain.Begin()");
             
+        //    //1. Call each posteffect in the chain to process the current input texture.
+        //    //The very first, "current" input texture is the temp render target set in PostEffectChain.Begin().
+        //    //The output texture from each posteffect becomes the input texture for the following
+        //    //post effect in the chain.
+        //    foreach (PostEffect postEffect in this)
+        //    {
+        //        _game.GraphicsDeviceContext.OutputMerger.SetTargets(_auxTextureRenderTarget);                               
+        //        postEffect.InputTexture = _textureShaderResource;                
+        //        postEffect.Apply();       
+        //        Swap<ShaderResourceView>(ref _textureShaderResource, ref _auxTextureShaderResource);
+        //        Swap<RenderTargetView>(ref _textureRenderTarget, ref _auxTextureRenderTarget);
+        //    }
+                
+        //    //2. We replace the temp render targets in the graphics output (we did this in PostEffectChain.Begin()),
+        //    //with original render target.
+        //    _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderView);   
+
+        //    //3. We render the output texture from the very last post effect to the original 
+        //    //render target.
+        //    passThruEffect.InputTexture = _textureShaderResource;
+        //    passThruEffect.Apply();        
+
+        //    //4. We unset this flag to indicate a matching End() call was called to an unmatched Begin() call.
+        //    this._isEffectInProgress = false;
+        //}
+       
+        public void Apply()
+        {        
+            //1. Save orginal render targets.            
+            _originalRenderView = _game.GraphicsDeviceContext.OutputMerger.GetRenderTargets(1, out _originalDepthStencilView)[0];
+          
+            //2. We replace the original render targets with a temp target.
+            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_tempRenderTarget);
+
+            //3. We render the chain input texture to the temp render target. 
+            //render target.
+            passThruEffect.InputTexture = InputTexture;
+            passThruEffect.Apply();
+
+            //We unbind the tempRenderTarget from the pipline so we can use it as a shader resource
+            //in the loop below.
+            _game.GraphicsDeviceContext.OutputMerger.SetTargets((RenderTargetView)null);
+
+            //4. Call each posteffect in the chain to process the current input texture.           
+            //The output texture from each posteffect becomes the input texture for the following
+            //post effect in the chain.
             foreach (PostEffect postEffect in this)
             {
-                _game.GraphicsDeviceContext.OutputMerger.SetTargets(_auxTextureRenderTarget);                               
-                postEffect.InputTexture = _textureShaderResource;                
-                postEffect.Apply();       
-                Swap<ShaderResourceView>(ref _textureShaderResource, ref _auxTextureShaderResource);
-                Swap<RenderTargetView>(ref _textureRenderTarget, ref _auxTextureRenderTarget);
+                if (postEffect.Enabled)
+                {
+                    //_game.GraphicsDeviceContext.OutputMerger.SetTargets(_tempAuxRenderTarget);
+                    _game.GraphicsDeviceContext.ClearRenderTargetView(_tempAuxRenderTarget, Color.Black);
+                    postEffect.InputTexture = _tempShaderResource;
+                    postEffect.OutputTexture = _tempAuxRenderTarget;                    
+                    postEffect.Apply();
+                    Swap<ShaderResourceView>(ref _tempShaderResource, ref _tempAuxTextureShaderResource);
+                    Swap<RenderTargetView>(ref _tempRenderTarget, ref _tempAuxRenderTarget);
+                }
             }
-                
-            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderView);   
-            passThruEffect.InputTexture = _textureShaderResource;
-            passThruEffect.Apply();        
 
-            this._isEffectInProgress = false;
+            //5. We replace the temp render targets in the graphics output with the chain output texture.
+            _game.GraphicsDeviceContext.ClearRenderTargetView(OutputTexture, Color.Black);
+            _game.GraphicsDeviceContext.OutputMerger.SetTargets(OutputTexture);            
+
+            //6. We render the texture drawn by the very last post effect to this chain's output texture.
+            //NOTE: We specify an optional blend state to allow for blending effects like overlays.
+            passThruEffect.InputTexture = _tempShaderResource;
+            passThruEffect.BlendState = this.BlendState;
+            passThruEffect.Apply();           
+
+            //7. We replace the chain output texture in the graphics output.
+            _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderView);
         }
 
         private static void Swap<T>(ref T a, ref T b)
@@ -125,6 +199,6 @@ namespace CipherPark.AngelJacket.Core.Effects
             b = temp;
         }
 
-        public bool IsEffectInProgress { get { return _isEffectInProgress; } }
+        //public bool IsEffectInProgress { get { return _isEffectInProgress; } }
     }
 }

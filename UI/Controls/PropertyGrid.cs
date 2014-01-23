@@ -140,7 +140,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private Label childLabel = null;
         private Label selectedChildLabel = null;
 
-        public PropertyGridItem(IUIRoot visualRoot, TextContent nameContent, TextContent selectNameContent)
+        private PropertyGridItem(IUIRoot visualRoot, TextContent nameContent, TextContent selectNameContent)
             : base(visualRoot)
         {
             childLabel = new Label(visualRoot, nameContent);    
@@ -159,7 +159,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }
        
-        public PropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, Color selectedFontColor)
+        private PropertyGridItem(IUIRoot visualRoot, string caption, SpriteFont font, Color fontColor, Color selectedFontColor)
             : this(visualRoot, new TextContent(caption, font, fontColor), new TextContent(caption, font, selectedFontColor))
         {  }        
         
@@ -169,8 +169,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Children.Add(valueControl);
         }
 
-        public PropertyGridItem(UIControl valueControl, TextContent nameContent, TextContent selectedDescription)
-            : this(valueControl.VisualRoot, nameContent, selectedDescription)
+        public PropertyGridItem(UIControl valueControl, TextContent nameContent, TextContent selectedContent)
+            : this(valueControl.VisualRoot, nameContent, selectedContent)
         {
             this.Children.Add(valueControl);
         }

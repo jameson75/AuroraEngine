@@ -30,6 +30,7 @@ namespace CipherPark.AngelJacket.Core
         private DeviceContext _graphicsDeviceContext = null;
         private Texture2D _renderTargetBuffer = null;
         private RenderTargetView _renderTargetView = null;
+        private ShaderResourceView _renderTargetShaderResource = null;
         private Texture2D _depthStencilBuffer = null;
         private DepthStencilView _depthStencilView = null;
         private XAudio2 _xaudio2Device = null;
@@ -111,13 +112,14 @@ namespace CipherPark.AngelJacket.Core
                 OutputHandle = form.Handle,
                 SampleDescription = new SampleDescription(1, 0),
                 SwapEffect = SwapEffect.Discard,
-                Usage = Usage.RenderTargetOutput
+                Usage = Usage.RenderTargetOutput | Usage.ShaderInput
             };
             SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.Debug, chainDesc, out _graphicsDevice, out _swapChain);
             _graphicsDeviceContext = _graphicsDevice.ImmediateContext;
             _renderTargetBuffer = Texture2D.FromSwapChain<Texture2D>(_swapChain, 0);
-            _renderTargetView = new RenderTargetView(_graphicsDevice, _renderTargetBuffer);           
-           
+            _renderTargetView = new RenderTargetView(_graphicsDevice, _renderTargetBuffer);
+            _renderTargetShaderResource = new ShaderResourceView(_graphicsDevice, _renderTargetBuffer);
+
             Texture2DDescription renderStencilDesc = new Texture2DDescription()
             {
                 Format = BestSupportedDepthStencilFormat(_graphicsDevice, false, true),
@@ -203,6 +205,11 @@ namespace CipherPark.AngelJacket.Core
         public RenderTargetView RenderTarget
         {
             get { return _renderTargetView; }
+        }
+
+        public ShaderResourceView RenderTargetShaderResource
+        {
+            get { return _renderTargetShaderResource; }
         }
 
         public DepthStencilView DepthStencil

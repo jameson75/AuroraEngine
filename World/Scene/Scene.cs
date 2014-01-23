@@ -55,11 +55,14 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public void Draw(long gameTime)
         {
             OnBeginDraw();
-            CameraNode.Camera.PostEffectChain.Begin(gameTime);            
+            //CameraNode.Camera.PostEffectChain.Begin(gameTime);            
             _DrawSkyModel(gameTime);
             foreach (SceneNode node in Nodes)
                 _DrawNodeHierarchy(gameTime, node);            
-            CameraNode.Camera.PostEffectChain.End(gameTime);
+            //CameraNode.Camera.PostEffectChain.End(gameTime);
+            CameraNode.Camera.PostEffectChain.InputTexture = Game.RenderTargetShaderResource;
+            CameraNode.Camera.PostEffectChain.OutputTexture = Game.RenderTarget;
+            CameraNode.Camera.PostEffectChain.Apply();
             _DrawSprites(gameTime);
             OnEndDraw();            
         }
@@ -91,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         private void _DrawNodeHierarchy(long gameTime, SceneNode node)
         {
-            if (node.IsVisible)
+            if (node.Visible)
             {
                 node.Draw(gameTime);
                 foreach (SceneNode child in node.Children)

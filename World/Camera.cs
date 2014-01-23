@@ -26,6 +26,7 @@ namespace CipherPark.AngelJacket.Core.World
         public Camera(IGameApp game)
         {
             _game = game;
+            Texture2DDescription desc = game.RenderTarget.ResourceAs<Texture2D>().Description;
             _postEffectChain = PostEffectChain.Create(game);
             ViewMatrix = Matrix.Identity;
             ProjectionMatrix = Matrix.Identity;
@@ -34,6 +35,7 @@ namespace CipherPark.AngelJacket.Core.World
         public Camera(IGameApp game, Matrix viewMatrix, Matrix projectionMatrix)
         {
             _game = game;
+            Texture2DDescription desc = game.RenderTarget.ResourceAs<Texture2D>().Description;
             _postEffectChain = PostEffectChain.Create(game);
             ViewMatrix = viewMatrix;
             ProjectionMatrix = projectionMatrix;

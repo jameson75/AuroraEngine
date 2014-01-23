@@ -257,14 +257,14 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Currrent Velocity
             //-----------------
-            Texture2D _currentVelocityTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
+            Texture2D _currentVelocityTexture = new Texture2D(_game.GraphicsDevice, highPercisionTextureDesc);
             _currentVelocityTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _currentVelocityTexture, resourceViewDesc);
             _currentVelocityTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _currentVelocityTexture, renderTargetViewDesc);
             _currentVelocityTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
 
             //Last Velocity
             //-------------
-            Texture2D _lastVelocityTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
+            Texture2D _lastVelocityTexture = new Texture2D(_game.GraphicsDevice, highPercisionTextureDesc);
             _lastVelocityTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _lastVelocityTexture, resourceViewDesc);
             _lastVelocityTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _lastVelocityTexture, renderTargetViewDesc);
             _lastVelocityTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
@@ -314,6 +314,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBox.DataPointer = Utilities.WriteAndPosition<Vector3>(dataBox.DataPointer, ref lightDir);
             GraphicsDevice.ImmediateContext.UnmapSubresource(_worldVertexConstantBuffer, 0);
             
+
             dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_blurPixelConstantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             //PixelBlurConst
             float blurAmount = this.BlurAmount;

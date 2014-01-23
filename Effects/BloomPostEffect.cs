@@ -29,6 +29,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         SharpDX.Direct3D11.Buffer _guassianHorizontalConstantBuffer = null;
         SharpDX.Direct3D11.Buffer _guassianVerticalConstantBuffer = null;
         SharpDX.Direct3D11.Buffer _bloomCombineConstantBuffer = null;
+        private bool _isInitialized = false;
 
         public float Threshold { get; set; }
         public float BlurAmount { get; set; }
@@ -40,25 +41,27 @@ namespace CipherPark.AngelJacket.Core.Effects
         public BloomPostEffect(Device graphicsDevice, IGameApp app)
             : base(graphicsDevice)
         {            
-            GuassianConstantBufferSize = BloomPostEffect.CalculateRequiredConstantBufferSize((Vector2.SizeInBytes * SampleCount) + (sizeof(float) * SampleCount));
+            //Explanation: In HLSL, each element in an array is aligned to a 16-byte boundary... 
+            //With 2 arrays of lenght "SampleCount" the calculation is 16 x SampleCount x 2.
+            GuassianConstantBufferSize = BloomPostEffect.CalculateRequiredConstantBufferSize((Vector4.SizeInBytes * SampleCount * 2));
             _game = app;
             Initialize();
         }  
 
-        public void InitializeWithPreset(BloomPreset preset)
+        public void SetPresetState(BloomPreset preset)
         {
             switch (preset)
             {
                 case BloomPreset.Soft:
                     Threshold = 0; BlurAmount = 3; BloomIntensity = 1; BaseIntensity = 1; BloomSaturation = 1; BaseSaturation = 1;
                     break;
-                case BloomPreset.Desaturated:
+                 case BloomPreset.Blurry:
                     Threshold = 0.5f; BlurAmount = 8; BloomIntensity = 2; BaseIntensity = 1; BloomSaturation = 0; BaseSaturation = 1;
                     break;
                 case BloomPreset.Saturated:
                     Threshold = 0.25f; BlurAmount = 4; BloomIntensity = 2; BaseIntensity = 1; BloomSaturation = 2; BaseSaturation = 0;
                     break;
-                case BloomPreset.Blurry:
+               case BloomPreset.Desaturated:
                     Threshold = 0; BlurAmount = 2; BloomIntensity = 1; BaseIntensity = 0.1f; BloomSaturation = 1; BaseSaturation = 1;
                     break;
                 case BloomPreset.Subtle:
@@ -72,12 +75,23 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         protected override void OnBeginApply()
         {
-            WriteShaderConstants();           
+            /////////////////////////////////////////////////////
+            //TODO: Fix this hack... Because the Input/Output textures
+            //may change between calls to Apply(), I needed a place to 
+            //set the input of the first (and second) pass as well 
+            //as output of the last pass only after Apply() is called.
+            //This is the quickest place I could come up with.
+            Passes[0].PixelShaderResources[0] = InputTexture;
+            Passes[1].PixelShaderResources[0] = InputTexture;
+            Passes[Passes.Count - 1].RenderTarget = OutputTexture;
+            /////////////////////////////////////////////////////
+
+            WriteShaderConstants();
             base.OnBeginApply();
-        }    
+        }      
 
         private void Initialize()
-        {
+        {        
             Mesh _quad = null;           
             VertexShader _passThruVertexShader = null;
             PixelShader _gaussianBlurPixelShader = null;
@@ -122,9 +136,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             
             //Load Shaders
             //-------------
-            byte[] _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\passthru-vs.cso", out _passThruVertexShader);
+            byte[] _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\postpassthru-vs.cso", out _passThruVertexShader);
             LoadPixelShader("Content\\Shaders\\msbloom-guassian-ps.cso", out _gaussianBlurPixelShader);
-            LoadPixelShader("Content\\Shaders\\msbloom-extract-ps.cso", out _bloomExtractPixelShader);
+            LoadPixelShader("Content\\Shaders\\msbloom-extract-ps.cso", out _bloomExtractPixelShader);           
             LoadPixelShader("Content\\Shaders\\msbloom-combine-ps.cso", out _bloomCombinePixelShader);
 
             //Create Screen Quad
@@ -142,11 +156,11 @@ namespace CipherPark.AngelJacket.Core.Effects
             passes[0].VertexShader = _passThruVertexShader;
             passes[0].PixelShader = _bloomExtractPixelShader;
             passes[0].PixelShaderConstantBuffers.Add(_bloomExtractConstantBuffer);
-            passes[0].PixelShaderResources.Add(InputTexture);
+            passes[0].PixelShaderResources.Add(null); //null indicates we'll be using the input texture. See OnApply().
             passes[0].PixelShaderSamplers.Add(_inputTextureSamplerState);
             passes[0].RenderTarget = _bloomExtractRenderTargetView;
             passes[0].ScreenQuad = _quad;
-            
+
             //Create Pass1
             //Input: Input Texture
             //Output: Temp Texture
@@ -156,7 +170,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             passes[1].VertexShader = _passThruVertexShader;
             passes[1].PixelShader = _gaussianBlurPixelShader;
             passes[1].PixelShaderConstantBuffers.Add(_guassianHorizontalConstantBuffer);
-            passes[1].PixelShaderResources.Add(InputTexture);
+            passes[1].PixelShaderResources.Add(null); //null indicates we'll be using the input texture. See OnApply().
             passes[1].PixelShaderSamplers.Add(_inputTextureSamplerState);
             passes[1].RenderTarget = _tempRenderTargetView;
             passes[1].ScreenQuad = _quad;
@@ -189,12 +203,12 @@ namespace CipherPark.AngelJacket.Core.Effects
             passes[3].PixelShaderSamplers.Add(_bloomExtractSamplerState);
             passes[3].PixelShaderResources.Add(_blurShaderResourceView);
             passes[3].PixelShaderSamplers.Add(_blurSamplerState);
-            passes[3].RenderTarget = OutputTexture;
-            passes[3].ScreenQuad = _quad;
+            passes[3].RenderTarget = null; //null indicates we'll be using the output texture. See OnApply().
+            passes[3].ScreenQuad = _quad;           
 
             //Add passes to the post effect
             //-----------------------------
-            Passes.AddRange(passes);
+            Passes.AddRange(passes);          
         }
 
         private void WriteShaderConstants()
@@ -289,15 +303,18 @@ namespace CipherPark.AngelJacket.Core.Effects
                 sampleWeights[i] /= totalWeights;
             }
 
-            for (int i = 0; i < sampleCount; i++)
+            for (int i = 0; i < sampleOffsets.Length; i++)
             {
-                Vector2 offset = sampleOffsets[i];
-                pointer = Utilities.WriteAndPosition<Vector2>(pointer, ref offset);
+                // Vector2 offset = sampleOffsets[i]; Fix for this memory misalignment is below - in hlsl, each element is 4 bytes wide.
+                Vector4 offset = new Vector4(sampleOffsets[i], 0, 0);
+                pointer = Utilities.WriteAndPosition<Vector4>(pointer, ref offset);
             }
-            for (int i = 0; i < sampleCount; i++)
+
+            for (int i = 0; i < sampleWeights.Length; i++)
             {
-                float weight = sampleWeights[i];
-                pointer = Utilities.WriteAndPosition<float>(pointer, ref weight);
+                // float weight = sampleWeights[i]; Fix for this memory misalignment is below - in hlsl, each element is 4 bytes wide.
+                Vector4 weight = new Vector4(sampleWeights[i], 0, 0, 0);
+                pointer = Utilities.WriteAndPosition<Vector4>(pointer, ref weight);
             }
 
             return pointer;

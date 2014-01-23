@@ -62,10 +62,16 @@ namespace CipherPark.AngelJacket.Core.Effects
         public override void Apply()
         {            
             //***********************************************************************************************************
-            //NOTE: This method assumes that the input shader resource view (InputTexture) is bound to the same texture
-            //as the current render target.
-            //***********************************************************************************************************         
-           
+            //NOTE: This method safe guards against the case where the input shader resource view (InputTexture) is
+            //bound to the same texture as the current render target.
+            //***********************************************************************************************************                    
+
+            ///////////////////////////////////////////////////////////////////////////////////
+            //This line was added in way after the original implementation of this method
+            //so that it would be compatible to changes made to the post processing pipeline.            
+            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(OutputTexture);
+            //////////////////////////////////////////////////////////////////////////////////
+
             /////////////////
             //Setup
             ////////////////

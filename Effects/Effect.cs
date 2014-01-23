@@ -37,8 +37,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             OnBeginApply();
             for (int i = 0; i < _passes.Count; i++)
-                if (_passes[i].Enabled)
-                    _passes[i].Execute();
+                _passes[i].Execute();
             OnEndApply();
         }
 

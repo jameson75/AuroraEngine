@@ -40,6 +40,8 @@ namespace CipherPark.AngelJacket.Core
 
         RenderTargetView RenderTarget { get; }
 
+        ShaderResourceView RenderTargetShaderResource { get; }
+
         DepthStencilView DepthStencil { get; }
 
         SwapChain SwapChain { get; }

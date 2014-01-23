@@ -52,8 +52,9 @@ namespace CipherPark.AngelJacket.Core.World
             else
                 _renderer.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);
 
-            for (int i = 0; i < _sprites.Count; i++)            
-                _renderer.Draw(_sprites[i].Texture, _sprites[i].Position, _sprites[i].SourceRectangle, _sprites[i].Tint, _sprites[i].Rotation, _sprites[i].Origin, _sprites[i].Scale, _sprites[i].SpriteEffects, _sprites[i].Layer);
+            for (int i = 0; i < _sprites.Count; i++)   
+                if(_sprites[i].Visible)
+                    _renderer.Draw(_sprites[i].Texture, _sprites[i].Position, _sprites[i].SourceRectangle, _sprites[i].Tint, _sprites[i].Rotation, _sprites[i].Origin, _sprites[i].Scale, _sprites[i].SpriteEffects, _sprites[i].Layer);
                 
             _renderer.End();
 
@@ -114,6 +115,7 @@ namespace CipherPark.AngelJacket.Core.World
             Rotation = 0;
             Origin = Vector2.Zero;
             Scale = Vector2.One;
+            Visible = true;
         }        
 
         public Vector2 Position { get; set; }
@@ -148,6 +150,8 @@ namespace CipherPark.AngelJacket.Core.World
 
         public SpriteEffects SpriteEffects { get; set; }
 
-        public int Layer { get; set; }       
+        public int Layer { get; set; }
+
+        public bool Visible { get; set; }
     }
 }
