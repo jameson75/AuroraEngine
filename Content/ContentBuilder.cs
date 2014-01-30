@@ -701,7 +701,41 @@ namespace CipherPark.AngelJacket.Core.Content
 
             return new Mesh[] { frontQuad, backQuad, leftQuad, rightQuad, topQuad, bottomQuad };
         }
-        #endregion
+        #endregion        
+
+        public static Mesh BuildBasicRing(float radius, float width, int segments, bool isDynamic = true)
+        {           
+            float angle = 0f;
+            float angle_stepsize = MathUtil.TwoPi / (float)segments;
+            float innerRadius = Math.Max(radius - width, 0);            
+            Edge2? previousEdge = null;
+            BasicVertexPositionColor[] vertices = new BasicVertexPositionColor[(segments + 1) * 2];
+            for(int i = 0; i < segments; i++)
+            {
+                Vector2 outer = new Vector2()
+                {
+                    X = radius * (float)Math.Cos(angle),
+                    Y = radius * (float)Math.Sin(angle)
+                };
+                Vector2 inner = new Vector2()
+                {
+                    X = innerRadius * (float)Math.Cos(angle),
+                    Y = innerRadius * (float)Math.Sin(angle)
+                };
+                Edge2 edge = new Edge2()
+                {
+                    V1 = inner,
+                    V2 = outer
+                };
+                if (previousEdge != null)
+                {
+                    int k = i * 2;
+                    vertices[k] = new edge.V1;
+                    vertices[k + 1] = edge.V2;
+                }
+                angle += angle_stepsize;
+            }
+        }
 
         #region Mesh
         public static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
