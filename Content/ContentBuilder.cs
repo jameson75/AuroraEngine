@@ -703,39 +703,66 @@ namespace CipherPark.AngelJacket.Core.Content
         }
         #endregion        
 
-        public static Mesh BuildBasicRing(float radius, float width, int segments, bool isDynamic = true)
-        {           
+        #region Ring
+        public static Mesh BuildBasicRing(IGameApp game, byte[] shaderByteCode, float radius, float width, int segments, bool isDynamic = true)
+        {          
+            Vector3[] positions = CreateRingPoints(radius, width, segments);
+            short[] indices = CreateRingIndices(segments);
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            BasicVertexPositionColor[] verts = new BasicVertexPositionColor[positions.Length];
+            for (int i = 0; i < verts.Length; i++)
+                verts[i] = new BasicVertexPositionColor(positions[i], Color.White.ToVector4());
+            return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+        }
+
+        private static Vector3[] CreateRingPoints(float radius, float width, int segments)
+        {
             float angle = 0f;
             float angle_stepsize = MathUtil.TwoPi / (float)segments;
-            float innerRadius = Math.Max(radius - width, 0);            
-            Edge2? previousEdge = null;
-            BasicVertexPositionColor[] vertices = new BasicVertexPositionColor[(segments + 1) * 2];
-            for(int i = 0; i < segments; i++)
-            {
-                Vector2 outer = new Vector2()
-                {
-                    X = radius * (float)Math.Cos(angle),
-                    Y = radius * (float)Math.Sin(angle)
-                };
-                Vector2 inner = new Vector2()
-                {
-                    X = innerRadius * (float)Math.Cos(angle),
-                    Y = innerRadius * (float)Math.Sin(angle)
-                };
-                Edge2 edge = new Edge2()
-                {
-                    V1 = inner,
-                    V2 = outer
-                };
-                if (previousEdge != null)
-                {
-                    int k = i * 2;
-                    vertices[k] = new edge.V1;
-                    vertices[k + 1] = edge.V2;
-                }
-                angle += angle_stepsize;
+            float innerRadius = Math.Max(radius - width, 0);
+            Vector3[] points = new Vector3[segments * 2];
+            for (int i = 0; i < segments; i++)
+            {               
+                int k = i * 2;
+                points[k] = new Vector3(radius * (float)Math.Cos(-angle), radius * (float)Math.Sin(-angle), 0);
+                points[k + 1] = new Vector3(innerRadius * (float)Math.Cos(-angle), innerRadius * (float)Math.Sin(-angle), 0);               
+                angle -= angle_stepsize;
             }
+            return points;
         }
+
+        private static short[] CreateRingIndices(int segments)
+        {
+            int[] indices = new int[segments * 6];
+
+            for (int i = 0; i < segments; i++)
+            {                
+                int k = i * 2;
+                int m = i * 6;
+                
+                indices[m + 0] = k + 0;
+                indices[m + 1] = k + 1;
+                if (i < (segments - 1))
+                    indices[m + 2] = k + 2;
+                else
+                    indices[m + 2] = 0;
+                
+                indices[m + 3] = k + 1;
+                if (i < (segments - 1))
+                {
+                    indices[m + 4] = k + 3;
+                    indices[m + 5] = k + 2;
+                }
+                else
+                {
+                    indices[m + 4] = 1;
+                    indices[m + 5] = 0;
+                }
+            }
+
+            return indices.Select(e => (short)e).ToArray();
+        }
+        #region Ring
 
         #region Mesh
         public static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
