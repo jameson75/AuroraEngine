@@ -581,7 +581,7 @@ namespace CipherPark.AngelJacket.Core.Content
         }
 
         #endregion
-
+      
         #region ReferenceGrid
         public static Mesh BuildReferenceGrid(IGameApp game, byte[] shaderByteCode, DrawingSizeF gridSize, Vector2 gridSteps, Color gridColor)
         {
@@ -936,5 +936,5 @@ namespace CipherPark.AngelJacket.Core.Content
             else
                 throw new NotSupportedException();
         }
-    }        
+    }    
 }
