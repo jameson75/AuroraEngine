@@ -762,7 +762,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
             return indices.Select(e => (short)e).ToArray();
         }
-        #region Ring
+        #endregion
 
         #region Mesh
         public static Mesh BuildMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct

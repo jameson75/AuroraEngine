@@ -130,7 +130,6 @@
     <Compile Include="UI\Controls\PropertyGrid.cs" />
     <Compile Include="UI\Controls\Spinner.cs" />
     <Compile Include="Utils\Boundary.cs" />
-    <Compile Include="Utils\Edge.cs" />
     <Compile Include="Utils\GameAssets.cs" />
     <Compile Include="Content\ContentBuilder.cs" />
     <Compile Include="Utils\MatrixStack.cs" />
