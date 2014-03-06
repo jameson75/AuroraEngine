@@ -112,10 +112,10 @@ namespace CipherPark.AngelJacket.Core.Effects
             int offset = 0;         
             dataBuffer.Set(offset, LampColor.ToVector4());
             offset += sizeof(float) * 4;                        
-            dataBuffer.Set(offset, AmbientColor.ToVector4());
-            offset += sizeof(float) * 4;            
+            dataBuffer.Set(offset, AmbientColor.ToVector3());
+            offset += sizeof(float) * 3;            
             dataBuffer.Set(offset, SpecularPower);
-            offset += sizeof(float) * 4;
+            offset += sizeof(float);
             dataBuffer.Set(offset, Eccentricity);
             GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
         }

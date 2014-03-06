@@ -180,7 +180,7 @@ namespace CipherPark.AngelJacket.Core.Content
         {
             BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[36];
             Vector3[] positions = CreateQuadPoints3D(dimension);
-            Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateQuadTextureCoords3D();
+            Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateQuadTextureCoords3DNI();
             for (int i = 0; i < positions.Length; i++)
                 verts[i] = new BasicVertexPositionTexture(positions[i], _texCoords[i]);
             return BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, verts, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, dimension);
@@ -191,15 +191,17 @@ namespace CipherPark.AngelJacket.Core.Content
             BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[36];
             Vector3[] positions = CreateQuadPoints3DNI(dimension);
             Vector3[] normals = GenerateNormals(positions, null);
-            Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateQuadTextureCoords3D();
+            Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateQuadTextureCoords3DNI();
             for (int i = 0; i < positions.Length; i++)
                 verts[i] = new BasicVertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, dimension);
         }
 
-        public static Vector2[] CreateQuadTextureCoords3D()
+        public static Vector2[] CreateQuadTextureCoords3DNI()
         {
-            throw new NotSupportedException();
+            Vector2[] quad2DTexCoords = CreateQuadTextureCoords();
+            short[] indices = CreateQuadTextureIndices3D();
+            return indices.Select((i) => quad2DTexCoords[i]).ToArray();
         }
 
         public static Vector3[] CreateQuadPoints3DNI(BoundingBox dimension)
@@ -227,6 +229,16 @@ namespace CipherPark.AngelJacket.Core.Content
                                     3, 2, 6, 6, 7, 3, //FRONT
                                     1, 0, 4, 4, 5, 1, //BACK                                             
                                 };
+        }
+
+        public static short[] CreateQuadTextureIndices3D()
+        {
+            return new short[36] { 0, 1, 2, 2, 3, 0,
+                                   0, 1, 2, 2, 3, 0,
+                                   0, 1, 2, 2, 3, 0,
+                                   0, 1, 2, 2, 3, 0,
+                                   0, 1, 2, 2, 3, 0,
+                                   0, 1, 2, 2, 3, 0 };
         }
       
         #endregion

@@ -80,6 +80,7 @@
     <Compile Include="Effects\FlexboardEffect.cs" />
     <Compile Include="Effects\CameraMotionBlur.cs" />
     <Compile Include="Effects\GlitchPostEffect.cs" />
+    <Compile Include="Effects\Obsolete\BlinnPhongEffect2.cs" />
     <Compile Include="Effects\PixelVelocityBlurPostEffect.cs" />
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
     <Compile Include="Effects\SSAOPostEffect.cs" />
