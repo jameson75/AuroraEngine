@@ -55,10 +55,10 @@ namespace CipherPark.AngelJacket.Core.Effects
         public float SpecularPower { get; set; }
 
         public float Eccentricity { get; set; }
-
+       
         public BlinnPhongEffect(Device graphicsDevice)
             : base(graphicsDevice)
-        {
+        {           
             _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\blinnphong-vs.cso", out _vertexShader);
             LoadPixelShader("Content\\Shaders\\blinnphong-ps.cso", out _pixelShader);
             _vertexConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
