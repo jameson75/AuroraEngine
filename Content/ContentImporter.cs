@@ -13,7 +13,9 @@ using SharpDX.Direct3D11;
 using SharpDX.Direct3D;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
+using SharpDX.MediaFoundation;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
+using CoreTransform = CipherPark.AngelJacket.Core.Animation.Transform;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Animation;
@@ -108,18 +110,43 @@ namespace CipherPark.AngelJacket.Core.Content
             return voiceData;
         }
 
-        public static SourceVoice LoadVoice(XAudio2 audioDevice, string resource)
+        public static SourceVoice LoadVoice(XAudio2 audioDevice, string resource, bool loop = false)
         {
             SourceVoice sourceVoice = null;
-            VoiceData vd = LoadVoiceDataFromWav(resource);
-            WaveFormat sourceVoiceFormat = WaveFormat.CreateCustomFormat((WaveFormatEncoding)vd.Format.FormatTag, (int)vd.Format.SamplesPerSec, (int)vd.Format.Channels, (int)vd.Format.AvgBytesPerSec, (int)vd.Format.BlockAlign, (int)vd.Format.BitsPerSample);
-            sourceVoice = new SourceVoice(audioDevice, sourceVoiceFormat);
             AudioBuffer ab = new AudioBuffer();
-            ab.AudioBytes = vd.AudioBytes;
-            ab.Flags = BufferFlags.EndOfStream;
-            ab.Stream = new DataStream(vd.AudioBytes, true, true);
-            vd.AudioData.CopyTo(ab.Stream);
-            sourceVoice.SubmitSourceBuffer(ab, null);
+            string resourceFileExt = System.IO.Path.GetExtension(resource).ToLower();
+            if (resourceFileExt == ".wav")
+            {
+                VoiceData vd = LoadVoiceDataFromWav(resource);
+                WaveFormat sourceVoiceFormat = WaveFormat.CreateCustomFormat((WaveFormatEncoding)vd.Format.FormatTag, (int)vd.Format.SamplesPerSec, (int)vd.Format.Channels, (int)vd.Format.AvgBytesPerSec, (int)vd.Format.BlockAlign, (int)vd.Format.BitsPerSample);
+                sourceVoice = new SourceVoice(audioDevice, sourceVoiceFormat);
+                ab.AudioBytes = vd.AudioBytes;
+                ab.Flags = BufferFlags.EndOfStream;
+                ab.Stream = new DataStream(vd.AudioBytes, true, true);               
+                vd.AudioData.CopyTo(ab.Stream);
+                if (loop)
+                    ab.LoopCount = AudioBuffer.LoopInfinite;
+                sourceVoice.SubmitSourceBuffer(ab, null);
+            }
+            else if (resourceFileExt == ".wma")
+            {
+                FileStream stream = new FileStream(resource, FileMode.Open);
+                AudioDecoder decoder = new AudioDecoder(stream);
+                var samplePointers = decoder.GetSamples();
+                int bufferSize = 0;
+                foreach (DataPointer samplePointer in samplePointers)
+                    bufferSize+= samplePointer.Size;
+                DataStream dataStream = new DataStream(bufferSize, true, true);                
+                foreach (DataPointer samplePonter in samplePointers)                
+                    dataStream.Write(samplePonter.Pointer, 0, samplePonter.Size);                                
+                ab.Flags = BufferFlags.EndOfStream;
+                ab.Stream = dataStream;
+                ab.AudioBytes = bufferSize;
+                sourceVoice = new SourceVoice(audioDevice, decoder.WaveFormat);
+                sourceVoice.SubmitSourceBuffer(ab, null);                
+                stream.Close();
+            }
+
             return sourceVoice;
         }
 
@@ -285,9 +312,9 @@ namespace CipherPark.AngelJacket.Core.Content
                 skinOffsets = new List<SkinOffset>();
 
                 for (int i = 0; i < xMesh.SkinWeightsCollection.Count; i++)
-                {
+                {                    
                     XFileSkinWeightsObject xSkinWeights = xMesh.SkinWeightsCollection[i];
-                    Transform skinOffsetTransform = new Transform(new Matrix(xSkinWeights.MatrixOffset.m));
+                    CoreTransform skinOffsetTransform = new CoreTransform(new Matrix(xSkinWeights.MatrixOffset.m));
                     skinOffsets.Add(new SkinOffset() { Name = xSkinWeights.TransformNodeName, Transform = skinOffsetTransform });
                     for (int j = 0; j < xSkinWeights.NWeights; j++)
                     {
@@ -332,7 +359,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 ////TODO: Remove hard coding.
                 //XFileFrameObject xRootBoneFrame = ((XFileFrameObject)doc.DataObjects[5]);
                 XFileFrameObject xRootBoneFrame = doc.DataObjects.GetDataObject<XFileFrameObject>(2);
-                rootFrame = new Frame() { Name = xRootBoneFrame.Name, Transform = new Transform(new Matrix(xRootBoneFrame.FrameTransformMatrix.m)) };
+                rootFrame = new Frame() { Name = xRootBoneFrame.Name, Transform = new CoreTransform(new Matrix(xRootBoneFrame.FrameTransformMatrix.m)) };
                 BuildBoneFrameHierarchy(xRootBoneFrame, rootFrame, skinOffsets);
 
                 if ((channels & XFileChannels.Animation) != 0)
@@ -367,7 +394,7 @@ namespace CipherPark.AngelJacket.Core.Content
                             }
                             TransformAnimation modelAnimation = new TransformAnimation();
                             foreach (long time in matrixTransformKeys.Keys)
-                                modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new Transform(matrixTransformKeys[time])));
+                                modelAnimation.SetKeyFrame(new AnimationKeyFrame((ulong)time, new CoreTransform(matrixTransformKeys[time])));
                             animationControllers.Add(new KeyframeAnimationController(modelAnimation, animationTarget));
                         }
                     }
@@ -405,7 +432,7 @@ namespace CipherPark.AngelJacket.Core.Content
             foreach (XFileFrameObject xChildBoneFrame in xBoneFrame.ChildFrames)
             {
                 SkinOffset skinOffset = skinOffsets.Find(b => b.Name == xChildBoneFrame.Name);
-                Frame childBoneFrame = new Frame() { Name = xChildBoneFrame.Name, Transform = new Transform(new Matrix(xChildBoneFrame.FrameTransformMatrix.m)) };
+                Frame childBoneFrame = new Frame() { Name = xChildBoneFrame.Name, Transform = new CoreTransform(new Matrix(xChildBoneFrame.FrameTransformMatrix.m)) };
                 if (skinOffset != null)
                     skinOffset.BoneReference = childBoneFrame;
                 boneframe.Children.Add(childBoneFrame);                

@@ -68,7 +68,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             InputState inputStateManager = inputServices.GetInputState();
             
-            if (inputStateManager.IsKeyReleased(Key.Back))
+            if (inputStateManager.IsKeyReleased(Key.Back) ||
+                inputStateManager.IsGamepadButtonDown(0, SharpDX.XInput.GamepadButtonFlags.Back))
                 SelectPreviousItem();
 
             if (ActiveScreen != null)

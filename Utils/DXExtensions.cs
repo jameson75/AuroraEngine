@@ -180,7 +180,12 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static Vector2 ToVector2(this DrawingSizeF sizeF)
         {
             return new Vector2(sizeF.Width, sizeF.Height);
-        }    
+        }  
+  
+        public static float AspectRatio(this DrawingSizeF sizeF)
+        {
+            return sizeF.Width / sizeF.Height;
+        }
     }
 
     /// <summary>
@@ -205,6 +210,11 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static Vector2 ToVector2(this DrawingSize size)
         {
             return new Vector2(Convert.ToSingle(size.Width), Convert.ToSingle(size.Height));
+        }
+
+        public static float AspectRatio(this DrawingSize sizeF)
+        {
+            return (float)sizeF.Width / (float)sizeF.Height;
         }
     }
 

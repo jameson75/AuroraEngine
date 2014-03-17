@@ -54,6 +54,9 @@
     <Reference Include="SharpDX.DXGI">
       <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net20\SharpDX.DXGI.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX.MediaFoundation">
+      <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net40\SharpDX.MediaFoundation.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX.XAudio2">
       <HintPath>..\..\Libraries\SharpDX\Bin\Standard-net20\SharpDX.XAudio2.dll</HintPath>
     </Reference>
