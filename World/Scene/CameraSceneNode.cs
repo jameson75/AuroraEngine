@@ -45,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             get
             {
                 if (Camera != null)
-                    return Camera.ViewToTransform(Camera.ViewMatrix);
+                    return Camera.ViewMatrixToTransform(Camera.ViewMatrix);
                 else
                     return _cachedTransform;
             }
@@ -54,9 +54,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 if (Camera != null)
                 {
                     if (LookAtTarget != null)
-                        Camera.ViewMatrix = TransformToLookAtTargetView(value);
+                        Camera.ViewMatrix = TransformToLookAtTargetMatrix(value);
                     else
-                        Camera.ViewMatrix = Camera.TransformToView(value);
+                        Camera.ViewMatrix = Camera.TransformToViewMatrix(value);
                 }
                 else
                     _cachedTransform = value;
@@ -66,18 +66,28 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public override void Update(long gameTime)
         {
             if (LookAtTarget != null && Camera != null)            
-                Camera.ViewMatrix = TransformToLookAtTargetView(Transform);
+                Camera.ViewMatrix = TransformToLookAtTargetMatrix(Transform);
             
             base.Update(gameTime);
-        }
+        }        
 
-        private Matrix TransformToLookAtTargetView(Transform t)
+        public Matrix TransformToLookAtTargetMatrix(Transform t, ITransformable lookAtTarget, Vector3? lookAtUp )
         {
-            Matrix specifiedNewView = Camera.TransformToView(t);
-            Vector3 up = LookAtUp != null ? LookAtUp.Value : new Vector3(specifiedNewView.Column2.ToArray().Take(3).ToArray());
-            Vector3 lookAt = this.WorldToParent(LookAtTarget.ParentToWorld(LookAtTarget.Transform)).Translation;
+            Matrix viewMatrix = Camera.TransformToViewMatrix(t);
+            Vector3 up = lookAtUp != null ? lookAtUp.Value : new Vector3(viewMatrix.Column2.ToArray().Take(3).ToArray());
+            Vector3 lookAt = this.WorldToParent(lookAtTarget.ParentToWorld(lookAtTarget.Transform)).Translation;
             Vector3 eye = t.Translation;
             return Matrix.LookAtLH(eye, lookAt, up);
+        }
+        
+        private Matrix TransformToLookAtTargetMatrix(Transform t)
+        {
+            //Matrix viewMatrix = Camera.TransformToViewMatrix(t);
+            //Vector3 up = LookAtUp != null ? LookAtUp.Value : new Vector3(viewMatrix.Column2.ToArray().Take(3).ToArray());
+            //Vector3 lookAt = this.WorldToParent(LookAtTarget.ParentToWorld(LookAtTarget.Transform)).Translation;
+            //Vector3 eye = t.Translation;
+            //return Matrix.LookAtLH(eye, lookAt, up);
+            return TransformToLookAtTargetMatrix(t, LookAtTarget, LookAtUp);
         }
     }
 }

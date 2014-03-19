@@ -28,14 +28,14 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public FormSceneNode(IGameApp game)
             : base(game)
         {
-            HitTestable = true;
+            //HitTestable = true;
         }
 
         public FormSceneNode(Form form, string name = null)
             : base(form.Game, name)
         {
             Form = form;
-            HitTestable = true;
+            //HitTestable = true;
         }
 
         public Form Form
@@ -60,7 +60,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
-        public bool HitTestable { get; set; }
+        //public bool HitTestable { get; set; }
 
         public override Transform Transform
         {
@@ -80,7 +80,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             {
                 //TODO: Change design so that Model.Draw() implementations aquire the Camera from a IViewportService
                 //and set the view and projecton matrices themselves.
-                Form.ElementEffect.View = Camera.TransformToView(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
+                Form.ElementEffect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
                 Form.ElementEffect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;
                 Form.Draw(gameTime);
             }

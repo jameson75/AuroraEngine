@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
 
             OnUpdateTarget(timeT);
 
-            if (timeT > RunningTime)
+            if (timeT >= RunningTime)
                 this.OnAnimationComplete();           
         }
 

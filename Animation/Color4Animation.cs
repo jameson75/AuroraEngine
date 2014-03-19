@@ -39,13 +39,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                 }
                 else
                 {
-                    //TODO: Implement either ease-in/ease-out with hermite control points.
-                    //or implement Curve with catmull-rom.
-                    //    for (int i = 0; i < f0.Curve.Length; i++)
-                    //    {
-
-                    //    }
-                    return Color.Transparent;
+                    throw new NotSupportedException();
                 }
             }
         }

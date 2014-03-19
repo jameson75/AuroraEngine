@@ -140,6 +140,11 @@ namespace CipherPark.AngelJacket.Core.Animation
             return ((Color4Animation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
 
+        protected Vector3 GetPropertyVector3AtT(string propertyName, ulong t)
+        {
+            return ((Vector3Animation)AnimatedProperties[propertyName]).GetValueAtT(t);
+        }
+
         protected object GetPropertyValueAtT(string propertyName, ulong t)
         {
             return ((ObjectAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);

@@ -51,7 +51,7 @@ namespace CipherPark.AngelJacket.Core.World
         {
             get
             {
-                return Camera.ViewToTransform(this.ViewMatrix).Translation;
+                return Camera.ViewMatrixToTransform(this.ViewMatrix).Translation;
             }
         }
 
@@ -59,7 +59,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public PostEffectChain PostEffectChain { get { return _postEffectChain; } }
 
-        public static Transform ViewToTransform(Matrix viewMatrix)
+        public static Transform ViewMatrixToTransform(Matrix viewMatrix)
         {
             Matrix viewRotation = viewMatrix * Matrix.Translation(-viewMatrix.TranslationVector);
             Vector3 viewTranslation = (viewMatrix * Matrix.Invert(viewRotation)).TranslationVector;
@@ -69,7 +69,7 @@ namespace CipherPark.AngelJacket.Core.World
             return new Transform(cameraRotation, cameraTranslation);
         }
 
-        public static Matrix TransformToView(Transform transform)
+        public static Matrix TransformToViewMatrix(Transform transform)
         {
             Quaternion q = new Quaternion(transform.Rotation.X, transform.Rotation.Y, transform.Rotation.Z, -transform.Rotation.W);
             Matrix viewRotation = Matrix.RotationQuaternion(q);

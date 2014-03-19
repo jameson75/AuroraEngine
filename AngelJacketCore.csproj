@@ -75,7 +75,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\Controllers\ReactionController.cs" />
-    <Compile Include="Animation\DynamicTransformAnimation.cs" />
+    <Compile Include="Animation\SpatialAnimation.cs" />
+    <Compile Include="Animation\Vector3Animation.cs" />
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\Obsolete\CookTorrenceEffect.cs" />

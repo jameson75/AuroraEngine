@@ -17,35 +17,35 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class DynamicTransformableAnimation : KeyframeAnimation
+    public class SpatialAnimation : KeyframeAnimation
     {
-        public DynamicTransformableAnimation()
+        public SpatialAnimation()
         { }
 
-        public DynamicTransformableAnimation(ITransformable localConverter)
+        public SpatialAnimation(ITransformable target)
         {
-            LocalConverter = localConverter;
+            Target = target;
         }
 
-        public DynamicTransformableAnimation(ITransformable localConverter, IEnumerable<AnimationKeyFrame> keyFrames)
+        public SpatialAnimation(ITransformable target, IEnumerable<AnimationKeyFrame> keyFrames)
             : base(keyFrames)
         {
-            LocalConverter = localConverter;
+            Target = target;
         }
 
         public bool SmoothingEnabled { get; set; }
 
-        public ITransformable LocalConverter { get; set; }
+        public ITransformable Target { get; set; }
 
         public Transform GetValueAtT(ulong t)
         {
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
-            Transform frameVal0 = (f0.Value != null) ? ((ITransformable)f0.Value).ParentToWorld(((ITransformable)f0.Value).Transform) : Transform.Identity;
-            Transform frameVal1 = (f1 != null && f1.Value != null) ? ((ITransformable)f1.Value).ParentToWorld(((ITransformable)f1.Value).Transform) : Transform.Identity;        
+            Transform frameValTx0 = (f0.Value != null) ? ((ITransformable)f0.Value).ParentToWorld(((ITransformable)f0.Value).Transform) : Transform.Identity;
+            Transform frameValTx1 = (f1 != null && f1.Value != null) ? ((ITransformable)f1.Value).ParentToWorld(((ITransformable)f1.Value).Transform) : Transform.Identity;        
 
             if (f1 == null)
-                return frameVal0;
+                return (Target != null) ? Target.WorldToParent(frameValTx0) : frameValTx0;
             else
             {
                 float pctT = (float)(t - f0.Time) / (float)(f1.Time - f0.Time);
@@ -62,7 +62,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                 else
                     pctStep = pctT;
 
-                Quaternion r = Quaternion.Lerp(frameVal0.Rotation, frameVal1.Rotation, pctStep);
+                Quaternion r = Quaternion.Lerp(frameValTx0.Rotation, frameValTx1.Rotation, pctStep);
                 Vector3 x = Vector3.Zero;
                 if (SmoothingEnabled)
                 {
@@ -72,17 +72,16 @@ namespace CipherPark.AngelJacket.Core.Animation
                     AnimationKeyFrame fb = GetNextKeyFrame(f1);
                     if (fb == null)
                         fb = f1;
-                    Transform frameVala = (fa.Value != null) ? (Transform)fa.Value : Transform.Identity;
-                    Transform frameValb = (fb.Value != null) ? (Transform)fb.Value : Transform.Identity;
-                    x = Vector3.CatmullRom(frameVala.Translation, frameVal0.Translation, frameVal1.Translation, frameValb.Translation, pctStep);
+                    Transform frameValTxa = (fa.Value != null) ? ((ITransformable)fa.Value).ParentToWorld(((ITransformable)fa.Value).Transform) : Transform.Identity;
+                    Transform frameValTxb = (fb.Value != null) ? ((ITransformable)fb.Value).ParentToWorld(((ITransformable)fb.Value).Transform) : Transform.Identity;
+                    x = Vector3.CatmullRom(frameValTxa.Translation, frameValTx0.Translation, frameValTx1.Translation, frameValTxb.Translation, pctStep);
                 }
                 else
-                    x = Vector3.Lerp(frameVal0.Translation, frameVal1.Translation, pctStep);
+                    x = Vector3.Lerp(frameValTx0.Translation, frameValTx1.Translation, pctStep);
 
-                Transform tx = new Transform { Rotation = r, Translation = x };
-               
-                //return (LocalConverter != null) ? LocalConverter.WorldToParent(tx) : tx;
-                return (LocalConverter != null) ? LocalConverter.WorldToParent(tx) : ((ITransformable)f0.Value).WorldToParent(tx);
+                Transform tx = new Transform { Rotation = r, Translation = x };              
+                
+                return (Target != null) ? Target.WorldToParent(tx) : tx;
             }
         }
     }
