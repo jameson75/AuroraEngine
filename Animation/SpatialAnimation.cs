@@ -17,35 +17,33 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class SpatialAnimation : KeyframeAnimation
+    public class SpatialAnimation : TransformAnimation
     {
         public SpatialAnimation()
         { }
 
         public SpatialAnimation(ITransformable target)
         {
-            Target = target;
+            LocalChild = target;
         }
 
         public SpatialAnimation(ITransformable target, IEnumerable<AnimationKeyFrame> keyFrames)
             : base(keyFrames)
         {
-            Target = target;
-        }
+            LocalChild = target;
+        }      
 
-        public bool SmoothingEnabled { get; set; }
+        public ITransformable LocalChild { get; set; }
 
-        public ITransformable Target { get; set; }
-
-        public Transform GetValueAtT(ulong t)
+        public override Transform GetValueAtT(ulong t)
         {
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
-            Transform frameValTx0 = (f0.Value != null) ? ((ITransformable)f0.Value).ParentToWorld(((ITransformable)f0.Value).Transform) : Transform.Identity;
-            Transform frameValTx1 = (f1 != null && f1.Value != null) ? ((ITransformable)f1.Value).ParentToWorld(((ITransformable)f1.Value).Transform) : Transform.Identity;        
+            Transform frameValTx0 = (f0.Value != null) ? ((SpatialNode)f0.Value).ParentToWorld(((SpatialNode)f0.Value).Transform) : Transform.Identity;
+            Transform frameValTx1 = (f1 != null && f1.Value != null) ? ((SpatialNode)f1.Value).ParentToWorld(((SpatialNode)f1.Value).Transform) : Transform.Identity;        
 
             if (f1 == null)
-                return (Target != null) ? Target.WorldToParent(frameValTx0) : frameValTx0;
+                return (LocalChild != null) ? LocalChild.WorldToParent(frameValTx0) : frameValTx0;
             else
             {
                 float pctT = (float)(t - f0.Time) / (float)(f1.Time - f0.Time);
@@ -72,8 +70,8 @@ namespace CipherPark.AngelJacket.Core.Animation
                     AnimationKeyFrame fb = GetNextKeyFrame(f1);
                     if (fb == null)
                         fb = f1;
-                    Transform frameValTxa = (fa.Value != null) ? ((ITransformable)fa.Value).ParentToWorld(((ITransformable)fa.Value).Transform) : Transform.Identity;
-                    Transform frameValTxb = (fb.Value != null) ? ((ITransformable)fb.Value).ParentToWorld(((ITransformable)fb.Value).Transform) : Transform.Identity;
+                    Transform frameValTxa = (fa.Value != null) ? ((SpatialNode)fa.Value).ParentToWorld(((SpatialNode)fa.Value).Transform) : Transform.Identity;
+                    Transform frameValTxb = (fb.Value != null) ? ((SpatialNode)fb.Value).ParentToWorld(((SpatialNode)fb.Value).Transform) : Transform.Identity;
                     x = Vector3.CatmullRom(frameValTxa.Translation, frameValTx0.Translation, frameValTx1.Translation, frameValTxb.Translation, pctStep);
                 }
                 else
@@ -81,8 +79,15 @@ namespace CipherPark.AngelJacket.Core.Animation
 
                 Transform tx = new Transform { Rotation = r, Translation = x };              
                 
-                return (Target != null) ? Target.WorldToParent(tx) : tx;
+                return (LocalChild != null) ? LocalChild.WorldToParent(tx) : tx;
             }
         }
+    }
+
+    public class SpatialNode : ITransformable
+    {
+        public Transform Transform { get; set; }
+
+        public ITransformable TransformableParent { get; set; }
     }
 }

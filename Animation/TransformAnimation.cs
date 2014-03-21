@@ -26,7 +26,7 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public bool SmoothingEnabled { get; set; }
 
-        public Transform GetValueAtT(ulong t)
+        public virtual Transform GetValueAtT(ulong t)
         {
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
