@@ -49,6 +49,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             Name = name;
         }
 
+        public IGameApp Game { get { return _game; } } 
+
         public virtual string Name { get; set; }
 
         public Scene Scene 
