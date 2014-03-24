@@ -141,6 +141,8 @@
     <Compile Include="Utils\Toolkit\BasicEffect.cs" />
     <Compile Include="Utils\Toolkit\SkinnedEffect.cs" />
     <Compile Include="Content\XFileDocument.cs" />
+    <Compile Include="Utils\Toolkit\WaveFormatEx.cs" />
+    <Compile Include="Utils\Toolkit\XAudio2StreamingManager.cs" />
     <Compile Include="World\Camera.cs" />
     <Compile Include="Module\GameModule.cs" />
     <Compile Include="IGameApp.cs" />

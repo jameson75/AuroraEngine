@@ -21,8 +21,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class CameraSceneNode : SceneNode
     {
-        private Transform _cachedTransform = Transform.Identity;
-   
+        //private Transform _cachedTransform = Transform.Identity;   
 
         public CameraSceneNode(IGameApp game)
             : base(game)
@@ -47,7 +46,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 if (Camera != null)
                     return Camera.ViewMatrixToTransform(Camera.ViewMatrix);
                 else
-                    return _cachedTransform;
+                    return Transform.Identity; // _cachedTransform;
             }
             set
             {
@@ -58,8 +57,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                     else
                         Camera.ViewMatrix = Camera.TransformToViewMatrix(value);
                 }
-                else
-                    _cachedTransform = value;
+                //else
+                //    _cachedTransform = value;
             }
         }
 
@@ -92,8 +91,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             Vector3 up = LookAtUp != null ? LookAtUp.Value : new Vector3(viewMatrix.Column2.ToArray().Take(3).ToArray());
             Vector3 lookAt = this.WorldToParent(LookAtTarget.ParentToWorld(LookAtTarget.Transform)).Translation;
             Vector3 eye = t.Translation;
-            return Matrix.LookAtLH(eye, lookAt, up);
-            //return TransformToLookAtTargetMatrix(t, LookAtTarget, LookAtUp);
+            return Matrix.LookAtLH(eye, lookAt, up);           
         }
     }
 }

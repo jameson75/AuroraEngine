@@ -27,14 +27,13 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public ModelSceneNode(IGameApp game)
             : base(game)
         {            
-            HitTestable = true;
+            
         }
 
         public ModelSceneNode(Model model, string name = null)
             : base(model.Game, name)
         {
-            Model = model;
-            HitTestable = true;
+            Model = model;            
         }
 
         public Model Model 
@@ -57,9 +56,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 if (_model != null)               
                     ((ITransformable)_model).TransformableParent = this;                                  
             }
-        }
-
-        public bool HitTestable { get; set; }
+        }     
 
         public override Transform Transform 
         { 
@@ -67,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             {
                 //if (Model != null)
                 //    return Model.Transform;
-                //elsef
+                //else
                     return _transform;
             }
             set 

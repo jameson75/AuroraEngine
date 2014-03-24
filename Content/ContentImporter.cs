@@ -33,83 +33,6 @@ namespace CipherPark.AngelJacket.Core.Content
 {
     public static class ContentImporter
     {
-        private const string vertexPositionColorPattern = @"\G\s*(?<x>-?[0-9]+(?:\.[0-9]+)?)\s+(?<y>-?[0-9]+(?:\.[0-9]+)?)\s+(?<z>-?[0-9]+(?:\.[0-9]+)?)\s+(?<c>[0-9]+)\s*(?:,|$)";
-        private const string indexPattern = @"\G\s*(?<i>[0-9]+)(?:\s+|$)";
-
-
-        //public static Model LoadModel(IGameApp game, string filePath)
-        //{
-        //    XDocument xmlDoc = XDocument.Load(filePath);
-        //    var meshInfo = (from element in xmlDoc.Descendants("mesh")
-        //                    select new
-        //                        {
-        //                            IndexCount = element.Attribute("IndexCount") != null ? Convert.ToInt32(element.Attribute("IndexCount").Value) : 0,
-        //                            VertexCount = Convert.ToInt32(element.Attribute("VertexCount").Value)
-        //                        }).First();
-
-        //    int vertexElementSize = BasicVertexPositionColor.ElementSize;
-        //    InputElement[] vertexInputElements = BasicVertexPositionColor.InputElements;
-        //    BasicVertexPositionColor[] vertexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("model/mesh/vertices").Value, vertexPositionColorPattern)
-        //                                             select new BasicVertexPositionColor()
-        //                                             {
-        //                                                 Position = new Vector4(Convert.ToSingle(m.Groups["x"].Value),
-        //                                                                        Convert.ToSingle(m.Groups["y"].Value),
-        //                                                                        Convert.ToSingle(m.Groups["z"].Value),
-        //                                                                        1.0f),
-        //                                                 Color = Color.Red.ToVector4() /*new Color(Convert.ToInt32(m.Groups["c"].Value)).ToVector4()*/
-        //                                             }).ToArray();
-        //    BasicEffectEx effect = new BasicEffectEx(game.GraphicsDevice);
-        //    effect.World = Matrix.Identity;
-        //    effect.EnableVertexColor = true;
-        //    byte[] shaderCode = effect.SelectShaderByteCode();
-
-        //    MeshDescription meshDesc = new MeshDescription();
-        //    BufferDescription vertexBufferDesc = new BufferDescription();
-        //    vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
-        //    vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
-        //    vertexBufferDesc.SizeInBytes = meshInfo.VertexCount * vertexElementSize;
-        //    vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-        //    vertexBufferDesc.StructureByteStride = 0;
-        //    meshDesc.VertexBuffer = DXBuffer.Create<BasicVertexPositionColor>(game.GraphicsDevice, vertexData, vertexBufferDesc);
-
-        //    if (meshInfo.IndexCount > 0)
-        //    {
-        //        short[] indexData = (from Match m in Regex.Matches(xmlDoc.XPathSelectElement("model/mesh/indices").Value, indexPattern)
-        //                             select Convert.ToInt16(m.Groups[0].Value)).ToArray();
-        //        BufferDescription indexBufferDesc = new BufferDescription();
-        //        indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
-        //        indexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
-        //        indexBufferDesc.SizeInBytes = meshInfo.IndexCount * sizeof(short);
-        //        indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-        //        indexBufferDesc.StructureByteStride = 0;
-        //        meshDesc.IndexBuffer = DXBuffer.Create<short>(game.GraphicsDevice, indexData, indexBufferDesc);
-        //    }
-
-        //    meshDesc.VertexCount = meshInfo.VertexCount;
-        //    meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderCode, vertexInputElements);
-        //    meshDesc.VertexStride = vertexElementSize;
-        //    meshDesc.Topology = PrimitiveTopology.TriangleList;
-        //    Vector3[] vertices = (from v in vertexData select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
-        //    meshDesc.BoundingBox = BoundingBox.FromPoints(vertices);
-        //    Mesh mesh = new Mesh(game, meshDesc);
-        //    Model model = new Model(game);
-        //    model.Mesh = mesh;
-        //    model.Effect = effect;
-        //    return model;
-        //}
-
-        private static VoiceData LoadVoiceDataFromWav(string filePath)
-        {
-            VoiceDataThunk vdt = new VoiceDataThunk();
-            VoiceData voiceData = new VoiceData();
-            ContentImporter.UnsafeNativeMethods.LoadVoiceDataFromWav(filePath, ref vdt);
-            voiceData.Format = vdt.Format;
-            voiceData.AudioBytes = vdt.AudioBytes;
-            voiceData.AudioData = new MemoryStream(vdt.MarshalFromAudioData());
-            vdt.Dispose();
-            return voiceData;
-        }
-
         public static SourceVoice LoadVoice(XAudio2 audioDevice, string resource, bool loop = false)
         {
             SourceVoice sourceVoice = null;
@@ -130,29 +53,21 @@ namespace CipherPark.AngelJacket.Core.Content
             }
             else if (resourceFileExt == ".wma")
             {
-                FileStream stream = new FileStream(resource, FileMode.Open);
-                AudioDecoder decoder = new AudioDecoder(stream);
-                var samplePointers = decoder.GetSamples();
-                int bufferSize = 0;
-                foreach (DataPointer samplePointer in samplePointers)
-                    bufferSize+= samplePointer.Size;
-                DataStream dataStream = new DataStream(bufferSize, true, true);                
-                foreach (DataPointer samplePonter in samplePointers)                
-                    dataStream.Write(samplePonter.Pointer, 0, samplePonter.Size);                                
-                ab.Flags = BufferFlags.EndOfStream;
-                ab.Stream = dataStream;
-                ab.AudioBytes = bufferSize;
-                sourceVoice = new SourceVoice(audioDevice, decoder.WaveFormat);
-                sourceVoice.SubmitSourceBuffer(ab, null);                
-                stream.Close();
+                return null;
             }
 
             return sourceVoice;
         }
 
-        public static SpriteFont LoadFont(Device graphicsDevice, string resource)
+        public static XAudio2StreamingManager LoadStreamingVoice(XAudio2 audioDevice, string resource)
         {            
-            //ShaderResourceView fontShaderResourceView = new ShaderResourceView(game.GraphicsDevice, resource);
+            IntPtr nativePointer = UnsafeNativeMethods.LoadStreamingAudio(resource);
+            XAudio2StreamingManager manager = new XAudio2StreamingManager(audioDevice, nativePointer);
+            return manager;
+        }
+
+        public static SpriteFont LoadFont(Device graphicsDevice, string resource)
+        {        
             SpriteFont font = new SpriteFont(graphicsDevice, resource);
             return font;
         }
@@ -163,7 +78,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return new Texture2D(_nativeTextureResource);
         }
 
-        public static Texture2D LoadCubeTexture(DeviceContext deviceContext, string[] fileNames)
+        public static Texture2D LoadTextureCube(DeviceContext deviceContext, string[] fileNames)
         {
             if (fileNames.Length != 6)
                 throw new InvalidOperationException("Number of specified file names is less or greater than 6");
@@ -184,7 +99,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 deviceContext.CopyResource(_textures[i], _stagingTextures[i]);                
             }     
             //NOTE: we create a separate loop so that the DeviceContext.CopyResource() operation in the prior loop
-            //can finish as many async operations as possible before calling DeviceContext.MapSubResource() on the
+            //can finish as many async operations as possible before we call DeviceContext.MapSubResource() on each
             //respective texture.
             for (int i = 0; i < _textures.Length; i++)
                 _dataBoxes[i] = deviceContext.MapSubresource(_stagingTextures[i], 0, MapMode.Read, MapFlags.None);
@@ -197,20 +112,17 @@ namespace CipherPark.AngelJacket.Core.Content
             for (int i = 0; i < _textures.Length; i++)
                 deviceContext.UnmapSubresource(_stagingTextures[i], 0);
             return cubeTexture;
-        }
-
-        private static class UnsafeNativeMethods
-        {
-            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadVoiceDataFromWav")]
-            public static extern int LoadVoiceDataFromWav([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref VoiceDataThunk voiceData);
-
-            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
-            public static extern IntPtr CreateTextureFromFile(IntPtr deviceContext, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
-
-            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
-            public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
-        }
-       
+        }    
+      
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="fileName"></param>
+        /// <param name="shaderByteCode"></param>
+        /// <param name="channels"></param>
+        /// <returns></returns>
+        [Obsolete]
         public static Model ImportFBX(IGameApp app, string fileName, byte[] shaderByteCode, FBXFileChannels channels = FBXFileChannels.Default)
         {
             BasicModel result = null;
@@ -439,6 +351,33 @@ namespace CipherPark.AngelJacket.Core.Content
                 BuildBoneFrameHierarchy(xChildBoneFrame, childBoneFrame, skinOffsets);
             }
         }
+
+        private static VoiceData LoadVoiceDataFromWav(string filePath)
+        {            
+            VoiceDataThunk vdt = new VoiceDataThunk();
+            VoiceData voiceData = new VoiceData();
+            ContentImporter.UnsafeNativeMethods.LoadVoiceDataFromWav(filePath, ref vdt);
+            voiceData.Format = vdt.Format;
+            voiceData.AudioBytes = vdt.AudioBytes;
+            voiceData.AudioData = new MemoryStream(vdt.MarshalFromAudioData());
+            vdt.Dispose();
+            return voiceData;
+        }
+
+        private static class UnsafeNativeMethods
+        {
+            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadVoiceDataFromWav")]
+            public static extern int LoadVoiceDataFromWav([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref VoiceDataThunk voiceData);
+
+            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
+            public static extern IntPtr CreateTextureFromFile(IntPtr deviceContext, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
+
+            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
+            public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
+            
+            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadStreamingAudio")]
+            public static extern IntPtr LoadStreamingAudio([MarshalAs(UnmanagedType.LPWStr)] string fileName);
+        }       
     }
   
     [Flags]
@@ -606,17 +545,5 @@ namespace CipherPark.AngelJacket.Core.Content
         }
 
         #endregion
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct WaveFormatEx
-    {
-        public UInt16 FormatTag;
-        public UInt16 Channels;
-        public UInt32 SamplesPerSec;
-        public UInt32 AvgBytesPerSec;
-        public UInt16 BlockAlign;
-        public UInt16 BitsPerSample;
-        public UInt16 PaddingSize;
     }
 }
