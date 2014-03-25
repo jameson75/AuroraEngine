@@ -114,7 +114,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap1RenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP0);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP0P1);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
 
@@ -128,7 +128,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap2RenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP1);
             //NOTE: We're using the same pixel shader from pass0.
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
 
@@ -144,7 +144,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP2);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP2);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);

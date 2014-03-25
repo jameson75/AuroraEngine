@@ -21,7 +21,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public abstract class SceneNodeEffector
     {
-        public abstract void Update(long gameTime, SceneNode node);
+        public abstract void Update(GameTime gameTime, SceneNode node);
     }
 
     public class OffsetNodeEffector : SceneNodeEffector
@@ -42,7 +42,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public float OuterRadius { get; set; }
 
-        public override void Update(long gameTime, SceneNode node)
+        public override void Update(GameTime gameTime, SceneNode node)
         {
             if (TrackedObject != null && CenterObject != null && OuterRadius > 0)
             {
@@ -77,7 +77,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public float MaxPivotAngle { get; set; }
         public float PivotSpeed { get; set; }    
 
-        public override void Update(long gameTime, SceneNode node)
+        public override void Update(GameTime gameTime, SceneNode node)
         {
             if (TrackedObject != null && PivotObject != null && TrackingRange > 0)
             {

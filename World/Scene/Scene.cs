@@ -44,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public List<SpriteBatchContext> SpriteBatchContexts { get { return _spriteBatchContexts; } }
 
-        public void Update(long gameTime)
+        public void Update(GameTime gameTime)
         {
             OnBeginUpdate();
             foreach (SceneNode node in Nodes)
@@ -52,7 +52,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             OnEndUpdate();
         }       
 
-        public void Draw(long gameTime)
+        public void Draw(GameTime gameTime)
         {
             OnBeginDraw();
             //CameraNode.Camera.PostEffectChain.Begin(gameTime);            
@@ -67,13 +67,13 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             OnEndDraw();            
         }
 
-        private void _DrawSprites(long gameTime)
+        private void _DrawSprites(GameTime gameTime)
         {
             foreach (SpriteBatchContext context in _spriteBatchContexts)
                 context.Draw();
         }
 
-        private void _DrawSkyModel(long gameTime)
+        private void _DrawSkyModel(GameTime gameTime)
         {
             if (SkyModel != null)
             {
@@ -85,14 +85,14 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
-        private void _UpdateNodeHierarchy(long gameTime, SceneNode node)
+        private void _UpdateNodeHierarchy(GameTime gameTime, SceneNode node)
         {       
             node.Update(gameTime);            
             foreach (SceneNode child in node.Children)
                 _UpdateNodeHierarchy(gameTime, child);           
         }
 
-        private void _DrawNodeHierarchy(long gameTime, SceneNode node)
+        private void _DrawNodeHierarchy(GameTime gameTime, SceneNode node)
         {
             if (node.Visible)
             {

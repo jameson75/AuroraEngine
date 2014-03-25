@@ -77,7 +77,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Render Screen quad.
             //-------------------
-            _quad.Draw(0);            
+            _quad.Draw(null);            
             
             //Clean Up Shader
             //----------------

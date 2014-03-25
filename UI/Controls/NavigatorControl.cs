@@ -83,9 +83,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             rotationEllipseDiameter = this.Bounds.Width / 3.0f;
             rotationRectangle = RectangleFExtension.CreateLTWH((this.Bounds.Width - rotationEllipseDiameter) / 2, (this.Bounds.Height - rotationEllipseDiameter) / 2, rotationEllipseDiameter, rotationEllipseDiameter);
             base.OnSizeChanged();
-        }     
+        }
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             InputService inputServices = (InputService)Game.Services.GetService(typeof(InputService));
             InputState inputState = inputServices.GetInputState();

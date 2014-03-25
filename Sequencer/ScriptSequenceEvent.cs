@@ -10,7 +10,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
     {
         public string Script { get; set; }
 
-        public override void Execute(long gameTime, SequencerContext context)
+        public override void Execute(GameTime gameTime, SequencerContext context)
         {
             
         }

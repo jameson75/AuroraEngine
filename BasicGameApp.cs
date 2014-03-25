@@ -41,11 +41,15 @@ namespace CipherPark.AngelJacket.Core
         private Keyboard _keyboard = null;
         private ServiceTable _services = null;
         private bool _closeFormOnUpdate = false;
+        private GameTime _gameTime = null;
 
         public BasicGameApp()
         {
             _services = new ServiceTable();
+            _gameTime = new GameTime();
         }
+
+        protected GameTime GameTime { get { return _gameTime; } } 
 
         public void Run(Form form)
         {

@@ -230,14 +230,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
         }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {
             foreach (MenuItem item in Items)
                 item.Draw(gameTime);
             base.OnDraw(gameTime);
         }
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             if (this.HasFocus)
             {
@@ -456,7 +456,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
 

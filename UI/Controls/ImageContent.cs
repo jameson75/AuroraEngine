@@ -49,7 +49,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             Texture = texture;
         }
 
-        public override void Draw(long gameTime)
+        public override void Draw(GameTime gameTime)
         {
             if (this.Container == null)
                 throw new InvalidOperationException("Container is null. Container must be specified before calling Draw method.");

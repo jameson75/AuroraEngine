@@ -27,9 +27,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         
         UIResourceCollection Resources { get; }
 
-        void Update(long gameTime);
+        void Update(GameTime gameTime);
 
-        void Draw(long gameTime);
+        void Draw(GameTime gameTime);
 
         event EventHandler LoadComplete;
 

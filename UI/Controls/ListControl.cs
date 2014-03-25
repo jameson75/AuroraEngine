@@ -171,14 +171,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public ListColumnDirection ColumnDirection { get; set; }
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             foreach (ListControlItem item in this.Items)
                 item.Update(gameTime);
             base.OnUpdate(gameTime);
         }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {
             if (_backgroundContent != null)
                 _backgroundContent.Draw(gameTime);

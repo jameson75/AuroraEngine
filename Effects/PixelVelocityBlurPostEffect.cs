@@ -113,7 +113,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.Set(_worldVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_worldColorPixelShader);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_colorTextureRenderTargetView);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -132,7 +132,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.Set(_worldVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_worldVelocityPixelShader);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentVelocityTextureRenderTargetView);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -162,7 +162,7 @@ namespace CipherPark.AngelJacket.Core.Effects
                 GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruVertexShader);
                 GraphicsDevice.ImmediateContext.PixelShader.Set(_blurPixelShader);
                 GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_originalRenderTargetView);
-                _quad.Draw(0);
+                _quad.Draw(null);
                 GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
                 GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
                 GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -184,7 +184,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_passThruPixelShader);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_lastVelocityTextureRenderTargetView);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.VertexShader.Set(null);
             GraphicsDevice.ImmediateContext.PixelShader.Set(null);

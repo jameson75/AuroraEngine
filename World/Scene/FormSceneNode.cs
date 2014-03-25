@@ -74,7 +74,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }        
 
-        public override void Draw(long gameTime)
+        public override void Draw(GameTime gameTime)
         {
             if (Form != null)
             {

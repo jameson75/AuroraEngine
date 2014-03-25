@@ -97,7 +97,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             OnClick();
         }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {
             if (BackgroundContent != null)
                 BackgroundContent.Draw(gameTime);
@@ -108,7 +108,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnDraw(gameTime);
         }     
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
             

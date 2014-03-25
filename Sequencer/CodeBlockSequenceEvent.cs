@@ -16,7 +16,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
 
     public class CodeBlockSequenceEvent : SequenceEvent
     {
-        public override void Execute(long gameTime, SequencerContext context)
+        public override void Execute(GameTime gameTime, SequencerContext context)
         {
             if (CodeBlock != null)
                 CodeBlock(gameTime, context);
@@ -25,5 +25,5 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         public ExecuteSequenceDelegate CodeBlock { get; set; }
     }
 
-    public delegate void ExecuteSequenceDelegate(long gameTime, SequencerContext context);
+    public delegate void ExecuteSequenceDelegate(GameTime gameTime, SequencerContext context);
 }

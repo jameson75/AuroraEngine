@@ -102,7 +102,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_hBlurRenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_horzVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_blurPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -119,7 +119,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_hvBlurRenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_blurPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -136,7 +136,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMapRenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_glowPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -154,7 +154,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_glowPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);

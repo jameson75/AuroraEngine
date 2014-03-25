@@ -70,7 +70,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public virtual void Draw(long gameTime)
+        public virtual void Draw(GameTime gameTime)
         { 
 
         }

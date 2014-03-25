@@ -72,7 +72,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Items.Add(item);
         }
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {             
             if (this.HasFocus || this.ContainsFocus)
             {
@@ -101,7 +101,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
              base.OnUpdate(gameTime);
         }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {
             foreach (ItemControl item in this.Items)
                 item.Draw(gameTime);

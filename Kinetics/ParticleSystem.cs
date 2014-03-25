@@ -99,7 +99,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             _particles.ForEach(p => p.TransformableParent = null);
         }
 
-        public virtual void Draw(long gameTime)
+        public virtual void Draw(GameTime gameTime)
         {
             var particleGroupings = _particles.GroupBy(p => p.Description);
             foreach (IGrouping<ParticleDescription, Particle> particleGrouping in particleGroupings)
@@ -111,7 +111,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             }
         }
 
-        private void DrawInstancedParticles(long gameTime, Mesh instanceMesh, Effect instanceEffect, IEnumerable<Particle> particles)
+        private void DrawInstancedParticles(GameTime gameTime, Mesh instanceMesh, Effect instanceEffect, IEnumerable<Particle> particles)
         {
             if (instanceMesh.IsInstanced == false || instanceMesh.IsDynamic == false)
                 throw new InvalidOperationException("Particle mesh is not dynamic and instanced.");
@@ -125,7 +125,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             }
         }
 
-        private void DrawParticles(long gameTime, IEnumerable<Particle> particles)
+        private void DrawParticles(GameTime gameTime, IEnumerable<Particle> particles)
         {
             foreach (Particle p in particles)
             {               
@@ -187,7 +187,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             base.OnParticlesReset();
         }
 
-        public override void Draw(long gameTime)
+        public override void Draw(GameTime gameTime)
         {
             //TODO: Implement wire frame rendering.
             //-------------------------------------

@@ -25,7 +25,7 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
         public override void Start()
         {  }
 
-        public override void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(GameTime gameTime)
         {
             if (Reaction != null)
             {

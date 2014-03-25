@@ -124,7 +124,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_dofPixelShader);            
-            _quad.Draw(0);
+            _quad.Draw(null);
 
             //Pass 1
             //------    
@@ -138,7 +138,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_smartBlurPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
 
             //Pass 2
             //------
@@ -152,7 +152,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_horzBlurPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
 
             //Pass 3
             //------
@@ -166,7 +166,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_vertBlurPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderTargetView);            
 

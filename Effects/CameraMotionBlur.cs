@@ -72,7 +72,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _passThruFixConstantsBuffer);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruFixVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_combinePixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
@@ -91,7 +91,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _passThruFixConstantsBuffer);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruFixVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_passThruPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
 
@@ -107,7 +107,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _passThruFixConstantsBuffer);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_passThruFixVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_passThruPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
 

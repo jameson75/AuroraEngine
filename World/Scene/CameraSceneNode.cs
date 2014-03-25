@@ -62,7 +62,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
-        public override void Update(long gameTime)
+        public override void Update(GameTime gameTime)
         {
             //Track the look-at-target, if one was specified.
             if (LookAtTarget != null && Camera != null)            

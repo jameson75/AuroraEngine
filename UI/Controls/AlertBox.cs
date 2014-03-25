@@ -82,7 +82,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         //TODO: Get rid of this override - only used for testing.
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {            
             base.OnDraw(gameTime);
         }

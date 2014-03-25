@@ -32,14 +32,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {
             foreach (UIControl control in Children)
                 control.Draw(gameTime);
             base.OnDraw(gameTime);    
         }      
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             foreach (UIControl child in this.Children)
                 child.Update(gameTime);

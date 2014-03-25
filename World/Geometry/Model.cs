@@ -70,7 +70,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         //    _effect.Apply(_effectParameters);
         //}
 
-        public abstract void Draw(long gameTime);      
+        public abstract void Draw(GameTime gameTime);      
 
         protected virtual void OnApplyingEffect()
         { }
@@ -95,7 +95,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
            
         }   
 
-        public override void Draw(long gameTime)
+        public override void Draw(GameTime gameTime)
         {
             if (Effect != null)
             {
@@ -207,7 +207,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             : base(game)
         { }
         
-        public override void Draw(long gameTime)
+        public override void Draw(GameTime gameTime)
         {
             List<Frame> frameList = null;
                 if(FrameTree != null)

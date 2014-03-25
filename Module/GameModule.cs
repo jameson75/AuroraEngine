@@ -27,9 +27,9 @@ namespace CipherPark.AngelJacket.Core.Module
 
         public abstract void LoadContent();
 
-        public abstract void Update(long gameTime);
+        public abstract void Update(GameTime gameTime);
         
-        public abstract void Draw(long gameTime);      
+        public abstract void Draw(GameTime gameTime);      
 
         public abstract void UnloadContent();
         
@@ -54,5 +54,5 @@ namespace CipherPark.AngelJacket.Core.Module
             IModuleService moduleService = (IModuleService)Game.Services.GetService(typeof(IModuleService));
             moduleService.ActivateOnUpdate(key);
         }
-    }
+    }  
 }

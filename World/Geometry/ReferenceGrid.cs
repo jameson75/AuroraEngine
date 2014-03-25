@@ -76,7 +76,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _mesh = new Mesh(app, meshDesc);
         }
 
-        public void Draw(long gameTime)
+        public void Draw(GameTime gameTime)
         {
             _effect.SetWorld(Transform);
             _effect.SetView(Camera.ViewMatrix);

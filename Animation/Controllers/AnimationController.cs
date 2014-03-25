@@ -25,7 +25,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     public interface IAnimationController
     {       
         void Start();
-        void UpdateAnimation(long gameTime);
+        void UpdateAnimation(GameTime gameTime);
         bool IsAnimationComplete { get; }
         void SetComplete();
         event EventHandler AnimationComplete;
@@ -50,7 +50,7 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public abstract void Start();
         
-        public abstract void UpdateAnimation(long gameTime);
+        public abstract void UpdateAnimation(GameTime gameTime);
         
         public event EventHandler AnimationComplete;
 
@@ -86,12 +86,12 @@ namespace CipherPark.AngelJacket.Core.Animation
             _animationStartTime = null;
         }
 
-        public override void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(GameTime gameTime)
         {
             if (_animationStartTime == null)
-                _animationStartTime = gameTime;
+                _animationStartTime = gameTime.GetTotalSimtime();
             
-            ulong elapsedTime = (ulong)(gameTime - _animationStartTime.Value);
+            ulong elapsedTime = (ulong)(gameTime.GetTotalSimtime() - _animationStartTime.Value);
 
             if (Target != null && Animation != null)
             {
@@ -145,12 +145,12 @@ namespace CipherPark.AngelJacket.Core.Animation
             _animationStartTime = null;           
         }
 
-        public override void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(GameTime gameTime)
         {
             if (_animationStartTime == null)
-                _animationStartTime = gameTime;
+                _animationStartTime = gameTime.GetTotalSimtime();
 
-            ulong elapsedTime = (ulong)(gameTime - _animationStartTime.Value);
+            ulong elapsedTime = (ulong)(gameTime.GetTotalSimtime() - _animationStartTime.Value);
 
             if (Target != null)                             
                 Target.Transform = new Transform(Delta.GetTransformationAtT((float)elapsedTime / 1000.0f));                         
@@ -178,7 +178,7 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public override void Start() { }
 
-        public override void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(GameTime gameTime)
         {
             //**********************************************************************************
             //NOTE: We use an auxilary controller collection to enumerate through, in 

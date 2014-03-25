@@ -30,9 +30,9 @@ namespace CipherPark.AngelJacket.Core.World
         public WorldSimulator(IGameApp game)
         {
             _game = game;
-        }       
+        }
 
-        public void Update(long gameTime, SimulationContext context)
+        public void Update(GameTime gameTime, SimulationContext context)
         {
             //Update animation controllers.
             //**********************************************************************************

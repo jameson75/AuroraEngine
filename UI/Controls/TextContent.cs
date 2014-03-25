@@ -35,7 +35,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public HorizontalAlignment HAlignment { get; set; }
 
-        public override void Draw(long gameTime)
+        public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);            
             if (Container == null)

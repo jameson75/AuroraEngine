@@ -21,9 +21,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         
         public Accordian(IUIRoot visualRoot)
             : base(visualRoot)
-        { }     
+        { }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {
             foreach (ToolMenuItem panel in Items)
                 panel.Draw(gameTime);
@@ -89,7 +89,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Button Button { get { return itemButton; } }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {
             itemButton.Draw(gameTime);
             if (this.Expanded)            

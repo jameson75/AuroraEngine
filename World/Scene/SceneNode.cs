@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
+using CipherPark.AngelJacket.Core;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
@@ -77,9 +78,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         
         public virtual Transform Transform { get; set; }        
 
-        public virtual void Draw(long gameTime) { }
+        public virtual void Draw(GameTime gameTime) { }
 
-        public virtual void Update(long gameTime) 
+        public virtual void Update(GameTime gameTime) 
         {
             if (NodeEffector != null)
                 NodeEffector.Update(gameTime, this);

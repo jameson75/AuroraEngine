@@ -125,7 +125,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(3, _randomTextureSampler);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);            
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            _quad.Draw(0);           
+            _quad.Draw(null);           
 
             //////////////
             //Clean up

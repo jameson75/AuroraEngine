@@ -88,6 +88,7 @@
     <Compile Include="Effects\PixelVelocityBlurPostEffect.cs" />
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
     <Compile Include="Effects\Obsolete\SSAOPostEffect.cs" />
+    <Compile Include="GameTime.cs" />
     <Compile Include="Kinetics\Animation\ParticleAnimationBuilder.cs" />
     <Compile Include="Animation\Controllers\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />

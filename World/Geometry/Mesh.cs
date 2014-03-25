@@ -93,7 +93,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                _instanceCount = data.Length;
         }    
 
-        public void Draw(long gameTime)
+        public void Draw(GameTime gameTime)
         {
             Format indexBufferFormat = Format.R16_UInt;
 

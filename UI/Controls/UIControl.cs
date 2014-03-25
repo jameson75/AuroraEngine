@@ -358,20 +358,20 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public virtual void Initialize() { }
 
-        public void Update(long gameTime)
+        public void Update(GameTime gameTime)
         {
             OnUpdate(gameTime);
         }
 
-        protected virtual void OnUpdate(long gameTime) { }
+        protected virtual void OnUpdate(GameTime gameTime) { }
 
-        public void Draw(long gameTime)
+        public void Draw(GameTime gameTime)
         {
             if(Visible)
                 OnDraw(gameTime);
         }
 
-        protected virtual void OnDraw(long gameTime) { }
+        protected virtual void OnDraw(GameTime gameTime) { }
 
         public virtual void ApplyTemplate(UIControlTemplate template)
         {

@@ -34,12 +34,12 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             _animationStartTime = null;            
         }
 
-        public override void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(GameTime gameTime)
         {
             if (_animationStartTime == null)
-                _animationStartTime = gameTime;
+                _animationStartTime = gameTime.GetTotalSimtime();
             
-            ulong timeT = (ulong)(gameTime - _animationStartTime.Value);
+            ulong timeT = (ulong)(gameTime.GetTotalSimtime() - _animationStartTime.Value);
 
             OnUpdateTarget(timeT);
 

@@ -70,7 +70,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             OnEndContext();
         }
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             if (this.ContainsFocus)
             {               

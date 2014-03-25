@@ -64,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             VisualRoot.FocusManager.ControlLostFocus += FocusManager_ControlLostFocus;
         }
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {
             if (_caret == null)
                 BeginCaret();
@@ -95,14 +95,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 }
             }            
 
-            if (_lastCaretUpdateTime == 0 || gameTime - _lastCaretUpdateTime > 500)
+            if (_lastCaretUpdateTime == 0 || gameTime.GetTotalRealtime() - _lastCaretUpdateTime > 500)
             {
                 _caret.Visible = !_caret.Visible;
-                _lastCaretUpdateTime = gameTime;
+                _lastCaretUpdateTime = gameTime.GetTotalRealtime();
             }
         }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {
             if (this.Size == DrawingSizeFExtension.Zero)
                 return;

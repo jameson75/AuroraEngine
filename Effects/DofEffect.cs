@@ -178,7 +178,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_lowResTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_downSampleVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_downSamplePixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
@@ -195,7 +195,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_tempTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_gaussianVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_gaussianPixelShader);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
@@ -214,7 +214,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //NOTE: We are reusing the Guassian vertex shader from previous pass.
             //*******************************************************************************
             GraphicsDevice.ImmediateContext.PixelShader.Set(_gaussianPixelShader2);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
@@ -237,7 +237,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_depthFinal1VertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_depthFinal1PixelShader);            
-            _quad.Draw(0);
+            _quad.Draw(null);
             //**********************************************************************************
             //NOTE: No need for clean-up, We'll be reusing the same resources in the next pass.
             //**********************************************************************************
@@ -268,7 +268,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
             BlendState oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
             GraphicsDevice.ImmediateContext.OutputMerger.BlendState = new BlendState(GraphicsDevice, blendDesc);
-            _quad.Draw(0);
+            _quad.Draw(null);
             GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);

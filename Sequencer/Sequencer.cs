@@ -34,7 +34,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
             _game = game;
         }
 
-        public void Update(long gameTime, SequencerContext context)
+        public void Update(GameTime gameTime, SequencerContext context)
         {
             if (!_isStarted)
                 Start();
@@ -72,7 +72,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
     public abstract class SequenceEvent 
     { 
         public long Time { get; set; }
-        public abstract void Execute(long gameTime, SequencerContext context);
+        public abstract void Execute(GameTime gameTime, SequencerContext context);
     }     
 
     public struct SequencerContext

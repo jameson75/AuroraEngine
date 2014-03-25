@@ -119,7 +119,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //EXECUTE SHADERS
             //---------------
-            ScreenQuad.Draw(0);       
+            ScreenQuad.Draw(null);       
 
             //CLEAN UP VERTEX SHADER
             //----------------------

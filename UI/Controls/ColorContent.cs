@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }         
         }
 
-        public override void Draw(long gameTime)
+        public override void Draw(GameTime gameTime)
         {            
             if (Container == null)
                 throw new InvalidOperationException("No container for this content was specified.");

@@ -122,13 +122,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }                    
         }
 
-        protected override void OnUpdate(long gameTime)
+        protected override void OnUpdate(GameTime gameTime)
         {            
             _mainPanel.Update(gameTime);
             base.OnUpdate(gameTime);
         }
 
-        protected override void OnDraw(long gameTime)
+        protected override void OnDraw(GameTime gameTime)
         {           
             _mainPanel.Draw(gameTime);
             base.OnDraw(gameTime);

@@ -147,7 +147,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 return _resourceParsers[elementName];
         }
 
-        public void Update(long gameTime)
+        public void Update(GameTime gameTime)
         {
             focusManager.Update();
 
@@ -159,7 +159,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             focusManager.PostUpdate();
         }
 
-        public void Draw(long gameTime)
+        public void Draw(GameTime gameTime)
         {
             //******************************************************************************
             // NOTE: When using the SpriteBatch, the DepthStencilState and RasterizerState
@@ -182,7 +182,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 handler(this, EventArgs.Empty);
         }
 
-        private void UpdateAnimations(long gameTime)
+        private void UpdateAnimations(GameTime gameTime)
         {
             //Update animation controllers.
             //**********************************************************************************
