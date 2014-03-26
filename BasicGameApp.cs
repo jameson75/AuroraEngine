@@ -74,7 +74,7 @@ namespace CipherPark.AngelJacket.Core
         {
             UnloadContent();
             Uninitialize();  
-        }      
+        }
 
         protected virtual void Update()
         { }

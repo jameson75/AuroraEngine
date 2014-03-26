@@ -62,6 +62,29 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
+        //public override Transform Transform
+        //{
+        //    get
+        //    {                
+        //        if (Camera != null)
+        //            return Camera.ViewMatrixToTransform(this.WorldToParent(Camera.ViewMatrix));
+        //        else
+        //            return Transform.Identity; // _cachedTransform;
+        //    }
+        //    set
+        //    {
+        //        if (Camera != null)
+        //        {
+        //            if (LookAtTarget != null)
+        //                Camera.ViewMatrix = this.ParentToWorld(TransformToLookAtTargetMatrix(value));
+        //            else
+        //                Camera.ViewMatrix = this.ParentToWorld(Camera.TransformToViewMatrix(value));
+        //        }
+        //        //else
+        //        //    _cachedTransform = value;
+        //    }
+        //}
+
         public override void Update(GameTime gameTime)
         {
             //Track the look-at-target, if one was specified.
@@ -75,14 +98,15 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         /// </summary>
         /// <param name="distance"></param>
         /// <returns>An infered look-at-target at the specified distance. The look-at-target is defined in world space.</returns>
-        public NullSceneNode InferTarget(float distance)
+        public NullSceneNode InferWorldTarget(float distance)
         {
             Vector3 lookAt = Vector3.Normalize(new Vector3(Camera.ViewMatrix.Column3.ToArray().Take(3).ToArray()));
             Vector3 eye = Camera.ViewMatrixToTransform(this.Camera.ViewMatrix).Translation;
             Vector3 targetLocation = eye + (lookAt * distance);
             NullSceneNode node = new NullSceneNode(this.Game);
-            node.Transform = new Transform() { Translation = targetLocation };
-            return node;            
+            node.Transform = this.ParentToWorld(new Transform() { Translation = targetLocation });
+            //node.Transform = new Transform() { Translation = targetLocation };
+            return node;                       
         }
         
         private Matrix TransformToLookAtTargetMatrix(Transform t)
