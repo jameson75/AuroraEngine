@@ -66,6 +66,12 @@ namespace CipherPark.AngelJacket.Core.Animation
         {
             return new Transform(Matrix.Invert(t.ToMatrix()));
         }
+
+        public static Transform Lerp(Transform t1, Transform t2, float step)
+        {
+            return new Transform(Quaternion.Lerp(t1.Rotation, t2.Rotation, step),
+                                 Vector3.Lerp(t1.Translation, t2.Translation, step));
+        }
     }
 
     /// <summary>

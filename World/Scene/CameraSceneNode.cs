@@ -95,15 +95,17 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     public class CameraLookAtAnimationController : AnimationController
     {
         private long? _animationStartTime = null;
-        private Vector3 _startLookAt = Vector3.Zero;
-        private Vector3 _startUp = Vector3.Zero;
+        //private Vector3 _startLookAt = Vector3.Zero;
+        //private Vector3 _startUp = Vector3.Zero;
+        private Transform _startCamTransform = Transform.Identity;
 
         public CameraSceneNode CameraNode { get; set; }
         public ITransformable LockInTarget { get; set; }
         public Vector3? LookAtTarget { get; set; }
         public Vector3? LockUp { get; set; }
         public ulong AnimationRunningTime { get; set; }
-  
+        public bool PreserveLockIn { get; set; }
+
         public override void Start()
         {
             _animationStartTime = null;
@@ -130,8 +132,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             if (_animationStartTime == null)
             {
                 _animationStartTime = gameTime.GetTotalSimtime();
-                _startLookAt = camEye + new Vector3(CameraNode.Camera.ViewMatrix.Column3.ToArray().Take(3).ToArray());
-                _startUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
+                //_startLookAt = camEye + new Vector3(CameraNode.Camera.ViewMatrix.Column3.ToArray().Take(3).ToArray());
+                //_startUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
+                _startCamTransform = CameraNode.Transform;
                 CameraNode.LockInTarget = null;
                 CameraNode.LockUp = null;
             }          
@@ -139,25 +142,35 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             ulong elapsedTime = (ulong)(gameTime.GetTotalSimtime() - _animationStartTime.Value);
             float step = MathUtil.Clamp((float)elapsedTime / (float)AnimationRunningTime, 0, 1);            
             
-            Vector3 csEndLookAt = Vector3.Zero;            
+            Vector3 endTarget = Vector3.Zero;            
             if (LockInTarget != null)
-                csEndLookAt = CameraNode.WorldToParent(LockInTarget.ParentToWorld(LockInTarget.Transform)).Translation;
+                endTarget = CameraNode.WorldToParent(LockInTarget.ParentToWorld(LockInTarget.Transform)).Translation;
             else
-                csEndLookAt = CameraNode.WorldToParent(new Transform(LookAtTarget.Value)).Translation;  
+                endTarget = CameraNode.WorldToParent(new Transform(LookAtTarget.Value)).Translation;  
             
-            Vector3 csEndUp = Vector3.Zero;
+            Vector3 endUp = Vector3.Zero;
             if(LockUp != null)
-               csEndUp = LockUp.Value; //TODO: Transform this NORMAL to local space.
+               endUp = LockUp.Value; //TODO: Transform this NORMAL to local space.
             else
-               csEndUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
+               endUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
             
-            Vector3 camLookAt = Vector3.Lerp(_startLookAt, csEndLookAt, step);
-            Vector3 camUp = Vector3.Lerp(_startUp, csEndUp, step);
+            //Vector3 camLookAt = Vector3.Lerp(_startLookAt, csEndLookAt, step);
+            //Vector3 camUp = Vector3.Lerp(_startUp, csEndUp, step);
 
-            CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(camEye, camLookAt, camUp);
+            Matrix endViewMatrix = Matrix.LookAtLH(camEye, endTarget, endUp);
+            Transform endCamTransform = Camera.ViewMatrixToTransform(endViewMatrix);
 
-            if (elapsedTime >= AnimationRunningTime && !IsAnimationComplete)            
-                OnAnimationComplete();            
-        }
+            CameraNode.Transform = Transform.Lerp(_startCamTransform, endCamTransform, step);
+
+            if (elapsedTime >= AnimationRunningTime && !IsAnimationComplete)
+            {
+                if (PreserveLockIn)
+                {
+                    CameraNode.LockInTarget = this.LockInTarget;
+                    CameraNode.LockUp = this.LockUp;
+                }
+                OnAnimationComplete();
+            }
+        }       
     }
 }
