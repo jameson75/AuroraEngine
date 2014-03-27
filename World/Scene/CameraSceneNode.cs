@@ -31,9 +31,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             Camera = camera;
         }
 
-        public ITransformable LookAtTarget { get; set; }
+        public ITransformable LockInTarget { get; set; }
 
-        public Vector3? LookAtUp { get; set; }      
+        public Vector3? LockUp { get; set; }      
 
         public Camera Camera { get; set; }
 
@@ -50,34 +50,45 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             {
                 if (Camera != null)
                 {
-                    //Transform, but track the look-at target if one was specified.
-                    if (LookAtTarget != null)
-                        Camera.ViewMatrix = TransformToLookAtTargetMatrix(value);
+                    //Transform, but track the lock-in target if one was specified.
+                    if (LockInTarget != null)
+                        Camera.ViewMatrix = TransformToLockInViewMatrix(value);
                     //Transform exactly as specified.
                     else
                         Camera.ViewMatrix = Camera.TransformToViewMatrix(value);
-                }
-                //else
-                //    _cachedTransform = value;
+                }                
             }
         }     
 
         public override void Update(GameTime gameTime)
         {
-            //Update, but track the look-at-target, if one was specified.
-            if (LookAtTarget != null && Camera != null)
-                Camera.ViewMatrix = TransformToLookAtTargetMatrix(Transform);            
+            //Update, but track the lock-in-target, if one was specified.
+            if (Camera != null && LockInTarget != null)
+                Camera.ViewMatrix = TransformToLockInViewMatrix(Transform);            
                         
             base.Update(gameTime);
         }
+
+        public void LookAtTarget(Vector3 lookAtTarget)
+        {
+            Vector3 eye = Camera.ViewMatrix.TranslationVector;
+            Vector3 target = this.WorldToParent(new Transform(lookAtTarget)).Translation;
+            Vector3 up = Vector3.Zero;
+            if (LockUp != null)
+                up = this.WorldToParent(new Transform(LockUp.Value)).Translation;
+            else
+                up = new Vector3(Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
+            Camera.ViewMatrix = Matrix.LookAtLH(eye, target, up);
+        }
         
-        private Matrix TransformToLookAtTargetMatrix(Transform t)
+        private Matrix TransformToLockInViewMatrix(Transform t)
         {
             Matrix viewMatrix = Camera.TransformToViewMatrix(t);
-            Vector3 up = LookAtUp != null ? LookAtUp.Value : new Vector3(viewMatrix.Column2.ToArray().Take(3).ToArray());
-            Vector3 lookAt = this.WorldToParent(LookAtTarget.ParentToWorld(LookAtTarget.Transform)).Translation;
+            Vector3 up = LockUp != null ? this.WorldToParent(new Transform(LockUp.Value)).Translation 
+                : new Vector3(viewMatrix.Column2.ToArray().Take(3).ToArray());
+            Vector3 target = this.WorldToParent(LockInTarget.ParentToWorld(LockInTarget.Transform)).Translation;
             Vector3 eye = t.Translation;
-            return Matrix.LookAtLH(eye, lookAt, up);           
+            return Matrix.LookAtLH(eye, target, up);           
         }      
     }
 
@@ -85,13 +96,14 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     {
         private long? _animationStartTime = null;
         private Vector3 _startLookAt = Vector3.Zero;
+        private Vector3 _startUp = Vector3.Zero;
 
         public CameraSceneNode CameraNode { get; set; }
-        public ITransformable Target { get; set; }
-        public Vector3? EndLookAt { get; set; }
-        public ulong PanTime { get; set; }
-        public bool LockTargetOnComplete { get; set; }
-
+        public ITransformable LockInTarget { get; set; }
+        public Vector3? LookAtTarget { get; set; }
+        public Vector3? LockUp { get; set; }
+        public ulong AnimationRunningTime { get; set; }
+  
         public override void Start()
         {
             _animationStartTime = null;
@@ -100,33 +112,52 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public override void UpdateAnimation(GameTime gameTime)
         {
             //Both cannot be specified.
-            if(Target != null && EndLookAt != null)
+            if(LockInTarget != null && LookAtTarget != null)
                 throw new InvalidOperationException("A transformable target and end-look-at vector were both specified");
 
             //Exactly one must be specified.
-            if(Target == null && EndLookAt == null)
+            if(LockInTarget == null && LookAtTarget == null)
                 throw new InvalidOperationException("Niether transformable target nor end-look-at vector was specified.");
 
             if(CameraNode == null)
                 throw new InvalidOperationException("CameraNode property was null");
 
-            if(PanTime <= 0)
+            if(AnimationRunningTime <= 0)
                 throw new InvalidOperationException("PanTime was not greater than zero");
 
+            Vector3 camEye = CameraNode.Transform.Translation;
+            
             if (_animationStartTime == null)
             {
                 _animationStartTime = gameTime.GetTotalSimtime();
-                _startLookAt = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());               
+                _startLookAt = camEye + new Vector3(CameraNode.Camera.ViewMatrix.Column3.ToArray().Take(3).ToArray());
+                _startUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
+                CameraNode.LockInTarget = null;
+                CameraNode.LockUp = null;
             }          
  
             ulong elapsedTime = (ulong)(gameTime.GetTotalSimtime() - _animationStartTime.Value);
-            float step = (float)elapsedTime / (float)PanTime;
-            Vector3 currentLookAt = Vector3.Zero;
+            float step = MathUtil.Clamp((float)elapsedTime / (float)AnimationRunningTime, 0, 1);            
+            
+            Vector3 csEndLookAt = Vector3.Zero;            
+            if (LockInTarget != null)
+                csEndLookAt = CameraNode.WorldToParent(LockInTarget.ParentToWorld(LockInTarget.Transform)).Translation;
+            else
+                csEndLookAt = CameraNode.WorldToParent(new Transform(LookAtTarget.Value)).Translation;  
+            
+            Vector3 csEndUp = Vector3.Zero;
+            if(LockUp != null)
+               csEndUp = CameraNode.WorldToParent(new Transform(LockUp.Value)).Translation;
+            else
+               csEndUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
+            
+            Vector3 camLookAt = Vector3.Lerp(_startLookAt, csEndLookAt, step);
+            Vector3 camUp = Vector3.Lerp(_startUp, csEndUp, step);
 
-            if(Target != null )
-            {
-                
-            }
+            CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(camEye, camLookAt, camUp);
+
+            if (elapsedTime >= AnimationRunningTime && !IsAnimationComplete)            
+                OnAnimationComplete();            
         }
     }
 }
