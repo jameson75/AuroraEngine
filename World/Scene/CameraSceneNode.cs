@@ -21,8 +21,6 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class CameraSceneNode : SceneNode
     {
-        //private Transform _cachedTransform = Transform.Identity;   
-
         public CameraSceneNode(IGameApp game)
             : base(game)
         { }       
@@ -35,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public ITransformable LookAtTarget { get; set; }
 
-        public Vector3? LookAtUp { get; set; }
+        public Vector3? LookAtUp { get; set; }      
 
         public Camera Camera { get; set; }
 
@@ -52,61 +50,25 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             {
                 if (Camera != null)
                 {
+                    //Transform, but track the look-at target if one was specified.
                     if (LookAtTarget != null)
                         Camera.ViewMatrix = TransformToLookAtTargetMatrix(value);
+                    //Transform exactly as specified.
                     else
                         Camera.ViewMatrix = Camera.TransformToViewMatrix(value);
                 }
                 //else
                 //    _cachedTransform = value;
             }
-        }
-
-        //public override Transform Transform
-        //{
-        //    get
-        //    {                
-        //        if (Camera != null)
-        //            return Camera.ViewMatrixToTransform(this.WorldToParent(Camera.ViewMatrix));
-        //        else
-        //            return Transform.Identity; // _cachedTransform;
-        //    }
-        //    set
-        //    {
-        //        if (Camera != null)
-        //        {
-        //            if (LookAtTarget != null)
-        //                Camera.ViewMatrix = this.ParentToWorld(TransformToLookAtTargetMatrix(value));
-        //            else
-        //                Camera.ViewMatrix = this.ParentToWorld(Camera.TransformToViewMatrix(value));
-        //        }
-        //        //else
-        //        //    _cachedTransform = value;
-        //    }
-        //}
+        }     
 
         public override void Update(GameTime gameTime)
         {
-            //Track the look-at-target, if one was specified.
-            if (LookAtTarget != null && Camera != null)            
+            //Update, but track the look-at-target, if one was specified.
+            if (LookAtTarget != null && Camera != null)
                 Camera.ViewMatrix = TransformToLookAtTargetMatrix(Transform);            
+                        
             base.Update(gameTime);
-        }
-
-        /// <summary>
-        /// Infers a look-at-target at the specified distance from the camera.
-        /// </summary>
-        /// <param name="distance"></param>
-        /// <returns>An infered look-at-target at the specified distance. The look-at-target is defined in world space.</returns>
-        public NullSceneNode InferWorldTarget(float distance)
-        {
-            Vector3 lookAt = Vector3.Normalize(new Vector3(Camera.ViewMatrix.Column3.ToArray().Take(3).ToArray()));
-            Vector3 eye = Camera.ViewMatrixToTransform(this.Camera.ViewMatrix).Translation;
-            Vector3 targetLocation = eye + (lookAt * distance);
-            NullSceneNode node = new NullSceneNode(this.Game);
-            node.Transform = this.ParentToWorld(new Transform() { Translation = targetLocation });
-            //node.Transform = new Transform() { Translation = targetLocation };
-            return node;                       
         }
         
         private Matrix TransformToLookAtTargetMatrix(Transform t)
@@ -116,6 +78,55 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             Vector3 lookAt = this.WorldToParent(LookAtTarget.ParentToWorld(LookAtTarget.Transform)).Translation;
             Vector3 eye = t.Translation;
             return Matrix.LookAtLH(eye, lookAt, up);           
+        }      
+    }
+
+    public class CameraLookAtAnimationController : AnimationController
+    {
+        private long? _animationStartTime = null;
+        private Vector3 _startLookAt = Vector3.Zero;
+
+        public CameraSceneNode CameraNode { get; set; }
+        public ITransformable Target { get; set; }
+        public Vector3? EndLookAt { get; set; }
+        public ulong PanTime { get; set; }
+        public bool LockTargetOnComplete { get; set; }
+
+        public override void Start()
+        {
+            _animationStartTime = null;
+        }
+
+        public override void UpdateAnimation(GameTime gameTime)
+        {
+            //Both cannot be specified.
+            if(Target != null && EndLookAt != null)
+                throw new InvalidOperationException("A transformable target and end-look-at vector were both specified");
+
+            //Exactly one must be specified.
+            if(Target == null && EndLookAt == null)
+                throw new InvalidOperationException("Niether transformable target nor end-look-at vector was specified.");
+
+            if(CameraNode == null)
+                throw new InvalidOperationException("CameraNode property was null");
+
+            if(PanTime <= 0)
+                throw new InvalidOperationException("PanTime was not greater than zero");
+
+            if (_animationStartTime == null)
+            {
+                _animationStartTime = gameTime.GetTotalSimtime();
+                _startLookAt = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());               
+            }          
+ 
+            ulong elapsedTime = (ulong)(gameTime.GetTotalSimtime() - _animationStartTime.Value);
+            float step = (float)elapsedTime / (float)PanTime;
+            Vector3 currentLookAt = Vector3.Zero;
+
+            if(Target != null )
+            {
+                
+            }
         }
     }
 }

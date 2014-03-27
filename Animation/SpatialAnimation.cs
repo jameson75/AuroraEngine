@@ -77,7 +77,9 @@ namespace CipherPark.AngelJacket.Core.Animation
                 else
                     x = Vector3.Lerp(frameValTx0.Translation, frameValTx1.Translation, pctStep);
 
-                Transform tx = new Transform { Rotation = r, Translation = x };              
+                Transform tx = new Transform { Rotation = r, Translation = x };  
+            
+                
                 
                 return (LocalChild != null) ? LocalChild.WorldToParent(tx) : tx;
             }
