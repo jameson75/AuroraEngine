@@ -83,8 +83,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         
         private Matrix TransformToLockInViewMatrix(Transform t)
         {
-            Matrix viewMatrix = Camera.TransformToViewMatrix(t);
-            Vector3 up = LockUp != null ? this.WorldToParent(new Transform(LockUp.Value)).Translation 
+            Matrix viewMatrix = Camera.TransformToViewMatrix(t);                    
+            Vector3 up = LockUp != null ? LockUp.Value //TODO: Transform this NORMAL to local space.
                 : new Vector3(viewMatrix.Column2.ToArray().Take(3).ToArray());
             Vector3 target = this.WorldToParent(LockInTarget.ParentToWorld(LockInTarget.Transform)).Translation;
             Vector3 eye = t.Translation;
@@ -147,7 +147,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             
             Vector3 csEndUp = Vector3.Zero;
             if(LockUp != null)
-               csEndUp = CameraNode.WorldToParent(new Transform(LockUp.Value)).Translation;
+               csEndUp = LockUp.Value; //TODO: Transform this NORMAL to local space.
             else
                csEndUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
             
