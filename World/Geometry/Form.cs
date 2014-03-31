@@ -58,14 +58,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         protected void ClearElements() { KillAll(); }
 
         protected List<Particle> EmitElements(int count) 
-        {
-            //List<Particle> newElements = _elementEmitter.CreateParticles(count);
-            //newElements.ForEach(e => e.Description = _elementDescription);
-            //return newElements;
+        {           
             return Emit(0, null, count);       
-        }
-
-        //protected void AddElements(IEnumerable<Particle> elements) { Add(elements); }
+        }      
 
         protected int ElementCount { get { return Particles.Count; } }
 
