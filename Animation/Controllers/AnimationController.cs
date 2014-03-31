@@ -200,112 +200,27 @@ namespace CipherPark.AngelJacket.Core.Animation
         public List<IAnimationController> Children { get { return _children; } }
     }
 
-    ///// <summary>
-    ///// 
-    ///// </summary>
-    //public class ParticleSystemController : AnimationController
-    //{
-    //    private List<EmitterAnimationController> _emitterControllers = new List<EmitterAnimationController>();
-    //    private long? _animationStartTime = null;
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ParticleSystemController : AnimationController
+    {       
+        private long? _animationStartTime = null;
+        
+        public ParticleSystem System { get; set; }
 
-    //    public ParticleSolver Solver { get; set; }
+        public ParticleSolver Solver { get; set; }
 
-    //    public override void Start() { }
+        public override void Start() { }
 
-    //    public override void UpdateAnimation(long gameTime)
-    //    {
-    //        if (_animationStartTime == null)
-    //            _animationStartTime = gameTime;
+        public override void UpdateAnimation(long gameTime)
+        {
+            if (_animationStartTime == null)
+                _animationStartTime = gameTime;
 
-    //        long elapsedTime = gameTime - _animationStartTime.Value;
-
-    //        Particle[] allParticles = _emitterControllers.SelectMany(p => p.Target.Particles).ToArray();
-    //        for (int i = 0; i < allParticles.Length; i++)
-    //        {
-    //            if (Solver != null)
-    //                Solver.UpdateParticleTransform((ulong)elapsedTime, allParticles[i]);
-                
-    //            allParticles[i].Color = allParticles[i].InstanceAttributes.ColorOverLife.GetValueAtAge(elapsedTime);
-    //            allParticles[i].Opacity = allParticles[i].InstanceAttributes.OpacityOverLife.GetValueAtAge(elapsedTime);
-    //        }
-    //    }
-    //}
-
-    ///// <summary>
-    ///// 
-    ///// </summary>
-    //public class EmitterAnimationController : AnimationController
-    //{
-    //    private long? _animationStartTime = null;
-    //    private long? _lastEmitTime = null;
-    //    private const int EmissionRate = 1000;
-
-    //    public Emitter Target { get; set; }
-    //    public List<EmitterAction> ExplicitTasks { get; set; }
-    //    public bool IsExplicitMode { get; set; }
-
-    //    public override void Start() { }
-
-    //    public override void UpdateAnimation(long gameTime)
-    //    {
-    //        if (Target == null)
-    //            throw new InvalidOperationException("Target not specified");
-
-    //        else if (IsExplicitMode && ExplicitTasks == null)
-    //            throw new InvalidOperationException("Actions not specified");
-
-    //        if (_animationStartTime == null)
-    //            _animationStartTime = gameTime;
-
-    //        if (_lastEmitTime == null)
-    //            _lastEmitTime = gameTime;
-
-    //        long elapsedTime = gameTime - _animationStartTime.Value;
-    //        long elapsedEmitTime = gameTime - _lastEmitTime.Value;
-
-    //        if (!IsExplicitMode)
-    //        {
-    //            if (elapsedEmitTime > EmissionRate)
-    //                Target.Emit();
-    //        }
-    //        else
-    //        {
-    //            foreach (EmitterAction action in this.ExplicitTasks)
-    //            {
-    //                if (action.Time <= (ulong)elapsedTime)
-    //                {
-    //                    switch (action.Task)
-    //                    {
-    //                        case EmitterAction.EmitterTask.KillAll:
-    //                            Target.KillAll();
-    //                            break;
-    //                        case EmitterAction.EmitterTask.Kill:
-    //                            Target.Kill(action.ParticleArgs);
-    //                            break;
-    //                        case EmitterAction.EmitterTask.Emit:
-    //                            Target.Emit();
-    //                            break;
-    //                        case EmitterAction.EmitterTask.EmitCustom:
-    //                            Target.Emit(action.CustomParticleDescriptionArg);
-    //                            break;
-    //                        case EmitterAction.EmitterTask.EmitExplicit:
-    //                            Target.Emit(action.ParticleArgs);
-    //                            break;
-    //                        case EmitterAction.EmitterTask.Link:
-    //                            Target.Link(action.ParticleArgs);
-    //                            break;
-    //                        case EmitterAction.EmitterTask.Transform:
-    //                            Target.Transform = action.Transform;
-    //                            break;
-    //                    }
-    //                }
-    //            }
-
-    //            this.ExplicitTasks.RemoveAll(a => a.Time <= (ulong)elapsedTime);
-
-    //            if (ExplicitTasks.Count == 0)
-    //                OnAnimationComplete();
-    //        }           
-    //    }
-    //}
+            long elapsedTime = gameTime - _animationStartTime.Value;           
+          
+            Solver.Step((ulong)elapsedTime, System);          
+        }
+    }   
 }

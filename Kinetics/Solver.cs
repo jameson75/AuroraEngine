@@ -18,7 +18,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// </summary>
     public abstract class ParticleSolver
     {
-        public abstract void UpdateParticleTransform(ulong time, Particle p);
+        public abstract void Step(ulong time, ParticleSystem system);
     }
 
     /// <summary>
@@ -27,13 +27,30 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     public class ParticleKeyframeSolver : ParticleSolver
     {       
         public AnimationLookup TargetAnimations { get; set; }
-        public override void UpdateParticleTransform(ulong time, Particle p)
+        
+        public override void Step(ulong time, ParticleSystem system)
         {
             if (TargetAnimations != null)
             {
-                p.Transform = TargetAnimations[p].GetValueAtT(time);
+                List<Particle> expiredTargets = new List<Particle>();
+                foreach (Particle p in TargetAnimations.Keys)
+                {
+                    if (time <= TargetAnimations[p].RunningTime)
+                        p.Transform = TargetAnimations[p].GetValueAtT(time);
+                    else
+                    {
+                        expiredTargets.Add(p);
+                        OnTargetAnimationComplete(p);
+                    }
+                }
+                foreach (Particle p in expiredTargets)
+                    TargetAnimations.Remove(p);
             }
         }
+
+        protected virtual void OnTargetAnimationComplete(Particle p)
+        { }
+
         public class AnimationLookup : Dictionary<Particle, TransformAnimation> { }
-    }    
+    } 
 }

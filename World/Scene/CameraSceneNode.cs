@@ -94,9 +94,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
     public class CameraLookAtAnimationController : AnimationController
     {
-        private long? _animationStartTime = null;
-        //private Vector3 _startLookAt = Vector3.Zero;
-        //private Vector3 _startUp = Vector3.Zero;
+        private long? _animationStartTime = null;       
         private Transform _startCamTransform = Transform.Identity;
 
         public CameraSceneNode CameraNode { get; set; }
@@ -131,9 +129,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             
             if (_animationStartTime == null)
             {
-                _animationStartTime = gameTime.GetTotalSimtime();
-                //_startLookAt = camEye + new Vector3(CameraNode.Camera.ViewMatrix.Column3.ToArray().Take(3).ToArray());
-                //_startUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
+                _animationStartTime = gameTime.GetTotalSimtime();               
                 _startCamTransform = CameraNode.Transform;
                 CameraNode.LockInTarget = null;
                 CameraNode.LockUp = null;
@@ -152,10 +148,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             if(LockUp != null)
                endUp = LockUp.Value; //TODO: Transform this NORMAL to local space.
             else
-               endUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());
-            
-            //Vector3 camLookAt = Vector3.Lerp(_startLookAt, csEndLookAt, step);
-            //Vector3 camUp = Vector3.Lerp(_startUp, csEndUp, step);
+               endUp = new Vector3(CameraNode.Camera.ViewMatrix.Column2.ToArray().Take(3).ToArray());      
 
             Matrix endViewMatrix = Matrix.LookAtLH(camEye, endTarget, endUp);
             Transform endCamTransform = Camera.ViewMatrixToTransform(endViewMatrix);
