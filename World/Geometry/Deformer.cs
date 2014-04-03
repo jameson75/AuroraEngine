@@ -22,21 +22,28 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             GridForm form = system as GridForm;
             if (form != null)
             {
-                Transform fsTrackedNodeTransform = form.WorldToParent(TrackedNode.ParentToWorld(TrackedNode.Transform));                                
-                
-
-                foreach (var e in elements)
-                    MakeInvisible(e);
-                CreateTransformsToHeadRow(elements);
-
-                var tail = form.GetRow(form.RowCount - 1);
-                CreateTransformsFromTailRow(tail);                
-                foreach (var e in tail)
-                    MakeInvisible(e);                
-                form.RemoveTailRow();
+                Transform fsTrackedNodeTransform = form.WorldToParent(TrackedNode.ParentToWorld(TrackedNode.Transform));
+                float gridFrontPlane = form.BoundingBox.GetLengthZ();
+                if (fsTrackedNodeTransform.Translation.Z <= gridFrontPlane)
+                {
+                    Deformer.AnimateGrid(form);
+                }
             }
 
             base.Step(time, system);
         }       
+
+        public static AnimateGrid(GridForm form)
+        {
+            foreach (var e in elements)
+                        MakeInvisible(e);
+                    CreateTransformsToHeadRow(elements);
+
+                    var tail = form.GetRow(form.RowCount - 1);
+                    CreateTransformsFromTailRow(tail);
+                    foreach (var e in tail)
+                        MakeInvisible(e);
+                    form.RemoveTailRow();
+        }
     }
 }
