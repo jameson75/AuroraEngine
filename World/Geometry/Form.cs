@@ -60,7 +60,22 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         protected List<Particle> EmitElements(int count) 
         {           
             return Emit(0, null, count);       
-        }      
+        }
+
+        protected List<Particle> SpawnElements(int count)
+        {
+            return Spawn(0, null, count);
+        }
+
+        protected void AddElements(IEnumerable<Particle> elements, int? index = null)
+        {
+            Add(elements, index);
+        }
+
+        protected void KillElements(IEnumerable<Particle> elements)
+        {
+            Kill(elements);
+        }
 
         protected int ElementCount { get { return Particles.Count; } }
 

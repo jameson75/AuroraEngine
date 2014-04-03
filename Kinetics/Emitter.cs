@@ -94,6 +94,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         }       
     }        
 
+    /*
     /// <summary>
     /// 
     /// </summary>
@@ -120,5 +121,6 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         }
         public EmitterTask Task { get; set; }
     }    
+    */
 }
     

@@ -32,34 +32,36 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         {
             _game = game;
         }
+        
+        #region ITransformable Members
+        public Transform Transform { get; set; }
+        public ITransformable TransformableParent { get; set; }
+        #endregion       
 
         public IGameApp Game { get { return _game; } }
 
         public List<Emitter> Emitters { get { return _emitters; } }
 
-        public ReadOnlyCollection<Particle> Particles { get { return _particles.ToList().AsReadOnly(); } }
+        public ReadOnlyCollection<Particle> Particles { get { return _particles.ToList().AsReadOnly(); } }     
 
-        #region ITransformable Members
-        public Transform Transform { get; set; }
-        public ITransformable TransformableParent { get; set; }
-        #endregion
-
-        //public List<Particle> Emit(int index)
-        //{
-        //    ParticleDescription desc = _emitters[index].DefaultParticleDescription;
-        //    return Emit(index, desc);
-        //}
+        public List<Particle> Spawn(int index = 0, ParticleDescription particleDescription = null, int count = 0)
+        {
+            return _emitters[index].Spawn(particleDescription, count);
+        }
 
         public List<Particle> Emit(int index = 0, ParticleDescription particleDescription = null, int count = 0)
         {
-            List<Particle> pList = _emitters[index].Spawn(particleDescription, count);
+            List<Particle> pList = Spawn(index, particleDescription, count);
             Add(pList);
             return pList;
         }
 
-        public void Add(IEnumerable<Particle> particles)
+        public void Add(IEnumerable<Particle> particles, int? index = null)
         {
-            _particles.AddRange(particles);
+            if (index == null)
+                _particles.AddRange(particles);
+            else
+                _particles.InsertRange(index.Value, particles);
             OnParticlesAdded(particles);
         }
 

@@ -23,7 +23,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class GridForm : Form
     {
         private Vector3 _dimensions = Vector3.Zero;
-        private Vector3 _cellPadding = Vector3.Zero;       
+        private Vector3 _cellPadding = Vector3.Zero;        
 
         public GridForm(IGameApp game)
             : base(game)
@@ -95,9 +95,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         {          
             ClearElements();
             int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);
-            //List<Particle> elements = CreateElements(elementCount);
-            EmitElements(elementCount);
-            //AddElements(elements);
+            //Emit elements (particles) into the particle system.
+            var elements = EmitElements(elementCount);
+            //Group particles into rows.     
             OnLayoutChanged();
         }
 
@@ -125,56 +125,63 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public List<Particle> AddFrontRow()
+        public void AddFrontRow()
         {
-            AlterDimensions(Dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z + 1));            
-            //******************************************************************************
-            //Simply changing the Dimension's Z component results in the appearing 
+            //We alter the field (and not the property) to avoid generating a new set of elements.
+            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z + 1);           
+            //Add the additional elements to the grid.
+            int oldElementCount = ElementCount;              
+            int newElementCount = (int)(_dimensions.X * _dimensions.Y * _dimensions.Z);
+            List<Particle> newElements = SpawnElements(newElementCount - oldElementCount);
+            AddElements(newElements, 0);
+            //Simply changing the dimension's Z component results in the appearing 
             //to extend it's back row. To give the illusion of extending the front row, we
             //transform the entire grid forward by the size of a row.            
-            //******************************************************************************
             Vector3 newPosition = this.Transform.Translation;
             newPosition.Z += CalculateRenderedCellSize().Z;          
-            this.Transform = new Animation.Transform(this.Transform.Rotation, newPosition);
-            return GetRow(0);
+            this.Transform = new Animation.Transform(this.Transform.Rotation, newPosition);          
+            //Recalc the new positions of each element.
+            OnLayoutChanged();
         }     
 
-        public List<Particle> AddBackRow()
+        public void AddBackRow()
         {            
-            AlterDimensions(new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z + 1));
-            return GetRow((int)(Dimensions.Z - 1));
+            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z + 1);
+            //Add the additional elements to the grid.
+            int oldElementCount = ElementCount;
+            int newElementCount = (int)(_dimensions.X * _dimensions.Y * _dimensions.Z);
+            List<Particle> newElements = SpawnElements(newElementCount - oldElementCount);
+            AddElements(newElements);
+            //Recalc the new positions of each element.
+            OnLayoutChanged();
         }
 
-        public List<Particle> RemoveBackRow()
+        public void RemoveFrontRow()
         {
-            AlterDimensions(new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 0));
-            return GetRow((int)(Dimensions.Z - 1));
-        }
-
-        public List<Particle> RemoveFrontRow()
-        {
-            AlterDimensions(new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 0));
-            //******************************************************************************
+            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 0);
+            //Remove elements from the grid.
+            KillElements(GetRow(0));
             //Simply changing the Dimension's Z component results in the appearing 
             //to extend it's back row. To give the illusion of extending the front row, we
-            //transform the entire grid backward by the size of a row.            
-            //******************************************************************************
+            //transform the entire grid backward by the size of a row.           
             Vector3 newPosition = this.Transform.Translation;
             newPosition.Z -= CalculateRenderedCellSize().Z;
-            this.Transform = new Animation.Transform(this.Transform.Rotation, newPosition);    
-            return GetRow(0);
+            this.Transform = new Animation.Transform(this.Transform.Rotation, newPosition);
+            //Recalc the new positions of each element.
+            OnLayoutChanged();
+        }
+
+        public void RemoveBackRow()
+        {            
+            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 0);            
+            //Remove elements from grid.
+            KillElements(GetRow((int)(Dimensions.Z - 1)));
+            OnLayoutChanged();
         }
 
         public List<Particle> GetRow(int index)
-        {
-
-        }
-
-        private public AlterDimensions(Vector3 vector3)
-        {
-            _true = 
-            OnLayoutChanged();
-            throw new NotImplementedException();   
-        }     
+        {           
+            return Particles.Skip(index * (int)Dimensions.X).Take((int)Dimensions.X).ToList();
+        }       
     }
 }

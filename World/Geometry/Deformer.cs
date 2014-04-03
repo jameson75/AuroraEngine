@@ -22,9 +22,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             GridForm form = system as GridForm;
             if (form != null)
             {
-                Transform fsTrackedNodeTransform = form.WorldToParent(TrackedNode.ParentToWorld(TrackedNode.Transform));                 
-                fsTrackedNodeTransform.
-                var elements = form.AddHeadRow();
+                Transform fsTrackedNodeTransform = form.WorldToParent(TrackedNode.ParentToWorld(TrackedNode.Transform));                                
+                
+
                 foreach (var e in elements)
                     MakeInvisible(e);
                 CreateTransformsToHeadRow(elements);
