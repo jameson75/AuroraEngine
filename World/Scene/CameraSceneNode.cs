@@ -104,7 +104,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public ulong AnimationRunningTime { get; set; }
         public bool PreserveLockIn { get; set; }
 
-        public override void Start()
+        public override void Reset()
         {
             _animationStartTime = null;
         }

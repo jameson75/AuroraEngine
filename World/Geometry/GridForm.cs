@@ -57,6 +57,17 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
+        public override BoundingBox BoundingBox
+        {
+            get
+            {
+                Vector3 renderedSize = CalculateRenderedSize();
+                Vector3 min = new Vector3(0, 0, 0);              
+                Vector3 max = new Vector3(renderedSize.X, renderedSize.Y, renderedSize.Z);
+                return new BoundingBox(min, max);
+            }
+        }
+
         protected override void OnLayoutChanged()
         {
             //**************************************************************************
@@ -72,7 +83,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 {
                     int xIndex = i % (int)Dimensions.X;
                     int zIndex = i / (int)Dimensions.X;
-                    int yIndex = i / ((int)Dimensions.X * (int)Dimensions.Z);
+                    int yIndex = 0; // i / ((int)Dimensions.X * (int)Dimensions.Z);
                     Vector3 elementOrigin = new Vector3();
                     elementOrigin.X = (xIndex * ((CellPadding.X * 2) + ElementMesh.BoundingBox.GetLengthX())) + (CellPadding.X + (ElementMesh.BoundingBox.GetLengthX() * 0.5f));
                     elementOrigin.Y = (yIndex * ((CellPadding.Y * 2) + ElementMesh.BoundingBox.GetLengthY())) + (CellPadding.Y + (ElementMesh.BoundingBox.GetLengthY() * 0.5f));
@@ -108,7 +119,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             else
             {
                 return new Vector3((ElementMesh.BoundingBox.GetLengthX() + CellPadding.X * 2) * Dimensions.X,
-                                   (ElementMesh.BoundingBox.GetLengthY() + CellPadding.Y * 2) * Dimensions.Y,
+                                   (ElementMesh.BoundingBox.GetLengthY() + CellPadding.Y * 2)/* * Dimensions.Y*/,
                                    (ElementMesh.BoundingBox.GetLengthZ() + CellPadding.Z * 2) * Dimensions.Z);
             }
         }
@@ -131,7 +142,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z + 1);           
             //Add the additional elements to the grid.
             int oldElementCount = ElementCount;              
-            int newElementCount = (int)(_dimensions.X * _dimensions.Y * _dimensions.Z);
+            int newElementCount = (int)(_dimensions.X * /*_dimensions.Y **/ _dimensions.Z);
             List<Particle> newElements = SpawnElements(newElementCount - oldElementCount);
             AddElements(newElements, 0);
             //Simply changing the dimension's Z component results in the appearing 
@@ -149,7 +160,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z + 1);
             //Add the additional elements to the grid.
             int oldElementCount = ElementCount;
-            int newElementCount = (int)(_dimensions.X * _dimensions.Y * _dimensions.Z);
+            int newElementCount = (int)(_dimensions.X * /*_dimensions.Y **/ _dimensions.Z);
             List<Particle> newElements = SpawnElements(newElementCount - oldElementCount);
             AddElements(newElements);
             //Recalc the new positions of each element.
@@ -158,14 +169,14 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public void RemoveFrontRow()
         {
-            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 0);
+            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 1);
             //Remove elements from the grid.
             KillElements(GetRow(0));
             //Simply changing the Dimension's Z component results in the appearing 
             //to extend it's back row. To give the illusion of extending the front row, we
             //transform the entire grid backward by the size of a row.           
             Vector3 newPosition = this.Transform.Translation;
-            newPosition.Z -= CalculateRenderedCellSize().Z;
+            newPosition.Z += CalculateRenderedCellSize().Z;
             this.Transform = new Animation.Transform(this.Transform.Rotation, newPosition);
             //Recalc the new positions of each element.
             OnLayoutChanged();

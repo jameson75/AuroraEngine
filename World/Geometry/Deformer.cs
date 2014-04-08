@@ -11,39 +11,59 @@ using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
 
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// Company: Cipher Park
+// Copyright © 2010-2013
+// Angel Jacket by Cipher Park is licensed under 
+// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+///////////////////////////////////////////////////////////////////////////////
+
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public class Deformer : ParticleKeyframeSolver
     {
         public ITransformable TrackedNode { get; set; }
+        public int MaxGridRows { get; set; }
+        public ParticleSystem subSystem = null;
 
-        public override void Step(ulong time, ParticleSystem system)
+        public Deformer()
+        {
+            subSystem = new ParticleSystem(game);
+        }
+
+        public override void Step(GameTime gameTime, ParticleSystem system)
         {           
             GridForm form = system as GridForm;
             if (form != null)
             {
-                Transform fsTrackedNodeTransform = form.WorldToParent(TrackedNode.ParentToWorld(TrackedNode.Transform));
+                Transform fsTrackedNodeTransform = form.WorldToLocal(TrackedNode.ParentToWorld(TrackedNode.Transform));
                 float gridFrontPlane = form.BoundingBox.GetLengthZ();
-                if (fsTrackedNodeTransform.Translation.Z <= gridFrontPlane)
+                if (fsTrackedNodeTransform.Translation.Z >= gridFrontPlane)
                 {
-                    Deformer.AnimateGrid(form);
+                    AnimateGrid(gameTime.GetTotalSimtime(), form);
                 }
             }
-
-            base.Step(time, system);
+            base.Step(gameTime, system);
         }       
 
-        public static AnimateGrid(GridForm form)
-        {
-            foreach (var e in elements)
-                        MakeInvisible(e);
-                    CreateTransformsToHeadRow(elements);
-
-                    var tail = form.GetRow(form.RowCount - 1);
-                    CreateTransformsFromTailRow(tail);
-                    foreach (var e in tail)
-                        MakeInvisible(e);
-                    form.RemoveTailRow();
+        private void AnimateGrid(long time, GridForm form)
+        {    
+            form.AddBackRow();
+            List<Particle> addedList = form.GetRow((int)form.Dimensions.Z - 1);
+            foreach(Particle p in addedList)
+            {
+                Particle pStar = new Particle();
+                TransformAnimation animation = new TransformAnimation();
+                animation.SetKeyFrame(new AnimationKeyFrame(0, new Transform(p.Transform.Rotation, p.Transform.Translation + new Vector3(-200, 0, 0))));
+                animation.SetKeyFrame(new AnimationKeyFrame(500, p.Transform));
+                KeyframeAnimationController animationController = new KeyframeAnimationController();
+                animationController.Animation = animation;
+                animationController.Target = p;
+                Controllers.Add(animationController);
+            }
+            //if (form.Dimensions.Z > (float)MaxGridRows)
+            //    form.RemoveFrontRow();
         }
     }
 }

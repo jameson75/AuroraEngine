@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
              get { return _animationStartTime; }
         }
 
-        public override void Start()
+        public override void Reset()
         {
             _animationStartTime = null;            
         }

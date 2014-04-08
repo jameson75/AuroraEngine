@@ -22,7 +22,7 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
     {
         public IReaction Reaction { get; set; }
 
-        public override void Start()
+        public override void Reset()
         {  }
 
         public override void UpdateAnimation(GameTime gameTime)

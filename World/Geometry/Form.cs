@@ -49,9 +49,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }      
 
-        public BoundingBox BoundingBox
-        {
-            //TODO: Calculate Bounding Box size.
+        public virtual BoundingBox BoundingBox
+        {            
             get { return BoundingBoxExtension.Empty; }
         }              
 

@@ -24,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// </summary>
     public interface IAnimationController
     {       
-        void Start();
+        void Reset();
         void UpdateAnimation(GameTime gameTime);
         bool IsAnimationComplete { get; }
         void SetComplete();
@@ -48,7 +48,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             OnAnimationComplete();
         }
 
-        public abstract void Start();
+        public abstract void Reset();
         
         public abstract void UpdateAnimation(GameTime gameTime);
         
@@ -81,7 +81,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             Animation = animation;
         }
 
-        public override void Start()
+        public override void Reset()
         {         
             _animationStartTime = null;
         }
@@ -140,7 +140,7 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         #region IAnimationController Members   
 
-        public override void Start()
+        public override void Reset()
         {
             _animationStartTime = null;           
         }
@@ -176,7 +176,10 @@ namespace CipherPark.AngelJacket.Core.Animation
             _children.AddRange(children);
         }
 
-        public override void Start() { }
+        public override void Reset() 
+        {
+            _children.ForEach(c => c.Reset());
+        }
 
         public override void UpdateAnimation(GameTime gameTime)
         {
@@ -211,16 +214,17 @@ namespace CipherPark.AngelJacket.Core.Animation
 
         public ParticleSolver Solver { get; set; }
 
-        public override void Start() { }
+        public override void Reset() 
+        {
+            Solver.Reset();
+        }
 
-        public override void UpdateAnimation(long gameTime)
+        public override void UpdateAnimation(GameTime gameTime)
         {
             if (_animationStartTime == null)
-                _animationStartTime = gameTime;
-
-            long elapsedTime = gameTime - _animationStartTime.Value;           
+                _animationStartTime = gameTime.GetTotalSimtime();                   
           
-            Solver.Step((ulong)elapsedTime, System);          
+            Solver.Step(gameTime, System);          
         }
     }   
 }
