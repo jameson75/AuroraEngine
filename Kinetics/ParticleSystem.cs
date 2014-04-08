@@ -120,7 +120,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
             if (particles.Count() > 0)
             {
-                IEnumerable<Matrix> instanceData = particles.Select(p => p.WorldTransform().ToMatrix());
+                IEnumerable<Matrix> instanceData = particles.Where(p => p.IsVisible).Select(p => p.WorldTransform().ToMatrix());
                 instanceMesh.UpdateMeshData<Matrix>(instanceData.ToArray());
                 instanceEffect.Apply();
                 instanceMesh.Draw(gameTime);
@@ -130,10 +130,13 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         private void DrawParticles(GameTime gameTime, IEnumerable<Particle> particles)
         {
             foreach (Particle p in particles)
-            {               
-                p.Description.Effect.World = p.WorldTransform().ToMatrix();
-                p.Description.Effect.Apply();
-                p.Description.Mesh.Draw(gameTime);                
+            {
+                if (p.IsVisible)
+                {
+                    p.Description.Effect.World = p.WorldTransform().ToMatrix();
+                    p.Description.Effect.Apply();
+                    p.Description.Mesh.Draw(gameTime);
+                }
             }
         }
     }

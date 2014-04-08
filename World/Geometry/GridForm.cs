@@ -144,13 +144,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             int oldElementCount = ElementCount;              
             int newElementCount = (int)(_dimensions.X * /*_dimensions.Y **/ _dimensions.Z);
             List<Particle> newElements = SpawnElements(newElementCount - oldElementCount);
-            AddElements(newElements, 0);
-            //Simply changing the dimension's Z component results in the appearing 
-            //to extend it's back row. To give the illusion of extending the front row, we
-            //transform the entire grid forward by the size of a row.            
-            Vector3 newPosition = this.Transform.Translation;
-            newPosition.Z += CalculateRenderedCellSize().Z;          
-            this.Transform = new Animation.Transform(this.Transform.Rotation, newPosition);          
+            AddElements(newElements, 0);                      
             //Recalc the new positions of each element.
             OnLayoutChanged();
         }     
@@ -171,13 +165,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         {
             _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 1);
             //Remove elements from the grid.
-            KillElements(GetRow(0));
-            //Simply changing the Dimension's Z component results in the appearing 
-            //to extend it's back row. To give the illusion of extending the front row, we
-            //transform the entire grid backward by the size of a row.           
-            Vector3 newPosition = this.Transform.Translation;
-            newPosition.Z += CalculateRenderedCellSize().Z;
-            this.Transform = new Animation.Transform(this.Transform.Rotation, newPosition);
+            KillElements(GetRow(0));           
             //Recalc the new positions of each element.
             OnLayoutChanged();
         }
@@ -193,6 +181,16 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public List<Particle> GetRow(int index)
         {           
             return Particles.Skip(index * (int)Dimensions.X).Take((int)Dimensions.X).ToList();
-        }       
+        }
+
+        public void HideRow(int index)
+        {
+            GetRow(index).ForEach(p => p.IsVisible = false);        
+        }
+
+        public void ShowRow(int index)
+        {
+            GetRow(index).ForEach(p => p.IsVisible = false);
+        }
     }
 }

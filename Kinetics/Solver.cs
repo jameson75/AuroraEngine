@@ -43,13 +43,8 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         public override void Step(GameTime time, ParticleSystem system)
         {
-            UpdateAnimation(time);
-        }        
-
-        private void UpdateAnimation(GameTime time)
-        {
             foreach (KeyframeAnimationController c in _controllers)
                 c.UpdateAnimation(time);
-        }          
+        }       
     } 
 }
