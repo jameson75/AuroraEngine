@@ -457,6 +457,26 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
+        public static Mesh BuildFormHexagon(IGameApp game, byte[] shaderByteCode, float radius, bool isInstanced = false)
+        {
+            short[] indices = CreateHexagonIndices();
+            Vector3[] positions = CreateHexagonPoints2(radius);
+            Vector2[] textureCoords = CreateHexagonTextureCoords();
+            if (isInstanced)
+            {
+                FormInstanceVertex[] verts = new FormInstanceVertex[6];
+            }
+            else
+            {
+                FormVertex[] verts = new FormVertex[6];
+            }
+        }
+
+        public static Vector2[] CreateHexagonTextureCoords()
+        {
+
+        }
+
         public static Vector3[] CreateHexagonPoints(RectangleF dimension)
         {
             float quaterWidth = dimension.Width * 0.25f;
@@ -470,6 +490,20 @@ namespace CipherPark.AngelJacket.Core.Content
                 new Vector3(dimension.Left + quaterWidth, 0, dimension.Bottom),
                 new Vector3(dimension.Left, 0, dimension.Top + halfHeight)
             };    
+        }
+
+        public static Vector3[] CreateHexagonPoints2(float radius)
+        {
+            int sides = 6;            
+            float angle_stepsize = MathUtil.TwoPi / (float)sides;
+            float angle = angle_stepsize * 3;          
+            Vector3[] points = new Vector3[6];
+            for (int i = 0; i < sides; i++)
+            {               
+                points[i] = new Vector3(radius * (float)Math.Cos(-angle), radius * (float)Math.Sin(-angle), 0);                                   
+                angle -= angle_stepsize;                
+            }
+            return points;
         }
 
         public static short[] CreateHexagonIndices()
@@ -716,59 +750,68 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion        
 
         #region Ring
-        public static Mesh BuildBasicRing(IGameApp game, byte[] shaderByteCode, float radius, float width, int segments, bool isDynamic = true)
+        public static Mesh BuildBasicRing(IGameApp game, byte[] shaderByteCode, float radius, float width, int segments, bool[] mask = null, bool isDynamic = false)
         {          
-            Vector3[] positions = CreateRingPoints(radius, width, segments);
+            Vector3[] positions = CreateRingPoints(radius, width, segments, mask);
             short[] indices = CreateRingIndices(segments);
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             BasicVertexPositionColor[] verts = new BasicVertexPositionColor[positions.Length];
             for (int i = 0; i < verts.Length; i++)
                 verts[i] = new BasicVertexPositionColor(positions[i], Color.White.ToVector4());
-            return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+            if (!isDynamic)
+                return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+            else
+                return BuildDynamicMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, verts.Length, indices, indices.Length, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
         }
 
-        private static Vector3[] CreateRingPoints(float radius, float width, int segments)
+        private static Vector3[] CreateRingPoints(float radius, float width, int segments, bool[] mask = null)
         {
             float angle = 0f;
             float angle_stepsize = MathUtil.TwoPi / (float)segments;
             float innerRadius = Math.Max(radius - width, 0);
             Vector3[] points = new Vector3[segments * 2];
             for (int i = 0; i < segments; i++)
-            {               
-                int k = i * 2;
-                points[k] = new Vector3(radius * (float)Math.Cos(-angle), radius * (float)Math.Sin(-angle), 0);
-                points[k + 1] = new Vector3(innerRadius * (float)Math.Cos(-angle), innerRadius * (float)Math.Sin(-angle), 0);               
-                angle -= angle_stepsize;
+            {
+                if (mask == null || mask[i])
+                {
+                    int k = i * 2;
+                    points[k] = new Vector3(radius * (float)Math.Cos(-angle), radius * (float)Math.Sin(-angle), 0);
+                    points[k + 1] = new Vector3(innerRadius * (float)Math.Cos(-angle), innerRadius * (float)Math.Sin(-angle), 0);
+                    angle -= angle_stepsize;
+                }
             }
             return points;
         }
 
-        private static short[] CreateRingIndices(int segments)
+        private static short[] CreateRingIndices(int segments, bool[] mask = null)
         {
             int[] indices = new int[segments * 6];
 
             for (int i = 0; i < segments; i++)
-            {                
-                int k = i * 2;
-                int m = i * 6;
-                
-                indices[m + 0] = k + 0;
-                indices[m + 1] = k + 1;
-                if (i < (segments - 1))
-                    indices[m + 2] = k + 2;
-                else
-                    indices[m + 2] = 0;
-                
-                indices[m + 3] = k + 1;
-                if (i < (segments - 1))
-                {
-                    indices[m + 4] = k + 3;
-                    indices[m + 5] = k + 2;
-                }
-                else
-                {
-                    indices[m + 4] = 1;
-                    indices[m + 5] = 0;
+            {      
+                if (mask != null && mask[i])
+                {          
+                    int k = i * 2;
+                    int m = i * 6;
+               
+                    indices[m + 0] = k + 0;
+                    indices[m + 1] = k + 1;
+                    if (i < (segments - 1))
+                        indices[m + 2] = k + 2;
+                    else
+                        indices[m + 2] = 0;
+
+                    indices[m + 3] = k + 1;
+                    if (i < (segments - 1))
+                    {
+                        indices[m + 4] = k + 3;
+                        indices[m + 5] = k + 2;
+                    }
+                    else
+                    {
+                        indices[m + 4] = 1;
+                        indices[m + 5] = 0;
+                    }
                 }
             }
 
