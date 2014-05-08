@@ -226,5 +226,5 @@ namespace CipherPark.AngelJacket.Core.Animation
           
             Solver.Step(gameTime, System);          
         }
-    }   
+    }       
 }

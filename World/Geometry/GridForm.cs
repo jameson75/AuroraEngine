@@ -134,63 +134,21 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                                    (ElementMesh.BoundingBox.GetLengthY() + CellPadding.Y * 2),
                                    (ElementMesh.BoundingBox.GetLengthZ() + CellPadding.Z * 2));
             }
-        }
+        }        
 
-        public void AddFrontRow()
-        {
-            //We alter the field (and not the property) to avoid generating a new set of elements.
-            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z + 1);           
-            //Add the additional elements to the grid.
-            int oldElementCount = ElementCount;              
-            int newElementCount = (int)(_dimensions.X * /*_dimensions.Y **/ _dimensions.Z);
-            List<Particle> newElements = SpawnElements(newElementCount - oldElementCount);
-            AddElements(newElements, 0);                      
-            //Recalc the new positions of each element.
-            OnLayoutChanged();
-        }     
-
-        public void AddBackRow()
-        {            
-            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z + 1);
-            //Add the additional elements to the grid.
-            int oldElementCount = ElementCount;
-            int newElementCount = (int)(_dimensions.X * /*_dimensions.Y **/ _dimensions.Z);
-            List<Particle> newElements = SpawnElements(newElementCount - oldElementCount);
-            AddElements(newElements);
-            //Recalc the new positions of each element.
-            OnLayoutChanged();
-        }
-
-        public void RemoveFrontRow()
-        {
-            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 1);
-            //Remove elements from the grid.
-            KillElements(GetRow(0));           
-            //Recalc the new positions of each element.
-            OnLayoutChanged();
-        }
-
-        public void RemoveBackRow()
-        {            
-            _dimensions = new Vector3(Dimensions.X, Dimensions.Y, Dimensions.Z - 0);            
-            //Remove elements from grid.
-            KillElements(GetRow((int)(Dimensions.Z - 1)));
-            OnLayoutChanged();
-        }
-
-        public List<Particle> GetRow(int index)
+        public List<Particle> GetRowElements(int index)
         {           
             return Particles.Skip(index * (int)Dimensions.X).Take((int)Dimensions.X).ToList();
         }
 
         public void HideRow(int index)
         {
-            GetRow(index).ForEach(p => p.IsVisible = false);        
+            GetRowElements(index).ForEach(p => p.IsVisible = false);        
         }
 
         public void ShowRow(int index)
         {
-            GetRow(index).ForEach(p => p.IsVisible = false);
+            GetRowElements(index).ForEach(p => p.IsVisible = false);
         }
     }
 }

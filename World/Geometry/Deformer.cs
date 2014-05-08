@@ -21,12 +21,12 @@ using CipherPark.AngelJacket.Core.Kinetics;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class Deformer : ParticleKeyframeSolver
+    public class GridDeformer : ParticleKeyframeSolver
     {
         public ITransformable TrackedNode { get; set; }
         public int MaxGridRows { get; set; }
 
-        public Deformer()
+        public GridDeformer()
         { }
 
         public override void Step(GameTime gameTime, ParticleSystem system)
@@ -34,22 +34,27 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             GridForm form = system as GridForm;
             if (form != null)
             {
-                Transform fsTrackedNodeTransform = form.WorldToLocal(TrackedNode.ParentToWorld(TrackedNode.Transform));
-                float gridFrontPlane = form.
-                if (fsTrackedNodeTransform.Translation.Z >= gridFrontPlane)
-                {
-                    
-                    List<Particle> addedList = form.GetRow((int)form.Dimensions.Z - 1);
-                    foreach (Particle p in addedList)
+                //Get the tracked node's transform in the GridForm-Space.
+                Transform fsTrackedNodeTransform = form.WorldToLocal(TrackedNode.ParentToWorld(TrackedNode.Transform));                               
+
+                if (fsTrackedNodeTransform.Translation.Z >= form.ClipVolume.Maximum.Z)
+                {                    
+                    int lastVisibleRowIndex = GridDeformer.CalculateRowFromZ(fsTrackedNodeTransform.Translation.Z);
+                    int firstVisbileRowIndex = lastVisibleRowIndex - MaxGridRows;
+                    form.ClipRows(firstVisbileRowIndex, lastVisibleRowIndex);
+
+                    List<Particle> lastVisibleRow = form.GetRowElements(lastVisibleRowIndex);
+                    foreach (Particle element in lastVisibleRow)
                     {
                         TransformAnimation animation = new TransformAnimation();
-                        animation.SetKeyFrame(new AnimationKeyFrame(0, new Transform(p.Transform.Rotation, p.Transform.Translation + new Vector3(-200, 0, 0))));
-                        animation.SetKeyFrame(new AnimationKeyFrame(100, p.Transform));
+                        animation.SetKeyFrame(new AnimationKeyFrame(0, new Transform(element.Transform.Rotation, element.Transform.Translation + new Vector3(-200, 0, 0))));
+                        animation.SetKeyFrame(new AnimationKeyFrame(100, element.Transform));
                         KeyframeAnimationController animationController = new KeyframeAnimationController();
                         animationController.Animation = animation;
-                        animationController.Target = p;
+                        animationController.Target = element;
                         Controllers.Add(animationController);
                     }
+
                     if (form.Dimensions.Z > (float)MaxGridRows)
                         form.HideRow((int)form.Dimensions.Z - (MaxGridRows + 1));
                 }
