@@ -269,7 +269,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
         }
 
-        public ShaderResourceView Texture { get; set; }
+        public ShaderResourceView Texture { get; set; }       
     }
 
     public enum BlinnPhongLightType

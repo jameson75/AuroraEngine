@@ -76,6 +76,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         { }
 
         public abstract BoundingBox BoundingBox { get; }
+
+        public void Move(Vector3 offset)
+        {
+            this.Transform = new Transform(this.Transform.Rotation, this.Transform.Translation + offset);
+        }
     }
 
     public class BasicModel : Model

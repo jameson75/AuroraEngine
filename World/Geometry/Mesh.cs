@@ -32,7 +32,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private int _vertexStride = 0;
         private int _instanceStride = 0;
         private InputLayout _vertexLayout = null;
-        private int _maxInstanceCount = 0;
+        private int _maxInstanceCount = 0;        
 
         private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;
 
@@ -79,6 +79,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public void UpdateMeshData<T>(T[] data, int offset = 0) where T : struct
         {
+            //TODO: The index buffer needs to be updated too for indexed data
+
             DXBuffer dynamicBuffer = (!IsInstanced) ? _vertexBuffer : _instanceBuffer;
             int dataStride = (!IsInstanced) ? _vertexStride : _instanceStride;
             if (dynamicBuffer == null)

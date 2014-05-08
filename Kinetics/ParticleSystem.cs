@@ -120,6 +120,10 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
             if (particles.Count() > 0)
             {
+                throw new NotSupportedException("Particle instancing isn't supported yet.");
+                //TODO: This code is broken... 
+                //1. Ensure that the correct buffer size of instance data is being determined..
+                //2. More importantly, figure out a way to infer the correct instance data type...
                 IEnumerable<Matrix> instanceData = particles.Where(p => p.IsVisible).Select(p => p.WorldTransform().ToMatrix());
                 instanceMesh.UpdateMeshData<Matrix>(instanceData.ToArray());
                 instanceEffect.Apply();

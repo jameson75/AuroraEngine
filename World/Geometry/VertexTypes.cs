@@ -315,7 +315,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {
         public Vector4 Position;
         public Vector3 Normal;
-        public Vector4 TextureCoord;
+        public Vector2 TextureCoord;
 
         private static InputElement[] _inputElements = null;
         private static int _elementSize = 0;
@@ -329,7 +329,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
              {
                  new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
                  new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0),
-                 new InputElement("TEXCOORD", 0, Format.R32G32B32A32_Float, 28, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 28, 0),
                  new InputElement("MATRIX", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1),
                  new InputElement("MATRIX", 1, Format.R32G32B32A32_Float, 16, 1, InputClassification.PerInstanceData, 1),
                  new InputElement("MATRIX", 2, Format.R32G32B32A32_Float, 32, 1, InputClassification.PerInstanceData, 1),
@@ -338,9 +338,25 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                  new InputElement("TEXCOORD", 2, Format.R32G32B32A32_Float, 80, 1, InputClassification.PerInstanceData, 1),
                  new InputElement("TEXCOORD", 3, Format.R32G32B32A32_Float, 96, 1, InputClassification.PerInstanceData, 1)
              };
-            _elementSize = 44;
+            _elementSize = 42;
             _instanceSize = 112;
         }      
+    }
+
+    /// <summary>
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct FormInstanceVertexData
+    {
+        public Matrix Matrix;
+        public Vector2 TransparencyCoord;
+        public Vector2 LightMapCoord;
+        public Vector2 ColorMapCoord;
+        public static int SizeInBytes
+        {
+            //Matrix.SizeInBytes + Vector2.SizeInBytes * 3
+            get { return 88; }
+        }
     }
 
     /// <summary>

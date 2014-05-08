@@ -124,7 +124,7 @@ namespace CipherPark.AngelJacket.Core.Content
             verts[3] = new BillboardInstancePositionVertexTexture(positions[3], _textureCoords[3], new Vector2(-size.Width, -size.Height));
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             Matrix[] instanceData = new Matrix[maxInstances];           
-            return BuildInstancedMesh<BillboardInstancePositionVertexTexture, Matrix>(game, shaderByteCode, verts, indices, BillboardInstancePositionVertexTexture.InputElements, BillboardInstancePositionVertexTexture.ElementSize, instanceData, BillboardInstancePositionVertexTexture.InstanceSize ); 
+            return BuildDynamicInstancedMesh<BillboardInstancePositionVertexTexture, Matrix>(game, shaderByteCode, verts, indices, BillboardInstancePositionVertexTexture.InputElements, BillboardInstancePositionVertexTexture.ElementSize, instanceData, BillboardInstancePositionVertexTexture.InstanceSize ); 
         }    
 
         public static Mesh BuildBasicViewportQuad(IGameApp game, byte[] shaderByteCode)
@@ -457,24 +457,49 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildFormHexagon(IGameApp game, byte[] shaderByteCode, float radius, bool isInstanced = false)
+        public static Mesh BuildFormHexagon(IGameApp game, byte[] shaderByteCode, float radius, bool isInstanced = false, int maxInstances = 0)
         {
             short[] indices = CreateHexagonIndices();
-            Vector3[] positions = CreateHexagonPoints2(radius);
+            Vector3[] positions = CreateHexagonPoints(radius);
             Vector2[] textureCoords = CreateHexagonTextureCoords();
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             if (isInstanced)
             {
                 FormInstanceVertex[] verts = new FormInstanceVertex[6];
+                for (int i = 0; i < positions.Length; i++)
+                    verts[i] = new FormInstanceVertex()
+                        {
+                            Position = new Vector4(positions[i], 1.0f),
+                            TextureCoord = textureCoords[i]
+                        };
+                if (maxInstances <= 0)
+                    throw new ArgumentException("Maxium instances is less than or equal to zero", "maxInstances");
+                FormInstanceVertexData[] data = new FormInstanceVertexData[maxInstances * verts.Length];
+                return BuildDynamicInstancedMesh<FormInstanceVertex, FormInstanceVertexData>(game, shaderByteCode, verts, indices, FormInstanceVertex.InputElements, FormInstanceVertex.ElementSize, data, FormInstanceVertexData.SizeInBytes);    
             }
             else
-            {
+            {               
                 FormVertex[] verts = new FormVertex[6];
+                for (int i = 0; i < positions.Length; i++)
+                    verts[i] = new FormVertex()
+                    {
+                        Position = new Vector4(positions[i], 1.0f),
+                        TextureCoord = textureCoords[i]
+                    };
+                return BuildDynamicMesh<FormVertex>(game, shaderByteCode, verts, verts.Length, indices, indices.Length, FormVertex.InputElements, FormVertex.ElementSize, boundingBox);
             }
         }
 
         public static Vector2[] CreateHexagonTextureCoords()
         {
-
+            return new Vector2[] {
+                new Vector2(0, 0.25f),
+                new Vector2(0, 0.75f),
+                new Vector2(0.5f, 1),
+                new Vector2(1, 0.75f),
+                new Vector2(1, 0.25f),
+                new Vector2(0, 0.5f)
+            };
         }
 
         public static Vector3[] CreateHexagonPoints(RectangleF dimension)
@@ -492,7 +517,7 @@ namespace CipherPark.AngelJacket.Core.Content
             };    
         }
 
-        public static Vector3[] CreateHexagonPoints2(float radius)
+        public static Vector3[] CreateHexagonPoints(float radius)
         {
             int sides = 6;            
             float angle_stepsize = MathUtil.TwoPi / (float)sides;
@@ -750,9 +775,9 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion        
 
         #region Ring
-        public static Mesh BuildBasicRing(IGameApp game, byte[] shaderByteCode, float radius, float width, int segments, bool[] mask = null, bool isDynamic = false)
+        public static Mesh BuildBasicRing(IGameApp game, byte[] shaderByteCode, float radius, float width, int segments, bool isDynamic = false)
         {          
-            Vector3[] positions = CreateRingPoints(radius, width, segments, mask);
+            Vector3[] positions = CreateRingPoints(radius, width, segments);
             short[] indices = CreateRingIndices(segments);
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             BasicVertexPositionColor[] verts = new BasicVertexPositionColor[positions.Length];
@@ -762,57 +787,52 @@ namespace CipherPark.AngelJacket.Core.Content
                 return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
             else
                 return BuildDynamicMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, verts.Length, indices, indices.Length, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
-        }
+        }      
 
-        private static Vector3[] CreateRingPoints(float radius, float width, int segments, bool[] mask = null)
+        private static Vector3[] CreateRingPoints(float radius, float width, int segments)
         {
-            float angle = 0f;
+            float angle = MathUtil.Pi / 2.0f;
             float angle_stepsize = MathUtil.TwoPi / (float)segments;
             float innerRadius = Math.Max(radius - width, 0);
             Vector3[] points = new Vector3[segments * 2];
             for (int i = 0; i < segments; i++)
-            {
-                if (mask == null || mask[i])
-                {
-                    int k = i * 2;
-                    points[k] = new Vector3(radius * (float)Math.Cos(-angle), radius * (float)Math.Sin(-angle), 0);
-                    points[k + 1] = new Vector3(innerRadius * (float)Math.Cos(-angle), innerRadius * (float)Math.Sin(-angle), 0);
-                    angle -= angle_stepsize;
-                }
+            {             
+                int k = i * 2;
+                points[k] = new Vector3(radius * (float)Math.Cos(-angle), radius * (float)Math.Sin(-angle), 0);
+                points[k + 1] = new Vector3(innerRadius * (float)Math.Cos(-angle), innerRadius * (float)Math.Sin(-angle), 0);
+                angle -= angle_stepsize;             
             }
             return points;
         }
 
-        private static short[] CreateRingIndices(int segments, bool[] mask = null)
+        private static short[] CreateRingIndices(int segments)
         {
             int[] indices = new int[segments * 6];
 
             for (int i = 0; i < segments; i++)
-            {      
-                if (mask != null && mask[i])
-                {          
-                    int k = i * 2;
-                    int m = i * 6;
+            {                
+                int k = i * 2;
+                int m = i * 6;
                
-                    indices[m + 0] = k + 0;
-                    indices[m + 1] = k + 1;
-                    if (i < (segments - 1))
-                        indices[m + 2] = k + 2;
-                    else
-                        indices[m + 2] = 0;
+                indices[m + 0] = k + 0;
+                indices[m + 1] = k + 1;
+                
+                if (i < (segments - 1))
+                    indices[m + 2] = k + 2;
+                else
+                    indices[m + 2] = 0;
 
-                    indices[m + 3] = k + 1;
-                    if (i < (segments - 1))
-                    {
-                        indices[m + 4] = k + 3;
-                        indices[m + 5] = k + 2;
-                    }
-                    else
-                    {
-                        indices[m + 4] = 1;
-                        indices[m + 5] = 0;
-                    }
+                indices[m + 3] = k + 1;
+                if (i < (segments - 1))
+                {
+                    indices[m + 4] = k + 3;
+                    indices[m + 5] = k + 2;
                 }
+                else
+                {
+                    indices[m + 4] = 1;
+                    indices[m + 5] = 0;
+                }               
             }
 
             return indices.Select(e => (short)e).ToArray();
@@ -907,7 +927,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return new Mesh(game, meshDesc);
         }      
 
-        public static Mesh BuildInstancedMesh<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices, 
+        public static Mesh BuildDynamicInstancedMesh<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices, 
             InputElement[] vertexInputElements, int vertexSize, Ti[] instances,  
             int instanceSize) where Ti : struct where Tv : struct
         {
