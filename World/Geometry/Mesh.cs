@@ -77,14 +77,25 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public void UpdateMeshData<T>(T[] data, int offset = 0) where T : struct
+        public void UpdateIndices(short[] indices, int offset = 0)
         {
+            if (!IsDynamic)
+                throw new IndexOutOfRangeException("Attempted to update a mesh which is not dynamic");
+            
             //TODO: The index buffer needs to be updated too for indexed data
+            DataBox box = _app.GraphicsDeviceContext.MapSubresource(_indexBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
+            DataBuffer dataBuffer = new DataBuffer(box.DataPointer, indices.Length * sizeof(short));
+            dataBuffer.Set<short>(offset * sizeof(short), indices);
+            _app.GraphicsDeviceContext.UnmapSubresource(_indexBuffer, 0);
+        }
 
-            DXBuffer dynamicBuffer = (!IsInstanced) ? _vertexBuffer : _instanceBuffer;
+        public void UpdateVertexData<T>(T[] data, int offset = 0) where T : struct
+        {            
+            if (!IsDynamic)
+                throw new InvalidOperationException("Attempted to update a mesh which is not dynamic");
+
+            DXBuffer dynamicBuffer = (!IsInstanced) ? _vertexBuffer : _instanceBuffer;          
             int dataStride = (!IsInstanced) ? _vertexStride : _instanceStride;
-            if (dynamicBuffer == null)
-                throw new InvalidOperationException("Buffer is not available.");
             DataBox box = _app.GraphicsDeviceContext.MapSubresource(dynamicBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(box.DataPointer, data.Length * dataStride);
             dataBuffer.Set<T>(offset * dataStride, data);            

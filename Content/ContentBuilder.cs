@@ -124,7 +124,7 @@ namespace CipherPark.AngelJacket.Core.Content
             verts[3] = new BillboardInstancePositionVertexTexture(positions[3], _textureCoords[3], new Vector2(-size.Width, -size.Height));
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             Matrix[] instanceData = new Matrix[maxInstances];           
-            return BuildDynamicInstancedMesh<BillboardInstancePositionVertexTexture, Matrix>(game, shaderByteCode, verts, indices, BillboardInstancePositionVertexTexture.InputElements, BillboardInstancePositionVertexTexture.ElementSize, instanceData, BillboardInstancePositionVertexTexture.InstanceSize ); 
+            return BuildInstancedMesh<BillboardInstancePositionVertexTexture, Matrix>(game, shaderByteCode, verts, indices, BillboardInstancePositionVertexTexture.InputElements, BillboardInstancePositionVertexTexture.ElementSize, instanceData, BillboardInstancePositionVertexTexture.InstanceSize ); 
         }    
 
         public static Mesh BuildBasicViewportQuad(IGameApp game, byte[] shaderByteCode)
@@ -475,7 +475,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 if (maxInstances <= 0)
                     throw new ArgumentException("Maxium instances is less than or equal to zero", "maxInstances");
                 FormInstanceVertexData[] data = new FormInstanceVertexData[maxInstances * verts.Length];
-                return BuildDynamicInstancedMesh<FormInstanceVertex, FormInstanceVertexData>(game, shaderByteCode, verts, indices, FormInstanceVertex.InputElements, FormInstanceVertex.ElementSize, data, FormInstanceVertexData.SizeInBytes);    
+                return BuildInstancedMesh<FormInstanceVertex, FormInstanceVertexData>(game, shaderByteCode, verts, indices, FormInstanceVertex.InputElements, FormInstanceVertex.ElementSize, data, FormInstanceVertexData.SizeInBytes);    
             }
             else
             {               
@@ -884,7 +884,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return new Mesh(game, meshDesc);
         }
 
-        public static Mesh BuildDynamicMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, int maxVertices, short[] indices, int maxIndices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox, bool isCage = false) where T : struct
+        public static Mesh BuildDynamicMesh<T>(IGameApp game, byte[] shaderByteCode, T[] verts, int maxVertices, short[] indices, int maxIndices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
         {
             MeshDescription meshDesc = new MeshDescription();
 
@@ -903,8 +903,8 @@ namespace CipherPark.AngelJacket.Core.Content
             vertexBufferDesc.StructureByteStride = 0;
             vertexBufferDesc.Usage = ResourceUsage.Dynamic;
             DXBuffer vBuffer = (verts != null) ? DXBuffer.Create<T>(game.GraphicsDevice, verts, vertexBufferDesc) : new DXBuffer(game.GraphicsDevice, vertexBufferDesc);
-            meshDesc.VertexBuffer = vBuffer;
             meshDesc.VertexCount = (verts != null) ? verts.Length : 0;
+            meshDesc.VertexBuffer = vBuffer;            
             meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderByteCode, inputElements);
             meshDesc.VertexStride = vertexSize;
 
@@ -922,12 +922,12 @@ namespace CipherPark.AngelJacket.Core.Content
                 meshDesc.IndexBuffer = iBuffer;
             }
 
-            meshDesc.Topology = (isCage) ? SharpDX.Direct3D.PrimitiveTopology.LineList : SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             meshDesc.BoundingBox = boundingBox;
             return new Mesh(game, meshDesc);
         }      
 
-        public static Mesh BuildDynamicInstancedMesh<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices, 
+        public static Mesh BuildInstancedMesh<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices, 
             InputElement[] vertexInputElements, int vertexSize, Ti[] instances,  
             int instanceSize) where Ti : struct where Tv : struct
         {
@@ -950,10 +950,9 @@ namespace CipherPark.AngelJacket.Core.Content
             //NOTE: We always make the instance buffer a dynamic/writable one.
             BufferDescription instanceBufferDesc = new BufferDescription();
             instanceBufferDesc.BindFlags = BindFlags.VertexBuffer;
-            instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
+            instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
             instanceBufferDesc.SizeInBytes = instanceSize * instances.Length;
-            instanceBufferDesc.OptionFlags = ResourceOptionFlags.None;
-            instanceBufferDesc.Usage = ResourceUsage.Dynamic;
+            instanceBufferDesc.OptionFlags = ResourceOptionFlags.None;            
             instanceBufferDesc.StructureByteStride = 0;
             DXBuffer nBuffer = DXBuffer.Create<Ti>(game.GraphicsDevice, instances, instanceBufferDesc);
             meshDesc.InstanceBuffer = nBuffer;
@@ -973,6 +972,65 @@ namespace CipherPark.AngelJacket.Core.Content
                 meshDesc.IndexBuffer = iBuffer;
             }
             
+            meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            return new Mesh(game, meshDesc);
+        }
+
+        public static Mesh BuildDynamicInstancedMesh<Tv, Ti>(IGameApp game, byte[] shaderByteCode, Tv[] verts, short[] indices,
+            int maxIndices, InputElement[] vertexInputElements, int vertexSize, Ti[] instances, int maxInstances,
+            int instanceSize)
+            where Ti : struct
+            where Tv : struct
+        {
+            MeshDescription meshDesc = new MeshDescription();
+
+            if (maxInstances <= 0)
+                throw new ArgumentOutOfRangeException("maxVertices");
+
+            if (indices != null && maxIndices <= 0)
+                throw new ArgumentOutOfRangeException("maxIndices");
+
+            //Vertices...
+            BufferDescription vertexBufferDesc = new BufferDescription();
+            vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
+            vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
+            vertexBufferDesc.SizeInBytes = verts.Length * vertexSize;
+            vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
+            vertexBufferDesc.StructureByteStride = 0;
+            DXBuffer vBuffer = DXBuffer.Create<Tv>(game.GraphicsDevice, verts, vertexBufferDesc);
+            meshDesc.VertexBuffer = vBuffer;
+            meshDesc.VertexCount = verts.Length;
+            meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderByteCode, vertexInputElements);
+            meshDesc.VertexStride = vertexSize;
+
+            //Instances...
+            //NOTE: We always make the instance buffer a dynamic/writable one.
+            BufferDescription instanceBufferDesc = new BufferDescription();
+            instanceBufferDesc.BindFlags = BindFlags.VertexBuffer;
+            instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
+            instanceBufferDesc.SizeInBytes = maxInstances * instances.Length;
+            instanceBufferDesc.OptionFlags = ResourceOptionFlags.None;
+            instanceBufferDesc.Usage = ResourceUsage.Dynamic;
+            instanceBufferDesc.StructureByteStride = 0;
+            DXBuffer nBuffer = (instances != null) ? DXBuffer.Create<Ti>(game.GraphicsDevice, instances, instanceBufferDesc)  : new DXBuffer(game.GraphicsDevice, instanceBufferDesc);           
+            meshDesc.InstanceCount = (instances != null) ? instances.Length : 0;
+            meshDesc.InstanceBuffer = nBuffer;
+            meshDesc.InstanceStride = instanceSize;
+
+            //Optional Indices...
+            if (indices != null)
+            {
+                BufferDescription indexBufferDesc = new BufferDescription();
+                indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
+                indexBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
+                indexBufferDesc.SizeInBytes = maxIndices * sizeof(short);
+                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
+                indexBufferDesc.Usage = ResourceUsage.Dynamic;
+                DXBuffer iBuffer = (indices != null) ? DXBuffer.Create<short>(game.GraphicsDevice, indices, indexBufferDesc) : new DXBuffer(game.GraphicsDevice, indexBufferDesc);
+                meshDesc.IndexCount = (indices != null) ? indices.Length : 0;
+                meshDesc.IndexBuffer = iBuffer;
+            }
+
             meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             return new Mesh(game, meshDesc);
         }

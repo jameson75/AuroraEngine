@@ -125,7 +125,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 //1. Ensure that the correct buffer size of instance data is being determined..
                 //2. More importantly, figure out a way to infer the correct instance data type...
                 IEnumerable<Matrix> instanceData = particles.Where(p => p.IsVisible).Select(p => p.WorldTransform().ToMatrix());
-                instanceMesh.UpdateMeshData<Matrix>(instanceData.ToArray());
+                instanceMesh.UpdateVertexData<Matrix>(instanceData.ToArray());
                 instanceEffect.Apply();
                 instanceMesh.Draw(gameTime);
             }
