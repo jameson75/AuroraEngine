@@ -150,5 +150,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         {
             GetRowElements(index).ForEach(p => p.IsVisible = false);
         }
+
+        public Range? RowClipRange
+        {
+            get;
+            set;
+        }
     }
 }

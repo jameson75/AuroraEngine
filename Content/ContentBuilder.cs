@@ -457,7 +457,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildFormHexagon(IGameApp game, byte[] shaderByteCode, float radius, bool isInstanced = false, int maxInstances = 0)
+        public static Mesh BuildParticleHexagon(IGameApp game, byte[] shaderByteCode, float radius, bool isInstanced = false, int maxInstances = 0)
         {
             short[] indices = CreateHexagonIndices();
             Vector3[] positions = CreateHexagonPoints(radius);
@@ -465,28 +465,28 @@ namespace CipherPark.AngelJacket.Core.Content
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             if (isInstanced)
             {
-                FormInstanceVertex[] verts = new FormInstanceVertex[6];
+                ParticleInstanceVertex[] verts = new ParticleInstanceVertex[6];
                 for (int i = 0; i < positions.Length; i++)
-                    verts[i] = new FormInstanceVertex()
+                    verts[i] = new ParticleInstanceVertex()
                         {
                             Position = new Vector4(positions[i], 1.0f),
                             TextureCoord = textureCoords[i]
                         };
                 if (maxInstances <= 0)
                     throw new ArgumentException("Maxium instances is less than or equal to zero", "maxInstances");
-                FormInstanceVertexData[] data = new FormInstanceVertexData[maxInstances * verts.Length];
-                return BuildInstancedMesh<FormInstanceVertex, FormInstanceVertexData>(game, shaderByteCode, verts, indices, FormInstanceVertex.InputElements, FormInstanceVertex.ElementSize, data, FormInstanceVertexData.SizeInBytes);    
+                ParticleInstanceVertexData[] data = new ParticleInstanceVertexData[maxInstances * verts.Length];
+                return BuildInstancedMesh<ParticleInstanceVertex, ParticleInstanceVertexData>(game, shaderByteCode, verts, indices, ParticleInstanceVertex.InputElements, ParticleInstanceVertex.ElementSize, data, ParticleInstanceVertexData.SizeInBytes);    
             }
             else
             {               
-                FormVertex[] verts = new FormVertex[6];
+                ParticleVertex[] verts = new ParticleVertex[6];
                 for (int i = 0; i < positions.Length; i++)
-                    verts[i] = new FormVertex()
+                    verts[i] = new ParticleVertex()
                     {
                         Position = new Vector4(positions[i], 1.0f),
                         TextureCoord = textureCoords[i]
                     };
-                return BuildDynamicMesh<FormVertex>(game, shaderByteCode, verts, verts.Length, indices, indices.Length, FormVertex.InputElements, FormVertex.ElementSize, boundingBox);
+                return BuildDynamicMesh<ParticleVertex>(game, shaderByteCode, verts, verts.Length, indices, indices.Length, ParticleVertex.InputElements, ParticleVertex.ElementSize, boundingBox);
             }
         }
 
@@ -775,14 +775,14 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion        
 
         #region Ring
-        public static Mesh BuildBasicRing(IGameApp game, byte[] shaderByteCode, float radius, float width, int segments, bool isDynamic = false)
+        public static Mesh BuildBasicRing(IGameApp game, byte[] shaderByteCode, Color color, float radius, float width, int segments, bool isDynamic = false)
         {          
             Vector3[] positions = CreateRingPoints(radius, width, segments);
             short[] indices = CreateRingIndices(segments);
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             BasicVertexPositionColor[] verts = new BasicVertexPositionColor[positions.Length];
             for (int i = 0; i < verts.Length; i++)
-                verts[i] = new BasicVertexPositionColor(positions[i], Color.White.ToVector4());
+                verts[i] = new BasicVertexPositionColor(positions[i], color.ToVector4());
             if (!isDynamic)
                 return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
             else

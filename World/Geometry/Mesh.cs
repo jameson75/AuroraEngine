@@ -77,7 +77,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public void UpdateIndices(short[] indices, int offset = 0)
+        public void UpdateIndexStream(short[] indices, int offset = 0)
         {
             if (!IsDynamic)
                 throw new IndexOutOfRangeException("Attempted to update a mesh which is not dynamic");
@@ -89,7 +89,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _app.GraphicsDeviceContext.UnmapSubresource(_indexBuffer, 0);
         }
 
-        public void UpdateVertexData<T>(T[] data, int offset = 0) where T : struct
+        public void UpdateVertexStream<T>(T[] data, int offset = 0) where T : struct
         {            
             if (!IsDynamic)
                 throw new InvalidOperationException("Attempted to update a mesh which is not dynamic");

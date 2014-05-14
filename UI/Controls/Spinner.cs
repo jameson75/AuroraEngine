@@ -103,7 +103,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
   
         public float Increment { get; set; }
 
-        public Range Range { get; set; }
+        public RangeF Range { get; set; }
 
         public double Value
         {

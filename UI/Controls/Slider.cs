@@ -18,7 +18,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         ContentControl trackContentControl = null;
         ContentControl handleContentControl = null;
-        Range _range = Range.Empty;
+        RangeF _range = RangeF.Empty;
         float _interval = 0.0f;
 
         private Slider(IUIRoot visualRoot) 
@@ -71,7 +71,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             
         }
 
-        public Range Range
+        public RangeF Range
         {
             get { return _range; }
             set

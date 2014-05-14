@@ -34,17 +34,19 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             GridForm form = system as GridForm;
             if (form != null)
             {
+                //if a clip range has not been initialized or the clip range 
+                if (form.RowClipRange == null)
+                    form.RowClipRange = new Range(0, MaxGridRows);
+
                 //Get the tracked node's transform in the GridForm-Space.
-                Transform fsTrackedNodeTransform = form.WorldToLocal(TrackedNode.ParentToWorld(TrackedNode.Transform));                               
+                Transform fsTrackedNodeTransform = form.WorldToLocal(TrackedNode.ParentToWorld(TrackedNode.Transform));
+                int targetRow = form.CalculateRowFromZ(fsTrackedNodeTransform.Translation.Z);        
 
-                if (fsTrackedNodeTransform.Translation.Z >= form.ClipVolume.Maximum.Z)
-                {                    
-                    int lastVisibleRowIndex = GridDeformer.CalculateRowFromZ(fsTrackedNodeTransform.Translation.Z);
-                    int firstVisbileRowIndex = lastVisibleRowIndex - MaxGridRows;
-                    form.ClipRows(firstVisbileRowIndex, lastVisibleRowIndex);
-
-                    List<Particle> lastVisibleRow = form.GetRowElements(lastVisibleRowIndex);
-                    foreach (Particle element in lastVisibleRow)
+                if(targetRow > form.RowClipRange.Value.Max)
+                {
+                    form.RowClipRange = new Range(targetRow, targetRow - MaxGridRows);
+                    List<Particle> targetRowElements = form.GetRowElements(targetRow);
+                    foreach (Particle element in targetRowElements)
                     {
                         TransformAnimation animation = new TransformAnimation();
                         animation.SetKeyFrame(new AnimationKeyFrame(0, new Transform(element.Transform.Rotation, element.Transform.Translation + new Vector3(-200, 0, 0))));
@@ -60,8 +62,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 }
             }
             base.Step(gameTime, system);
-        }              
-
+        }
+     
         //public override void Step(GameTime gameTime, ParticleSystem system)
         //{           
         //    GridForm form = system as GridForm;
@@ -89,5 +91,15 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         //    }
         //    base.Step(gameTime, system);
         //}              
+    }
+
+    public static class GridFormExtension
+    {
+        public static int CalculateRowFromZ(this GridForm form, float z)
+        {
+            Vector3 cellSize = form.CalculateRenderedCellSize();
+            int row = (int)(z / cellSize.Z);
+            return (row < form.Dimensions.Z && row >= 0) ? row : -1;
+        }
     }
 }

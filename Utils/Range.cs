@@ -13,12 +13,25 @@ using System.Text;
 
 namespace CipherPark.AngelJacket.Core.Utils
 {
+    public struct RangeF
+    {
+        public static RangeF Empty = new RangeF();
+        public float Min { get; set; }
+        public float Max { get; set; }
+        public RangeF(float min, float max) : this()
+        {
+            Min = min;
+            Max = max;
+        }
+    }
+
     public struct Range
     {
         public static Range Empty = new Range();
-        public float Min { get; set; }
-        public float Max { get; set; }
-        public Range(float min, float max) : this()
+        public int Min { get; set; }
+        public int Max { get; set; }
+        public Range(int min, int max)
+            : this()
         {
             Min = min;
             Max = max;

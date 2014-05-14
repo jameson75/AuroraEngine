@@ -120,7 +120,6 @@
     <Compile Include="Effects\SkysphereEffect.cs" />
     <Compile Include="Kinetics\Force.cs" />
     <Compile Include="Kinetics\Particle.cs" />
-    <Compile Include="Kinetics\ParticleCluster.cs" />
     <Compile Include="Kinetics\ParticleSystem.cs" />
     <Compile Include="Kinetics\Solver.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />

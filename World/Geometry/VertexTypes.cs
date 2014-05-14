@@ -311,7 +311,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct FormInstanceVertex
+    public struct ParticleInstanceVertex
     {
         public Vector4 Position;
         public Vector3 Normal;
@@ -323,7 +323,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
         public static int InstanceSize { get { return _instanceSize; } }
-        static FormInstanceVertex()
+        static ParticleInstanceVertex()
         {
             _inputElements = new InputElement[]
              {
@@ -346,7 +346,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct FormInstanceVertexData
+    public struct ParticleInstanceVertexData
     {
         public Matrix Matrix;
         public Vector2 TransparencyCoord;
@@ -362,7 +362,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct FormVertex
+    public struct ParticleVertex
     {
         public Vector4 Position;
         public Vector3 Normal;
@@ -376,7 +376,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
 
-        static FormVertex()
+        static ParticleVertex()
         {
             _inputElements = new InputElement[]
              {

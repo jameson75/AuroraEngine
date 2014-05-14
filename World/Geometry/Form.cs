@@ -54,8 +54,6 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             get { return BoundingBoxExtension.Empty; }
         }
 
-        public virtual BoundingBox ClipVolume { get; set; }
-
         protected void ClearElements() { KillAll(); }
 
         protected List<Particle> EmitElements(int count) 

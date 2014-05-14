@@ -25,23 +25,20 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private SharpDX.Direct3D11.Buffer _vertexConstantsBuffer = null;
         private SharpDX.Direct3D11.Buffer _skinnedVertexConstantsBuffer = null;
-        private SharpDX.Direct3D11.Buffer _pixelConstantsBuffer = null;
-        private SharpDX.Direct3D11.Buffer _transPixelConstantsBuffer = null;
+        private SharpDX.Direct3D11.Buffer _pixelConstantsBuffer = null;  
 
         private int VertexConstantBufferSize = 256;
         private int SkinnedVertexConstantBufferSize = 3712;
         private int PixelConstantBufferSize = 320;
-        private int TransPixelConstantBufferSize = 320;
 
         private PixelShader _pixelShader = null;
         private VertexShader _vertexShader = null;
         private VertexShader _skinnedVertexShader = null;
-        private VertexShader _transVertexShader = null;
-        private PixelShader _transPixelShader = null;
+        private VertexShader _mtVertexShader = null;
 
         private byte[] _vertexShaderByteCode = null;
         private byte[] _skinnedVertexShaderByteCode = null;
-        private byte[] _transVertexShaderByteCode = null;
+        private byte[] _mtVertexShaderByteCode = null;
 
         private Vector3[] _lampDirPosArray = new Vector3[MaxLights];
         private Color[] _lampColorArray = new Color[MaxLights];
@@ -83,7 +80,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public bool EnableSkinning { get; set; }
 
-        public bool EnableTransparency { get; set; }
+        public bool EnableAlphaMap { get; set; }
 
         public Matrix[] BoneTransforms { get; set; }
 
@@ -92,13 +89,18 @@ namespace CipherPark.AngelJacket.Core.Effects
         {            
             FirstActiveLightsCount = 1;
            
+            //Create shaders...
             _skinnedVertexShaderByteCode = LoadVertexShader("Content\\Shaders\\blinnphong2-skin-vs.cso", out _skinnedVertexShader);
-            _skinnedVertexConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, SkinnedVertexConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\blinnphong2-vs.cso", out _vertexShader);
-            _vertexConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _mtVertexShaderByteCode = LoadVertexShader("Content\\Shaders\\blinnphong2-mt-vs.cso", out _mtVertexShader);
             LoadPixelShader("Content\\Shaders\\blinnphong2-ps.cso", out _pixelShader);
+                  
+            //Create constant buffer... 
+            _vertexConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);   
+            _skinnedVertexConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, SkinnedVertexConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _pixelConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, PixelConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);           
             
+            //Create sampler states...
             SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
             samplerStateDesc.Filter = Filter.MinMagMipLinear;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
@@ -112,7 +114,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             //Validate flags
             //--------------
-            if (EnableSkinning && EnableTransparency)
+            if (EnableSkinning)
                 throw new InvalidOperationException("Skinning and Transparency are both enabled. These features cannot be enabled at the same time");
 
             //Write Constants
@@ -122,10 +124,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             else            
                 WriteVertexConstants();
                
-            if(EnableTransparency)
-                WriteTransparencyPixelConstants();
-            else 
-                WritePixelConstants();
+             WritePixelConstants();
             
             //Setup Vertex Shader.
             //-------------------
@@ -133,34 +132,29 @@ namespace CipherPark.AngelJacket.Core.Effects
             {
                 GraphicsDevice.ImmediateContext.VertexShader.Set(_skinnedVertexShader);
                 GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _skinnedVertexConstantsBuffer);
-            }
-            else if (EnableTransparency)
-            {
-                GraphicsDevice.ImmediateContext.VertexShader.Set(_transVertexShader);
-                GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _vertexConstantsBuffer);
-            }
+            }           
             else
             {
-                GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+                if (EnableAlphaMap)
+                    GraphicsDevice.ImmediateContext.VertexShader.Set(_mtVertexShader);
+                else
+                    GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
                 GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _vertexConstantsBuffer);                
             }
 
             //Setup Pixel Shader.
-            //------------------
-            if (EnableTransparency)
+            //------------------  
+            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
+            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _pixelConstantsBuffer);
+
+            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _textureSamplerState);
+            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);            
+            
+            if (EnableAlphaMap)
             {
-                GraphicsDevice.ImmediateContext.PixelShader.Set(_transPixelShader);
-                GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _transPixelConstantsBuffer);
                 GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, _alphaSamplerState);
                 GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, AlphaMap);
-            }
-            else
-            {
-                GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-                GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _pixelConstantsBuffer);               
-            }
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _textureSamplerState);
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
+            }            
         }
 
         private void WriteSkinnedVertexConstants()
@@ -171,31 +165,10 @@ namespace CipherPark.AngelJacket.Core.Effects
             DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, SkinnedVertexConstantBufferSize);
             int offset = 0;
 
-            //WorldITXf
-            //---------
-            Matrix worldITXf = this.WorldInverseTranspose;
-            worldITXf.Transpose();
-            dataBuffer.Set(offset, worldITXf);
-            offset += sizeof(float) * 16;
-            //WorldXf
-            //-------
-            Matrix world = this.World;
-            world.Transpose();
-            dataBuffer.Set(offset, world);
-            offset += sizeof(float) * 16;
-            //ViewIXf
-            //-------
-            Matrix viewIXf = this.ViewInverse;
-            viewIXf.Transpose();
-            dataBuffer.Set(offset, viewIXf);
-            offset += sizeof(float) * 16;
-            //WvpXf
-            //-----
-            Matrix wvpXf = this.WorldViewProjection;
-            wvpXf.Transpose();
-            dataBuffer.Set(offset, wvpXf);
-            offset += sizeof(float) * 16;
-
+            //Write data buffer matrices
+            //--------------------------
+            offset = _SetDataBufferMatrices(dataBuffer);
+            
             if (BoneTransforms != null)
             {
                 if (BoneTransforms.Length > MaxBones)
@@ -230,9 +203,21 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Open Access to Buffer
             //---------------------
             DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_vertexConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
-            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, VertexConstantBufferSize);
+            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, VertexConstantBufferSize);            
+
+            //Write matrices to data buffer.
+            //-------------------------------
+            _SetDataBufferMatrices(dataBuffer);    
+
+            //Close Access to Buffer
+            //----------------------
+            GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBuffer, 0);
+        }
+
+        private int _SetDataBufferMatrices(DataBuffer dataBuffer)
+        {
             int offset = 0;
-            
+
             //WorldITXf
             //---------
             Matrix worldITXf = this.WorldInverseTranspose;
@@ -256,11 +241,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             Matrix wvpXf = this.WorldViewProjection;
             wvpXf.Transpose();
             dataBuffer.Set(offset, wvpXf);
-            offset += sizeof(float) * 16;          
+            offset += sizeof(float) * 16;
 
-            //Close Access to Buffer
-            //----------------------
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBuffer, 0);
+            return offset;
         }
 
         private void WritePixelConstants()
@@ -304,50 +287,7 @@ namespace CipherPark.AngelJacket.Core.Effects
                 dataBuffer.Set(offset + (i * Vector4.SizeInBytes), new Vector4(LampDirPosArray[i], (float)BlinnPhongLightType.Point));
             
             GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
-        }
-
-        private void WriteTransparencyPixelConstants()
-        {
-            //Open access to buffer
-            //---------------------
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_transPixelConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
-            DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, TransPixelConstantBufferSize);
-
-            //LampColorArray
-            //--------------
-            int offset = 0;
-            for (int i = 0; i < MaxLights; i++)
-                dataBuffer.Set(offset + (i * Vector4.SizeInBytes), LampColorArray[i].ToVector4());
-
-            //AmbiColor
-            //------------
-            offset += sizeof(float) * 4 * MaxLights;
-            dataBuffer.Set(offset, AmbientColor.ToVector3());
-
-            //Ks
-            //--
-            offset += sizeof(float) * 3;
-            dataBuffer.Set(offset, SpecularPower);
-
-            //Eccentricity
-            //-------------
-            offset += sizeof(float);
-            dataBuffer.Set(offset, Eccentricity);
-
-            //NLights
-            //-------
-            offset += sizeof(float);
-            dataBuffer.Set(offset, (float)FirstActiveLightsCount);
-        
-            //LightPosDirArray
-            //Close access to buffer
-            //----------------------
-            offset += sizeof(float) * 3;
-            for (int i = 0; i < MaxLights; i++)
-                dataBuffer.Set(offset + (i * Vector4.SizeInBytes), new Vector4(LampDirPosArray[i], (float)BlinnPhongLightType.Point));
-
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_transPixelConstantsBuffer, 0);
-        }
+        }   
 
         public ShaderResourceView Texture { get; set; }
 
