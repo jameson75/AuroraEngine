@@ -111,12 +111,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         }
 
         public override void Apply()
-        {
-            //Validate flags
-            //--------------
-            if (EnableSkinning)
-                throw new InvalidOperationException("Skinning and Transparency are both enabled. These features cannot be enabled at the same time");
-
+        {           
             //Write Constants
             //---------------
             if (EnableSkinning)            

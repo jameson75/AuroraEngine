@@ -23,7 +23,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public class GridForm : Form
     {
         private Vector3 _dimensions = Vector3.Zero;
-        private Vector3 _cellPadding = Vector3.Zero;        
+        private Vector3 _cellPadding = Vector3.Zero;
+        private Range? _rowClipRange = null;
 
         public GridForm(IGameApp game)
             : base(game)
@@ -153,8 +154,27 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public Range? RowClipRange
         {
-            get;
-            set;
+            get { return _rowClipRange; }
+            set
+            {
+                _rowClipRange = value;
+                OnRowClipRangeChanged();
+            }
+        }
+
+        protected void OnRowClipRangeChanged()
+        {
+            int i = 0;
+            foreach (Particle element in Particles)
+            {                              
+                int zIndex = i / (int)Dimensions.X;
+                if ( _rowClipRange == null ||
+                    (_rowClipRange.Value.Min <= zIndex && _rowClipRange.Value.Max >= zIndex))
+                    element.IsVisible = true;
+                else
+                    element.IsVisible = false;
+                i++;
+            }
         }
     }
 }

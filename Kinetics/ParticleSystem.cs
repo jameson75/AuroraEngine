@@ -99,7 +99,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         protected virtual void OnParticlesReset()
         {
             _particles.ForEach(p => p.TransformableParent = null);
-        }
+        }    
 
         public virtual void Draw(GameTime gameTime)
         {
