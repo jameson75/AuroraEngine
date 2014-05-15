@@ -349,7 +349,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public struct ParticleInstanceVertexData
     {
         public Matrix Matrix;
-        public Vector2 TransparencyCoord;
+        public Vector2 AlphaMapCoord;
         public Vector2 LightMapCoord;
         public Vector2 ColorMapCoord;
         public static int SizeInBytes

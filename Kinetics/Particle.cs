@@ -38,6 +38,11 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public ForwardEffect Effect { get; set; }
     }
 
+    public class ParticleInstanceData
+    {
+        public Vector2 AlphaMapCoord { get; set; }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -64,6 +69,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public ulong Age { get; set; }
         public ulong Life { get; set; }
         public ParticleDescription Description { get; set; }
+        public ParticleInstanceData InstanceData { get; set; }
         public bool IsVisible { get; set; }
         #endregion          
     }

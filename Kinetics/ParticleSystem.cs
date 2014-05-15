@@ -105,13 +105,13 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         {
             var particleGroupings = _particles.GroupBy(p => p.Description);
             foreach (IGrouping<ParticleDescription, Particle> particleGrouping in particleGroupings)
-            {                  
+            {
                 if (particleGrouping.Key.Mesh.IsInstanced)
-                    DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());
+                    DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());               
                 else
                     DrawParticles(gameTime, particleGrouping.ToArray());
             }
-        }
+        }     
 
         private void DrawInstancedParticles(GameTime gameTime, Mesh instanceMesh, Effect instanceEffect, IEnumerable<Particle> particles)
         {
@@ -119,12 +119,14 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 throw new InvalidOperationException("Particle mesh is not dynamic and instanced.");
 
             if (particles.Count() > 0)
-            {
-                throw new NotSupportedException("Particle instancing isn't supported yet.");
-                //TODO: This code is broken... 
-                //1. Ensure that the correct buffer size of instance data is being determined..
-                //2. More importantly, figure out a way to infer the correct instance data type...
-                IEnumerable<ParticleInstanceVertexData> instanceData = particles.Where(p => p.IsVisible).Select(p => p.WorldTransform().ToMatrix());
+            {              
+                //TODO: Ensure that the correct buffer size of instance data is being determined.                
+                IEnumerable<ParticleInstanceVertexData> instanceData = particles.Where(p => p.IsVisible)
+                                                                                .Select( p => new ParticleInstanceVertexData() 
+                                                                                {
+                                                                                   Matrix = p.WorldTransform().ToMatrix(),
+                                                                                   AlphaMapCoord = p.InstanceData.AlphaMapCoord,                                                                                   
+                                                                                });
                 instanceMesh.UpdateVertexStream<ParticleInstanceVertexData>(instanceData.ToArray());
                 instanceEffect.Apply();
                 instanceMesh.Draw(gameTime);
