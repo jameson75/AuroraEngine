@@ -49,16 +49,16 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     foreach (Particle element in targetRowElements)
                     {
                         TransformAnimation animation = new TransformAnimation();
-                        animation.SetKeyFrame(new AnimationKeyFrame(0, new Transform(element.Transform.Rotation, element.Transform.Translation + new Vector3(-200, 0, 0))));
-                        animation.SetKeyFrame(new AnimationKeyFrame(100, element.Transform));
+                        animation.SetKeyFrame(new AnimationKeyFrame(0, new Transform(element.Transform.Rotation, element.Transform.Translation + new Vector3(-800, 0, 0))));
+                        animation.SetKeyFrame(new AnimationKeyFrame(300, element.Transform));
                         KeyframeAnimationController animationController = new KeyframeAnimationController();
                         animationController.Animation = animation;
                         animationController.Target = element;
                         Controllers.Add(animationController);
                     }
 
-                    if (form.Dimensions.Z > (float)MaxGridRows)
-                        form.HideRow((int)form.Dimensions.Z - (MaxGridRows + 1));
+                    //if (form.Dimensions.Z > (float)MaxGridRows)
+                    //    form.HideRow((int)form.Dimensions.Z - (MaxGridRows + 1));
                 }
             }
             base.Step(gameTime, system);
