@@ -17,7 +17,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BasicVertexPositionColor
+    public struct VertexPositionColor
     {
         public Vector4 Position;
         public Vector4 Color;
@@ -27,7 +27,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
         
-        static BasicVertexPositionColor()
+        static VertexPositionColor()
         {
             _inputElements = new InputElement[]
              {
@@ -37,13 +37,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementSize = 32;
         }
 
-        public BasicVertexPositionColor(Vector3 position)
+        public VertexPositionColor(Vector3 position)
         {
             Position = new Vector4(position, 1.0f);
             Color = SharpDX.Color.Transparent.ToVector4();
         }
 
-        public BasicVertexPositionColor(Vector3 position, Vector4 color)
+        public VertexPositionColor(Vector3 position, Vector4 color)
         {
             Position = new Vector4(position, 1.0f);
             Color = color;
@@ -54,7 +54,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BasicVertexPositionTexture
+    public struct VertexPositionTexture
     {
         public Vector4 Position;
         public Vector2 TextureCoord;
@@ -63,7 +63,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private static int _elementSize = 0;
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
-        static BasicVertexPositionTexture()
+        static VertexPositionTexture()
         {
             _inputElements = new InputElement[]
              {
@@ -72,12 +72,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
              };
             _elementSize = 24;
         }
-        public BasicVertexPositionTexture(Vector3 position)
+        public VertexPositionTexture(Vector3 position)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = Vector2.Zero;
         }
-        public BasicVertexPositionTexture(Vector3 position, Vector2 textureCoord)
+        public VertexPositionTexture(Vector3 position, Vector2 textureCoord)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = textureCoord;
@@ -88,7 +88,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BillboardVertexPositionTexture
+    public struct BillboardVertex
     {
         public Vector4 Position;
         public Vector4 TextureCoord;
@@ -97,7 +97,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private static int _elementSize = 0;
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
-        static BillboardVertexPositionTexture()
+        static BillboardVertex()
         {
             _inputElements = new InputElement[]
              {
@@ -107,13 +107,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementSize = 32;
         }
 
-        public BillboardVertexPositionTexture(Vector3 position)
+        public BillboardVertex(Vector3 position)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = Vector4.Zero;
         }
 
-        public BillboardVertexPositionTexture(Vector3 position, Vector2 textureCoords, Vector2 dimensions)
+        public BillboardVertex(Vector3 position, Vector2 textureCoords, Vector2 dimensions)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, dimensions.X, dimensions.Y);
@@ -123,7 +123,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BillboardInstancePositionVertexTexture
+    public struct BillboardInstanceVertex
     {
         public Vector4 Position;
         public Vector4 TextureCoord;
@@ -134,7 +134,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
         public static int InstanceSize { get { return _instanceSize; } }
-        static BillboardInstancePositionVertexTexture()
+        static BillboardInstanceVertex()
         {           
             _inputElements = new InputElement[]
              {
@@ -149,13 +149,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _instanceSize = 64;
         }
 
-        public BillboardInstancePositionVertexTexture(Vector3 position)
+        public BillboardInstanceVertex(Vector3 position)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = Vector4.Zero;
         }
 
-        public BillboardInstancePositionVertexTexture(Vector3 position, Vector2 textureCoords, Vector2 dimensions)
+        public BillboardInstanceVertex(Vector3 position, Vector2 textureCoords, Vector2 dimensions)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, dimensions.X, dimensions.Y);
@@ -166,7 +166,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BasicVertexScreenTexture
+    public struct ScreenVertex
     {
         public Vector2 Position;
         public Vector2 TextureCoord;
@@ -176,7 +176,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
         
-        static BasicVertexScreenTexture()
+        static ScreenVertex()
         {
             _inputElements = new InputElement[]
              {
@@ -186,13 +186,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementSize = 16;
         }
         
-        public BasicVertexScreenTexture(Vector2 position)
+        public ScreenVertex(Vector2 position)
         {
             Position = position;
             TextureCoord = Vector2.Zero;
         }
         
-        public BasicVertexScreenTexture(Vector2 position, Vector2 textureCoord)
+        public ScreenVertex(Vector2 position, Vector2 textureCoord)
         {
             Position = position;
             TextureCoord = textureCoord;
@@ -204,7 +204,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BasicVertexPositionNormalTexture
+    public struct VertexPositionNormalTexture
     {
         public Vector4 Position;
         public Vector3 Normal;
@@ -215,7 +215,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
         
-        static BasicVertexPositionNormalTexture()
+        static VertexPositionNormalTexture()
         {
             _inputElements = new InputElement[]
              {
@@ -226,7 +226,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementSize = 36;
         }      
         
-        public BasicVertexPositionNormalTexture(Vector3 position, Vector3 normal, Vector2 textureCoord)
+        public VertexPositionNormalTexture(Vector3 position, Vector3 normal, Vector2 textureCoord)
         {
             Position = new Vector4(position, 1.0f);
             Normal = normal;
@@ -238,7 +238,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BasicVertexPositionNormalColor
+    public struct VertexPositionNormalColor
     {
         public Vector4 Position;
         public Vector3 Normal;
@@ -249,7 +249,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
 
-        static BasicVertexPositionNormalColor()
+        static VertexPositionNormalColor()
         {
             _inputElements = new InputElement[]
              {
@@ -260,7 +260,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementSize = 44;
         }
 
-        public BasicVertexPositionNormalColor(Vector3 position, Vector3 normal, Vector4 color)
+        public VertexPositionNormalColor(Vector3 position, Vector3 normal, Vector4 color)
         {
             Position = new Vector4(position, 1.0f);
             Normal = normal;
@@ -272,7 +272,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct BasicSkinnedVertexTexture
+    public struct VertexPositionNormalTextureSkin
     {
         public Vector4 Position;
         public Vector3 Normal;
@@ -285,7 +285,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }        
 
-        static BasicSkinnedVertexTexture()
+        static VertexPositionNormalTextureSkin()
         {
             _inputElements = new InputElement[]
              {
@@ -298,7 +298,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementSize = 68;
         }
 
-        public BasicSkinnedVertexTexture(Vector3 position, Vector3 normal, Vector2 textureCoord, float[] weights, int[] boneIndices)
+        public VertexPositionNormalTextureSkin(Vector3 position, Vector3 normal, Vector2 textureCoord, float[] weights, int[] boneIndices)
         {
             Position = new Vector4(position, 1.0f);
             Normal = normal;

@@ -145,8 +145,8 @@ namespace CipherPark.AngelJacket.Core.Content
             switch (channels)
             {
                 case FBXFileChannels.PositionColor:
-                    BasicVertexPositionColor[] _vertices = vertices.Select(e => new BasicVertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.Red.ToVector4() }).ToArray();
-                    mesh = ContentBuilder.BuildMesh<BasicVertexPositionColor>(app, shaderByteCode, _vertices, _indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+                    VertexPositionColor[] _vertices = vertices.Select(e => new VertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.Red.ToVector4() }).ToArray();
+                    mesh = ContentBuilder.BuildMesh<VertexPositionColor>(app, shaderByteCode, _vertices, _indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
                     result = new BasicModel(app);
                     result.Mesh = mesh;
                     break;
@@ -205,7 +205,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 //dynamic _vertices = null;
                 //if(normals != null && texCoords != null)
                 //{
-                BasicSkinnedVertexTexture[] _vertices = xMesh.Vertices.Select((v, i) => new BasicSkinnedVertexTexture()
+                VertexPositionNormalTextureSkin[] _vertices = xMesh.Vertices.Select((v, i) => new VertexPositionNormalTextureSkin()
                 {
                     Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
                     Normal = normals[i],
@@ -312,7 +312,7 @@ namespace CipherPark.AngelJacket.Core.Content
                     }
                 }
 
-                mesh = ContentBuilder.BuildMesh<BasicSkinnedVertexTexture>(app, shaderByteCode, _vertices, _indices, BasicSkinnedVertexTexture.InputElements, BasicSkinnedVertexTexture.ElementSize, boundingBox);
+                mesh = ContentBuilder.BuildMesh<VertexPositionNormalTextureSkin>(app, shaderByteCode, _vertices, _indices, VertexPositionNormalTextureSkin.InputElements, VertexPositionNormalTextureSkin.ElementSize, boundingBox);
 
                 //Create and return model
                 //-----------------------
@@ -326,11 +326,11 @@ namespace CipherPark.AngelJacket.Core.Content
             
             else
             {
-                BasicVertexPositionColor[] _vertices = xMesh.Vertices.Select((v, i) => new BasicVertexPositionColor()
+                VertexPositionColor[] _vertices = xMesh.Vertices.Select((v, i) => new VertexPositionColor()
                 {
                     Position = new Vector4(v.X, v.Y, v.Z, 1.0f)
                 }).ToArray();
-                mesh = ContentBuilder.BuildMesh<BasicVertexPositionColor>(app, shaderByteCode, _vertices, _indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+                mesh = ContentBuilder.BuildMesh<VertexPositionColor>(app, shaderByteCode, _vertices, _indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
                 BasicModel basicModel = new BasicModel(app);
                 basicModel.Mesh = mesh;
                 result = basicModel;

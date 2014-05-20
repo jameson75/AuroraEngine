@@ -26,48 +26,48 @@ namespace CipherPark.AngelJacket.Core.Content
         #region Quad
         public static Mesh BuildBasicQuad(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Color color)
         {   
-            BasicVertexPositionColor[] verts = new BasicVertexPositionColor[4];
+            VertexPositionColor[] verts = new VertexPositionColor[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(dimension);
             for(int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionColor(positions[i], color.ToVector4());                      
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());                      
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);         
-            return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionColor>(game, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
         }
 
         public static Mesh BuildBasicLitQuad(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[4];
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(dimension);
             for(int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalColor(positions[i], Vector3.UnitY, color.ToVector4());
+                verts[i] = new VertexPositionNormalColor(positions[i], Vector3.UnitY, color.ToVector4());
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
         }    
 
         public static Mesh BuildBasicTexturedQuad(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
-            BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[4];
+            VertexPositionTexture[] verts = new VertexPositionTexture[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(dimension);
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : CreateQuadTextureCoords();
             for(int i = 0; i < positions.Length; i++)
-                verts[0] = new BasicVertexPositionTexture(positions[i], _textureCoords[i]);                            
+                verts[0] = new VertexPositionTexture(positions[i], _textureCoords[i]);                            
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);         
-            return BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionTexture>(game, shaderByteCode, verts, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
         }
 
         public static Mesh BuildBasicLitTexturedQuad(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
-            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[4];
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(dimension);
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : CreateQuadTextureCoords();
             for(int i = 0; i < positions.Length; i++)
-                verts[0] = new BasicVertexPositionNormalTexture(positions[i], Vector3.UnitY, _textureCoords[i]);          
+                verts[0] = new VertexPositionNormalTexture(positions[i], Vector3.UnitY, _textureCoords[i]);          
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionNormalTexture>(game, shaderByteCode, verts, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
         public static Vector3[] CreateQuadPoints(RectangleF dimension, bool includeCenterPoint = false)
@@ -100,101 +100,101 @@ namespace CipherPark.AngelJacket.Core.Content
         #region Special Quad
         public static Mesh BuildBillboardQuad(IGameApp game, byte[] shaderByteCode, DrawingSizeF size)
         {
-            BillboardVertexPositionTexture[] verts = new BillboardVertexPositionTexture[4];
+            BillboardVertex[] verts = new BillboardVertex[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(new RectangleF(0, 0, 0, 0));
             Vector2[] _textureCoords = CreateQuadTextureCoords();
-            verts[0] = new BillboardVertexPositionTexture(positions[0], _textureCoords[0], new Vector2(-size.Width, size.Height));
-            verts[1] = new BillboardVertexPositionTexture(positions[1], _textureCoords[1], new Vector2(size.Width, size.Height));
-            verts[2] = new BillboardVertexPositionTexture(positions[2], _textureCoords[2], new Vector2(size.Width, -size.Height));
-            verts[3] = new BillboardVertexPositionTexture(positions[3], _textureCoords[3], new Vector2(-size.Width, -size.Height));
+            verts[0] = new BillboardVertex(positions[0], _textureCoords[0], new Vector2(-size.Width, size.Height));
+            verts[1] = new BillboardVertex(positions[1], _textureCoords[1], new Vector2(size.Width, size.Height));
+            verts[2] = new BillboardVertex(positions[2], _textureCoords[2], new Vector2(size.Width, -size.Height));
+            verts[3] = new BillboardVertex(positions[3], _textureCoords[3], new Vector2(-size.Width, -size.Height));
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BillboardVertexPositionTexture>(game, shaderByteCode, verts, indices, BillboardVertexPositionTexture.InputElements, BillboardVertexPositionTexture.ElementSize, boundingBox); 
+            return BuildMesh<BillboardVertex>(game, shaderByteCode, verts, indices, BillboardVertex.InputElements, BillboardVertex.ElementSize, boundingBox); 
         }
 
         public static Mesh BuildBillboardInstanceQuad(IGameApp game, byte[] shaderByteCode, DrawingSizeF size, int maxInstances)
         {
-            BillboardInstancePositionVertexTexture[] verts = new BillboardInstancePositionVertexTexture[4];
+            BillboardInstanceVertex[] verts = new BillboardInstanceVertex[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(new RectangleF(0, 0, 0, 0));
             Vector2[] _textureCoords = CreateQuadTextureCoords();
-            verts[0] = new BillboardInstancePositionVertexTexture(positions[0], _textureCoords[0], new Vector2(-size.Width, size.Height));
-            verts[1] = new BillboardInstancePositionVertexTexture(positions[1], _textureCoords[1], new Vector2(size.Width, size.Height));
-            verts[2] = new BillboardInstancePositionVertexTexture(positions[2], _textureCoords[2], new Vector2(size.Width, -size.Height));
-            verts[3] = new BillboardInstancePositionVertexTexture(positions[3], _textureCoords[3], new Vector2(-size.Width, -size.Height));
+            verts[0] = new BillboardInstanceVertex(positions[0], _textureCoords[0], new Vector2(-size.Width, size.Height));
+            verts[1] = new BillboardInstanceVertex(positions[1], _textureCoords[1], new Vector2(size.Width, size.Height));
+            verts[2] = new BillboardInstanceVertex(positions[2], _textureCoords[2], new Vector2(size.Width, -size.Height));
+            verts[3] = new BillboardInstanceVertex(positions[3], _textureCoords[3], new Vector2(-size.Width, -size.Height));
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             Matrix[] instanceData = new Matrix[maxInstances];           
-            return BuildInstancedMesh<BillboardInstancePositionVertexTexture, Matrix>(game, shaderByteCode, verts, indices, BillboardInstancePositionVertexTexture.InputElements, BillboardInstancePositionVertexTexture.ElementSize, instanceData, BillboardInstancePositionVertexTexture.InstanceSize ); 
+            return BuildInstancedMesh<BillboardInstanceVertex, Matrix>(game, shaderByteCode, verts, indices, BillboardInstanceVertex.InputElements, BillboardInstanceVertex.ElementSize, instanceData, BillboardInstanceVertex.InstanceSize ); 
         }    
 
         public static Mesh BuildBasicViewportQuad(IGameApp game, byte[] shaderByteCode)
         {
             Rectangle dimension = new Rectangle(-1, 1, 1, -1);
             Vector2[] textureCoords = { new Vector2( 0, 0 ), new Vector2( 1, 0 ), new Vector2( 1, 1 ), new Vector2( 0, 1 ) };
-            BasicVertexScreenTexture[] verts = new BasicVertexScreenTexture[6];            
-            verts[0] = new BasicVertexScreenTexture(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
-            verts[1] = new BasicVertexScreenTexture(new Vector2(dimension.Right, dimension.Top), textureCoords[1]);
-            verts[2] = new BasicVertexScreenTexture(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
-            verts[3] = new BasicVertexScreenTexture(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
-            verts[4] = new BasicVertexScreenTexture(new Vector2(dimension.Left, dimension.Bottom), textureCoords[3]);
-            verts[5] = new BasicVertexScreenTexture(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
+            ScreenVertex[] verts = new ScreenVertex[6];            
+            verts[0] = new ScreenVertex(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
+            verts[1] = new ScreenVertex(new Vector2(dimension.Right, dimension.Top), textureCoords[1]);
+            verts[2] = new ScreenVertex(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
+            verts[3] = new ScreenVertex(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
+            verts[4] = new ScreenVertex(new Vector2(dimension.Left, dimension.Bottom), textureCoords[3]);
+            verts[5] = new ScreenVertex(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
             Vector3[] positions = (from v in verts select new Vector3(v.Position.X, v.Position.Y, 0)).ToArray();
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);         
-            return BuildMesh<BasicVertexScreenTexture>(game, shaderByteCode, verts, BasicVertexScreenTexture.InputElements, BasicVertexScreenTexture.ElementSize, boundingBox);
+            return BuildMesh<ScreenVertex>(game, shaderByteCode, verts, ScreenVertex.InputElements, ScreenVertex.ElementSize, boundingBox);
         }             
         #endregion
 
         #region Quad3D
         public static Mesh BuildBasicQuad3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
-            BasicVertexPositionColor[] verts = new BasicVertexPositionColor[8];
+            VertexPositionColor[] verts = new VertexPositionColor[8];
             short[] indices = CreateQuadIndices3D();
             Vector3[] positions = CreateQuadPoints3D(dimension);
             for(int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionColor(positions[i], color.ToVector4());          
-            return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, dimension);
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());          
+            return BuildMesh<VertexPositionColor>(game, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitQuad3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[8];
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[8];
             short[] indices = CreateQuadIndices3D();
             Vector3[] positions = CreateQuadPoints3D(dimension);
             Vector3[] normals = GenerateNormals(positions, indices);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitQuad3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[36];           
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[36];           
             Vector3[] positions = CreateQuadPoints3DNI(dimension);
             Vector3[] normals = GenerateNormals(positions, null);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicTexturedQuad3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
-            BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[36];
+            VertexPositionTexture[] verts = new VertexPositionTexture[36];
             Vector3[] positions = CreateQuadPoints3D(dimension);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateQuadTextureCoords3DNI();
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionTexture(positions[i], _texCoords[i]);
-            return BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, verts, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, dimension);
+                verts[i] = new VertexPositionTexture(positions[i], _texCoords[i]);
+            return BuildMesh<VertexPositionTexture>(game, shaderByteCode, verts, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitTexturedQuad3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
-            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[36];
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[36];
             Vector3[] positions = CreateQuadPoints3DNI(dimension);
             Vector3[] normals = GenerateNormals(positions, null);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateQuadTextureCoords3DNI();
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
-            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
+            return BuildMesh<VertexPositionNormalTexture>(game, shaderByteCode, verts, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, dimension);
         }
 
         public static Vector2[] CreateQuadTextureCoords3DNI()
@@ -247,50 +247,50 @@ namespace CipherPark.AngelJacket.Core.Content
         //Constructs an equilateral triangle.
         public static Mesh BuildBasicTriangle(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
-            BasicVertexPositionColor[] verts = new BasicVertexPositionColor[3];
+            VertexPositionColor[] verts = new VertexPositionColor[3];
             Vector3[] positions = CreateTrianglePoints(dimension);
-            verts[0] = new BasicVertexPositionColor(positions[0], color.ToVector4());
-            verts[1] = new BasicVertexPositionColor(positions[1], color.ToVector4());
-            verts[2] = new BasicVertexPositionColor(positions[2], color.ToVector4());            
+            verts[0] = new VertexPositionColor(positions[0], color.ToVector4());
+            verts[1] = new VertexPositionColor(positions[1], color.ToVector4());
+            verts[2] = new VertexPositionColor(positions[2], color.ToVector4());            
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);         
-            return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionColor>(game, shaderByteCode, verts, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
         }
 
         //Constructs an equilateral triangle.
         public static Mesh BuildBasicLitTriangle(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[3];
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[3];
             Vector3[] positions = CreateTrianglePoints(dimension);
-            verts[0] = new BasicVertexPositionNormalColor(positions[0], Vector3.UnitY, color.ToVector4());
-            verts[1] = new BasicVertexPositionNormalColor(positions[1], Vector3.UnitY, color.ToVector4());
-            verts[2] = new BasicVertexPositionNormalColor(positions[2], Vector3.UnitY, color.ToVector4());
+            verts[0] = new VertexPositionNormalColor(positions[0], Vector3.UnitY, color.ToVector4());
+            verts[1] = new VertexPositionNormalColor(positions[1], Vector3.UnitY, color.ToVector4());
+            verts[2] = new VertexPositionNormalColor(positions[2], Vector3.UnitY, color.ToVector4());
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
         }     
 
         public static Mesh BuildBasicTexturedTriangle(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
-            BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[3];
+            VertexPositionTexture[] verts = new VertexPositionTexture[3];
             Vector3[] positions = CreateTrianglePoints(dimension);
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0.5f, 0.5f), new Vector2(1, 1), new Vector2(0, 1) };
-            verts[0] = new BasicVertexPositionTexture(positions[0], _textureCoords[0]);
-            verts[1] = new BasicVertexPositionTexture(positions[1], _textureCoords[1]);
-            verts[2] = new BasicVertexPositionTexture(positions[2], _textureCoords[2]);            
+            verts[0] = new VertexPositionTexture(positions[0], _textureCoords[0]);
+            verts[1] = new VertexPositionTexture(positions[1], _textureCoords[1]);
+            verts[2] = new VertexPositionTexture(positions[2], _textureCoords[2]);            
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, verts, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionTexture>(game, shaderByteCode, verts, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
         }
 
         //Constructs an equilateral triangle.
         public static Mesh BuildBasicLitTexturedTriangle(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0.5f, 0), new Vector2(1, 1), new Vector2(0, 1)};
-            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[3];
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[3];
             Vector3[] positions = CreateTrianglePoints(dimension);
-            verts[0] = new BasicVertexPositionNormalTexture(positions[0], Vector3.UnitY, _textureCoords[0]);
-            verts[1] = new BasicVertexPositionNormalTexture(positions[1], Vector3.UnitY, _textureCoords[1]);
-            verts[2] = new BasicVertexPositionNormalTexture(positions[2], Vector3.UnitY, _textureCoords[2]);           
+            verts[0] = new VertexPositionNormalTexture(positions[0], Vector3.UnitY, _textureCoords[0]);
+            verts[1] = new VertexPositionNormalTexture(positions[1], Vector3.UnitY, _textureCoords[1]);
+            verts[2] = new VertexPositionNormalTexture(positions[2], Vector3.UnitY, _textureCoords[2]);           
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionNormalTexture>(game, shaderByteCode, verts, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, boundingBox);
         }        
 
         public static Vector3[] CreateTrianglePoints(RectangleF dimension)
@@ -308,67 +308,67 @@ namespace CipherPark.AngelJacket.Core.Content
 
         public static Mesh BuildBasicTriangle3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
-            BasicVertexPositionColor[] verts = new BasicVertexPositionColor[6];
+            VertexPositionColor[] verts = new VertexPositionColor[6];
             short[] indices = CreateTriangleIndices3D();
             Vector3[] positions = CreateTrianglePoints3D(dimension);
             for(int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionColor(positions[i], color.ToVector4());          
-            return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, dimension);
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());          
+            return BuildMesh<VertexPositionColor>(game, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitTriangle3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[6];
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[6];
             short[] indices = CreateTriangleIndices3D();
             Vector3[] positions = CreateTrianglePoints3D(dimension);
             Vector3[] normals = GenerateNormals(positions, indices);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitTriangle3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[24];            
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[24];            
             Vector3[] positions = CreateTrianglePoints3DNI(dimension);
             Vector3[] normals = GenerateNormals(positions, null);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicTexturedTriangle3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
-            BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[6];
+            VertexPositionTexture[] verts = new VertexPositionTexture[6];
             short[] indices = CreateTriangleIndices3D();
             Vector3[] positions = CreateTrianglePoints3D(dimension);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateTriangleTextureCoords3D();
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionTexture(positions[i], _texCoords[i]);
-            return BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, dimension);
+                verts[i] = new VertexPositionTexture(positions[i], _texCoords[i]);
+            return BuildMesh<VertexPositionTexture>(game, shaderByteCode, verts, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitTexturedTriangle3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
-            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[6];
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[6];
             short[] indices = CreateTriangleIndices3D();
             Vector3[] positions = CreateTrianglePoints3D(dimension);
             Vector3[] normals = GenerateNormals(positions, indices);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateTriangleTextureCoords3D();
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
-            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
+            return BuildMesh<VertexPositionNormalTexture>(game, shaderByteCode, verts, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitTexturedTriangle3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
-            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[24];            
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[24];            
             Vector3[] positions = CreateTrianglePoints3D(dimension);
             Vector3[] normals = GenerateNormals(positions, null);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateTriangleTextureCoords3D();
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
-            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
+            return BuildMesh<VertexPositionNormalTexture>(game, shaderByteCode, verts, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, dimension);
         }      
 
         public static Vector2[] CreateTriangleTextureCoords3D()
@@ -414,47 +414,47 @@ namespace CipherPark.AngelJacket.Core.Content
         public static Mesh BuildBasicHexagon(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
             short[] indices = CreateHexagonIndices();
-            BasicVertexPositionColor[] verts = new BasicVertexPositionColor[6];
+            VertexPositionColor[] verts = new VertexPositionColor[6];
             Vector3[] positions = CreateHexagonPoints(dimension);
             for(int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionColor(positions[i], color.ToVector4());                  
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());                  
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionColor>(game, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
         }
 
         public static Mesh BuildBasicLitHexagon(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
             short[] indices = CreateHexagonIndices();
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[6];
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[6];
             Vector3[] positions = CreateHexagonPoints(dimension);           
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalColor(positions[i], Vector3.UnitY, color.ToVector4());
+                verts[i] = new VertexPositionNormalColor(positions[i], Vector3.UnitY, color.ToVector4());
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
         }
 
         public static Mesh BuildBasicTexturedHexagon(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             short[] indices = CreateHexagonIndices();
-            BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[6];
+            VertexPositionTexture[] verts = new VertexPositionTexture[6];
             Vector3[] positions = CreateHexagonPoints(dimension);
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1) };
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionTexture(positions[i], _textureCoords[i]);        
+                verts[i] = new VertexPositionTexture(positions[i], _textureCoords[i]);        
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionTexture>(game, shaderByteCode, verts, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
         }
 
         public static Mesh BuildBasicLitTexturedHexagon(IGameApp game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             short[] indices = CreateHexagonIndices();
-            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[6];
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[6];
             Vector3[] positions = CreateHexagonPoints(dimension);
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1) };
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalTexture(positions[i], Vector3.UnitY, _textureCoords[i]);       
+                verts[i] = new VertexPositionNormalTexture(positions[i], Vector3.UnitY, _textureCoords[i]);       
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, boundingBox);
+            return BuildMesh<VertexPositionNormalTexture>(game, shaderByteCode, verts, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, boundingBox);
         }
 
         public static Mesh BuildParticleHexagon(IGameApp game, byte[] shaderByteCode, float radius, bool isInstanced = false, int maxInstances = 0)
@@ -542,66 +542,66 @@ namespace CipherPark.AngelJacket.Core.Content
         public static Mesh BuildBasicHexagon3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             short[] indices = CreateHexagonIndices3D();
-            BasicVertexPositionColor[] verts = new BasicVertexPositionColor[12];
+            VertexPositionColor[] verts = new VertexPositionColor[12];
             Vector3[] positions = CreateHexagonPoints3D(dimension);
             for(int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionColor(positions[i], color.ToVector4());               
-            return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, dimension);
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());               
+            return BuildMesh<VertexPositionColor>(game, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitHexagon3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             short[] indices = CreateHexagonIndices3D();
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[12];
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[12];
             Vector3[] positions = CreateHexagonPoints3D(dimension);
             Vector3[] normals = GenerateNormals(positions, indices);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitHexagon3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {            
-            BasicVertexPositionNormalColor[] verts = new BasicVertexPositionNormalColor[60];
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[60];
             Vector3[] positions = CreateHexagonPoints3DNI(dimension);
             Vector3[] normals = GenerateNormals(positions, null);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
-            return BuildMesh<BasicVertexPositionNormalColor>(game, shaderByteCode, verts, BasicVertexPositionNormalColor.InputElements, BasicVertexPositionNormalColor.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
+            return BuildMesh<VertexPositionNormalColor>(game, shaderByteCode, verts, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicTexturedHexagon3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             short[] indices = CreateHexagonIndices3D();
-            BasicVertexPositionTexture[] verts = new BasicVertexPositionTexture[12];
+            VertexPositionTexture[] verts = new VertexPositionTexture[12];
             Vector3[] positions = CreateHexagonPoints3D(dimension);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateHexagonTextureCoords3D();
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionTexture(positions[i], _texCoords[i]);
-            return BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, dimension);
+                verts[i] = new VertexPositionTexture(positions[i], _texCoords[i]);
+            return BuildMesh<VertexPositionTexture>(game, shaderByteCode, verts, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitTexturedHexagon3D(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             short[] indices = CreateHexagonIndices3D();
-            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[12];
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[12];
             Vector3[] positions = CreateHexagonPoints3D(dimension);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateHexagonTextureCoords3D();
             Vector3[] normals = GenerateNormals(positions, indices);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
-            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, indices, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
+            return BuildMesh<VertexPositionNormalTexture>(game, shaderByteCode, verts, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitTexturedHexagon3DNI(IGameApp game, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {    
-            BasicVertexPositionNormalTexture[] verts = new BasicVertexPositionNormalTexture[60];
+            VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[60];
             Vector3[] positions = CreateHexagonPoints3DNI(dimension);
             Vector2[] _texCoords = (texCoords != null) ? texCoords : CreateHexagonTextureCoords3D();
             Vector3[] normals = GenerateNormals(positions, null);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new BasicVertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
-            return BuildMesh<BasicVertexPositionNormalTexture>(game, shaderByteCode, verts, BasicVertexPositionNormalTexture.InputElements, BasicVertexPositionNormalTexture.ElementSize, dimension);
+                verts[i] = new VertexPositionNormalTexture(positions[i], normals[i], _texCoords[i]);
+            return BuildMesh<VertexPositionNormalTexture>(game, shaderByteCode, verts, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, dimension);
         }
 
         public static Vector2[] CreateHexagonTextureCoords3D()
@@ -672,7 +672,7 @@ namespace CipherPark.AngelJacket.Core.Content
             int nVertices = 2 * (xSteps + zSteps);
             float xStepSize = (float)gridSize.Width / (gridSteps.X - 1);
             float zStepSize = (float)gridSize.Height / (gridSteps.Y - 1);
-            BasicVertexPositionColor[] vertices = new BasicVertexPositionColor[nVertices];
+            VertexPositionColor[] vertices = new VertexPositionColor[nVertices];
             Vector3 vOrigin = new Vector3(-halfWidth, 0f, halfHeight);
             Vector3 vBackRight = new Vector3(gridSize.Width - halfWidth, 0f, halfHeight);
             Vector3 vFrontLeft = new Vector3(-halfWidth, 0f, -gridSize.Height + halfHeight);
@@ -680,8 +680,8 @@ namespace CipherPark.AngelJacket.Core.Content
             Vector3 vx2 = vFrontLeft;
             for (int i = 0; i < xSteps; i++)
             {
-                vertices[i * 2] = new BasicVertexPositionColor(vx1, gridColor.ToVector4());
-                vertices[i * 2 + 1] = new BasicVertexPositionColor(vx2, gridColor.ToVector4());
+                vertices[i * 2] = new VertexPositionColor(vx1, gridColor.ToVector4());
+                vertices[i * 2 + 1] = new VertexPositionColor(vx2, gridColor.ToVector4());
                 vx1 += new Vector3(xStepSize, 0f, 0f);
                 vx2 += new Vector3(xStepSize, 0f, 0f);
             }
@@ -690,8 +690,8 @@ namespace CipherPark.AngelJacket.Core.Content
             Vector3 vz2 = vBackRight;
             for (int i = 0; i < zSteps; i++)
             {
-                vertices[i * 2 + k] = new BasicVertexPositionColor(vz1, gridColor.ToVector4());
-                vertices[i * 2 + 1 + k] = new BasicVertexPositionColor(vz2, gridColor.ToVector4());
+                vertices[i * 2 + k] = new VertexPositionColor(vz1, gridColor.ToVector4());
+                vertices[i * 2 + 1 + k] = new VertexPositionColor(vz2, gridColor.ToVector4());
                 vz1 += new Vector3(0f, 0f, -zStepSize);
                 vz2 += new Vector3(0f, 0f, -zStepSize);
             }
@@ -700,13 +700,13 @@ namespace CipherPark.AngelJacket.Core.Content
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
-            vertexBufferDesc.SizeInBytes = vertices.Length * BasicVertexPositionColor.ElementSize;
+            vertexBufferDesc.SizeInBytes = vertices.Length * VertexPositionColor.ElementSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
             meshDesc.VertexCount = vertices.Length;
-            meshDesc.VertexBuffer = DXBuffer.Create<BasicVertexPositionColor>(game.GraphicsDevice, vertices, vertexBufferDesc);
-            meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderByteCode, BasicVertexPositionColor.InputElements);
-            meshDesc.VertexStride = BasicVertexPositionColor.ElementSize;
+            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(game.GraphicsDevice, vertices, vertexBufferDesc);
+            meshDesc.VertexLayout = new InputLayout(game.GraphicsDevice, shaderByteCode, VertexPositionColor.InputElements);
+            meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = PrimitiveTopology.LineList;
             Vector3[] positions = (from v in vertices select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
             BoundingBox boundingBox = BoundingBox.FromPoints(positions); 
@@ -717,58 +717,58 @@ namespace CipherPark.AngelJacket.Core.Content
         #region Skybox
         public static Mesh[] CreateSkyBox(IGameApp game, byte[] shaderByteCode, float distanceFromViewPoint)
         {
-            BasicVertexPositionTexture[] front = new BasicVertexPositionTexture[4];
-            BasicVertexPositionTexture[] back = new BasicVertexPositionTexture[4];
-            BasicVertexPositionTexture[] left = new BasicVertexPositionTexture[4];
-            BasicVertexPositionTexture[] right = new BasicVertexPositionTexture[4];
-            BasicVertexPositionTexture[] top = new BasicVertexPositionTexture[4];
-            BasicVertexPositionTexture[] bottom = new BasicVertexPositionTexture[4];
+            VertexPositionTexture[] front = new VertexPositionTexture[4];
+            VertexPositionTexture[] back = new VertexPositionTexture[4];
+            VertexPositionTexture[] left = new VertexPositionTexture[4];
+            VertexPositionTexture[] right = new VertexPositionTexture[4];
+            VertexPositionTexture[] top = new VertexPositionTexture[4];
+            VertexPositionTexture[] bottom = new VertexPositionTexture[4];
             Vector2[] _textureCoords = new Vector2[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1) };
             
             //front quad...
-            front[0] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[0]);
-            front[1] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[1]);
-            front[2] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[2]);
-            front[3] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[3]);
+            front[0] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[0]);
+            front[1] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[1]);
+            front[2] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[2]);
+            front[3] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[3]);
             
             //back quad...
-            back[0] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[0]);
-            back[1] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[1]);
-            back[2] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[2]);
-            back[3] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[3]);
+            back[0] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[0]);
+            back[1] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[1]);
+            back[2] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[2]);
+            back[3] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[3]);
             
             //left quad...
-            left[0] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[0]);
-            left[1] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[1]);
-            left[2] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[2]);
-            left[3] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[3]);
+            left[0] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[0]);
+            left[1] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[1]);
+            left[2] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[2]);
+            left[3] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[3]);
             
             //right quad...
-            right[0] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[0]);
-            right[1] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[1]);
-            right[2] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[2]);
-            right[3] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[3]);
+            right[0] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[0]);
+            right[1] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[1]);
+            right[2] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[2]);
+            right[3] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[3]);
             
             //top quad...
-            top[0] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[0]);
-            top[1] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[1]);
-            top[2] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[2]);
-            top[3] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[3]);
+            top[0] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[0]);
+            top[1] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[1]);
+            top[2] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[2]);
+            top[3] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint), _textureCoords[3]);
             
             //bottom quad...
-            bottom[0] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[0]);
-            bottom[1] = new BasicVertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[1]);
-            bottom[2] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[2]);
-            bottom[3] = new BasicVertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[3]);
+            bottom[0] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[0]);
+            bottom[1] = new VertexPositionTexture(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[1]);
+            bottom[2] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, distanceFromViewPoint), _textureCoords[2]);
+            bottom[3] = new VertexPositionTexture(new Vector3(distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), _textureCoords[3]);
 
             BoundingBox boundingBox = new BoundingBox(new Vector3(-distanceFromViewPoint, -distanceFromViewPoint, -distanceFromViewPoint), new Vector3(distanceFromViewPoint, distanceFromViewPoint, distanceFromViewPoint));
             short[] indices = new short[] { 0, 1, 2, 0, 2, 3 };
-            Mesh frontQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, front, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
-            Mesh backQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, back, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
-            Mesh leftQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, left, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
-            Mesh rightQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, right, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
-            Mesh topQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, top, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
-            Mesh bottomQuad = BuildMesh<BasicVertexPositionTexture>(game, shaderByteCode, bottom, indices, BasicVertexPositionTexture.InputElements, BasicVertexPositionTexture.ElementSize, boundingBox);
+            Mesh frontQuad = BuildMesh<VertexPositionTexture>(game, shaderByteCode, front, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+            Mesh backQuad = BuildMesh<VertexPositionTexture>(game, shaderByteCode, back, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+            Mesh leftQuad = BuildMesh<VertexPositionTexture>(game, shaderByteCode, left, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+            Mesh rightQuad = BuildMesh<VertexPositionTexture>(game, shaderByteCode, right, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+            Mesh topQuad = BuildMesh<VertexPositionTexture>(game, shaderByteCode, top, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+            Mesh bottomQuad = BuildMesh<VertexPositionTexture>(game, shaderByteCode, bottom, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
 
             return new Mesh[] { frontQuad, backQuad, leftQuad, rightQuad, topQuad, bottomQuad };
         }
@@ -780,13 +780,13 @@ namespace CipherPark.AngelJacket.Core.Content
             Vector3[] positions = CreateRingPoints(radius, width, segments);
             short[] indices = CreateRingIndices(segments);
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            BasicVertexPositionColor[] verts = new BasicVertexPositionColor[positions.Length];
+            VertexPositionColor[] verts = new VertexPositionColor[positions.Length];
             for (int i = 0; i < verts.Length; i++)
-                verts[i] = new BasicVertexPositionColor(positions[i], color.ToVector4());
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());
             if (!isDynamic)
-                return BuildMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, indices, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+                return BuildMesh<VertexPositionColor>(game, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
             else
-                return BuildDynamicMesh<BasicVertexPositionColor>(game, shaderByteCode, verts, verts.Length, indices, indices.Length, BasicVertexPositionColor.InputElements, BasicVertexPositionColor.ElementSize, boundingBox);
+                return BuildDynamicMesh<VertexPositionColor>(game, shaderByteCode, verts, verts.Length, indices, indices.Length, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
         }      
 
         private static Vector3[] CreateRingPoints(float radius, float width, int segments)

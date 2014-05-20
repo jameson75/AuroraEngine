@@ -37,7 +37,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             int nVertices = 2 * (xSteps + zSteps);
             float xStepSize = (float)gridSize.Width / (gridSteps.X - 1);
             float zStepSize = (float)gridSize.Height / (gridSteps.Y - 1);
-            BasicVertexPositionColor[] vertices = new BasicVertexPositionColor[nVertices];
+            VertexPositionColor[] vertices = new VertexPositionColor[nVertices];
             Vector3 vOrigin = new Vector3(-halfWidth, 0f, halfHeight);
             Vector3 vBackRight = new Vector3(gridSize.Width - halfWidth, 0f, halfHeight);
             Vector3 vFrontLeft = new Vector3(-halfWidth, 0f, -gridSize.Height + halfHeight);
@@ -45,8 +45,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Vector3 vx2 = vFrontLeft;
             for (int i = 0; i < xSteps; i++)
             {
-                vertices[i * 2] = new BasicVertexPositionColor(vx1, Color.Gray.ToVector4());
-                vertices[i * 2 + 1] = new BasicVertexPositionColor(vx2, Color.Gray.ToVector4());
+                vertices[i * 2] = new VertexPositionColor(vx1, Color.Gray.ToVector4());
+                vertices[i * 2 + 1] = new VertexPositionColor(vx2, Color.Gray.ToVector4());
                 vx1 += new Vector3(xStepSize, 0f, 0f);
                 vx2 += new Vector3(xStepSize, 0f, 0f);
             }
@@ -55,8 +55,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Vector3 vz2 = vBackRight;
             for (int i = 0; i < zSteps; i++)
             {
-                vertices[i * 2 + k] = new BasicVertexPositionColor(vz1, Color.Gray.ToVector4());
-                vertices[i * 2 + 1 + k] = new BasicVertexPositionColor(vz2, Color.Gray.ToVector4());
+                vertices[i * 2 + k] = new VertexPositionColor(vz1, Color.Gray.ToVector4());
+                vertices[i * 2 + 1 + k] = new VertexPositionColor(vz2, Color.Gray.ToVector4());
                 vz1 += new Vector3(0f, 0f, -zStepSize);
                 vz2 += new Vector3(0f, 0f, -zStepSize);
             }
@@ -65,13 +65,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
-            vertexBufferDesc.SizeInBytes = vertices.Length * BasicVertexPositionColor.ElementSize;
+            vertexBufferDesc.SizeInBytes = vertices.Length * VertexPositionColor.ElementSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
             meshDesc.VertexCount = vertices.Length;
-            meshDesc.VertexBuffer = DXBuffer.Create<BasicVertexPositionColor>(app.GraphicsDevice, vertices, vertexBufferDesc);
-            meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, BasicVertexPositionColor.InputElements);
-            meshDesc.VertexStride = BasicVertexPositionColor.ElementSize;
+            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(app.GraphicsDevice, vertices, vertexBufferDesc);
+            meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, VertexPositionColor.InputElements);
+            meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = PrimitiveTopology.LineList;
             _mesh = new Mesh(app, meshDesc);
         }
