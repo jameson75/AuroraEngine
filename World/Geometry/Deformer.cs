@@ -21,12 +21,12 @@ using CipherPark.AngelJacket.Core.Kinetics;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class GridDeformer : ParticleKeyframeSolver
+    public class StackGridDeformer : ParticleKeyframeSolver
     {
         public ITransformable TrackedNode { get; set; }
         public int MaxGridRows { get; set; }
 
-        public GridDeformer()
+        public StackGridDeformer()
         { }
 
         public override void Step(GameTime gameTime, ParticleSystem system)

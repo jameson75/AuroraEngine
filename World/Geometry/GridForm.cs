@@ -105,11 +105,14 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         private void GenerateElements()
         {          
+            //Remove existing elements
             ClearElements();
-            int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);
-            //Emit elements (particles) into the particle system.
-            var elements = EmitElements(elementCount);
-            //Group particles into rows.     
+            
+            //Emit elements (particles) into the particle system.           
+            int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);           
+            EmitElements(elementCount);
+            
+            //Layout particles into rows.                
             OnLayoutChanged();
         }
 

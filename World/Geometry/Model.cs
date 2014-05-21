@@ -48,27 +48,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public string Name { get; set; }
 
         public IGameApp Game { get { return _game; } }
-
-       // public Mesh Mesh { get { return _mesh; } set { _mesh = value; OnMeshChanged(); } }       
+          
 
         public Transform Transform { get; set; }
 
-        public ITransformable TransformableParent { get; set; }
-        
-        //public Camera Camera { get; set; }
-
-        //public Matrix Transform { get; set; }
-
-        //public BasicEffect Effect { get; set; }
-
-        //public BasicEffectEx Effect { get; set; }
-
-        public CoreEffect Effect { get; set; }
-
-        //public void ApplyEffect()
-        //{
-        //    _effect.Apply(_effectParameters);
-        //}
+        public ITransformable TransformableParent { get; set; }        
+    
+        public CoreEffect Effect { get; set; }    
 
         public abstract void Draw(GameTime gameTime);      
 
@@ -115,81 +101,16 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         protected virtual void OnMeshChanged()
         { } 
-    }
-
-    //public class CompositeModel : Model
-    //{
-    //    private List<CompositeModel> _childModels = new List<CompositeModel>();
-
-    //    public List<CompositeModel> ChildModels { get { return _childModels; } }
-
-    //    public CompositeModel Parent { get; set; }
-
-    //    public CompositeModel(IGameApp app)
-    //        : base(app)
-    //    { }      
-
-    //    public override void Draw(long gameTime)
-    //    {
-    //        if (Effect != null)
-    //            Effect.Apply();
-
-    //        if (Mesh != null)
-    //            Mesh.Draw(gameTime);
-
-    //        foreach (CompositeModel childModel in _childModels)
-    //        {
-    //            if (Effect != null)
-    //            {
-    //                childModel.Effect.World = childModel.LocalToWorld(childModel.Transform.ToMatrix());
-    //                childModel.Effect.View = Effect.View;
-    //                childModel.Effect.Projection = Effect.Projection;
-    //            }
-    //            childModel.Draw(gameTime);
-    //        }
-    //    }
-
-    //    //public Matrix LocalToWorld(Matrix localTransform)
-    //    //{
-    //    //    MatrixStack stack = new MatrixStack();
-    //    //    stack.Push(localTransform);
-    //    //    CompositeModel model = this.Parent;
-    //    //    while (model != null)
-    //    //    {
-    //    //        stack.Push(model.Transform.ToMatrix());
-    //    //        model = model.Parent;
-    //    //    }
-    //    //    return stack.Transform;
-    //    //}
-
-    //    //public Transform LocalToWorld(Transform localTransform)
-    //    //{
-    //    //    TransformStack stack = new TransformStack();
-    //    //    stack.Push(localTransform);
-    //    //    CompositeModel model = this.Parent;
-    //    //    while (model != null)
-    //    //    {
-    //    //        stack.Push(model.Transform);
-    //    //        model = model.Parent;
-    //    //    }
-    //    //    return stack.Transform;
-    //    //} 
-    //}
+    }   
 
     /// <summary>
     /// 
     /// </summary>
     public class ComplexModel : Model, IAnimatedModel
     {
-        private List<Mesh> _meshes = new List<Mesh>();
-        
-        //private List<Emitter> _emitters = new List<Emitter>();
+        private List<Mesh> _meshes = new List<Mesh>();      
 
         public List<Mesh> Meshes { get { return _meshes; } }        
-        
-        //public List<Emitter> Emitters { get { return _emitters; } }
-
-        //public ParticleRenderer ParticleRenderer { get; set; }
         
         #region IAnimatedModel
         public Frame FrameTree { get; set; }        
@@ -218,6 +139,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 if(FrameTree != null)
                     frameList = FrameTree.FlattenToList();
              
+            //TODO: Finish implementing this draw method my applying the frame transformation to the correct mesh.
+            //How??
+
             if (Effect != null)
             {
                 Effect.World = ((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
@@ -226,12 +150,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 foreach (Mesh mesh in Meshes)
                     mesh.Draw(gameTime);
                 Effect.Restore();
-            }
-
-            //TODO: UnCommment and support instanced particles - Possibly by delegating the 
-            //operations to a ParticleSystem class.
-            //if (Emitters != null && ParticleRenderer != null)
-            //    ParticleRenderer.Draw(gameTime, Emitters.SelectMany(e => e.Particles));              
+            }           
         }
 
         protected override void OnApplyingEffect()
