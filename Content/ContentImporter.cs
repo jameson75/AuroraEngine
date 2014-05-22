@@ -357,6 +357,12 @@ namespace CipherPark.AngelJacket.Core.Content
                 (channels & XFileChannels.MeshVertexColors) != 0 )
                 throw new NotSupportedException("One or more of the specified channels is not supported.");
 
+            //Throw an error for conflicting channels.
+            //----------------------------------------
+            if (((channels & XFileChannels.MeshVertexColors) != 0 || (channels & XFileChannels.DefaultMaterialColor) != 0) &&
+                 ((channels & XFileChannels.MeshTextureCoords1) != 0 || (channels & XFileChannels.MeshTextureCoords2) != 0))
+                throw new NotSupportedException("Conflicting channels specified.");
+
             //Read X-File Data
             //----------------
             doc.Load(System.IO.File.Open(fileName, FileMode.Open, FileAccess.ReadWrite));
@@ -373,7 +379,7 @@ namespace CipherPark.AngelJacket.Core.Content
             //Construct model vertex indices from mesh data
             //----------------------------------------------            
             short[] _indices = xMesh.Faces.SelectMany(e => e.FaceVertexIndices.Select(x => (short)x)).ToArray();
-
+          
             //Extract texture coords from mesh data
             //-------------------------------------
             Vector2[] texCoords = null;
@@ -392,6 +398,27 @@ namespace CipherPark.AngelJacket.Core.Content
                 normals = xMesh.DeclData.GetNormals();
                 if (normals == null)
                     throw new InvalidOperationException("Expected normal data was not present.");
+            }
+
+            //Extract Color from default material
+            //-----------------------------------
+            Color[] colors = null;
+            if ((channels & XFileChannels.DefaultMaterialColor) != 0)
+            {               
+                XFileMaterialObject defaultMaterial = null;
+                if (xMesh.MeshMaterialList != null)
+                {                   
+                    if(xMesh.MeshMaterialList.MaterialRefs.Count() > 0 )
+                        defaultMaterial = doc.DataObjects.GetDataObject<XFileMaterialObject>(0);
+                    else if(xMesh.MeshMaterialList.Materials.Count() > 0)
+                        defaultMaterial = xMesh.MeshMaterialList.Materials[0];
+                    colors = xMesh.Vertices.Select( v => new Color(defaultMaterial.FaceColor.Red,
+                                                             defaultMaterial.FaceColor.Green,
+                                                             defaultMaterial.FaceColor.Blue,
+                                                             1.0f)).ToArray();
+                }
+                if (colors == null)
+                    throw new InvalidOperationException("Expected material color data was not present.");
             }
 
             if ((channels & XFileChannels.Animation) != 0)
@@ -539,7 +566,8 @@ namespace CipherPark.AngelJacket.Core.Content
 
         private static Mesh BuildMeshForChannels(XFileChannels channels, IGameApp app, byte[] shaderByteCode, XFileVector[] vertices, short[] indices, Vector2[] texCoords, Vector3[] normals, Color[] colors, BoundingBox boundingBox)
         {
-            if ((channels & XFileChannels.MeshVertexColors) != 0)
+            if ((channels & XFileChannels.MeshVertexColors) != 0 ||
+                (channels & XFileChannels.DefaultMaterialColor) != 0)
             {
                 if ((channels & XFileChannels.MeshNormals) != 0 ||
                     (channels & XFileChannels.DeclNormals) != 0)
@@ -676,6 +704,7 @@ namespace CipherPark.AngelJacket.Core.Content
         DeclTextureCoords2 =    0x0100,
         MeshNormals =           0x0200,
         DeclNormals =           0x0400,
+        DefaultMaterialColor =  0x0800,
         CommonAlinBasic = Mesh,
         CommonAlinRigged = Mesh | Skinning | Frames | Animation,
         CommonAlinRiggedTexture1 = CommonAlinRigged | DeclTextureCoords1,

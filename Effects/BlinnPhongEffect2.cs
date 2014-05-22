@@ -124,9 +124,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Write Constants
             //---------------
             if (EnableSkinning)            
-                WriteSkinnedVertexConstants();                                            
+                WriteVertexConstantsSkin();                                            
             else            
-                WriteVertexConstants();
+                WriteVertexConstantsCommon();
                
              WritePixelConstants();
             
@@ -141,8 +141,11 @@ namespace CipherPark.AngelJacket.Core.Effects
             {
                 if (EnableAlphaMap)
                     GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderPNTA);
+                else if (EnableVertexColor)
+                    GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderPNC);
                 else
                     GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderPNT);
+                
                 GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _vertexConstantsBufferCommon);                
             }
 
@@ -161,7 +164,15 @@ namespace CipherPark.AngelJacket.Core.Effects
             }            
         }
 
-        private void WriteSkinnedVertexConstants()
+        public override byte[] SelectShaderByteCode()
+        {
+            if (EnableSkinning)
+                return _vertexShaderSkinByteCode;
+            else
+                return _vertexShaderPNTByteCode;
+        }
+
+        private void WriteVertexConstantsSkin()
         {
             //Open Access to Buffer
             //---------------------
@@ -193,16 +204,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             //----------------------
             GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBufferSkin, 0);
         }
-
-        public override byte[] SelectShaderByteCode()
-        {
-            if (EnableSkinning)
-                return _vertexShaderSkinByteCode;
-            else 
-                return _vertexShaderPNTByteCode;
-        }
-
-        private void WriteVertexConstants()
+     
+        private void WriteVertexConstantsCommon()
         {
             //Open Access to Buffer
             //---------------------
@@ -216,39 +219,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Close Access to Buffer
             //----------------------
             GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBufferCommon, 0);
-        }
-
-        private int _SetDataBufferMatrices(DataBuffer dataBuffer)
-        {
-            int offset = 0;
-
-            //WorldITXf
-            //---------
-            Matrix worldITXf = this.WorldInverseTranspose;
-            worldITXf.Transpose();
-            dataBuffer.Set(offset, worldITXf);
-            offset += sizeof(float) * 16;
-            //WorldXf
-            //-------
-            Matrix world = this.World;
-            world.Transpose();
-            dataBuffer.Set(offset, world);
-            offset += sizeof(float) * 16;
-            //ViewIXf
-            //-------
-            Matrix viewIXf = this.ViewInverse;
-            viewIXf.Transpose();
-            dataBuffer.Set(offset, viewIXf);
-            offset += sizeof(float) * 16;
-            //WvpXf
-            //-----
-            Matrix wvpXf = this.WorldViewProjection;
-            wvpXf.Transpose();
-            dataBuffer.Set(offset, wvpXf);
-            offset += sizeof(float) * 16;
-
-            return offset;
-        }
+        }       
 
         private void WritePixelConstants()
         {
@@ -289,17 +260,51 @@ namespace CipherPark.AngelJacket.Core.Effects
             offset += sizeof(float) * 3;
             for(int i = 0; i < MaxLights; i++)
                 dataBuffer.Set(offset + (i * Vector4.SizeInBytes), new Vector4(LampDirPosArray[i], (float)BlinnPhongLightType.Point));
-
-            //TODO: 
+                     
             //Write EnableAlphaMap
             //--------------------
-
-            //TODO:
+            offset += Vector4.SizeInBytes * MaxLights;
+            dataBuffer.Set(offset, EnableAlphaMap);
+            
             //Write EnableVertexColor
             //-----------------------
+            offset += sizeof(Int32); //A bool in HLSL is 32 bytes.
+            dataBuffer.Set(offset, EnableVertexColor);
             
             GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
-        }   
+        }
+
+        private int _SetDataBufferMatrices(DataBuffer dataBuffer)
+        {
+            int offset = 0;
+
+            //WorldITXf
+            //---------
+            Matrix worldITXf = this.WorldInverseTranspose;
+            worldITXf.Transpose();
+            dataBuffer.Set(offset, worldITXf);
+            offset += sizeof(float) * 16;
+            //WorldXf
+            //-------
+            Matrix world = this.World;
+            world.Transpose();
+            dataBuffer.Set(offset, world);
+            offset += sizeof(float) * 16;
+            //ViewIXf
+            //-------
+            Matrix viewIXf = this.ViewInverse;
+            viewIXf.Transpose();
+            dataBuffer.Set(offset, viewIXf);
+            offset += sizeof(float) * 16;
+            //WvpXf
+            //-----
+            Matrix wvpXf = this.WorldViewProjection;
+            wvpXf.Transpose();
+            dataBuffer.Set(offset, wvpXf);
+            offset += sizeof(float) * 16;
+
+            return offset;
+        }
     }
 
     public enum BlinnPhongLightType
