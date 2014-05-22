@@ -596,7 +596,6 @@ namespace CipherPark.AngelJacket.Core.Content
                     }).ToArray();
 
                     return ContentBuilder.BuildMesh<VertexPositionTexture>(app, shaderByteCode, _vertices, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
-
                 }
             }
             else 

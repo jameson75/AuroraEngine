@@ -44,9 +44,6 @@ namespace CipherPark.AngelJacket.Core.Content
         private void ReadNextDataObject(TextReader reader, out XFileDataObject dataObject)
         {            
             dataObject = null;
-            //string dataObjectPattern = @"(?<!template\s*)\b(?<data>(?<type>[^{}\s;]+)\s+(?:(?<!template\s*)\b(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
-            //Regex regEx = new Regex(dataObjectPattern);
-            //Match match = regEx.Match(content, startPosition);
             XFileObjectBlock ob = ReadNextDataBlock(reader);
             if (ob != null)
             {
@@ -61,26 +58,19 @@ namespace CipherPark.AngelJacket.Core.Content
                         break;
                     case XFileMeshObject.TemplateName:
                         dataObject = ParseMeshObject(dataReader, ob.Name);
-                        break;
-                    //case XFileAnimationObject.TemplateName:
-                    //    dataObject = ParseAnimationObject(match.Groups["data"].Value, match.Groups["name"].Value);
-                    //    //frame.Animations.Add((XFileAnimationObject)childObject);
-                    //    break;
+                        break;                 
                     case XFileAnimationTicksPerSecondObject.TemplateName:
                         dataObject = ParseAnimationTicksPerSecond(dataReader, ob.Name);
                         break;
                     case XFileAnimationSetObject.TemplateName:
-                        dataObject = ParseAnimationSetObject(dataReader, ob.Name);
-                        //frame.AnimationSets.Add((XFileAnimationSetObject)childObject);
+                        dataObject = ParseAnimationSetObject(dataReader, ob.Name);                      
                         break;
                 }                
             }
         }                    
 
         public XFileAnimationTicksPerSecondObject ParseAnimationTicksPerSecond(TextReader reader, string name)
-        {
-            //string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            //Match match = Regex.Match(content, valuesPattern);
+        {       
             XFileAnimationTicksPerSecondObject result = new XFileAnimationTicksPerSecondObject();
             result.TicksPerSecond = ReadNextInt(reader).Value;
             return result;
@@ -90,10 +80,7 @@ namespace CipherPark.AngelJacket.Core.Content
         {
             XFileFrameObject frame = new XFileFrameObject();
             frame.Name = name;
-            //string childObjectPattern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
-            //Regex regEx = new Regex(childObjectPattern);
-            //MatchCollection collection = regEx.Matches(frameContent);
-            //foreach (Match match in collection)
+          
             XFileObjectBlock ob = ReadNextDataBlock(reader);
             while(ob != null)
             {
@@ -122,12 +109,8 @@ namespace CipherPark.AngelJacket.Core.Content
         {
             XFileAnimationSetObject animationSet = new XFileAnimationSetObject();
             animationSet.Name = name;
-
-            //string childObjectPattern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
-            //Regex regEx = new Regex(childObjectPattern);
-            //MatchCollection collection = regEx.Matches(animationSetContent);
-            XFileObjectBlock ob = ReadNextDataBlock(reader);
-            //foreach (Match match in collection)
+        
+            XFileObjectBlock ob = ReadNextDataBlock(reader);           
             while(ob != null)
             {
                 XFileAnimationObject childObject = null;
@@ -149,13 +132,9 @@ namespace CipherPark.AngelJacket.Core.Content
         {
             XFileAnimationObject animation = new XFileAnimationObject();
             animation.Name = name;
-            //string childObjectPatern = @"(?<=(?:\{\s*)|(\}\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
-            //string frameReferencePattern = @"(?<! Animation\s*){\s*(?<frame>[^\s]*)\s*}";
-            //Match frameMatch = Regex.Match(animationContent, frameReferencePattern);
-            animation.FrameRef = ReadNextReference(reader); // frameMatch.Groups["frame"].Value;
-            //MatchCollection collection = Regex.Matches(animationContent, childObjectPatern);
+            animation.FrameRef = ReadNextReference(reader);             
             XFileObjectBlock ob = ReadNextDataBlock(reader);
-            //foreach (Match match in collection)
+            
             while(ob != null)
             {
                 XFileDataObject childObject = null;
@@ -175,10 +154,8 @@ namespace CipherPark.AngelJacket.Core.Content
         private XFileAnimationKeyObject ParseAnimationKeyObject(TextReader reader, string name)
         {
             XFileAnimationKeyObject animationKey = new XFileAnimationKeyObject();
-            animationKey.Name = name;
-           // string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-           // MatchCollection matches = Regex.Matches(animationKeyContent, valuesPattern);
-            animationKey.KeyType = (KeyType)Math.Min(ReadNextInt(reader).Value, 3); //I've capped this to deal with an apparent bug in an exporter, which writes '4' for matrix keys.
+            animationKey.Name = name;           
+            animationKey.KeyType = (KeyType)Math.Min(ReadNextInt(reader).Value, 3);
             animationKey.NKeys = ReadNextInt(reader).Value;
             const int tfkOffset = 2;
             animationKey.TimedFloatKeys = new XFileTimedFloatKey[animationKey.NKeys];
@@ -186,16 +163,16 @@ namespace CipherPark.AngelJacket.Core.Content
             switch (animationKey.KeyType)
             {
                 case KeyType.Matrix:
-                    nAnimationKeyComponents = 18; //1 (time) + 1 (nvalues) + 16 (matrix)
+                    nAnimationKeyComponents = 18;
                     break;
                 case KeyType.Position:
-                    nAnimationKeyComponents = 5;  //1 (time) + 1 (nvalues) + 3 (translation vector)
+                    nAnimationKeyComponents = 5;
                     break;
                 case KeyType.Scale:
-                    nAnimationKeyComponents = 5; //1 (time) + 1 (nvalues) + 3 (scale vector)
+                    nAnimationKeyComponents = 5;
                     break;
                 case KeyType.Rotation:
-                    nAnimationKeyComponents = 6; //1 (time) + 1 (nvalues) + 4 (rotation quaternion)
+                    nAnimationKeyComponents = 6;
                     break;
             }
             for (int i = 0; i < animationKey.NKeys; i++)
@@ -225,11 +202,8 @@ namespace CipherPark.AngelJacket.Core.Content
             const int nFaceComponents = 4;
             XFileMeshObject mesh = new XFileMeshObject();
             mesh.Name = name;
-            //string childObjectPattern = @"(?<=(?:\{\s*)|(\}\s*)|(;;\s*))(?<data>(?<type>[^{}\s;]+)\s+(?:(?<name>[^{}\s]+)\s+)?\{((?:[^{}]|(?<open>\{)|(?<-open>\}))+(?(open)(?!)))\})";
-            //string childLessMeshContent = Regex.Replace(meshContent, childObjectPattern, string.Empty);
-            //string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            //MatchCollection matches = Regex.Matches(childLessMeshContent, valuesPattern);
-            mesh.NVertices = ReadNextInt(reader).Value; //int.Parse(matches[0].Value);
+         
+            mesh.NVertices = ReadNextInt(reader).Value; 
             int verticesOffset = 1;
             mesh.Vertices = new XFileVector[mesh.NVertices];
             for (int i = 0; i < mesh.NVertices; i++)
@@ -260,10 +234,8 @@ namespace CipherPark.AngelJacket.Core.Content
                         ReadNextInt(reader).Value }
                 };
             }
-
-            //MatchCollection collection = Regex.Matches(meshContent, childObjectPattern);
-            XFileObjectBlock ob = ReadNextDataBlock(reader);
-            //foreach (Match match in collection)
+            
+            XFileObjectBlock ob = ReadNextDataBlock(reader);           
             while(ob != null)
             {
                 XFileDataObject childObject = null;
@@ -293,12 +265,8 @@ namespace CipherPark.AngelJacket.Core.Content
         {
             XFileSkinWeightsObject skinWeights = new XFileSkinWeightsObject();
             skinWeights.Name = name;
-            //string boneReferencePattern = @"""(?<bone>[^""]+)""";
-            //string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            //string childLessSkinWeightsContent = Regex.Replace(skinWeightsContent, boneReferencePattern, string.Empty);
-            skinWeights.TransformNodeName = ReadNextString(reader); //Regex.Match(skinWeightsContent, boneReferencePattern).Groups["bone"].Value;
-            //MatchCollection matches = Regex.Matches(childLessSkinWeightsContent, valuesPattern);
-            skinWeights.NWeights = ReadNextInt(reader).Value; //int.Parse(matches[0].Value);
+            skinWeights.TransformNodeName = ReadNextString(reader);          
+            skinWeights.NWeights = ReadNextInt(reader).Value;
             skinWeights.VertexIndices = new int[skinWeights.NWeights];
             int vertexIndicesOffset = 1;
             for (int i = 0; i < skinWeights.NWeights; i++)
@@ -320,10 +288,8 @@ namespace CipherPark.AngelJacket.Core.Content
         {
             const int nComponentsPerVertexElement = 4;
             XFileDeclDataObject declData = new XFileDeclDataObject();
-            declData.Name = name;
-            //string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            //MatchCollection matches = Regex.Matches(declDataContent, valuesPattern);
-            declData.NVertexElements = ReadNextInt(reader).Value; //int.Parse(matches[0].Value);
+            declData.Name = name;            
+            declData.NVertexElements = ReadNextInt(reader).Value; 
             int vertexElementsOffset = 1;
             declData.VertexElements = new XFileVertexElement[declData.NVertexElements];
             int nTotalVertexElementComponents = declData.NVertexElements * nComponentsPerVertexElement;
@@ -352,34 +318,24 @@ namespace CipherPark.AngelJacket.Core.Content
         {
             XFileMeshMaterialListObject meshMaterialList = new XFileMeshMaterialListObject();
             meshMaterialList.Name = name;
-            //string materialReferencesPattern = @"(?<! MeshMaterialList\s*){\s*(?<material>[^\s]*\s*)}";
-            //string inlineMaterialsPattern = @"(?<!MeshMaterialList\s*)Material\s*{\s*(?<material>[^}]*\s*)}";
-            //string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            //string childLessContent = Regex.Replace(Regex.Replace(meshMaterialListContent, materialReferencesPattern, string.Empty), inlineMaterialsPattern, string.Empty);
-            //MatchCollection matches = Regex.Matches(childLessContent, valuesPattern);
             meshMaterialList.NMaterials = ReadNextInt(reader).Value;
             meshMaterialList.NFaceIndices = ReadNextInt(reader).Value;
-            //int faceIndicesOffset = 2;
+            
             meshMaterialList.FaceIndices = new int[meshMaterialList.NFaceIndices];
             for (int i = 0; i < meshMaterialList.NFaceIndices; i++)
             {
                 meshMaterialList.FaceIndices[i] = ReadNextInt(reader).Value;
             }
             if (meshMaterialList.NMaterials > 0)
-            {                
-                //MatchCollection collection = Regex.Matches(meshMaterialListContent, materialReferencesPattern);
-                //NOTE: We're assuming that either all child materials are references or that all child materials
-                //are inline.
-                //if (collection.Count != 0)
+            { 
                 if (!IsNextObjectReference(reader))
                 {
                     meshMaterialList.MaterialRefs = new string[meshMaterialList.NMaterials];
                     for (int i = 0; i < meshMaterialList.NMaterials; i++)
-                        meshMaterialList.MaterialRefs[i] = ReadNextReference(reader); //collection[i].Groups["material"].Value;
+                        meshMaterialList.MaterialRefs[i] = ReadNextReference(reader); 
                 }
                 else
-                {
-                    //collection = Regex.Matches(meshMaterialListContent, inlineMaterialsPattern);                    
+                {                                        
                     meshMaterialList.Materials = new XFileMaterialObject[meshMaterialList.NMaterials];
                     for (int i = 0; i < meshMaterialList.NMaterials; i++)
                     {
@@ -395,16 +351,11 @@ namespace CipherPark.AngelJacket.Core.Content
         private XFileMaterialObject ParseMaterialObject(TextReader reader, string name)
         {
             XFileMaterialObject material = new XFileMaterialObject();
-            material.Name = name;
-            //string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?"; //@"(\d+.\d+)\s*";   
-            //string textureFileNameExpression = @"TextureFilename\s*{\s*""(?<texturename>[^""]+)""\s*;\s*}";
-            //string childLessMaterialContent = Regex.Replace(materialContent, textureFileNameExpression, string.Empty);
-            //MatchCollection matches = Regex.Matches(childLessMaterialContent, valuesPattern);
+            material.Name = name;          
             material.FaceColor = ParseColorRGBA(reader);
             material.Power = ReadNextFloat(reader).Value;
             material.SpecularColor = ParseColorRGB(reader);
-            material.EmissiveColor = ParseColorRGB(reader);
-            //Match match = Regex.Match(materialContent, textureFileNameExpression);
+            material.EmissiveColor = ParseColorRGB(reader);            
             XFileObjectBlock ob = ReadNextDataBlock(reader);
             if (ob != null)
             {
@@ -415,27 +366,16 @@ namespace CipherPark.AngelJacket.Core.Content
         }
 
         private XFileMatrix ParseFrameTransformMatrix(TextReader reader)
-        {
-            //string valuesPattern = @"(?![^\{]+\{)\d+(?:\.\d+)?";
-            //MatchCollection matches = Regex.Matches(matrixContent, valuesPattern);            
+        {                      
             XFileMatrix matrix = new XFileMatrix();
             matrix.m = new float[16];
             for (int i = 0; i < matrix.m.Length; i++)
                 matrix.m[i] = ReadNextFloat(reader).Value;
             return matrix;
-        }        
-
-        //private string ReadHeader(TextReader reader)
-        //{
-        //    char[] result = new char[16];
-        //    reader.Read(result, 0, 16);
-        //    return new string(result);
-        //}           
+        }   
 
         private XFileColorRGBA ParseColorRGBA(TextReader reader)
-        {
-            //string valuesPattern = @"(?<value>(?![^\{]+\{)\d+(?:\.\d+)?);";
-            //MatchCollection collection = Regex.Matches(rgbaContent, valuesPattern);
+        {            
             return new XFileColorRGBA()
             {
                 Red = ReadNextFloat(reader).Value,
@@ -446,9 +386,7 @@ namespace CipherPark.AngelJacket.Core.Content
         }
 
         private XFileColorRGB ParseColorRGB(TextReader reader)
-        {
-            //string valuesPattern = @"(?<value>(?![^\{]+\{)\d+(?:\.\d+)?);";
-            //MatchCollection collection = Regex.Matches(rgbContent, valuesPattern);
+        {           
             return new XFileColorRGB()
             {
                 Red = ReadNextFloat(reader).Value,
@@ -459,11 +397,8 @@ namespace CipherPark.AngelJacket.Core.Content
         
         private XFileHeader ReadHeader(TextReader reader)
         {
-            //string headerContent = ReadHeader(reader);
-
             XFileHeader header = new XFileHeader();
-            //StringReader reader = new StringReader(headerContent);
-
+            
             char[] magicNumber = new char[4];
             reader.Read(magicNumber, 0, magicNumber.Length);
             header.MagicNumber = new string(magicNumber);
@@ -1210,15 +1145,11 @@ namespace CipherPark.AngelJacket.Core.Content
     {
         public const string TemplateName = "Frame";
         private List<XFileMeshObject> _meshes = new List<XFileMeshObject>();
-        private List<XFileFrameObject> _childFrames = new List<XFileFrameObject>();
-        //private List<XFileAnimationObject> _animations = new List<XFileAnimationObject>();
-        //private List<XFileAnimationSetObject> _animationSets = new List<XFileAnimationSetObject>();
+        private List<XFileFrameObject> _childFrames = new List<XFileFrameObject>();     
 
         public XFileMatrix FrameTransformMatrix { get; set; }        
         public List<XFileMeshObject> Meshes { get { return _meshes; } }
-        public List<XFileFrameObject> ChildFrames { get { return _childFrames; } }
-    //    public List<XFileAnimationObject> Animations { get { return _animations; } }
-    //    public List<XFileAnimationSetObject> AnimationSets { get { return _animationSets; } }
+        public List<XFileFrameObject> ChildFrames { get { return _childFrames; } }   
     }
 
     public class XFileMeshObject : XFileDataObject
@@ -1342,39 +1273,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 default:
                     throw new NotImplementedException();
             }
-        }
-
-        //public T[] GetVertexDataStream<T>(int dataStreamIndex)
-        //{
-        //    //NOTE: While we make ensure the dataStreamIndex is in range,
-        //    //we, implicitly, ensure that NVertexElements is not equalt to 0.
-        //    if (dataStreamIndex >= NVertexElements || dataStreamIndex < 0)
-        //        throw new ArgumentOutOfRangeException("Stream not available.");    
-         
-        //    T[] results = new T[NData / NVertexElements];
-        //    for (int i = 0; i < results.Length; i++)
-        //    {
-        //        int j = i * NVertexElements + dataStreamIndex;
-        //        results[i] = (T)Convert.ChangeType(Data[j], typeof(T));
-        //    }
-
-        //    return results;
-        //}
-        //public T[] GetVertexDataStream<T>(VertexElementUsage usage, int usageInstanceIndex)
-        //{
-        //    int usageInstancesFound = 0;
-        //    for (int i = 0; i < NVertexElements; i++)
-        //    {
-        //        if (VertexElements[i].Usage == usage)
-        //        {
-        //            if (usageInstanceIndex == usageInstancesFound)
-        //                return GetVertexDataStream<T>(i);
-        //            else
-        //                usageInstancesFound++;
-        //        }
-        //    }
-        //    return null;
-        //}
+        }      
     }
 
     public class XFileSkinWeightsObject : XFileDataObject
@@ -1393,8 +1292,7 @@ namespace CipherPark.AngelJacket.Core.Content
         private List<XFileAnimationKeyObject> _keys = new List<XFileAnimationKeyObject>();
         public string FrameRef { get; set; }
         public XFileAnimationOptions? Options { get; set; }
-        public List<XFileAnimationKeyObject> Keys { get { return _keys; } }
-        //public KeyType AnimationType { get { return _keys.Count > 0 ? _keys[0].KeyType : KeyType.Unknown; } }
+        public List<XFileAnimationKeyObject> Keys { get { return _keys; } }      
     }
 
     public class XFileAnimationSetObject : XFileDataObject
