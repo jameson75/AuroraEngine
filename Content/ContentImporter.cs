@@ -361,7 +361,7 @@ namespace CipherPark.AngelJacket.Core.Content
             //----------------------------------------
             if (((channels & XFileChannels.MeshVertexColors) != 0 || 
                 (channels & XFileChannels.DefaultMaterialColor) != 0 ||
-                (channels & XFileChannels.DeclColor))&&
+                (channels & XFileChannels.DeclColor) != 0 ) &&
                  ((channels & XFileChannels.MeshTextureCoords1) != 0 ||
                  (channels & XFileChannels.MeshTextureCoords2) != 0))
                 throw new NotSupportedException("Conflicting channels specified.");

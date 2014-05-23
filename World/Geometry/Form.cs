@@ -98,7 +98,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 p.TransformableParent = node;
         }
 
-        protected virtual void OnParticlesRemoved(IEnumerable<Particle> particles)
+        protected override void OnParticlesRemoved(IEnumerable<Particle> particles)
         {  
             foreach (Particle p in particles)
             {                   
