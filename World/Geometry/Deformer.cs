@@ -45,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 if(targetRow > form.RowClipRange.Value.Max)
                 {
                     form.RowClipRange = new Range(targetRow - MaxGridRows + 1, targetRow);
-                    List<Particle> targetRowElements = form.GetRowElements(targetRow);
+                    List<Particle> targetRowElements = form.GetRowParticles(targetRow);
                     foreach (Particle element in targetRowElements)
                     {
                         TransformAnimation animation = new TransformAnimation();

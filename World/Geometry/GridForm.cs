@@ -78,7 +78,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             //So... First Row is the front/near side, Last Row is the back/far side.
             //**************************************************************************
             int i = 0;
-            foreach (Particle element in Particles)
+            //foreach (Particle element in Particles)
+            foreach(FormNode element in Nodes)
             {
                 if (ElementMesh != null)
                 {
@@ -140,19 +141,24 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }        
 
-        public List<Particle> GetRowElements(int index)
+        public List<Particle> GetRowParticles(int index)
         {           
             return Particles.Skip(index * (int)Dimensions.X).Take((int)Dimensions.X).ToList();
         }
 
+        public List<FormNode> GetRowNodes(int index)
+        {
+            return Nodes.Skip(index * (int)Dimensions.X).Take((int)Dimensions.X).ToList();
+        }
+
         public void HideRow(int index)
         {
-            GetRowElements(index).ForEach(p => p.IsVisible = false);        
+            GetRowParticles(index).ForEach(p => p.IsVisible = false);        
         }
 
         public void ShowRow(int index)
         {
-            GetRowElements(index).ForEach(p => p.IsVisible = false);
+            GetRowParticles(index).ForEach(p => p.IsVisible = false);
         }
 
         public Range? RowClipRange

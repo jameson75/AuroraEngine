@@ -359,8 +359,11 @@ namespace CipherPark.AngelJacket.Core.Content
 
             //Throw an error for conflicting channels.
             //----------------------------------------
-            if (((channels & XFileChannels.MeshVertexColors) != 0 || (channels & XFileChannels.DefaultMaterialColor) != 0) &&
-                 ((channels & XFileChannels.MeshTextureCoords1) != 0 || (channels & XFileChannels.MeshTextureCoords2) != 0))
+            if (((channels & XFileChannels.MeshVertexColors) != 0 || 
+                (channels & XFileChannels.DefaultMaterialColor) != 0 ||
+                (channels & XFileChannels.DeclColor))&&
+                 ((channels & XFileChannels.MeshTextureCoords1) != 0 ||
+                 (channels & XFileChannels.MeshTextureCoords2) != 0))
                 throw new NotSupportedException("Conflicting channels specified.");
 
             //Read X-File Data
@@ -705,6 +708,7 @@ namespace CipherPark.AngelJacket.Core.Content
         MeshNormals =           0x0200,
         DeclNormals =           0x0400,
         DefaultMaterialColor =  0x0800,
+        DeclColor =             0x1000,
         CommonAlinBasic = Mesh,
         CommonAlinRigged = Mesh | Skinning | Frames | Animation,
         CommonAlinRiggedTexture1 = CommonAlinRigged | DeclTextureCoords1,

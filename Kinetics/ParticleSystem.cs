@@ -116,7 +116,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         private void DrawInstancedParticles(GameTime gameTime, Mesh instanceMesh, Effect instanceEffect, IEnumerable<Particle> particles)
         {
             if (instanceMesh.IsInstanced == false || instanceMesh.IsDynamic == false)
-                throw new InvalidOperationException("Particle mesh is not dynamic and instanced.");
+                throw new InvalidOperationException("Particle mesh is not both dynamic and instanced.");
 
             if (particles.Count() > 0)
             {              

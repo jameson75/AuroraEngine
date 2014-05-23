@@ -19,6 +19,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {      
         private Emitter _elementEmitter = null;
         private ParticleDescription _elementDescription = null;
+        private List<FormNode> _nodes = null;
 
         protected Form(IGameApp game)
             : base(game)
@@ -28,6 +29,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementEmitter.DefaultParticleDescription = _elementDescription;
             Emitters.Add(_elementEmitter);
         }
+
+        public ReadOnlyCollection<FormNode> Nodes 
+        { get { return _nodes.ToList().AsReadOnly(); } }
 
         public Mesh ElementMesh
         {
@@ -54,7 +58,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             get { return BoundingBoxExtension.Empty; }
         }
 
-        protected void ClearElements() { KillAll(); }
+        protected void ClearElements() 
+        { KillAll(); }
 
         protected List<Particle> EmitElements(int count) 
         {           
@@ -83,5 +88,29 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         protected virtual void OnMeshChanged() { }
 
         protected virtual void OnEffectChanged() { }
-    }  
+
+        protected override void OnParticlesAdded(IEnumerable<Particle> particles)
+        {
+            FormNode node = new FormNode();
+            node.TransformableParent = this;
+            _nodes.Add(node);
+            foreach (Particle p in particles)
+                p.TransformableParent = node;
+        }
+
+        protected virtual void OnParticlesRemoved(IEnumerable<Particle> particles)
+        {  
+            foreach (Particle p in particles)
+            {                   
+                _nodes.RemoveAll(n => p.TransformableParent == n);
+                p.TransformableParent = null;
+            }
+        }
+    }
+
+    public class FormNode : ITransformable
+    {
+        public Transform Transform { get; set; }
+        public ITransformable TransformableParent { get; set; }       
+    }
 }

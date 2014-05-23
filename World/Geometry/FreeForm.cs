@@ -169,17 +169,22 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public Transform Transform { get; set; }       
     }
-    
-    public class PathGridDeformer : ParticleSolver
+
+    public abstract class Deformer
+    {
+        public abstract void Step(GameTime gameTime, Form form);      
+    }
+
+    public class PathGridDeformer : Deformer
     {
         private Path Path { get; set; }
 
         public PathGridDeformer()            
-        { }
+        { }    
 
-        public override void Step(GameTime gameTime, ParticleSystem particleSystem)
+        public override void Step(GameTime gameTime, Form form)
         {
-            GridForm gridForm = (GridForm)particleSystem;
+            GridForm gridForm = (GridForm)form;
             Vector3 renderedGridSize = gridForm.CalculateRenderedSize();
             Vector3 gridDimension = gridForm.Dimensions;
             ReadOnlyCollection<Particle> elements = gridForm.Particles;
