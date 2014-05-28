@@ -102,5 +102,7 @@ namespace CipherPark.AngelJacket.Core
         {
             get { return _averageFrameRate; }
         }
+
+        
     }
 }

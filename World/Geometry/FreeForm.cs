@@ -172,22 +172,22 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
     public abstract class Deformer
     {
-        public abstract void Step(GameTime gameTime, Form form);      
+        public abstract void Deform(Form form);      
     }
 
     public class PathGridDeformer : Deformer
     {
-        private Path Path { get; set; }
+        public Path Path { get; set; }
 
         public PathGridDeformer()            
         { }    
 
-        public override void Step(GameTime gameTime, Form form)
+        public override void Deform(Form form)
         {
             GridForm gridForm = (GridForm)form;
             Vector3 renderedGridSize = gridForm.CalculateRenderedSize();
             Vector3 gridDimension = gridForm.Dimensions;
-            ReadOnlyCollection<Particle> elements = gridForm.Particles;
+            ReadOnlyCollection<FormNode> elements = gridForm.Nodes;
             float rowOffset = -0.5f * renderedGridSize.X;
             float heightOffset = -0.5f * renderedGridSize.Y;
             for (int i = 0; i < gridDimension.Z; i++)
