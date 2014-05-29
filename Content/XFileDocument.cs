@@ -41,6 +41,21 @@ namespace CipherPark.AngelJacket.Core.Content
             }
         }
 
+        public IEnumerable<XFileMaterialObject> GetMeshMaterials(XFileMeshObject xMesh)
+        {
+            List<XFileMaterialObject> materials = new List<XFileMaterialObject>();
+            if (xMesh.MeshMaterialList != null)
+            {
+                if (xMesh.MeshMaterialList.MaterialRefs != null)
+                    for (int i = 0; i < xMesh.MeshMaterialList.MaterialRefs.Count(); i++)
+                        materials.Add(this.DataObjects.GetDataObject<XFileMaterialObject>(i));
+                if (xMesh.MeshMaterialList.Materials != null)
+                    for (int i = 0; i < xMesh.MeshMaterialList.Materials.Count(); i++)
+                        materials.Add(xMesh.MeshMaterialList.Materials[i]);
+            }
+            return materials;
+        }
+
         private void ReadNextDataObject(TextReader reader, out XFileDataObject dataObject)
         {            
             dataObject = null;
@@ -1162,7 +1177,7 @@ namespace CipherPark.AngelJacket.Core.Content
         public XFileMeshFaceObject[] Faces { get; set; }
         public XFileMeshMaterialListObject MeshMaterialList { get; set; }
         public XFileDeclDataObject DeclData { get; set; }
-        public List<XFileSkinWeightsObject> SkinWeightsCollection { get { return _skinWeightsCollection; } }
+        public List<XFileSkinWeightsObject> SkinWeightsCollection { get { return _skinWeightsCollection; } }        
     }
 
     public class XFileMeshFaceObject : XFileDataObject

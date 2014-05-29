@@ -19,7 +19,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {      
         private Emitter _elementEmitter = null;
         private ParticleDescription _elementDescription = null;
-        private List<FormNode> _nodes = null;
+        private List<FormNode> _nodes = new List<FormNode>();
 
         protected Form(IGameApp game)
             : base(game)
@@ -91,11 +91,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         protected override void OnParticlesAdded(IEnumerable<Particle> particles)
         {
-            FormNode node = new FormNode();
-            node.TransformableParent = this;
-            _nodes.Add(node);
             foreach (Particle p in particles)
+            {
+                FormNode node = new FormNode();
+                node.TransformableParent = this;
+                _nodes.Add(node);
                 p.TransformableParent = node;
+            }
         }
 
         protected override void OnParticlesRemoved(IEnumerable<Particle> particles)
@@ -105,6 +107,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 _nodes.RemoveAll(n => p.TransformableParent == n);
                 p.TransformableParent = null;
             }
+        }
+
+        protected override void OnParticlesReset()
+        {            
+            _nodes.Clear();
+            base.OnParticlesReset();
         }
     }
 

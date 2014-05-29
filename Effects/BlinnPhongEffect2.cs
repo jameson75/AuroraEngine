@@ -168,6 +168,10 @@ namespace CipherPark.AngelJacket.Core.Effects
         {
             if (EnableSkinning)
                 return _vertexShaderSkinByteCode;
+            else if (EnableAlphaMap)
+                return _vertexShaderPNTAByteCode;
+            else if (EnableVertexColor)
+                return _vertexShaderPNCByteCode;
             else
                 return _vertexShaderPNTByteCode;
         }
