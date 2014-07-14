@@ -37,9 +37,9 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         public void Update(GameTime gameTime, SequencerContext context)
         {
             if (!_isStarted)
-                Start();
+                Start(gameTime);
             
-            long elapsedSequencerTime = CalculateElapsedSequencerTime();
+            long elapsedSequencerTime = CalculateElapsedSequencerTime(gameTime);
             //**************************************************************************
             //NOTE: We use an auxilary sequence to enumerate through, in the event that
             //an executed sequence alters this sequencer's Sequence collection.
@@ -56,14 +56,14 @@ namespace CipherPark.AngelJacket.Core.Sequencer
             }          
         }
 
-        private void Start()
+        private void Start(GameTime gameTime)
         {
-            _startTime = Environment.TickCount;
+            _startTime = gameTime.GetTotalSimtime();
             _isStarted = true;
         }
 
-        private long CalculateElapsedSequencerTime()
-        { return Environment.TickCount - _startTime; }
+        private long CalculateElapsedSequencerTime(GameTime gameTime)
+        { return  gameTime.GetTotalSimtime() - _startTime; }
     }
 
     public class Sequence : List<SequenceEvent>

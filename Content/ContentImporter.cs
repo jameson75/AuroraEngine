@@ -156,7 +156,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return result;
         }   
 
-        public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, XFileChannels channels, List<string> textureNames = null)
+        public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, XFileChannels channels, XFileOptions options = XFileOptions.None, List<string> textureNames = null)
         {
             Model result = null;
             Mesh mesh = null;
@@ -207,12 +207,19 @@ namespace CipherPark.AngelJacket.Core.Content
             {
                 texCoords = xMesh.DeclData.GetTextureCoords();
                 if (texCoords == null)
-                    throw new InvalidOperationException("Expected texture coordinate data was not present.");
-
-                if (textureNames != null)
-                    textureNames.AddRange(doc.GetMeshMaterials(xMesh)
-                                               .Where(m => m.TextureFilename != null)
-                                               .Select(m => m.TextureFilename));
+                {
+                    if (!options.HasFlag(XFileOptions.IgnoreMissingTexCoords))
+                        throw new InvalidOperationException("Expected texture coordinate data was not present.");
+                    else
+                        texCoords = xMesh.Vertices.Select( v=> Vector2.Zero).ToArray();
+                }
+                else
+                {
+                    if (textureNames != null)
+                        textureNames.AddRange(doc.GetMeshMaterials(xMesh)
+                                                 .Where(m => m.TextureFilename != null)
+                                                 .Select(m => m.TextureFilename));
+                }
             }
 
             //Extract normals.
@@ -222,7 +229,12 @@ namespace CipherPark.AngelJacket.Core.Content
             {
                 normals = xMesh.DeclData.GetNormals();
                 if (normals == null)
-                    throw new InvalidOperationException("Expected normal data was not present.");
+                {
+                    if (!options.HasFlag(XFileOptions.IgnoreMissingNormals))
+                        throw new InvalidOperationException("Expected normal data was not present.");
+                    else
+                        normals = xMesh.Vertices.Select(v=> Vector3.Zero).ToArray();
+                }
             }
 
             //Extract Color from default material
@@ -243,7 +255,12 @@ namespace CipherPark.AngelJacket.Core.Content
                                                              1.0f)).ToArray();
                 }
                 if (colors == null)
-                    throw new InvalidOperationException("Expected material color data was not present.");
+                {
+                    if (!options.HasFlag(XFileOptions.IgnoreMissingColors))
+                        throw new InvalidOperationException("Expected material color data was not present.");
+                    else
+                        colors = xMesh.Vertices.Select(v => Color.Transparent).ToArray();
+                }
             }
 
             if ((channels & XFileChannels.Skinning) != 0)
@@ -560,6 +577,15 @@ namespace CipherPark.AngelJacket.Core.Content
         CommonLegacyComplex = Mesh | Frames | Animation,
         CommonLegacyComplexTexture1 = CommonLegacyComplex | MeshTextureCoords1,
         CommonLegacyComplexTexture2 = CommonLegacyComplexTexture1 | MeshTextureCoords2       
+    }
+
+    [Flags]
+    public enum XFileOptions
+    {
+        None = 0,
+        IgnoreMissingTexCoords =    0x0001,
+        IgnoreMissingNormals =      0x0002,
+        IgnoreMissingColors =       0x0004
     }
 
     [StructLayout(LayoutKind.Sequential)]

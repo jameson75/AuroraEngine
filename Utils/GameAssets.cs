@@ -10,6 +10,7 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -24,11 +25,12 @@ namespace CipherPark.AngelJacket.Core.Utils
     public class GameAssets
     {
         private IGameApp _game = null;
-        private Dictionary<string, Mesh> _meshes = new Dictionary<string, Mesh>();
-        private Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();        
-        private Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
-        private Dictionary<string, Model> _models = new Dictionary<string, Model>();
-        private Dictionary<string, Camera> _cameras = new Dictionary<string, Camera>();
+        private EffectsCollection _effects = new EffectsCollection();
+        private ModelCollection _models = new ModelCollection();
+        private CameraCollection _cameras = new CameraCollection();
+        private ObjectCollection _misc = new ObjectCollection();
+        private SourceVoiceCollection _sounds = new SourceVoiceCollection();
+        private AudioStreamCollection _music = new AudioStreamCollection();
 
         public GameAssets(IGameApp game)
         {
@@ -37,14 +39,28 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         public IGameApp Game { get { return _game; } }
 
-        public Dictionary<string, Mesh> Meshes { get { return _meshes; } }
+        public EffectsCollection Effects { get { return _effects; } }
 
-        public Dictionary<string, Texture2D> Textures { get { return _textures; } }
+        public ModelCollection Models { get { return _models; } }
 
-        public Dictionary<string, Effect> Effects { get { return _effects; } }
+        public CameraCollection Cameras { get { return _cameras; } }
 
-        public Dictionary<string, Model> Models { get { return _models; } }
+        public ObjectCollection Misc { get { return _misc; } }
 
-        public Dictionary<string, Camera> Cameras { get { return _cameras; } }
+        public SourceVoiceCollection Sounds { get { return _sounds; } }
+
+        public AudioStreamCollection Music { get { return _music; } }
     }
+
+    public class EffectsCollection : Dictionary<string, Effect> { }
+
+    public class ModelCollection : Dictionary<string, Model> { }
+
+    public class CameraCollection : Dictionary<string, Camera> { }
+
+    public class ObjectCollection : Dictionary<string, object> { }
+
+    public class SourceVoiceCollection : Dictionary<string, SourceVoice> { }
+
+    public class AudioStreamCollection : Dictionary<string, XAudio2StreamingManager> { }
 }

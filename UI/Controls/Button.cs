@@ -134,7 +134,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected virtual void OnClick()
         {
-            EventHandler handler = Click;
+            EventHandler handler = Click;  
             
             if (handler != null)
                 handler(this, EventArgs.Empty);
