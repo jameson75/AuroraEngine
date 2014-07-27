@@ -20,8 +20,7 @@ using CipherPark.AngelJacket.Core.Content;
 namespace CipherPark.AngelJacket.Core.Effects
 {
     public class GlowFSPostEffect : PostEffect
-    {
-        private IGameApp _game = null;
+    {      
         private const int ConstantBufferSize = 48;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
         private VertexShader _vertexShaderP0 = null;
@@ -49,12 +48,11 @@ namespace CipherPark.AngelJacket.Core.Effects
         public Vector4 ClearColor { get; set; }
         public Vector2 ViewportSize { get; set; }
 
-        public GlowFSPostEffect(Device graphicsDevice, IGameApp app)
-            : base(graphicsDevice)
+        public GlowFSPostEffect(IGameApp game)
+            : base(game)
         {
-            _game = app;
-            _constantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _passThruEffect = new PassThruPostEffect(graphicsDevice, app);
+            _constantBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _passThruEffect = new PassThruPostEffect(game);
             CreateShaders();
             CreateResources();
         }
@@ -180,15 +178,15 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateResources()
         {
-            _quad = ContentBuilder.BuildBasicViewportQuad(_game, _vertexShaderByteCode);            
+            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);            
             
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
             textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
             textureDesc.CpuAccessFlags = CpuAccessFlags.None;
             textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            textureDesc.Height = _game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
-            textureDesc.Width = _game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
+            textureDesc.Height = Game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
+            textureDesc.Width = Game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
             textureDesc.MipLevels = 1;
             textureDesc.OptionFlags = ResourceOptionFlags.None;
             textureDesc.Usage = ResourceUsage.Default;
@@ -213,29 +211,29 @@ namespace CipherPark.AngelJacket.Core.Effects
             
             //SceneTexture
             //------------
-            Texture2D _sceneTexture = new Texture2D(GraphicsDevice, textureDesc);
-            _sceneTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _sceneTexture, resourceViewDesc);       
-            _sceneTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _sceneTexture, renderTargetViewDesc);  
-            _sceneTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);         
+            Texture2D _sceneTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            _sceneTextureShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _sceneTexture, resourceViewDesc);       
+            _sceneTextureRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _sceneTexture, renderTargetViewDesc);  
+            _sceneTextureSampler = new SamplerState(Game.GraphicsDevice, samplerStateDesc);         
 
             //GlowMap1
             //--------
-            Texture2D _glowMap1 = new Texture2D(_game.GraphicsDevice, textureDesc);
-            _glowMap1ShaderResourceView = new ShaderResourceView(GraphicsDevice, _glowMap1, resourceViewDesc);
-            _glowMap1RenderTargetView = new RenderTargetView(GraphicsDevice, _glowMap1, renderTargetViewDesc);
-            _glowMap1Sampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+            Texture2D _glowMap1 = new Texture2D(Game.GraphicsDevice, textureDesc);
+            _glowMap1ShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _glowMap1, resourceViewDesc);
+            _glowMap1RenderTargetView = new RenderTargetView(Game.GraphicsDevice, _glowMap1, renderTargetViewDesc);
+            _glowMap1Sampler = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
 
             //GlowMap2
             //--------
-            Texture2D _glowMap2 = new Texture2D(_game.GraphicsDevice, textureDesc);
-            _glowMap2ShaderResourceView = new ShaderResourceView(GraphicsDevice, _glowMap2, resourceViewDesc);
-            _glowMap2RenderTargetView = new RenderTargetView(GraphicsDevice, _glowMap2, renderTargetViewDesc);
-            _glowMap2Sampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+            Texture2D _glowMap2 = new Texture2D(Game.GraphicsDevice, textureDesc);
+            _glowMap2ShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _glowMap2, resourceViewDesc);
+            _glowMap2RenderTargetView = new RenderTargetView(Game.GraphicsDevice, _glowMap2, renderTargetViewDesc);
+            _glowMap2Sampler = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
         }
 
         private void WriteConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = Game.GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, ConstantBufferSize);            
             int offset = 0;
             dataBuffer.Set(offset, GlowSpan);
@@ -249,7 +247,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBuffer.Set(offset, ClearColor);
             offset += (sizeof(float) * 4);
             dataBuffer.Set(offset, ViewportSize);
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
+            Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
         }
     }
 }

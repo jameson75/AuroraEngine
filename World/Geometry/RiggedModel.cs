@@ -33,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="game"></param>
+        /// <param name="device"></param>
         public RiggedModel(IGameApp game)
             : base(game)
         { }    

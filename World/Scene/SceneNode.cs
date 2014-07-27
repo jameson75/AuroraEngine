@@ -28,12 +28,12 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     }
 
     public abstract class SceneNode : ITransformable
-    {        
-        private IGameApp _game = null;
+    {       
         private SceneNode _parent = null;
         private SceneNodes _children = null;
         private Scene _scene = null;
         private ITransformable _transformableParent = null;
+        private IGameApp _game = null;
 
         public SceneNode(IGameApp game)
         {

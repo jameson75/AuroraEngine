@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class BlinnPhongEffect2 : ForwardEffect, ISkinEffect
+    public class BlinnPhongEffect2 : SurfaceEffect, ISkinEffect
     {
         public const int MaxLights = 8;
         public const int MaxBones = 72;
@@ -85,7 +85,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         public ShaderResourceView AlphaMap { get; set; }
 
         public BlinnPhongEffect2(BlinnPhongShader shader)
-            : base(shader.GraphicsDevice)
+            : base(shader.Game)
         {            
             FirstActiveLightsCount = 1;
            
@@ -154,7 +154,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             {
                 GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, _alphaSamplerState);
                 GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, AlphaMap);
-            }            
+            }        
         }
 
         public override byte[] SelectShaderByteCode()
@@ -306,11 +306,11 @@ namespace CipherPark.AngelJacket.Core.Effects
     public class BlinnPhongShader
     {
         private BlinnPhongShaderVertexType _vertexType;
-        private Device _graphicsDevice = null;
+        private IGameApp _game = null;
 
-        public BlinnPhongShader(Device graphicsDevice, BlinnPhongShaderVertexType vertexType)
+        public BlinnPhongShader(IGameApp game, BlinnPhongShaderVertexType vertexType)
         {
-            _graphicsDevice = graphicsDevice;
+            _game = game;
             _vertexType = vertexType;
             switch (vertexType)
             {
@@ -342,19 +342,19 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public VertexShader VertexShader { get { return _vertexShader; } }
 
-        public Device GraphicsDevice { get { return _graphicsDevice; } }
+        public IGameApp Game { get { return _game; } }
 
         protected byte[] LoadVertexShader(string fileName, out VertexShader shader)
         {
             byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
-            shader = new VertexShader(_graphicsDevice, shaderByteCode);
+            shader = new VertexShader(_game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
         }
 
         protected byte[] LoadPixelShader(string fileName, out PixelShader shader)
         {
             byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
-            shader = new PixelShader(_graphicsDevice, shaderByteCode);
+            shader = new PixelShader(_game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
         }
     }

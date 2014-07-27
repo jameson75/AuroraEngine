@@ -21,15 +21,17 @@ namespace CipherPark.AngelJacket.Core.Effects
 {
     public abstract class Effect
     {      
-        private Device _graphicsDevice = null;
+        private IGameApp _game = null;
         private List<EffectPass> _passes = new List<EffectPass>();        
 
-        protected Effect(Device graphicsDevice)
+        protected Effect(IGameApp game)
         {
-            _graphicsDevice = graphicsDevice;
+            _game = game;
         }       
 
-        public Device GraphicsDevice { get { return _graphicsDevice; } }
+        public IGameApp Game { get { return _game; } }
+
+        public Device GraphicsDevice { get { return _game.GraphicsDevice; } }
 
         public List<EffectPass> Passes { get { return _passes; } }
 
@@ -50,22 +52,22 @@ namespace CipherPark.AngelJacket.Core.Effects
         protected byte[] LoadVertexShader(string fileName, out VertexShader shader)
         {
             byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
-            shader = new VertexShader(GraphicsDevice, shaderByteCode);
+            shader = new VertexShader(Game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
         }
 
         protected byte[] LoadPixelShader(string fileName, out PixelShader shader)
         {
             byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
-            shader = new PixelShader(GraphicsDevice, shaderByteCode);
+            shader = new PixelShader(Game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
         }     
     }
 
-    public abstract class ForwardEffect : Effect
+    public abstract class SurfaceEffect : Effect
     {
-        protected ForwardEffect(Device graphicsDevice)
-            : base(graphicsDevice)
+        protected SurfaceEffect(IGameApp game)
+            : base(game)
         { }
 
         public virtual Matrix World { get; set; }
@@ -82,7 +84,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         public virtual void Restore()
         {
             for (int i = 0; i < Passes.Count; i++)
-                ((ForwardEffectPass)Passes[i]).CleanUp();
+                ((SurfaceEffectPass)Passes[i]).CleanUp();
         }
     }
 }

@@ -18,14 +18,14 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private Mesh _mesh = null;
         private BasicEffect _effect = null;
 
-        public ReferenceGrid(IGameApp app, DrawingSizeF gridSize, Vector2 gridSteps, Color4 color)
+        public ReferenceGrid(SharpDX.Direct3D11.Device device, DrawingSizeF gridSize, Vector2 gridSteps, Color4 color)
         {
             Transform = Matrix.Identity;
 
             //*******************************************************************
             //TODO: Port this logic into a static ReferenceGrid.Create() method.*
             //*******************************************************************
-            _effect = new BasicEffect(app.GraphicsDevice);
+            _effect = new BasicEffect(device);
             _effect.SetWorld(Matrix.Identity);
             _effect.SetVertexColorEnabled(true);
             byte[] shaderCode = _effect.SelectShaderByteCode();
@@ -69,11 +69,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
             meshDesc.VertexCount = vertices.Length;
-            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(app.GraphicsDevice, vertices, vertexBufferDesc);
-            meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, VertexPositionColor.InputElements);
+            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(device, vertices, vertexBufferDesc);
+            meshDesc.VertexLayout = new InputLayout(device, shaderCode, VertexPositionColor.InputElements);
             meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = PrimitiveTopology.LineList;
-            _mesh = new Mesh(app, meshDesc);
+            _mesh = new Mesh(device, meshDesc);
         }
 
         public void Draw(GameTime gameTime)

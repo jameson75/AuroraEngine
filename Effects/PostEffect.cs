@@ -28,21 +28,21 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public RenderTargetView OutputTexture { get; set; }
 
-        protected PostEffect(Device graphicsDevice)
-            : base(graphicsDevice)
+        protected PostEffect(IGameApp game)
+            : base(game)
         {
             Enabled = true;
         }
 
         protected override void OnBeginApply()
         {
-            originalRenderTarget = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out originalDepthStencilView)[0];
+            originalRenderTarget = Game.GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out originalDepthStencilView)[0];
             base.OnBeginApply();
         }
 
         protected override void OnEndApply()
         {
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalDepthStencilView, originalRenderTarget);
+            Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalDepthStencilView, originalRenderTarget);
             base.OnEndApply();
         }
 

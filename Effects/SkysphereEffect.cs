@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Content;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class SkysphereEffect : ForwardEffect
+    public class SkysphereEffect : SurfaceEffect
     {
         private VertexShader _vertexShader = null;
         private PixelShader _pixelShader = null;
@@ -31,22 +31,22 @@ namespace CipherPark.AngelJacket.Core.Effects
         private RasterizerState _oldRasterizerState = null;
         private DepthStencilState _oldDepthStencilState = null;
 
-        public SkysphereEffect(Device graphicsDevice, IGameApp game) : base(graphicsDevice)
+        public SkysphereEffect(IGameApp game) : base(game)
         {
             _game = game;
             string psFileName = @"Content\Shaders\skysphere-ps.cso";
             string vsFileName = @"Content\Shaders\skysphere-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
-            _vertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
-            _pixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
+            _vertexShader = new VertexShader(game.GraphicsDevice, _vertexShaderByteCode);
+            _pixelShader = new PixelShader(game.GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
             int bufferSize = sizeof(float) * 16 * 2; //Size of View and Projection matrices.
-            _constantBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _constantBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
             samplerStateDesc.Filter = Filter.MinMagMipLinear;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
             samplerStateDesc.AddressV = TextureAddressMode.Clamp;
             samplerStateDesc.AddressU = TextureAddressMode.Clamp;
-            _environmentMapSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
+            _environmentMapSamplerState = new SamplerState(game.GraphicsDevice, samplerStateDesc);
         }
 
         public override void Apply()
@@ -70,6 +70,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             newDepthStencilStateDesc.IsDepthEnabled = true;
             newDepthStencilStateDesc.DepthWriteMask = 0;
             GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = new DepthStencilState(GraphicsDevice, newDepthStencilStateDesc);
+            _isRestoreRequired = true;
 
             /////////
             //Pass0
@@ -81,7 +82,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);            
-        }
+        }     
 
         public override void Restore()
         {

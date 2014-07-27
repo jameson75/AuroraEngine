@@ -48,6 +48,16 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// </summary>
         public bool SmoothingEnabled { get; set; }
 
+        public float Distance
+        {
+            get
+            {
+                if (_approximateSegmentLengths != null)
+                    throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
+                return _approximateSegmentLengths.Sum();
+            }
+        }
+
         /// <summary>
         /// Generates and stores the linear-approximate length of each curve segment.
         /// </summary>
@@ -100,22 +110,18 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
 
         /// <summary>
-        /// Gets the interpolated node at the specifed distance along this path.
-        /// </summary>
-        /// <remarks>
-        /// The path node returned is always the result of an interpolation.
-        /// Therefore, the Nodes property of this Path will never contain the
-        /// PathNode instance returned by this method.
-        /// </remarks>
+        /// Uses interpoation to evaluate a node at the specifed distance along this path and
+        /// returns a new instance of that node.
+        /// </summary>      
         /// <param name="d"></param>
         /// <param name="linearApproximation"></param>
         /// <returns></returns>
-        public PathNode GetNodeAtDistance(float d)
+        public PathNode EvaluateNodeAtDistance(float d)
         {
             PathNode pathNode = null;
 
             if (_approximateSegmentLengths == null)
-                GenerateLinearApproximation();
+                throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
 
             //TODO: Handle looped path.
             //-------------------------
@@ -194,7 +200,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             {                
                 int zIndex = i;
                 float zOrigin = (zIndex * ((gridForm.CellPadding.Z * 2) + gridForm.ElementMesh.BoundingBox.GetLengthZ())) + (gridForm.CellPadding.Z + (gridForm.ElementMesh.BoundingBox.GetLengthZ() * 0.5f));
-                PathNode node = Path.GetNodeAtDistance(zOrigin);                
+                PathNode node = Path.EvaluateNodeAtDistance(zOrigin);                
                 for (int j = 0; j < gridDimension.X; j++)
                 {                    
                     int k = i * (int)gridDimension.X + j;

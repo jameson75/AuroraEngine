@@ -117,13 +117,13 @@ namespace CipherPark.AngelJacket.Core.Content
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="app"></param>
+        /// <param name="device"></param>
         /// <param name="fileName"></param>
         /// <param name="shaderByteCode"></param>
         /// <param name="channels"></param>
         /// <returns></returns>
         [Obsolete]
-        public static Model ImportFBX(IGameApp app, string fileName, byte[] shaderByteCode, FBXFileChannels channels = FBXFileChannels.Default)
+        public static Model ImportFBX(IGameApp game, string fileName, byte[] shaderByteCode, FBXFileChannels channels = FBXFileChannels.Default)
         {
             BasicModel result = null;
             FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();            
@@ -146,8 +146,8 @@ namespace CipherPark.AngelJacket.Core.Content
             {
                 case FBXFileChannels.PositionColor:
                     VertexPositionColor[] _vertices = vertices.Select(e => new VertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.Red.ToVector4() }).ToArray();
-                    mesh = ContentBuilder.BuildMesh<VertexPositionColor>(app, shaderByteCode, _vertices, _indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
-                    result = new BasicModel(app);
+                    mesh = ContentBuilder.BuildMesh<VertexPositionColor>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
+                    result = new BasicModel(game);
                     result.Mesh = mesh;
                     break;
                 default:
@@ -156,7 +156,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return result;
         }   
 
-        public static Model ImportX(IGameApp app, string fileName, byte[] shaderByteCode, XFileChannels channels, XFileOptions options = XFileOptions.None, List<string> textureNames = null)
+        public static Model ImportX(IGameApp game, string fileName, byte[] shaderByteCode, XFileChannels channels, XFileOptions options = XFileOptions.None, List<string> textureNames = null)
         {
             Model result = null;
             Mesh mesh = null;
@@ -211,7 +211,7 @@ namespace CipherPark.AngelJacket.Core.Content
                     if (!options.HasFlag(XFileOptions.IgnoreMissingTexCoords))
                         throw new InvalidOperationException("Expected texture coordinate data was not present.");
                     else
-                        texCoords = xMesh.Vertices.Select( v=> Vector2.Zero).ToArray();
+                        texCoords = xMesh.Vertices.Select(v => Vector2.Zero).ToArray();
                 }
                 else
                 {
@@ -348,7 +348,7 @@ namespace CipherPark.AngelJacket.Core.Content
                     animationControllers = BuildAnimationRig(xAnimationSet, targetFrames);                   
                 }
                 
-                mesh = ContentBuilder.BuildMesh<VertexPositionNormalTextureSkin>(app, shaderByteCode, _vertices, _indices, VertexPositionNormalTextureSkin.InputElements, VertexPositionNormalTextureSkin.ElementSize, boundingBox);          
+                mesh = ContentBuilder.BuildMesh<VertexPositionNormalTextureSkin>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionNormalTextureSkin.InputElements, VertexPositionNormalTextureSkin.ElementSize, boundingBox);          
             }
             
             //Create and return model
@@ -356,7 +356,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
             if ((channels & XFileChannels.Skinning) != 0)
             {               
-                RiggedModel riggedModel = new RiggedModel(app);
+                RiggedModel riggedModel = new RiggedModel(game);
                 riggedModel.Mesh = mesh;
                 riggedModel.SkinOffsets.AddRange(skinOffsets);
                 riggedModel.FrameTree = rootBoneFrame;
@@ -366,8 +366,8 @@ namespace CipherPark.AngelJacket.Core.Content
 
             else if ((channels & XFileChannels.Animation) != 0)
             {
-                mesh = BuildMeshForChannels(channels, app, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox);
-                ComplexModel complexModel = new ComplexModel(app);
+                mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox);
+                ComplexModel complexModel = new ComplexModel(game);
                 complexModel.Meshes.Add(mesh);
                 complexModel.FrameTree = rootBoneFrame;
                 complexModel.AnimationRig.AddRange(animationControllers);
@@ -376,8 +376,8 @@ namespace CipherPark.AngelJacket.Core.Content
 
             else
             {
-                mesh = BuildMeshForChannels(channels, app, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox);
-                BasicModel basicModel = new BasicModel(app);
+                mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox);
+                BasicModel basicModel = new BasicModel(game);
                 basicModel.Mesh = mesh;
                 result = basicModel;
             }
@@ -420,7 +420,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return animationControllers;
         }
 
-        private static Mesh BuildMeshForChannels(XFileChannels channels, IGameApp app, byte[] shaderByteCode, XFileVector[] vertices, short[] indices, Vector2[] texCoords, Vector3[] normals, Color[] colors, BoundingBox boundingBox)
+        private static Mesh BuildMeshForChannels(XFileChannels channels, Device device, byte[] shaderByteCode, XFileVector[] vertices, short[] indices, Vector2[] texCoords, Vector3[] normals, Color[] colors, BoundingBox boundingBox)
         {
             if ((channels & XFileChannels.MeshVertexColors) != 0 ||
                 (channels & XFileChannels.DefaultMaterialColor) != 0)
@@ -437,7 +437,7 @@ namespace CipherPark.AngelJacket.Core.Content
                         Color = colors[i].ToVector4()
                     }).ToArray();
 
-                    return ContentBuilder.BuildMesh<VertexPositionNormalColor>(app, shaderByteCode, _vertices, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
+                    return ContentBuilder.BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, _vertices, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
                 }
                 else
                 {
@@ -449,7 +449,7 @@ namespace CipherPark.AngelJacket.Core.Content
                         Color = colors[i].ToVector4()
                     }).ToArray();
 
-                    return ContentBuilder.BuildMesh<VertexPositionColor>(app, shaderByteCode, _vertices, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
+                    return ContentBuilder.BuildMesh<VertexPositionColor>(device, shaderByteCode, _vertices, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
                 }
             }
             else if((channels & XFileChannels.DeclTextureCoords1) != 0 ||
@@ -467,7 +467,7 @@ namespace CipherPark.AngelJacket.Core.Content
                         TextureCoord = texCoords[i]
                     }).ToArray();
 
-                    return ContentBuilder.BuildMesh<VertexPositionNormalTexture>(app, shaderByteCode, _vertices, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, boundingBox);
+                    return ContentBuilder.BuildMesh<VertexPositionNormalTexture>(device, shaderByteCode, _vertices, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, boundingBox);
                 }
                 else
                 {
@@ -479,7 +479,7 @@ namespace CipherPark.AngelJacket.Core.Content
                         TextureCoord = texCoords[i]
                     }).ToArray();
 
-                    return ContentBuilder.BuildMesh<VertexPositionTexture>(app, shaderByteCode, _vertices, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+                    return ContentBuilder.BuildMesh<VertexPositionTexture>(device, shaderByteCode, _vertices, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
                 }
             }
             else 

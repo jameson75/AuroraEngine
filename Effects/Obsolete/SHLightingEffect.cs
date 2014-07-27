@@ -33,26 +33,26 @@ namespace CipherPark.AngelJacket.Core.Effects
         public Matrix BlueSHCoefficients { get; set; }
         public Matrix WorldView { get; set; }
 
-        public SHLightingEffect(Device graphicsDevice)
-            : base(graphicsDevice)
+        public SHLightingEffect(IGameApp game)
+            : base(game)
         {
             _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\sh-vs.cso", out _vertexShader);
             LoadPixelShader("Content\\Shaders\\sh-ps.cso", out _pixelShader);
-            _constantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _constantsBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, ConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }        
 
         public override void Apply()
         {
             WriteConstants();
-            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);        
+            Game.GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
+            Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);        
         }     
 
         private void WriteConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = Game.GraphicsDevice.ImmediateContext.MapSubresource(_constantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, ConstantBufferSize);
             int offset = 0;
             dataBuffer.Set(offset, WorldViewProjection);
@@ -64,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBuffer.Set(offset, BlueSHCoefficients);
             offset += sizeof(float) * 16;
             dataBuffer.Set(offset, WorldView);           
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);
+            Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);
         }
     }
 }

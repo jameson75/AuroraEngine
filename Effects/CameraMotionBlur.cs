@@ -22,7 +22,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 {
     public class CameraMotionBlur : PostEffect
     {
-        IGameApp _game = null;
+        //IGameApp _game = null;
         private byte[] _vertexShaderByteCode = null;
         private VertexShader _passThruFixVertexShader = null;
         private PixelShader _combinePixelShader = null;   
@@ -38,9 +38,8 @@ namespace CipherPark.AngelJacket.Core.Effects
         private RenderTargetView _sumTextureRenderTargetView = null;
         private int ConstantsBufferSize = 16;
 
-        public CameraMotionBlur(Device graphicsDevice, IGameApp game) : base(graphicsDevice)
-        {
-            _game = game;
+        public CameraMotionBlur(IGameApp game) : base(game)
+        {          
             CreateConstantBuffers();
             CreateTextures();
             CreateShaders();            
@@ -132,15 +131,15 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateTextures()
         {
-            _quad = ContentBuilder.BuildBasicViewportQuad(_game, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
 
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
             textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
             textureDesc.CpuAccessFlags = CpuAccessFlags.None;
             textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            textureDesc.Height = _game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
-            textureDesc.Width = _game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
+            textureDesc.Height = Game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
+            textureDesc.Width = Game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
             textureDesc.MipLevels = 1;
             textureDesc.OptionFlags = ResourceOptionFlags.None;
             textureDesc.Usage = ResourceUsage.Default;
@@ -165,34 +164,34 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Scene (Input) Texture
             //---------------------
-            Texture2D _sceneTexture = new Texture2D(GraphicsDevice, textureDesc);           
-            _inputTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+            Texture2D _sceneTexture = new Texture2D(Game.GraphicsDevice, textureDesc);           
+            _inputTextureSampler = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
 
             //Sum Texture
             //-----------
-            Texture2D _sumTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
-            _sumTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _sumTexture, resourceViewDesc);
-            _sumTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _sumTexture, renderTargetViewDesc);
-            _sumTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+            Texture2D _sumTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            _sumTextureShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _sumTexture, resourceViewDesc);
+            _sumTextureRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _sumTexture, renderTargetViewDesc);
+            _sumTextureSampler = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
 
             //Temp Texture
             //--------
-            Texture2D _tempTexture = new Texture2D(_game.GraphicsDevice, textureDesc);
-            _tempTextureShaderResourceView = new ShaderResourceView(GraphicsDevice, _tempTexture, resourceViewDesc);
-            _tempTextureRenderTargetView = new RenderTargetView(GraphicsDevice, _tempTexture, renderTargetViewDesc);
-            _tempTextureSampler = new SamplerState(GraphicsDevice, samplerStateDesc);
+            Texture2D _tempTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            _tempTextureShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _tempTexture, resourceViewDesc);
+            _tempTextureRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _tempTexture, renderTargetViewDesc);
+            _tempTextureSampler = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
         }
 
         private void WriteShaderConstants()
         {
             int inputTextureWidth = InputTexture.ResourceAs<Texture2D>().Description.Width;
             int inputTextureHeight = InputTexture.ResourceAs<Texture2D>().Description.Height;          
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_passThruFixConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = Game.GraphicsDevice.ImmediateContext.MapSubresource(_passThruFixConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             float invWidth = 1 / inputTextureWidth;
             dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref invWidth);
             float invHeight = 1 / inputTextureHeight;
             dataBox.DataPointer = Utilities.WriteAndPosition<float>(dataBox.DataPointer, ref invHeight);
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_passThruFixConstantsBuffer, 0);        
+            Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_passThruFixConstantsBuffer, 0);        
         }
     }
 }

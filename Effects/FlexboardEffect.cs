@@ -18,35 +18,35 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class FlexboardEffect : ForwardEffect
+    public class FlexboardEffect : SurfaceEffect
     {
         private VertexShader _vertexShader = null;
         private PixelShader _pixelShader = null;
         private byte[] _vertexShaderByteCode = null;   
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
 
-        public FlexboardEffect(Device graphicsDevice)
-            : base(graphicsDevice)        
+        public FlexboardEffect(IGameApp game)
+            : base(game)        
         {      
             World = Matrix.Identity;
             View = Matrix.Identity;
             Projection = Matrix.Identity;
             string psFileName = "Content\\Shaders\\flexboard-ps.cso";
             string vsFileName = "Content\\Shaders\\flexboard-vs.cso";
-            _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);           
-            _vertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);            
-            _pixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
+            _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
+            _vertexShader = new VertexShader(Game.GraphicsDevice, _vertexShaderByteCode);
+            _pixelShader = new PixelShader(Game.GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
             int bufferSize = sizeof(float) * 16  * 3; //size of WorldViewProj + View + Proj
-            _constantBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _constantBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
         public override void Apply()
-        {             
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+        {
+            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
+            Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             SetShaderConstants();
-            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
+            Game.GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
         }
 
         public override byte[] SelectShaderByteCode()
@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void SetShaderConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = Game.GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             Matrix worldViewProjection = this.World * this.View;
             worldViewProjection.Transpose();
             dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);
@@ -66,7 +66,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Matrix projection = this.Projection;
             projection.Transpose();
             dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref projection);
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
+            Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
         }
     }
 }

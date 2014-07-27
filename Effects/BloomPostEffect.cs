@@ -38,8 +38,8 @@ namespace CipherPark.AngelJacket.Core.Effects
         public float BloomSaturation { get; set; }
         public float BaseSaturation { get; set; }
 
-        public BloomPostEffect(Device graphicsDevice, IGameApp app)
-            : base(graphicsDevice)
+        public BloomPostEffect(IGameApp app)
+            : base(app)
         {            
             //Explanation: In HLSL, each element in an array is aligned to a 16-byte boundary... 
             //With 2 arrays of lenght "SampleCount" the calculation is 16 x SampleCount x 2.
@@ -100,10 +100,10 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Create Constant Buffers
             //------------------------
-            _bloomExtractConstantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, BloomExtractConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _guassianHorizontalConstantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, GuassianConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _guassianVerticalConstantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, GuassianConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _bloomCombineConstantBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, BloomCombineConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _bloomExtractConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, BloomExtractConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _guassianHorizontalConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, GuassianConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _guassianVerticalConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, GuassianConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _bloomCombineConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, BloomCombineConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
 
             //Create descriptions for textures and samplers
             //---------------------------------------------
@@ -114,25 +114,25 @@ namespace CipherPark.AngelJacket.Core.Effects
             SamplerStateDescription samplerStateDesc = CreateCommonSamplerStateDesc();
             
             //Input Texture...
-            SamplerState _inputTextureSamplerState = new SamplerState(this.GraphicsDevice, samplerStateDesc);
+            SamplerState _inputTextureSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
             
             //Bloom Extract Texture...
-            Texture2D _bloomExtractTexture = new Texture2D(this.GraphicsDevice, textureDesc);
-            ShaderResourceView _bloomExtractShaderResourceView = new ShaderResourceView(this.GraphicsDevice, _bloomExtractTexture, shaderResourceViewDesc);
-            SamplerState _bloomExtractSamplerState = new SamplerState(this.GraphicsDevice, samplerStateDesc);
-            RenderTargetView _bloomExtractRenderTargetView = new RenderTargetView(this.GraphicsDevice, _bloomExtractTexture, renderTargetViewDesc); 
+            Texture2D _bloomExtractTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            ShaderResourceView _bloomExtractShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _bloomExtractTexture, shaderResourceViewDesc);
+            SamplerState _bloomExtractSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
+            RenderTargetView _bloomExtractRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _bloomExtractTexture, renderTargetViewDesc); 
     
             //Temp Texture...
-            Texture2D _tempTexture = new Texture2D(this.GraphicsDevice, textureDesc);
-            ShaderResourceView _tempShaderResourceView = new ShaderResourceView(this.GraphicsDevice, _tempTexture, shaderResourceViewDesc);
-            SamplerState _tempSamplerState = new SamplerState(this.GraphicsDevice, samplerStateDesc);         
-            RenderTargetView _tempRenderTargetView = new RenderTargetView(this.GraphicsDevice, _tempTexture, renderTargetViewDesc);            
+            Texture2D _tempTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            ShaderResourceView _tempShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _tempTexture, shaderResourceViewDesc);
+            SamplerState _tempSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);         
+            RenderTargetView _tempRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _tempTexture, renderTargetViewDesc);            
             
             //Blur Texture...
-            Texture2D _blurTexture = new Texture2D(this.GraphicsDevice, textureDesc);
-            ShaderResourceView _blurShaderResourceView = new ShaderResourceView(this.GraphicsDevice, _blurTexture, shaderResourceViewDesc);
-            SamplerState _blurSamplerState = new SamplerState(this.GraphicsDevice, samplerStateDesc);
-            RenderTargetView _blurRenderTargetView = new RenderTargetView(this.GraphicsDevice, _blurTexture, renderTargetViewDesc); 
+            Texture2D _blurTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            ShaderResourceView _blurShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _blurTexture, shaderResourceViewDesc);
+            SamplerState _blurSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
+            RenderTargetView _blurRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _blurTexture, renderTargetViewDesc); 
             
             //Load Shaders
             //-------------
@@ -143,7 +143,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Create Screen Quad
             //------------------
-            _quad = ContentBuilder.BuildBasicViewportQuad(_game, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
 
             PostEffectPass[] passes = new PostEffectPass[4];
 
@@ -151,7 +151,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Input: Input Texture
             //Output: BloomExtract Texture
             //-----------------------------            
-            passes[0] = new PostEffectPass(this.GraphicsDevice);
+            passes[0] = new PostEffectPass(Game.GraphicsDevice);
             passes[0].Name = "Bloom Extract";
             passes[0].VertexShader = _passThruVertexShader;
             passes[0].PixelShader = _bloomExtractPixelShader;
@@ -165,7 +165,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Input: Input Texture
             //Output: Temp Texture
             //--------------------           
-            passes[1] = new PostEffectPass(this.GraphicsDevice);
+            passes[1] = new PostEffectPass(Game.GraphicsDevice);
             passes[1].Name = "Horizontal Blur";
             passes[1].VertexShader = _passThruVertexShader;
             passes[1].PixelShader = _gaussianBlurPixelShader;
@@ -179,7 +179,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Input: Temp Texture
             //Output: Blur Texture
             //--------------------
-            passes[2] = new PostEffectPass(this.GraphicsDevice);
+            passes[2] = new PostEffectPass(Game.GraphicsDevice);
             passes[2].Name = "Vertical Blur";
             passes[2].VertexShader = _passThruVertexShader;
             passes[2].PixelShader = _gaussianBlurPixelShader;
@@ -194,7 +194,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //       Blur Texture
             //Output: 
             //----------------------------
-            passes[3] = new PostEffectPass(this.GraphicsDevice);
+            passes[3] = new PostEffectPass(Game.GraphicsDevice);
             passes[3].Name = "Combine";
             passes[3].VertexShader = _passThruVertexShader;
             passes[3].PixelShader = _bloomCombinePixelShader;

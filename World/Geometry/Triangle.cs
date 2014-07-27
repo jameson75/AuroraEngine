@@ -16,13 +16,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public Matrix Transform { get; set; }
         private BasicEffect _effect = null;
         //private TriEffect _effect = null;
-        private IGameApp _app = null;
+        private Device _device = null;
         private Mesh _mesh = null;
 
-        public Triangle(IGameApp app)
+        public Triangle(Device device)
         {
-            _app = app;
-            _effect = new BasicEffect(app.GraphicsDevice);            
+            _device = device;
+            _effect = new BasicEffect(device);            
             _effect.SetVertexColorEnabled(true);
             byte[] shaderCode = _effect.SelectShaderByteCode();
             //_effect = new TriEffect(app.GraphicsDevice);
@@ -40,15 +40,15 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             vertexBufferDesc.SizeInBytes = verts.Length * VertexPositionColor.ElementSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;            
-            DXBuffer vBuffer = DXBuffer.Create<VertexPositionColor>(app.GraphicsDevice, verts, vertexBufferDesc);
+            DXBuffer vBuffer = DXBuffer.Create<VertexPositionColor>(device, verts, vertexBufferDesc);
             meshDesc.VertexBuffer = vBuffer;
             meshDesc.VertexCount = verts.Length;
-            meshDesc.VertexLayout = new InputLayout(app.GraphicsDevice, shaderCode, VertexPositionColor.InputElements);
+            meshDesc.VertexLayout = new InputLayout(device, shaderCode, VertexPositionColor.InputElements);
             meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             Vector3[] positions = (from v in verts select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
             meshDesc.BoundingBox = BoundingBox.FromPoints(positions);         
-            _mesh = new Mesh(app, meshDesc); 
+            _mesh = new Mesh(device, meshDesc); 
         }
 
         public void Draw(GameTime gameTime)

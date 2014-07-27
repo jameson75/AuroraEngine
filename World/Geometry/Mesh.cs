@@ -25,7 +25,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private DXBuffer _instanceBuffer = null;
         private DXBuffer _vertexBuffer = null;
         private DXBuffer _indexBuffer = null;
-        private IGameApp _app = null;
+        private SharpDX.Direct3D11.Device _device = null;
         private int _instanceCount = 0;
         private int _vertexCount = 0;
         private int _indexCount = 0;
@@ -40,9 +40,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public BoundingBox BoundingBox { get; private set; }
 
-        public Mesh(IGameApp app, MeshDescription description)
+        public Mesh(SharpDX.Direct3D11.Device device, MeshDescription description)
         {
-            _app = app;
+            _device = device;
             _vertexStride = description.VertexStride;
             _vertexLayout = description.VertexLayout;
             _topology = description.Topology;
@@ -83,10 +83,10 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 throw new IndexOutOfRangeException("Attempted to update a mesh which is not dynamic");
             
             //TODO: The index buffer needs to be updated too for indexed data
-            DataBox box = _app.GraphicsDeviceContext.MapSubresource(_indexBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
+            DataBox box = _device.ImmediateContext.MapSubresource(_indexBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(box.DataPointer, indices.Length * sizeof(short));
             dataBuffer.Set<short>(offset * sizeof(short), indices);
-            _app.GraphicsDeviceContext.UnmapSubresource(_indexBuffer, 0);
+            _device.ImmediateContext.UnmapSubresource(_indexBuffer, 0);
         }
 
         public void UpdateVertexStream<T>(T[] data, int offset = 0) where T : struct
@@ -96,10 +96,10 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
             DXBuffer dynamicBuffer = (!IsInstanced) ? _vertexBuffer : _instanceBuffer;          
             int dataStride = (!IsInstanced) ? _vertexStride : _instanceStride;
-            DataBox box = _app.GraphicsDeviceContext.MapSubresource(dynamicBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
+            DataBox box = _device.ImmediateContext.MapSubresource(dynamicBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(box.DataPointer, data.Length * dataStride);
             dataBuffer.Set<T>(offset * dataStride, data);            
-            _app.GraphicsDeviceContext.UnmapSubresource(dynamicBuffer, 0);
+            _device.ImmediateContext.UnmapSubresource(dynamicBuffer, 0);
             if(!IsInstanced)
                _vertexCount = data.Length;
             else
@@ -116,37 +116,37 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             if (_vertexLayout == null)
                 throw new InvalidOperationException("Input layout was not set.");
 
-            _app.GraphicsDeviceContext.InputAssembler.InputLayout = _vertexLayout;
-            _app.GraphicsDeviceContext.InputAssembler.PrimitiveTopology = _topology;
+            _device.ImmediateContext.InputAssembler.InputLayout = _vertexLayout;
+            _device.ImmediateContext.InputAssembler.PrimitiveTopology = _topology;
             
             if (_instanceBuffer == null)
             {
-                _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding[] 
+                _device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding[] 
                     {
                         new VertexBufferBinding(_vertexBuffer, _vertexStride, 0),
                         new VertexBufferBinding(null, 0, 0)
                     });
                 if (_indexBuffer == null)
-                    _app.GraphicsDeviceContext.Draw(_vertexCount, 0);
+                    _device.ImmediateContext.Draw(_vertexCount, 0);
                 else
                 {
-                    _app.GraphicsDeviceContext.InputAssembler.SetIndexBuffer(_indexBuffer, indexBufferFormat, 0);
-                    _app.GraphicsDeviceContext.DrawIndexed(_indexCount, 0, 0);
+                    _device.ImmediateContext.InputAssembler.SetIndexBuffer(_indexBuffer, indexBufferFormat, 0);
+                    _device.ImmediateContext.DrawIndexed(_indexCount, 0, 0);
                 }
             }
             else
             {
-                _app.GraphicsDeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding[] 
+                _device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding[] 
                 { 
                     new VertexBufferBinding(_vertexBuffer, _vertexStride, 0),
                     new VertexBufferBinding(_instanceBuffer, _instanceStride, 0)
                 });
                 if (_indexBuffer == null)
-                    _app.GraphicsDeviceContext.DrawInstanced(_vertexCount, _instanceCount, 0, 0);
+                    _device.ImmediateContext.DrawInstanced(_vertexCount, _instanceCount, 0, 0);
                 else
                 {
-                    _app.GraphicsDeviceContext.InputAssembler.SetIndexBuffer(_indexBuffer, indexBufferFormat, 0);
-                    _app.GraphicsDeviceContext.DrawIndexedInstanced(_indexCount, _instanceCount, 0, 0, 0);
+                    _device.ImmediateContext.InputAssembler.SetIndexBuffer(_indexBuffer, indexBufferFormat, 0);
+                    _device.ImmediateContext.DrawIndexedInstanced(_indexCount, _instanceCount, 0, 0, 0);
                 }
             }
         }

@@ -88,7 +88,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //depthResourceDesc.Texture2D.MipLevels = 1;            
             //effectChain._depthShaderResource = new ShaderResourceView(game.GraphicsDevice, game.DepthStencil.ResourceAs<Texture2D>(), depthResourceDesc);
 
-            effectChain.passThruEffect = new PassThruPostEffect(game.GraphicsDevice, game);           
+            effectChain.passThruEffect = new PassThruPostEffect(game);           
                  
             return effectChain;            
         }

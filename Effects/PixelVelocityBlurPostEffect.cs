@@ -77,8 +77,8 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public float BlurAmount { get; set; }
 
-        public PixelVelocityBlurPostEffect(Device graphicsDevice, IGameApp game)
-            : base(graphicsDevice)
+        public PixelVelocityBlurPostEffect(IGameApp game)
+            : base(game)
         {
             _game = game;
             LightAmbient = new Color(1, 1, 1, 1);

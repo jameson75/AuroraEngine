@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class BasicEffectEx : ForwardEffect
+    public class BasicEffectEx : SurfaceEffect
     {
         private Matrix _world;
         private Matrix _view;
@@ -27,9 +27,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         private BasicEffect _effect = null;
         private bool _enableVertexColor = false;
 
-        public BasicEffectEx(Device device) : base(device)
+        public BasicEffectEx(IGameApp game) : base(game)
         {
-            _effect = new BasicEffect(device);
+            _effect = new BasicEffect(game.GraphicsDevice);
         }
 
         public override Matrix World

@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class BlinnPhongEffect : ForwardEffect
+    public class BlinnPhongEffect : SurfaceEffect
     {
         private SharpDX.Direct3D11.Buffer _vertexConstantsBuffer = null;
         private SharpDX.Direct3D11.Buffer _pixelConstantsBuffer = null;
@@ -56,23 +56,23 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public float Eccentricity { get; set; }
        
-        public BlinnPhongEffect(Device graphicsDevice)
-            : base(graphicsDevice)
+        public BlinnPhongEffect(IGameApp game)
+            : base(game)
         {           
             _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\blinnphong-vs.cso", out _vertexShader);
             LoadPixelShader("Content\\Shaders\\blinnphong-ps.cso", out _pixelShader);
-            _vertexConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _pixelConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, PixelConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _vertexConstantsBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, VertexConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _pixelConstantsBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, PixelConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
         public override void Apply()
         {
             WriteVertexConstants();
             WritePixelConstants();
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _vertexConstantsBuffer);            
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _pixelConstantsBuffer);            
+            Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
+            Game.GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _vertexConstantsBuffer);            
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _pixelConstantsBuffer);            
         }
 
         public override byte[] SelectShaderByteCode()
@@ -82,7 +82,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void WriteVertexConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_vertexConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = Game.GraphicsDevice.ImmediateContext.MapSubresource(_vertexConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, VertexConstantBufferSize);
             int offset = 0;
             Matrix worldITXf = this.WorldInverseTranspose;
@@ -102,12 +102,12 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBuffer.Set(offset, wvpXf);
             offset += sizeof(float) * 16;
             dataBuffer.Set(offset, new Vector4(LampDirPos, 1));            
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBuffer, 0);
+            Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBuffer, 0);
         }
 
         private void WritePixelConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_pixelConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = Game.GraphicsDevice.ImmediateContext.MapSubresource(_pixelConstantsBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(dataBox.DataPointer, PixelConstantBufferSize);
             int offset = 0;         
             dataBuffer.Set(offset, LampColor.ToVector4());
@@ -117,7 +117,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBuffer.Set(offset, SpecularPower);
             offset += sizeof(float);
             dataBuffer.Set(offset, Eccentricity);
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
+            Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
         }
     }
 }

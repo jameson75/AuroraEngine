@@ -167,13 +167,13 @@ namespace CipherPark.AngelJacket.Core.Effects
         }
     }
 
-    public class ForwardEffectPass : EffectPass
+    public class SurfaceEffectPass : EffectPass
     {
         BlendState _oldBlendState = null;
         RasterizerState _oldRasterizerState = null;
         DepthStencilState _oldDepthStencilState = null;
 
-        public ForwardEffectPass(Device graphicsDevice)
+        public SurfaceEffectPass(Device graphicsDevice)
             : base(graphicsDevice)
         { }
 

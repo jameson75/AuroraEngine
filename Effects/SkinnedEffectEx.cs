@@ -23,15 +23,15 @@ namespace CipherPark.AngelJacket.Core.Effects
     {
         Matrix[] BoneTransforms { get; set; }
     }
-    public class SkinnedEffectEx : ForwardEffect, ISkinEffect
+    public class SkinnedEffectEx : SurfaceEffect, ISkinEffect
     {
         private SkinnedEffect _effect = null;
         private int _weightsPerVertex = 0;
 
-        public SkinnedEffectEx(Device graphicsDevice)
-            : base(graphicsDevice)
+        public SkinnedEffectEx(IGameApp game)
+            : base(game)
         {
-            _effect = new SkinnedEffect(graphicsDevice);
+            _effect = new SkinnedEffect(game.GraphicsDevice);
         }
 
         public override Matrix World

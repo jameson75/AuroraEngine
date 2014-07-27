@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class BillboardEffect : ForwardEffect
+    public class BillboardEffect : SurfaceEffect
     {
         private VertexShader _vertexShader = null;
         private VertexShader _ivertexShader = null;
@@ -31,7 +31,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         public Color ForegroundColor { get; set; }
         public Color BackgroundColor { get; set; }
 
-        public BillboardEffect(Device graphicsDevice) : base(graphicsDevice)        
+        public BillboardEffect(IGameApp game) : base(game)        
         {      
             ForegroundColor = Color.Transparent;
             BackgroundColor = Color.Transparent;
@@ -44,24 +44,24 @@ namespace CipherPark.AngelJacket.Core.Effects
             string ivsFileName = "Content\\Shaders\\billboard-i-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
             _ivertexShaderByteCode = System.IO.File.ReadAllBytes(ivsFileName);
-            _vertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
-            _ivertexShader = new VertexShader(GraphicsDevice, _ivertexShaderByteCode);
-            _pixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
+            _vertexShader = new VertexShader(Game.GraphicsDevice, _vertexShaderByteCode);
+            _ivertexShader = new VertexShader(Game.GraphicsDevice, _ivertexShaderByteCode);
+            _pixelShader = new PixelShader(Game.GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
             int bufferSize = sizeof(float) * 16  * 3; //size of WorldViewProj + ForegroundColor + BackgroundColor
-            _constantBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _constantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
         public override void Apply()
         {                      
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
             if (IsBillboardInstanced)
-                GraphicsDevice.ImmediateContext.VertexShader.Set(_ivertexShader);
+                Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_ivertexShader);
             else
-                GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+                Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             SetShaderConstants();
-            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
-            //GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
+            Game.GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
+            //Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
         }
 
         public override byte[] SelectShaderByteCode()
@@ -71,7 +71,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void SetShaderConstants()
         {
-            DataBox dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
+            DataBox dataBox = Game.GraphicsDevice.ImmediateContext.MapSubresource(_constantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
             Matrix worldViewProjection = this.World * this.View * this.Projection;
             worldViewProjection.Transpose();               
             dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref worldViewProjection);          
@@ -82,7 +82,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref vForegroundColor);
             Vector4 vBackgroundColor = BackgroundColor.ToVector4();
             dataBox.DataPointer = Utilities.WriteAndPosition<Vector4>(dataBox.DataPointer, ref vBackgroundColor);
-            GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
+            Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);
         }
     }
 }

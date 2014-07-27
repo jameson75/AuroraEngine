@@ -20,13 +20,13 @@ using CipherPark.AngelJacket.Core.Effects;
 namespace CipherPark.AngelJacket.Core.World
 {
     public class Camera
-    {
-        private IGameApp _game = null;
+    {   
         private PostEffectChain _postEffectChain = null;
+        private IGameApp _game = null;
+
         public Camera(IGameApp game)
         {
-            _game = game;
-            Texture2DDescription desc = game.RenderTarget.ResourceAs<Texture2D>().Description;
+            _game = game;           
             _postEffectChain = PostEffectChain.Create(game);
             ViewMatrix = Matrix.Identity;
             ProjectionMatrix = Matrix.Identity;
@@ -34,8 +34,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public Camera(IGameApp game, Matrix viewMatrix, Matrix projectionMatrix)
         {
-            _game = game;
-            Texture2DDescription desc = game.RenderTarget.ResourceAs<Texture2D>().Description;
+            _game = game;          
             _postEffectChain = PostEffectChain.Create(game);
             ViewMatrix = viewMatrix;
             ProjectionMatrix = projectionMatrix;

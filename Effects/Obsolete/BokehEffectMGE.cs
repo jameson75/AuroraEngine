@@ -47,8 +47,8 @@ namespace CipherPark.AngelJacket.Core.Effects
         public float ScreenWidth { get; set; }
         public float ScreenHeight { get; set; }
 
-        public BokehEffect(Device graphicsDevice, IGameApp game)
-            : base(graphicsDevice)
+        public BokehEffect(IGameApp game)
+            : base(game)
         {
             string vsFileName = "Content\\Shaders\\bokeh-knu-x1x2x3x4-vs.cso";
             string psDofFileName = "Content\\Shaders\\bokeh-knu-x1-ps.cso";
@@ -57,16 +57,16 @@ namespace CipherPark.AngelJacket.Core.Effects
             string psVertBlurFileName = "Content\\Shaders\\bokeh-knu-x4-ps.cso";
 
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
-            _frameVertexShader = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
-            _dofPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psDofFileName));
-            _smartBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psSmartBlurFileName));
-            _horzBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psHorzBlurFileName));
-            _vertBlurPixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psVertBlurFileName));
+            _frameVertexShader = new VertexShader(game.GraphicsDevice, _vertexShaderByteCode);
+            _dofPixelShader = new PixelShader(game.GraphicsDevice, System.IO.File.ReadAllBytes(psDofFileName));
+            _smartBlurPixelShader = new PixelShader(game.GraphicsDevice, System.IO.File.ReadAllBytes(psSmartBlurFileName));
+            _horzBlurPixelShader = new PixelShader(game.GraphicsDevice, System.IO.File.ReadAllBytes(psHorzBlurFileName));
+            _vertBlurPixelShader = new PixelShader(game.GraphicsDevice, System.IO.File.ReadAllBytes(psVertBlurFileName));
             
             _constantBufferSize = 80;
-            _constantsBuffer = new SharpDX.Direct3D11.Buffer(graphicsDevice, _constantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _constantsBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, _constantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
 
-            _quad = ContentBuilder.BuildBasicViewportQuad(game, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildBasicViewportQuad(game.GraphicsDevice, _vertexShaderByteCode);
 
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
@@ -100,30 +100,30 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public override void Apply()
         {
-            _originalRenderTargetView = GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out _originalDepthStencilView)[0];
+            _originalRenderTargetView = Game.GraphicsDevice.ImmediateContext.OutputMerger.GetRenderTargets(1, out _originalDepthStencilView)[0];
             ShaderResourceView _lastPassRenderTarget = null;
             RenderTargetView _currentPassRenderTarget = null;
             
             //Set the shader's constants
             //--------------------------
             SetShaderConstants();
-            GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
-            GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantsBuffer);
+            Game.GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantsBuffer);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantsBuffer);
 
             //Set the resource's used by all pasess
             //-------------------------------------
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, Depth);
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Mirror, AddressV = TextureAddressMode.Mirror, AddressW = TextureAddressMode.Mirror }));
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Clamp, AddressV = TextureAddressMode.Clamp, AddressW = TextureAddressMode.Clamp }));
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(2, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Mirror, AddressV = TextureAddressMode.Mirror, AddressW = TextureAddressMode.Mirror }));
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, Depth);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Mirror, AddressV = TextureAddressMode.Mirror, AddressW = TextureAddressMode.Mirror }));
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Clamp, AddressV = TextureAddressMode.Clamp, AddressW = TextureAddressMode.Clamp }));
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(2, new SamplerState(GraphicsDevice, new SamplerStateDescription { Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, AddressU = TextureAddressMode.Mirror, AddressV = TextureAddressMode.Mirror, AddressW = TextureAddressMode.Mirror }));
                         
             //Pass 0
             //------
             _currentPassRenderTarget = _renderTargetView1;
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_dofPixelShader);            
+            Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget);
+            Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_dofPixelShader);            
             _quad.Draw(null);
 
             //Pass 1
@@ -132,12 +132,12 @@ namespace CipherPark.AngelJacket.Core.Effects
             _currentPassRenderTarget = _renderTargetView2;
             _lastPassRenderTarget = _renderShaderResource1;
             //Unbind new output from input.
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, null);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, null);
             //NOTE: the next call will have the effect of unbinding the new input from output.    
-            GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget); 
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
-            GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_smartBlurPixelShader);
+            Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
+            Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_smartBlurPixelShader);
             _quad.Draw(null);
 
             //Pass 2

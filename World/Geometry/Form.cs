@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public ForwardEffect ElementEffect
+        public SurfaceEffect ElementEffect
         {
             get { return _elementDescription.Effect; }
             set

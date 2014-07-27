@@ -221,6 +221,7 @@
     <Compile Include="World\Geometry\ConcentricForm.cs" />
     <Compile Include="Kinetics\IRigidBody.cs" />
     <Compile Include="Kinetics\Emitter.cs" />
+    <Compile Include="World\Geometry\Track.cs" />
     <Compile Include="World\ISprite.cs" />
     <Compile Include="World\Renderers\ParticleRenderer.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />

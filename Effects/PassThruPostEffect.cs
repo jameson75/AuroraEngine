@@ -33,8 +33,8 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public BlendState BlendState { get; set; }
 
-        public PassThruPostEffect(Device graphicsDevice, IGameApp game)
-            : base(graphicsDevice)
+        public PassThruPostEffect(IGameApp game)
+            : base(game)
         {
             string psFileName = "Content\\Shaders\\postpassthru-ps.cso";
             string vsFileName = "Content\\Shaders\\postpassthru-vs.cso";
@@ -43,14 +43,14 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Load Shaders
             //------------
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
-            _samplerState = new SamplerState(graphicsDevice, SamplerStateDescription.Default());
-            _vertexShaderNoFix = new VertexShader(GraphicsDevice, _vertexShaderByteCode);
-            _pixelShader = new PixelShader(GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
-            _vertexShaderWithFix = new VertexShader(GraphicsDevice, System.IO.File.ReadAllBytes(vsFixFileName));
+            _samplerState = new SamplerState(game.GraphicsDevice, SamplerStateDescription.Default());
+            _vertexShaderNoFix = new VertexShader(Game.GraphicsDevice, _vertexShaderByteCode);
+            _pixelShader = new PixelShader(Game.GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
+            _vertexShaderWithFix = new VertexShader(Game.GraphicsDevice, System.IO.File.ReadAllBytes(vsFixFileName));
             
             //Create Scree Quad
             //------------------
-            _quad = ContentBuilder.BuildBasicViewportQuad(game, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
         }
 
         public override void Apply()
@@ -60,19 +60,19 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Setup Shaders
             //--------------
             if (!EnableTexelFix)
-                GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderNoFix);
+                Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderNoFix);
             else
-                GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderWithFix);
-            GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);            
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _samplerState);
+                Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderWithFix);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);            
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _samplerState);
             
             //Setup states.
             //-------------
             if (BlendState != null)
             {
-                oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
-                GraphicsDevice.ImmediateContext.OutputMerger.BlendState = BlendState;
+                oldBlendState = Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
+                Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = BlendState;
             }
 
             //Render Screen quad.
@@ -81,19 +81,19 @@ namespace CipherPark.AngelJacket.Core.Effects
             
             //Clean Up Shader
             //----------------
-            GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
-            GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);            
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);            
 
             //Clean Up State
             //--------------
             if (BlendState != null)            
-                GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;            
+                Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;            
         }
     }
 
     //public static class CommonBlendStates
     //{
-    //    public static BlendState Create(Device graphicsDevice, BlendStatePresets preset)
+    //    public static BlendState Create(Device Game.GraphicsDevice, BlendStatePresets preset)
     //    {
     //        BlendStateDescription desc = BlendStateDescription.Default();
     //        switch (preset)
