@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.Services;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
-using CoreEffect = CipherPark.AngelJacket.Core.Effects.SurfaceEffect;
+//using CoreEffect = CipherPark.AngelJacket.Core.Effects.SurfaceEffect;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.Renderers;
 
@@ -54,7 +54,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public ITransformable TransformableParent { get; set; }        
     
-        public CoreEffect Effect { get; set; }    
+        public SurfaceEffect Effect { get; set; }    
 
         public abstract void Draw(GameTime gameTime);      
 
