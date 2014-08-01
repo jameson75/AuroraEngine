@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {        
         private readonly Vector2 segmentFaceCount = new Vector2();
 
-        public void Build(SharpDX.Direct3D11.Device graphicsDevice, TrackSegmentBuilder[] segmentBuilders, TrackLayoutItem[] layoutItems, Path path, SurfaceEffect effect, int partitionSize)
+        public Track Build(SharpDX.Direct3D11.Device graphicsDevice, TrackSegmentBuilder[] segmentBuilders, TrackLayoutItem[] layoutItems, Path path, SurfaceEffect effect, int partitionSize)
         {
             int totalInstances = layoutItems.Sum( i => i.InstanceCount );
             float stepSize = path.Distance / totalInstances;  
@@ -86,10 +86,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 }
             }
 
-            return new Track() 
+            return new Track()
             {
-               
-            }
+                Effect = effect,
+                Meshes = trackMeshes
+            };
         }      
     }
 
