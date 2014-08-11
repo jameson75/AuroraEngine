@@ -25,147 +25,235 @@ using CipherPark.AngelJacket.Core.Content;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class TrackBuilder
-    {        
-        private readonly Vector2 segmentFaceCount = new Vector2();
-
-        public Track Build(SharpDX.Direct3D11.Device graphicsDevice, TrackSegmentBuilder[] segmentBuilders, TrackLayoutItem[] layoutItems, Path path, SurfaceEffect effect, int partitionSize)
+    /// <summary>
+    /// 
+    /// </summary>
+    public class TrackSection : ITransformable
+    {
+        public TrackSection()
         {
-            int totalInstances = layoutItems.Sum( i => i.InstanceCount );
-            float stepSize = path.Distance / totalInstances;  
-            List<short> meshIndices = new List<short>();
-            List<Vector2> meshTextureCoords = new List<Vector2>();
-            List<Vector3> meshVertices = new List<Vector3>();
-            List<Vector3> meshNormals = new List<Vector3>();
-            short indexOffset = 0;
-            int partitionCount = 0;
-            List<Mesh> trackMeshes = new List<Mesh>();
+            _items.CollectionChanged += Items_CollectionChanged;
+        }        
 
-            for (int i = 0; i < layoutItems.Length; i++)
-            {
-                bool excludeNearEdge = i > 0;
-                List<short> indices = segmentBuilders[i].GetIndices();
-                List<Vector2> textureCoords = segmentBuilders[i].GetTextureCoords();                            
-                for (int j = 0; j < layoutItems[j].InstanceCount; j++)
-                {
-                    List<Vector3> vertices = segmentBuilders[i].GenerateVertices(path, i * stepSize, stepSize);               
-                    List<Vector3> normals = ContentBuilder.GenerateNormals(vertices.ToArray(), indices.ToArray()).ToList();
-                    List<short> adjustedIndices = indices.Select( e => (short)(e + indexOffset)).ToList();
-                    meshIndices.AddRange(adjustedIndices);
-                    meshTextureCoords.AddRange(meshTextureCoords);
-                    meshVertices.AddRange(vertices);
-                    meshNormals.AddRange(normals);
-                    indexOffset += (short)vertices.Count;
-                    partitionCount++;
-                    if (partitionCount == partitionSize || i == layoutItems.Length - 1)
-                    {
-                        TrackVertex[] meshTrackVertices = meshVertices.Select((v,k) => new TrackVertex()
-                        {
-                            Position = new Vector4(v, 1.0f),
-                            Normal = meshNormals[k],
-                            TextureCoord = textureCoords[k]
-                        }).ToArray();
-                        BoundingBox box = BoundingBoxExtension.Empty;
-                        Mesh mesh = ContentBuilder.BuildMesh<TrackVertex>(graphicsDevice,
-                                                                          effect.SelectShaderByteCode(),
-                                                                          meshTrackVertices.ToArray(),
-                                                                          meshIndices.ToArray(),
-                                                                          TrackVertex.InputElements,
-                                                                          TrackVertex.ElementSize,
-                                                                          box);
+        private ObservableCollection<Form> _items = new ObservableCollection<Form>();
 
-                        trackMeshes.Add(mesh);
+        /// <summary>
+        /// 
+        /// </summary>
+        public ObservableCollection<Form> Items { get { return _items; } }
 
-                        meshIndices.Clear();
-                        meshVertices.Clear();
-                        meshNormals.Clear();
-                        meshTextureCoords.Clear();
-                        indexOffset = 0;
-                        partitionCount = 0;
-                    }
-                }
-            }
+        /// <summary>
+        /// 
+        /// </summary>
+        public Transform Transform { get; set; }
 
-            return new Track()
-            {
-                Effect = effect,
-                Meshes = trackMeshes
-            };
-        }      
+        /// <summary>
+        /// 
+        /// </summary>
+        public ITransformable TransformableParent { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public void Draw(GameTime gameTime)
+        {
+            foreach (Form item in _items)
+                item.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Items_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+                foreach (Form item in e.OldItems)
+                    item.TransformableParent = null;
+
+            if (e.NewItems != null)
+                foreach (Form item in e.NewItems)
+                    item.TransformableParent = this;
+        }
     }
 
     /// <summary>
     /// 
     /// </summary>
-    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct TrackVertex
+    public class TrackSectionInstance : ITransformable
     {
-        public Vector4 Position;
-        public Vector3 Normal;
-        public Vector2 TextureCoord;
+        /// <summary>
+        /// 
+        /// </summary>
+        public TrackSection Section { get; set; }
 
-        private static InputElement[] _inputElements = null;
-        private static int _elementSize = 0;
-        public static InputElement[] InputElements { get { return _inputElements; } }
-        public static int ElementSize { get { return _elementSize; } }
+        /// <summary>
+        /// 
+        /// </summary>
+        public Transform Transform { get; set; }
 
-        static TrackVertex()
-        {
-            _inputElements = new InputElement[]
-             {
-                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
-                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0),
-                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 28, 0)
-             };
-            _elementSize = 36;
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public ITransformable TransformableParent { get; set; }
 
-        public TrackVertex(Vector3 position, Vector3 normal, Vector2 textureCoord)
-        {
-            Position = new Vector4(position, 1.0f);
-            Normal = normal;
-            TextureCoord = textureCoord;
-        }
-    }
-
-    public abstract class TrackSegmentBuilder
-    {
-        public abstract List<short> GetIndices();
-        public abstract List<Vector2> GetTextureCoords();
-        public abstract List<Vector3> GenerateVertices(Path path, float subPathStart, float subPathStart);
-
-    }
-
-    public class TrackLayoutItem
-    {        
-        public int DescriptionIndex { get; set; }
-        public int InstanceCount { get; set; }
-    }
-
-    public class Track
-    {           
-        public SurfaceEffect Effect { get; set; }
-        public List<Mesh> Meshes { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
-        {            
-            if (Effect != null)
-            {
-                Effect.World = Matrix.Identity;               
-                Effect.Apply();
-                foreach (Mesh mesh in Meshes)
-                    mesh.Draw(gameTime);
-                Effect.Restore();
-            }  
+        {
+            //Save the original state of the section's spatial data.
+            Transform originalTransform = Section.Transform;
+            ITransformable originalParent = Section.TransformableParent;
+            //Set section's spatial data to this instance.
+            Section.Transform = this.Transform;
+            Section.TransformableParent = this.TransformableParent;
+            //Render section.
+            Section.Draw(gameTime);
+            //Set section spatial data back to its orignal state.
+            Section.Transform = originalTransform;
+            Section.TransformableParent = originalParent;            
         }
     }
 
-    public static class EnumerableExtensions
+    /// <summary>
+    /// 
+    /// </summary>
+    public class Track : ITransformable
+    {
+        private IGameApp _game = null;
+        private List<TrackSectionInstance> _trackLayout = new List<TrackSectionInstance>();
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="game"></param>
+        public Track(IGameApp game)
+        {
+            _game = game;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public IGameApp Game { get { return _game; } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<TrackSectionInstance> TrackLayout { get { return _trackLayout; } }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Path PathOfAction { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public Transform Transform { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ITransformable TransformableParent { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sections"></param>
+        /// <param name="sequence"></param>
+        public void GenerateLayout(IEnumerable<TrackSection> sections, IEnumerable<int> sequence)
+        {
+            if(PathOfAction == null)
+                throw new InvalidOperationException("Path of action property not initialized.");
+
+            _trackLayout.Clear();
+            for (int i = 0; i < sequence.Count(); i++)
+            {
+                float SectionLength = 1000.0f; //TODO: Figure out a way to parameterize this value.
+                PathNode pathNode = PathOfAction.EvaluateNodeAtDistance(i * SectionLength);
+                Transform instanceTransform = pathNode.Transform;
+                _trackLayout.Add(new TrackSectionInstance()
+                {
+                    Section = sections.ElementAt(sequence.ElementAt(i)),
+                    TransformableParent = this,
+                    //TODO: Use action path to calculate transform.
+                    Transform = instanceTransform
+                });
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public void Draw(GameTime gameTime)
+        {
+            foreach (TrackSectionInstance instance in _trackLayout)
+                instance.Draw(gameTime);
+        }       
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class TrackNode : Scene.SceneNode
+    {
+        Track _track = null;
+
+        public TrackNode(Track track, string name = null)
+            : base(track.Game, name)
+        {
+            _track = track;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public override void Draw(GameTime gameTime)
+        {
+            //TODO: Change design so that Form.Draw() implementations aquire the Camera from a IViewportService
+            //and set the view and projecton matrices themselves.
+
+            foreach( TrackSectionInstance sectionInstance in _track.TrackLayout)
+                foreach(Form item in sectionInstance.Section.Items)
+                {
+                    item.ElementEffect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
+                    item.ElementEffect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;    
+                    _track.Draw(gameTime);
+                }
+
+            base.Draw(gameTime);
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class EnumerableExtension
     {
         public static void RemoveAll<T>(this IList<T> data, System.Func<T, bool> selector)
         {
             var itemsToDelete = data.Where(selector);
             foreach (var d in data)
                 data.Remove(d);
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class ObservableCollectionExtension
+    {
+        public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> data)
+        {
+            foreach (T d in data)
+                collection.Add(d);
         }
     }
 }

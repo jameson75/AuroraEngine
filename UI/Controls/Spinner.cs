@@ -110,14 +110,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             get
             {
                 double result = 0;
-                if (!double.TryParse(_textArea.Text.Text, out result))
+                if (!double.TryParse(_textArea.TextContent.Text, out result))
                     return 0;
                 else
                     return result;
             }
             set
             {
-                _textArea.Text.Text = value.ToString();
+                _textArea.TextContent.Text = value.ToString();
                 OnValueChanged(Value);
             }                    
         }

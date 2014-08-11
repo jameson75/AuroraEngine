@@ -102,10 +102,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public string Caption
         {
-            get { return _label.Text.Text; }
+            get { return _label.TextContent.Text; }
             set
             {
-                _label.Text.Text = value;
+                _label.TextContent.Text = value;
                 _label.SizeToContent();
             }
         }

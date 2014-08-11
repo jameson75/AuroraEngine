@@ -50,6 +50,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
     }
 
+   
     /// <summary>
     /// 
     /// </summary>
@@ -311,7 +312,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct ParticleInstanceVertex
+    public struct ParticleVertexPostionNormalTexture
     {
         public Vector4 Position;
         public Vector3 Normal;
@@ -323,7 +324,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
         public static int InstanceSize { get { return _instanceSize; } }
-        static ParticleInstanceVertex()
+        static ParticleVertexPostionNormalTexture()
         {
             _inputElements = new InputElement[]
              {
@@ -333,61 +334,64 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                  new InputElement("MATRIX", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1),
                  new InputElement("MATRIX", 1, Format.R32G32B32A32_Float, 16, 1, InputClassification.PerInstanceData, 1),
                  new InputElement("MATRIX", 2, Format.R32G32B32A32_Float, 32, 1, InputClassification.PerInstanceData, 1),
-                 new InputElement("MATRIX", 3, Format.R32G32B32A32_Float, 48, 1, InputClassification.PerInstanceData, 1),
-                 new InputElement("TEXCOORD", 1, Format.R32G32B32A32_Float, 64, 1, InputClassification.PerInstanceData, 1),
-                 new InputElement("TEXCOORD", 2, Format.R32G32B32A32_Float, 80, 1, InputClassification.PerInstanceData, 1),
-                 new InputElement("TEXCOORD", 3, Format.R32G32B32A32_Float, 96, 1, InputClassification.PerInstanceData, 1)
+                 new InputElement("MATRIX", 3, Format.R32G32B32A32_Float, 48, 1, InputClassification.PerInstanceData, 1)               
              };
             _elementSize = 42;
-            _instanceSize = 112;
+            _instanceSize = 64;
         }      
-    }
+    }   
 
+    /// <summary>
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct ParticleVertexPositionNormalColor
+    {
+        public Vector4 Position;
+        public Vector3 Normal;
+        public Vector4 Color;
+
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        private static int _instanceSize = 0;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+        public static int InstanceSize { get { return _instanceSize; } }
+
+        static ParticleVertexPositionNormalColor()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0),
+                 new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 28, 0),
+                 new InputElement("MATRIX", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 1, Format.R32G32B32A32_Float, 16, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 2, Format.R32G32B32A32_Float, 32, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 3, Format.R32G32B32A32_Float, 48, 1, InputClassification.PerInstanceData, 1)
+             };
+            _elementSize = 44;
+            _instanceSize = 64;
+        }
+
+        public ParticleVertexPositionNormalColor(Vector3 position, Vector3 normal, Color color)
+        {
+            Position = new Vector4(position, 1.0f);
+            Normal = normal;
+            Color = color.ToVector4();
+        }
+    }  
+    
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct ParticleInstanceVertexData
     {
         public Matrix Matrix;
-        public Vector2 AlphaMapCoord;
-        public Vector2 LightMapCoord;
-        public Vector2 ColorMapCoord;
         public static int SizeInBytes
         {
             //Matrix.SizeInBytes + Vector2.SizeInBytes * 3
-            get { return 88; }
+            get {return Matrix.SizeInBytes; }
         }
-    }
+    }  
 
-    /// <summary>
-    /// </summary>
-    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct ParticleVertex
-    {
-        public Vector4 Position;
-        public Vector3 Normal;
-        public Vector2 TextureCoord;
-        public Vector2 TransparencyCoord;
-        public Vector2 LightMapCoord;
-        public Vector2 ColorMapCoord;
-       
-        private static InputElement[] _inputElements = null;
-        private static int _elementSize = 0;
-        public static InputElement[] InputElements { get { return _inputElements; } }
-        public static int ElementSize { get { return _elementSize; } }
-
-        static ParticleVertex()
-        {
-            _inputElements = new InputElement[]
-             {
-                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
-                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0),
-                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 28, 0),
-                 new InputElement("TEXCOORD", 1, Format.R32G32_Float, 36, 0),
-                 new InputElement("TEXCOORD", 2, Format.R32G32_Float, 44, 0),
-                 new InputElement("TEXCOORD", 3, Format.R32G32_Float, 52, 0)
-             };
-            _elementSize = 60;
-        }       
-    }
 }

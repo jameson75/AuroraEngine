@@ -124,6 +124,7 @@
     <Compile Include="Kinetics\Solver.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
+    <Compile Include="Services\IPerformanceService.cs" />
     <Compile Include="UI\Animation\UIAnimationBuilder.cs" />
     <Compile Include="UI\Animation\UIContentAnimationController.cs" />
     <Compile Include="UI\Controls\AlertBox.cs" />

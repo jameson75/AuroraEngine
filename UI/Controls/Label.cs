@@ -53,7 +53,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             return label;
         }
 
-        public TextContent Text
+        public TextContent TextContent
         {
             get
             {
@@ -70,7 +70,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public ColorContent Background
+        public ColorContent BackgroundContent
         {
             get
             {
@@ -89,11 +89,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnDraw(GameTime gameTime)
         {          
-            if (Background != null)
-                Background.Draw(gameTime);
+            if (BackgroundContent != null)
+                BackgroundContent.Draw(gameTime);
             
-            if(Text != null)
-                Text.Draw(gameTime);
+            if(TextContent != null)
+                TextContent.Draw(gameTime);
             
             base.OnDraw(gameTime);
         }
@@ -105,7 +105,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 throw new ArgumentException("template was not of type LabelTemplate");
 
             if (labelTemplate.CaptionStyle != null)
-                Text.ApplyStyle(labelTemplate.CaptionStyle);
+                TextContent.ApplyStyle(labelTemplate.CaptionStyle);
 
             if (labelTemplate.BackgroundColor != null)
                 _backgroundContent.ApplyStyle(labelTemplate.BackgroundColor);
@@ -115,8 +115,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public void SizeToContent()
         {            
-            if (Text != null)
-                this.Size = Text.CalculateSmallestBoundingRect().Size();
+            if (TextContent != null)
+                this.Size = TextContent.CalculateSmallestBoundingRect().Size();
             else
                 this.Size = DrawingSizeFExtension.Zero;
         }

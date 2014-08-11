@@ -48,11 +48,14 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// </summary>
         public bool SmoothingEnabled { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public float Distance
         {
             get
             {
-                if (_approximateSegmentLengths != null)
+                if (_approximateSegmentLengths == null)
                     throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
                 return _approximateSegmentLengths.Sum();
             }
