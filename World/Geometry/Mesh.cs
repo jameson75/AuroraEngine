@@ -104,7 +104,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                _vertexCount = data.Length;
             else
                _instanceCount = data.Length;
-        }    
+        }     
 
         public void Draw(GameTime gameTime)
         {
@@ -148,7 +148,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     _device.ImmediateContext.InputAssembler.SetIndexBuffer(_indexBuffer, indexBufferFormat, 0);
                     _device.ImmediateContext.DrawIndexedInstanced(_indexCount, _instanceCount, 0, 0, 0);
                 }
-            }
+            }           
         }
     }
 

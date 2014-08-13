@@ -51,15 +51,15 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// 
         /// </summary>
         public ITransformable TransformableParent { get; set; }
-
+      
         /// <summary>
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
-        {
+        {            
             foreach (Form item in _items)
-                item.Draw(gameTime);
+                item.Draw(gameTime);          
         }
 
         /// <summary>
@@ -224,9 +224,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 foreach(Form item in sectionInstance.Section.Items)
                 {
                     item.ElementEffect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
-                    item.ElementEffect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;    
-                    _track.Draw(gameTime);
+                    item.ElementEffect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;                        
                 }
+            _track.Draw(gameTime);
 
             base.Draw(gameTime);
         }

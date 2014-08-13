@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.Content
             
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             ParticleInstanceVertexData[] instanceData = new ParticleInstanceVertexData[maxInstances];
-            return BuildInstancedMesh<ParticleVertexPositionNormalColor, ParticleInstanceVertexData>(game, shaderByteCode, verts, indices, ParticleVertexPositionNormalColor.InputElements, ParticleVertexPositionNormalColor.ElementSize, instanceData, ParticleInstanceVertexData.SizeInBytes);
+            return BuildDynamicInstancedMesh<ParticleVertexPositionNormalColor, ParticleInstanceVertexData>(game, shaderByteCode, verts, indices, indices.Length, ParticleVertexPositionNormalColor.InputElements, ParticleVertexPositionNormalColor.ElementSize, instanceData, instanceData.Length, ParticleInstanceVertexData.SizeInBytes);
         }
 
         public static Mesh BuildBasicTexturedQuad(Device game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)

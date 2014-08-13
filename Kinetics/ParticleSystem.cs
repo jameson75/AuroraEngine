@@ -99,19 +99,30 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         protected virtual void OnParticlesReset()
         {
             _particles.ForEach(p => p.TransformableParent = null);
-        }    
+        }
 
+
+        static long nCalls = 0;
         public virtual void Draw(GameTime gameTime)
         {
-            var particleGroupings = _particles.GroupBy(p => p.Description);
-            foreach (IGrouping<ParticleDescription, Particle> particleGrouping in particleGroupings)
+           // var particleGroupings = _particles.GroupBy(p => p.Description);
+
+            //foreach (IGrouping<ParticleDescription, Particle> particleGrouping in particleGroupings)
             {
-                if (particleGrouping.Key.Mesh.IsInstanced)
-                    DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());               
-                else
-                    DrawParticles(gameTime, particleGrouping.ToArray());
+                long callTime = Environment.TickCount;
+               // if (particleGrouping.Key.Mesh.IsInstanced)
+               //     DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());
+               // else
+                //    DrawParticles(gameTime, particleGrouping.ToArray());
+                DrawParticles(gameTime, _particles);
+                if (nCalls % 1000 == 0)
+                {
+                    long tickCount = Environment.TickCount;
+                    System.Diagnostics.Trace.WriteLine(string.Format("Particle Draw Count: {0}", nCalls));
+                }
+                nCalls++;
             }
-        }     
+        }
 
         private void DrawInstancedParticles(GameTime gameTime, Mesh instanceMesh, Effect instanceEffect, IEnumerable<Particle> particles)
         {
@@ -131,6 +142,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 instanceMesh.Draw(gameTime);
             }
         }
+       
 
         private void DrawParticles(GameTime gameTime, IEnumerable<Particle> particles)
         {
@@ -139,9 +151,9 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 if (p.IsVisible)
                 {
                     p.Description.Effect.World = p.WorldTransform().ToMatrix();
-                    p.Description.Effect.Apply();
+                    p.Description.Effect.Apply();                   
                     p.Description.Mesh.Draw(gameTime);
-                }
+                }             
             }
         }
     }
