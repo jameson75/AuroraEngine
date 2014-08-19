@@ -100,31 +100,20 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         {
             _particles.ForEach(p => p.TransformableParent = null);
         }
-
-
-        static long nCalls = 0;
+       
         public virtual void Draw(GameTime gameTime)
         {
-           // var particleGroupings = _particles.GroupBy(p => p.Description);
-
-            //foreach (IGrouping<ParticleDescription, Particle> particleGrouping in particleGroupings)
-            {
-                long callTime = Environment.TickCount;
-               // if (particleGrouping.Key.Mesh.IsInstanced)
-               //     DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());
-               // else
-                //    DrawParticles(gameTime, particleGrouping.ToArray());
-                DrawParticles(gameTime, _particles);
-                if (nCalls % 1000 == 0)
-                {
-                    long tickCount = Environment.TickCount;
-                    System.Diagnostics.Trace.WriteLine(string.Format("Particle Draw Count: {0}", nCalls));
-                }
-                nCalls++;
+            var particleGroupings = _particles.GroupBy(p => p.Description);
+            foreach (IGrouping<ParticleDescription, Particle> particleGrouping in particleGroupings)
+            {                
+                if (particleGrouping.Key.Mesh.IsInstanced)
+                    DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());
+                else
+                    DrawParticles(gameTime, particleGrouping.ToArray());                               
             }
         }
 
-        private void DrawInstancedParticles(GameTime gameTime, Mesh instanceMesh, Effect instanceEffect, IEnumerable<Particle> particles)
+        private void DrawInstancedParticles(GameTime gameTime, Mesh instanceMesh, SurfaceEffect instanceEffect, IEnumerable<Particle> particles)
         {
             if (instanceMesh.IsInstanced == false || instanceMesh.IsDynamic == false)
                 throw new InvalidOperationException("Particle mesh is not both dynamic and instanced.");
@@ -135,9 +124,10 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 IEnumerable<ParticleInstanceVertexData> instanceData = particles.Where(p => p.IsVisible)
                                                                                 .Select( p => new ParticleInstanceVertexData() 
                                                                                 {
-                                                                                   Matrix = p.WorldTransform().ToMatrix()                                                                                  
+                                                                                   Matrix = Matrix.Transpose(p.Transform.ToMatrix())
                                                                                 });
                 instanceMesh.UpdateVertexStream<ParticleInstanceVertexData>(instanceData.ToArray());
+                instanceEffect.World = this.WorldTransform().ToMatrix();
                 instanceEffect.Apply();
                 instanceMesh.Draw(gameTime);
             }

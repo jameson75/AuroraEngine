@@ -160,7 +160,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// 
         /// </summary>
         public ITransformable TransformableParent { get; set; }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ITransformable FrameOfAction { get; set; }
+
         /// <summary>
         /// 
         /// </summary>

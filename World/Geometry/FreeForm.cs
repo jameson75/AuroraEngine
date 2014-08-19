@@ -196,7 +196,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             GridForm gridForm = (GridForm)form;
             Vector3 renderedGridSize = gridForm.CalculateRenderedSize();
             Vector3 gridDimension = gridForm.Dimensions;
-            ReadOnlyCollection<FormNode> elements = gridForm.Nodes;
+            //ReadOnlyCollection<FormNode> elements = gridForm.Nodes;
+            ReadOnlyCollection<Particle> elements = gridForm.Particles;
             float rowOffset = -0.5f * renderedGridSize.X;
             float heightOffset = -0.5f * renderedGridSize.Y;
             for (int i = 0; i < gridDimension.Z; i++)

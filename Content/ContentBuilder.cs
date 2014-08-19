@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.Content
             
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             ParticleInstanceVertexData[] instanceData = new ParticleInstanceVertexData[maxInstances];
-            return BuildDynamicInstancedMesh<ParticleVertexPositionNormalColor, ParticleInstanceVertexData>(game, shaderByteCode, verts, indices, indices.Length, ParticleVertexPositionNormalColor.InputElements, ParticleVertexPositionNormalColor.ElementSize, instanceData, instanceData.Length, ParticleInstanceVertexData.SizeInBytes);
+            return BuildDynamicInstancedMesh<ParticleVertexPositionNormalColor, ParticleInstanceVertexData>(game, shaderByteCode, verts, indices, indices.Length, ParticleVertexPositionNormalColor.InputElements, ParticleVertexPositionNormalColor.ElementSize, instanceData, instanceData.Length, ParticleInstanceVertexData.SizeInBytes, boundingBox);
         }
 
         public static Mesh BuildBasicTexturedQuad(Device game, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
@@ -981,7 +981,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
         public static Mesh BuildDynamicInstancedMesh<Tv, Ti>(Device device, byte[] shaderByteCode, Tv[] verts, short[] indices,
             int maxIndices, InputElement[] vertexInputElements, int vertexSize, Ti[] instances, int maxInstances,
-            int instanceSize)
+            int instanceSize, BoundingBox boundingBox)
             where Ti : struct
             where Tv : struct
         {
@@ -1011,7 +1011,7 @@ namespace CipherPark.AngelJacket.Core.Content
             BufferDescription instanceBufferDesc = new BufferDescription();
             instanceBufferDesc.BindFlags = BindFlags.VertexBuffer;
             instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
-            instanceBufferDesc.SizeInBytes = maxInstances * instances.Length;
+            instanceBufferDesc.SizeInBytes = instanceSize * maxInstances;
             instanceBufferDesc.OptionFlags = ResourceOptionFlags.None;
             instanceBufferDesc.Usage = ResourceUsage.Dynamic;
             instanceBufferDesc.StructureByteStride = 0;
@@ -1035,6 +1035,8 @@ namespace CipherPark.AngelJacket.Core.Content
             }
 
             meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            meshDesc.BoundingBox = boundingBox;
+
             return new Mesh(device, meshDesc);
         }
         #endregion

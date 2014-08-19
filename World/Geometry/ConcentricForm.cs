@@ -52,7 +52,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             float step = ElementCount != 0 ? MathUtil.TwoPi / ElementCount : 0;
             float angle = MathUtil.PiOverTwo;
             //foreach (Particle element in Particles)
-            foreach(FormNode element in Nodes)
+            foreach(Particle element in Particles)
             {
                 Matrix rotation = Matrix.RotationY(angle);
                 Matrix translation = Matrix.Translation(new Vector3(0, 0, _radius));

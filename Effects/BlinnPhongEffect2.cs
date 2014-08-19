@@ -259,7 +259,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Write EnableVertexColor
             //-----------------------
             offset += sizeof(Int32); //A bool in HLSL is 32 bytes.
-            dataBuffer.Set(offset, _shader.VertexType == BlinnPhongShaderVertexType.PositionNormalColor);
+            dataBuffer.Set(offset, _shader.VertexType == BlinnPhongShaderVertexType.PositionNormalColor ||
+                                   _shader.VertexType == BlinnPhongShaderVertexType.ParticlePositionNormalColor);
             
             GraphicsDevice.ImmediateContext.UnmapSubresource(_pixelConstantsBuffer, 0);
         }
@@ -326,6 +327,9 @@ namespace CipherPark.AngelJacket.Core.Effects
                 case BlinnPhongShaderVertexType.PositionNormalColor:
                     _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\blinnphong2-pnc-vs.cso", out _vertexShader);
                     break;
+                case BlinnPhongShaderVertexType.ParticlePositionNormalColor:
+                    _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\blinnphong2-p-pnc-vs.cso", out _vertexShader);
+                    break;
             }
             LoadPixelShader("Content\\Shaders\\blinnphong2-ps.cso", out _pixelShader);
         }
@@ -364,7 +368,8 @@ namespace CipherPark.AngelJacket.Core.Effects
         Skin,
         PositionNormalTexture,
         PositionNormalTextureAlpha,
-        PositionNormalColor
+        PositionNormalColor,
+        ParticlePositionNormalColor
     }
 }
 

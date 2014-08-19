@@ -45,12 +45,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 if(targetRow > form.RowClipRange.Value.Max)
                 {
                     form.RowClipRange = new Range(targetRow - MaxGridRows + 1, targetRow);
-                    List<Particle> targetRowParticles = form.GetRowParticles(targetRow);
+                    List<Particle> targetRowParticles = form.GetRowParticles(targetRow);                  
                     foreach (Particle particle in targetRowParticles)
                     {
                         TransformAnimation animation = new TransformAnimation();
                         animation.SetKeyFrame(new AnimationKeyFrame(0, new Transform(particle.Transform.Rotation, particle.Transform.Translation + new Vector3(-800, 0, 0))));
-                        animation.SetKeyFrame(new AnimationKeyFrame(300, Transform.Identity));
+                        animation.SetKeyFrame(new AnimationKeyFrame(300, particle.Transform));
                         KeyframeAnimationController animationController = new KeyframeAnimationController();
                         animationController.Animation = animation;
                         animationController.Target = particle;

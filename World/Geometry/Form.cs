@@ -19,7 +19,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     {      
         private Emitter _elementEmitter = null;
         private ParticleDescription _elementDescription = null;
-        private List<FormNode> _nodes = new List<FormNode>();
+        //private List<FormNode> _nodes = new List<FormNode>();
 
         protected Form(IGameApp game)
             : base(game)
@@ -30,8 +30,10 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Emitters.Add(_elementEmitter);
         }
 
+        /*
         public ReadOnlyCollection<FormNode> Nodes 
         { get { return _nodes.ToList().AsReadOnly(); } }
+        */
 
         public Mesh ElementMesh
         {
@@ -89,6 +91,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         protected virtual void OnEffectChanged() { }
 
+        /*
         protected override void OnParticlesAdded(IEnumerable<Particle> particles)
         {
             foreach (Particle p in particles)
@@ -114,6 +117,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _nodes.Clear();
             base.OnParticlesReset();
         }
+         */
     }
 
     public class FormNode : ITransformable

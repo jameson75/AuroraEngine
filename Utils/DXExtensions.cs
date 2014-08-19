@@ -314,6 +314,16 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    public static class QuaternionExtension
+    {
+        public static void GetYawPitchRoll(this Quaternion q, out float yaw, out float pitch, out float roll)
+        {
+            yaw = (float)Math.Atan2(2.0 * (q.Y * q.Z + q.W * q.X), q.W * q.W - q.X * q.X - q.Y * q.Y + q.Z * q.Z);
+            pitch = (float)Math.Asin(-2.0 * (q.X * q.Z - q.W * q.Y));
+            roll = (float)Math.Atan2(2.0 * (q.X * q.Y + q.W * q.Z), q.W * q.W + q.X * q.X - q.Y * q.Y - q.Z * q.Z);
+        }
+    }
+
     public static class MathUtilExtension
     {
         public static short Clamp(short value, short min, short max)
