@@ -25,8 +25,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public IGameApp Game { get { return _game; } }    
         public List<IAnimationController> AnimationControllers { get { return _animationControllers; } }
-        public WorldSimulatorSettings Settings { get; set; }
-
+        
         public WorldSimulator(IGameApp game)
         {
             _game = game;
@@ -58,13 +57,7 @@ namespace CipherPark.AngelJacket.Core.World
             foreach (SceneNode childNode in node.Children)
                 SimulatePhysics(childNode);
         }
-    }
-
-    public class WorldSimulatorSettings
-    {
-
-        
-    }
+    }  
 
     public struct SimulationContext
     {
