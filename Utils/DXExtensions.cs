@@ -363,23 +363,62 @@ namespace CipherPark.AngelJacket.Core.Utils
             roll *= 0.5f;
 
             // Assuming the angles are in radians.
-            float c1 = (float)Math.Cos(yaw);
-            float s1 = (float)Math.Sin(yaw);
-            float c2 = (float)Math.Cos(pitch);
-            float s2 = (float)Math.Sin(pitch);
-            float c3 = (float)Math.Cos(roll);
-            float s3 = (float)Math.Sin(roll);
-            float c1c2 = c1 * c2;
-            float s1s2 = s1 * s2;
+            float cy = (float)Math.Cos(yaw);
+            float sy = (float)Math.Sin(yaw);
+            float cp = (float)Math.Cos(pitch);
+            float sp = (float)Math.Sin(pitch);
+            float cr = (float)Math.Cos(roll);
+            float sr = (float)Math.Sin(roll);
+            float cycp = cy * cp;
+            float sysp = sy * sp;
 
             Quaternion quaternion = new Quaternion();
-            quaternion.W = c1c2 * c3 - s1s2 * s3;
-            quaternion.X = c1c2 * s3 + s1s2 * c3;
-            quaternion.Y = s1 * c2 * c3 + c1 * s2 * s3;
-            quaternion.Z = c1 * s2 * c3 - s1 * c2 * s3;
+            quaternion.W = cycp * cr - sysp * sr;
+            quaternion.X = cycp * sr + sysp * cr;
+            quaternion.Y = sy * cp * cr + cy * sp * sr;
+            quaternion.Z = cy * sp * cr - sy * cp * sr;
 
             return quaternion;
         }
+
+        public static void GetYawPitchRoll3(this Quaternion q, out float yaw, out float pitch, out float roll)
+        {
+            Vector3 v = Vector3.Zero;
+
+            v.X = (float)Math.Atan2
+            (
+                2 * q.Y * q.W - 2 * q.X * q.Z,
+                   1 - 2 * Math.Pow(q.Y, 2) - 2 * Math.Pow(q.Z, 2)
+            );
+
+            v.Z = (float)Math.Asin
+            (
+                2 * q.X * q.Y + 2 * q.Z * q.W
+            );
+
+            v.Y = (float)Math.Atan2
+            (
+                2 * q.X * q.W - 2 * q.Y * q.Z,
+                1 - 2 * Math.Pow(q.X, 2) - 2 * Math.Pow(q.Z, 2)
+            );
+
+            if (q.X * q.Y + q.Z * q.W == 0.5)
+            {
+                v.X = (float)(2 * Math.Atan2(q.X, q.W));
+                v.Y = 0;
+            }
+
+            else if (q.X * q.Y + q.Z * q.W == -0.5)
+            {
+                v.X = (float)(-2 * Math.Atan2(q.X, q.W));
+                v.Y = 0;
+            }
+
+            yaw = v.X;
+            pitch = v.Y;
+            roll = v.Z;
+        }   
+
     }
 
     public static class MathUtilExtension
