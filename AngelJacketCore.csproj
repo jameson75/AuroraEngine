@@ -79,6 +79,7 @@
     <Compile Include="Animation\Vector3Animation.cs" />
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
+    <Compile Include="Effects\Light.cs" />
     <Compile Include="Effects\Obsolete\CookTorrenceEffect.cs" />
     <Compile Include="Effects\EffectPass.cs" />
     <Compile Include="Effects\FlexboardEffect.cs" />
@@ -89,7 +90,6 @@
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
     <Compile Include="Effects\Obsolete\SSAOPostEffect.cs" />
     <Compile Include="GameTime.cs" />
-    <Compile Include="Kinetics\Animation\ParticleAnimationBuilder.cs" />
     <Compile Include="Animation\Controllers\AnimationController.cs" />
     <Compile Include="Animation\AnimationInterpolationPoint.cs" />
     <Compile Include="Animation\AnimationKeyFrame.cs" />
@@ -224,7 +224,6 @@
     <Compile Include="Kinetics\Emitter.cs" />
     <Compile Include="World\Geometry\Track.cs" />
     <Compile Include="World\ISprite.cs" />
-    <Compile Include="World\Renderers\ParticleRenderer.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />
     <Compile Include="World\Geometry\ReferenceGrid.cs" />

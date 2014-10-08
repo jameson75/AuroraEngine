@@ -7,7 +7,6 @@ using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.Kinetics;
 using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.World.Renderers;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -209,22 +208,36 @@ namespace CipherPark.AngelJacket.Core.Animation
     public class ParticleSystemController : AnimationController
     {       
         private long? _animationStartTime = null;
-        
+        private long? _lastEmissionTime = null;
+
         public ParticleSystem System { get; set; }
 
         public ParticleSolver Solver { get; set; }
 
+        public int EmissionRate { get; set; }
+
         public override void Reset() 
         {
-            Solver.Reset();
+            if( Solver != null )
+                Solver.Reset();
         }
 
         public override void UpdateAnimation(GameTime gameTime)
         {
             if (_animationStartTime == null)
-                _animationStartTime = gameTime.GetTotalSimtime();                   
+                _animationStartTime = gameTime.GetTotalSimtime();
+
+            if (_lastEmissionTime == null)
+                _lastEmissionTime = gameTime.GetTotalSimtime();
+
+            if (gameTime.GetTotalSimtime() - _lastEmissionTime > EmissionRate)
+            {
+                for (int i = 0; i < System.Emitters.Count; i++)
+                    System.Emit(i);
+            }
           
-            Solver.Step(gameTime, System);          
+            if( Solver != null )
+                Solver.Step(gameTime, System);          
         }
     }       
 }

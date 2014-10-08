@@ -5,7 +5,6 @@ using SharpDX.XAudio2;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core;
 using CipherPark.AngelJacket.Core.World;
-using CipherPark.AngelJacket.Core.World.Renderers;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Animation;

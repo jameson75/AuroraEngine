@@ -314,6 +314,14 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    public static class Vector4Extension
+    {
+        public static Vector3 ToVector3(this Vector4 v)
+        {
+            return new Vector3(v.X, v.Y, v.Z);
+        }
+    }
+
     public static class QuaternionExtension
     {
         public static void GetYawPitchRoll(this Quaternion q, out float yaw, out float pitch, out float roll)

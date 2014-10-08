@@ -9,7 +9,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
-using CipherPark.AngelJacket.Core.World.Renderers;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 

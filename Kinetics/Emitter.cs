@@ -75,7 +75,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             Random randomGen = new Random();
             List<Particle> pList = new List<Particle>();            
             int birthCount = (count != 0) ? count : (this.BirthRateRandomness == 0) ? this.BirthRate : 
-                randomGen.Next(this.BirthRate, this.BirthRateRandomness);                
+                this.BirthRate + randomGen.Next(this.BirthRateRandomness);                
             for (int i = 0; i < birthCount; i++)
             {
                 ulong randomLife = (this.LifeRandomness == 0) ? this.Life :

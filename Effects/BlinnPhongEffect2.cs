@@ -7,6 +7,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -35,7 +36,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private Vector3[] _lampDirPosArray = new Vector3[MaxLights];
         private Color[] _lampColorArray = new Color[MaxLights];
-        public BlinnPhongLightType[] _lightTypes = new BlinnPhongLightType[8];
+        public BlinnPhongLampType[] _lampTypes = new BlinnPhongLampType[8];
         public SamplerState _textureSamplerState = null;
         public SamplerState _alphaSamplerState = null;
 
@@ -62,7 +63,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public Color[] LampColorArray { get { return _lampColorArray; } }
 
-        public BlinnPhongLightType[] LightTypes { get { return _lightTypes; } }
+        public BlinnPhongLampType[] LightTypes { get { return _lampTypes; } }
 
         public int FirstActiveLightsCount { get; set; }
 
@@ -83,6 +84,8 @@ namespace CipherPark.AngelJacket.Core.Effects
         public ShaderResourceView Texture { get; set; }
 
         public ShaderResourceView AlphaMap { get; set; }
+
+        public Light[] Lighting { get; set; }
 
         public BlinnPhongEffect2(BlinnPhongShader shader)
             : base(shader.Game)
@@ -109,6 +112,11 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public override void Apply()
         {           
+            //Setup Dynamic Lighting if specified.
+            //------------------------------------
+            if (Lighting != null)
+                SetupLights(Lighting);
+
             //Setup Constants
             //---------------
             if (_shader.VertexType == BlinnPhongShaderVertexType.Skin)
@@ -160,6 +168,38 @@ namespace CipherPark.AngelJacket.Core.Effects
         public override byte[] SelectShaderByteCode()
         {
             return _shader.VertexShaderByteCode;
+        }
+
+        public void SetupLights(Light[] lights)
+        {
+            FirstActiveLightsCount = lights.Length;
+            for (int i = 0; i < MaxLights; i++)
+            {
+                if (i < lights.Length)
+                {
+                    _lampColorArray[i] = lights[i].Diffuse;
+                    if (lights[i] is PointLight)
+                    {
+                        PointLight light = (PointLight)lights[i];
+                        _lampDirPosArray[i] = light.WorldTransform().Translation;
+                        _lampTypes[i] = BlinnPhongLampType.Point;
+                    }
+                    else if (lights[i] is DirectionalLight)
+                    {
+                        DirectionalLight light = (DirectionalLight)lights[i];
+                        _lampDirPosArray[i] = light.Direction;
+                        _lampTypes[i] = BlinnPhongLampType.Directional;
+                    }
+                    else
+                        throw new ArgumentException("Unexepcted light type");
+                }
+                else
+                {
+                    _lampDirPosArray[i] = Vector3.Zero;
+                    _lampColorArray[i] = Color.Zero;
+                    _lampTypes[i] = BlinnPhongLampType.Default;
+                }
+            }
         }
 
         private void WriteVertexConstantsSkin()
@@ -249,7 +289,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //----------------------
             offset += sizeof(float) * 3;
             for(int i = 0; i < MaxLights; i++)
-                dataBuffer.Set(offset + (i * Vector4.SizeInBytes), new Vector4(LampDirPosArray[i], (float)BlinnPhongLightType.Point));
+                dataBuffer.Set(offset + (i * Vector4.SizeInBytes), new Vector4(LampDirPosArray[i], (float)BlinnPhongLampType.Point));
                      
             //Write EnableAlphaMap
             //--------------------
@@ -298,10 +338,11 @@ namespace CipherPark.AngelJacket.Core.Effects
         }
     }
 
-    public enum BlinnPhongLightType
+    public enum BlinnPhongLampType
     {
         Directional = 0,
-        Point = 1
+        Point = 1,
+        Default = Directional,
     }
 
     public class BlinnPhongShader
