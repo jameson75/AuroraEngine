@@ -74,7 +74,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Animation\Controllers\ReactionController.cs" />
+    <Compile Include="Animation\Controllers\CompositeAnimationController.cs" />
+    <Compile Include="Animation\Controllers\KeyframeAnimationController.cs" />
+    <Compile Include="Animation\Controllers\ParticleSystemController.cs" />
+    <Compile Include="Animation\Controllers\RigidBodyAnimationController.cs" />
     <Compile Include="Animation\SpatialAnimation.cs" />
     <Compile Include="Animation\Vector3Animation.cs" />
     <Compile Include="Effects\BlinnPhongEffect.cs" />
@@ -120,6 +123,7 @@
     <Compile Include="Effects\SkysphereEffect.cs" />
     <Compile Include="Kinetics\Force.cs" />
     <Compile Include="Kinetics\Particle.cs" />
+    <Compile Include="Kinetics\ParticleKeyframeSolver.cs" />
     <Compile Include="Kinetics\ParticleSystem.cs" />
     <Compile Include="Kinetics\Solver.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
@@ -212,12 +216,13 @@
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="Animation\Animation.cs" />
-    <Compile Include="World\Geometry\Deformer.cs" />
+    <Compile Include="World\Geometry\Modifiers\StackGridModifier.cs" />
     <Compile Include="World\Geometry\Form.cs" />
-    <Compile Include="World\Geometry\FreeForm.cs" />
+    <Compile Include="World\Geometry\Modifiers\PathGridModifier.cs" />
     <Compile Include="World\Geometry\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
+    <Compile Include="World\Geometry\Path.cs" />
     <Compile Include="World\Geometry\RiggedModel.cs" />
     <Compile Include="World\Geometry\ConcentricForm.cs" />
     <Compile Include="Kinetics\IRigidBody.cs" />

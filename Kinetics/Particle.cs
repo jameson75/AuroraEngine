@@ -39,8 +39,8 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     }
 
     public class ParticleInstanceData
-    {
-        public Vector2 AlphaMapCoord { get; set; }
+    {        
+        public Vector3 DirectionalBlur { get; set; }
     }
 
     /// <summary>

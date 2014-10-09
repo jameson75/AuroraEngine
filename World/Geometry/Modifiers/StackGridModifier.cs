@@ -8,6 +8,7 @@ using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
 
@@ -19,14 +20,14 @@ using CipherPark.AngelJacket.Core.Kinetics;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.AngelJacket.Core.World.Geometry.Modifiers
 {
-    public class GridStackSolver : ParticleKeyframeSolver
+    public class StackGridModifier : ParticleKeyframeSolver
     {
         public ITransformable TrackedNode { get; set; }
         public int MaxGridRows { get; set; }
 
-        public GridStackSolver()
+        public StackGridModifier()
         { }
 
         public override void Step(GameTime gameTime, ParticleSystem system)

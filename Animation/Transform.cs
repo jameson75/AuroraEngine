@@ -88,6 +88,33 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// </summary>
     public static class TransformableExtension
     {
+
+        public static Vector3 LocalToWorld(this ITransformable transformable, Vector3 normal)
+        {
+            MatrixStack stack = new MatrixStack();
+            stack.Push(transformable.Transform.ToMatrix());
+            ITransformable node = transformable.TransformableParent;
+            while (node != null)
+            {
+                stack.Push(node.Transform.ToMatrix());
+                node = node.TransformableParent;
+            }
+            return Vector3.TransformNormal(normal, stack.Transform);
+        }
+
+        public static Vector3 WorldToLocal(this ITransformable transformable, Vector3 normal)
+        {
+            MatrixStack stack = new MatrixStack();
+            stack.Push(Matrix.Invert(transformable.Transform.ToMatrix()));
+            ITransformable node = transformable.TransformableParent;
+            while (node != null)
+            {
+                stack.Push(Matrix.Invert(node.Transform.ToMatrix()));
+                node = node.TransformableParent;
+            }
+            return Vector3.TransformNormal(normal, stack.ReverseTransform);
+        }
+
         public static Matrix LocalToWorld(this ITransformable transformable, Matrix localTransform)
         {
             MatrixStack stack = new MatrixStack();
