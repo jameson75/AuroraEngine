@@ -37,6 +37,11 @@ namespace CipherPark.AngelJacket.Core.World.Geometry.Modifiers
         public PathGridModifier()            
         { }
 
+        public override void Reset()
+        {
+            //throw new NotImplementedException();
+        }
+
         public override void Step(GameTime time, ParticleSystem system)
         { 
             //In an effort to replace the Deform() method, which behaved as a one-time call.

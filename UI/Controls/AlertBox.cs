@@ -7,6 +7,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.UI.Animation;
+using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
