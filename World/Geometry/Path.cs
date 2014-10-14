@@ -66,8 +66,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// Generates and stores the linear-approximate length of each curve segment.
         /// </summary>
         /// <param name="nSamplesPerSegment"></param>
+        /// <param name="iFirstNode">Index of the first node to start generating the approximation.</param>
         /// <returns></returns>
-        public void GenerateLinearApproximation(int nSamplesPerSegment = 16)
+        public void GenerateLinearApproximation(int nSamplesPerSegment = 16, int iFirstNode = 0)
         {
             if (nSamplesPerSegment <= 0)
                 throw new ArgumentOutOfRangeException("nSamplesPerSegment must be a positive, non-zero integer");
@@ -77,7 +78,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             if (SmoothingEnabled)
             {
                 float stepSize = 1.0f / nSamplesPerSegment;
-                for (int i = 1; i < _nodes.Count; i++)
+                for (int i = iFirstNode; i < _nodes.Count; i++)
                 {
                     PathNode n1 = _nodes[i - 1];
                     PathNode n2 = _nodes[i];

@@ -242,6 +242,7 @@
     <Compile Include="Sandbox\TestEffect.cs" />
     <Compile Include="World\Scene\SceneNodeEffector.cs" />
     <Compile Include="World\Sprite.cs" />
+    <Compile Include="World\TrackingObject.cs" />
     <Compile Include="World\Weapon.cs" />
     <Compile Include="World\WorldSimulator.cs" />
   </ItemGroup>

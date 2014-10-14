@@ -124,7 +124,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 IEnumerable<ParticleInstanceVertexData> instanceData = particles.Where(p => p.IsVisible)
                                                                                 .Select( p => new ParticleInstanceVertexData() 
                                                                                 {
-                                                                                   Matrix = Matrix.Transpose(p.Transform.ToMatrix())
+                                                                                   Matrix = Matrix.Transpose(p.Transform.ToMatrix())                                                                                   
                                                                                 });
                 instanceMesh.UpdateVertexStream<ParticleInstanceVertexData>(instanceData.ToArray());
                 instanceEffect.World = this.WorldTransform().ToMatrix();
