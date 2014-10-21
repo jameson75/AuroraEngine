@@ -83,6 +83,7 @@
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\Light.cs" />
+    <Compile Include="Effects\LineEffect.cs" />
     <Compile Include="Effects\Obsolete\CookTorrenceEffect.cs" />
     <Compile Include="Effects\EffectPass.cs" />
     <Compile Include="Effects\FlexboardEffect.cs" />
@@ -229,6 +230,7 @@
     <Compile Include="Kinetics\Emitter.cs" />
     <Compile Include="World\Geometry\Track.cs" />
     <Compile Include="World\ISprite.cs" />
+    <Compile Include="World\LineRenderer.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />
     <Compile Include="World\Geometry\ReferenceGrid.cs" />
