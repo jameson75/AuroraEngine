@@ -18,20 +18,17 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.Effects
 {
-    public class LineEffect : SurfaceEffect
+    public class StreakEffect : SurfaceEffect
     {
         private VertexShader _vertexShader = null;
-        private VertexShader _ivertexShader = null;
         private PixelShader _pixelShader = null;
         private byte[] _vertexShaderByteCode = null;
-        private byte[] _ivertexShaderByteCode = null;
         private SharpDX.Direct3D11.Buffer _constantBuffer = null;
 
-        public bool IsBillboardInstanced { get; set; }
         public Color ForegroundColor { get; set; }
         public Color BackgroundColor { get; set; }
 
-        public LineEffect(IGameApp game)
+        public StreakEffect(IGameApp game)
             : base(game)
         {
             ForegroundColor = Color.Transparent;
@@ -40,13 +37,10 @@ namespace CipherPark.AngelJacket.Core.Effects
             View = Matrix.Identity;
             Projection = Matrix.Identity;
 
-            string psFileName = "Content\\Shaders\\billboard-ps.cso";
-            string vsFileName = "Content\\Shaders\\billboard-vs.cso";
-            string ivsFileName = "Content\\Shaders\\billboard-i-vs.cso";
+            string psFileName = "Content\\Shaders\\flexboard-ps.cso";
+            string vsFileName = "Content\\Shaders\\flexboard-vs.cso";      
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
-            _ivertexShaderByteCode = System.IO.File.ReadAllBytes(ivsFileName);
             _vertexShader = new VertexShader(Game.GraphicsDevice, _vertexShaderByteCode);
-            _ivertexShader = new VertexShader(Game.GraphicsDevice, _ivertexShaderByteCode);
             _pixelShader = new PixelShader(Game.GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
             int bufferSize = sizeof(float) * 16 * 3; //size of WorldViewProj + ForegroundColor + BackgroundColor
             _constantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, bufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
@@ -54,11 +48,8 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public override void Apply()
         {
-            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            if (IsBillboardInstanced)
-                Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_ivertexShader);
-            else
-                Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
+            Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);          
+            Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShader);
             SetShaderConstants();
             Game.GraphicsDevice.ImmediateContext.VertexShader.SetConstantBuffer(0, _constantBuffer);
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, _constantBuffer);
@@ -67,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public override byte[] SelectShaderByteCode()
         {
-            return (IsBillboardInstanced) ? _ivertexShaderByteCode : _vertexShaderByteCode;
+            return _vertexShaderByteCode;
         }
 
         private void SetShaderConstants()

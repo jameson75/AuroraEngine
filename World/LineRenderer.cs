@@ -22,78 +22,68 @@ using CipherPark.AngelJacket.Core.Effects;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public class LineRenderer
-    {
-        private Vector3 _p1;
-        private Vector3 _p2;
-        private Vector3[] _allPoints;
-        private LineEffect _effect = null;
-        private Mesh _lineMesh = null;
+    public class StreakRenderer
+    {       
+        private StreakEffect _effect = null;
+        private Mesh _mesh = null;
+        private float _stepSize = 0;
 
-        public LineRenderer(IGameApp game)
+        private StreakRenderer()
+        {}
+        
+        public static StreakRenderer Create(IGameApp game)
         {
-            LineWidth = 10.0f;
-            _p1 = Vector3.Zero;
-            _p2 = Vector3.Zero;
-            _allPoints = new Vector3[] { Vector3.Zero };
-            _effect = new LineEffect(game);
-            _lineMesh = new Mesh(game.GraphicsDevice, new MeshDescription()
-            {
-                
-            });
+            StreakEffect effect = new StreakEffect(game);
+            return new StreakRenderer()
+            {               
+                Width = 10.0f,
+                _stepSize = 10.0f,
+                _effect = effect,
+                _mesh = Content.ContentBuilder.BuildDynamicMesh<FlexboardVertex>(
+                    game.GraphicsDevice,
+                    effect.SelectShaderByteCode(),
+                    null,
+                    1000,
+                    null,
+                    0,
+                    FlexboardVertex.InputElements,
+                    FlexboardVertex.ElementSize,
+                    BoundingBoxExtension.Empty)                
+            };
         }
 
-        public float LineWidth { get; set; }
+        public float Width { get; set; }
 
-        public Vector3 P1
-        {
-            get { return _p1; }
-            set
-            {
-                _p1 = value;
-                OnLengthChanged();
-            }
-        }
+        public float StepSize { get; set; }
 
-        public Vector3 P2
-        {
-            get { return _p2; }
-            set
-            {
-                _p2 = value;
-                OnLengthChanged();
-            }
-        }      
+        public Path Path { get; set; }     
 
         public void Draw()
         {
             const int VERTICES_PER_QUAD = 4;
-            LineVertex[] vertices = new LineVertex[(_allPoints.Length - 1) * VERTICES_PER_QUAD];
+            Vector3[] points = this.Path.ToPoints(StepSize);
+            FlexboardVertex[] vertices = new FlexboardVertex[(points.Length - 1) * VERTICES_PER_QUAD];
             Vector2[] texCoords = Content.ContentBuilder.CreateQuadTextureCoords();
+            float halfWidth = Width / 2.0f;
             Vector2[] offsets = new Vector2[] { new Vector2(halfWidth, 0), 
-                                                new Vector2(halfWidth, stepSize), 
-                                                new Vector2(-halfWdith, stepSize), 
-                                                new Vector2(-halfWidth, 0}; 
-            for (int i = 0; i < _allPoints.Length - 1; i++)
+                                                new Vector2(halfWidth, StepSize), 
+                                                new Vector2(-halfWidth, StepSize), 
+                                                new Vector2(-halfWidth, 0) }; 
+            for (int i = 0; i < points.Length - 1; i++)
             {
-                Vector3 slopeDir = Vector3.Normalize(_allPoints[i+1] - _allPoints[i]);
+                Vector3 slopeDir = Vector3.Normalize(points[i+1] - points[i]);
                 for(int j = 0; j < VERTICES_PER_QUAD; j++)                
-                    vertices[i * VERTICES_PER_QUAD + j] = new LineVertex(_allPoints[i], texCoords[j], offsets[j], slopeDir);                     
+                    vertices[i * VERTICES_PER_QUAD + j] = new FlexboardVertex(points[i], texCoords[j], offsets[j], slopeDir);                     
             }
-            _lineMesh.UpdateVertexStream<LineVertex>(vertices);
-        }
-
-        private void OnLengthChanged()
-        {
-            throw new NotImplementedException();
-        }
+            _mesh.UpdateVertexStream<FlexboardVertex>(vertices);
+        }      
     }
 
     /// <summary>
     /// 
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct LineVertex
+    public struct FlexboardVertex
     {
         private static InputElement[] _inputElements = null;
         private static int _elementSize = 0;
@@ -104,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.World
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
 
-        static LineVertex()
+        static FlexboardVertex()
         {
             _inputElements = new InputElement[]
              {
@@ -115,7 +105,7 @@ namespace CipherPark.AngelJacket.Core.World
             _elementSize = 48;
         }
 
-        public LineVertex(Vector3 position, Vector2 textureCoords, Vector2 offset, Vector3 slopeDir)
+        public FlexboardVertex(Vector3 position, Vector2 textureCoords, Vector2 offset, Vector3 slopeDir)
         {
             Position = new Vector4(position, 1.0f);
             TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, offset.X, offset.Y);

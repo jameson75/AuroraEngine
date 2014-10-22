@@ -29,17 +29,17 @@ namespace CipherPark.AngelJacket.Core.World.Geometry.Modifiers
     }
     */
 
-    public class PathGridModifier : /* Deformer */ ParticleSolver
+    public class PathGridDeformer : /* Deformer */ ParticleSolver
     {
         public Path Path { get; set; }
         public bool _deformed; //TODO: Remove this flag once we've tested one-time only step.
 
-        public PathGridModifier()            
+        public PathGridDeformer()            
         { }
 
         public override void Reset()
         {
-            //throw new NotImplementedException();
+           
         }
 
         public override void Step(GameTime time, ParticleSystem system)

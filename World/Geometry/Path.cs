@@ -68,7 +68,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// <param name="nSamplesPerSegment"></param>
         /// <param name="iFirstNode">Index of the first node to start generating the approximation.</param>
         /// <returns></returns>
-        public void GenerateLinearApproximation(int nSamplesPerSegment = 16, int iFirstNode = 0)
+        public void GenerateLinearApproximation(int nSamplesPerSegment = 16)
         {
             if (nSamplesPerSegment <= 0)
                 throw new ArgumentOutOfRangeException("nSamplesPerSegment must be a positive, non-zero integer");
@@ -78,7 +78,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             if (SmoothingEnabled)
             {
                 float stepSize = 1.0f / nSamplesPerSegment;
-                for (int i = iFirstNode; i < _nodes.Count; i++)
+                for (int i = 0; i < _nodes.Count; i++)
                 {
                     PathNode n1 = _nodes[i - 1];
                     PathNode n2 = _nodes[i];
@@ -169,8 +169,20 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
             return pathNode;
         }
-    }
 
+        public Vector3[] ToPoints(float StepSize, PathNode firstNode = null, PathNode lastNode = null)
+        {
+            List<Vector3> result = new List<Vector3>();
+            float step = 0;
+            while (step < Distance)
+            {
+                result.Add(EvaluateNodeAtDistance(step).Transform.Translation);
+                step += StepSize;
+            }
+            result.Add(EvaluateNodeAtDistance(Distance).Transform.Translation);
+            return result.ToArray();
+        }
+    }
     
     public class PathNode
     {

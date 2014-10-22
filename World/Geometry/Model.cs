@@ -20,7 +20,7 @@ using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Effects;
 //using CoreEffect = CipherPark.AngelJacket.Core.Effects.SurfaceEffect;
 using CipherPark.AngelJacket.Core.Kinetics;
-
+using CipherPark.AngelJacket.Core.Animation.Controllers;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

@@ -21,6 +21,7 @@ using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.AngelJacket.Core.Animation.Controllers;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

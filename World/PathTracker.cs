@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public class TrackingObject : ITransformable
+    public class PathTracker : ITransformable
     {
         private Path _path = null;
 
@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public float PathNodeMinDistance { get; set; }
 
-        public TrackingObject()
+        public PathTracker()
         {
             _path = new Path();           
         }

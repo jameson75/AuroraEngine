@@ -217,9 +217,9 @@
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="Animation\Animation.cs" />
-    <Compile Include="World\Geometry\Modifiers\StackGridModifier.cs" />
+    <Compile Include="World\Geometry\Modifiers\StackGridDeformer.cs" />
     <Compile Include="World\Geometry\Form.cs" />
-    <Compile Include="World\Geometry\Modifiers\PathGridModifier.cs" />
+    <Compile Include="World\Geometry\Modifiers\PathGridDeformer.cs" />
     <Compile Include="World\Geometry\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
@@ -244,7 +244,7 @@
     <Compile Include="Sandbox\TestEffect.cs" />
     <Compile Include="World\Scene\SceneNodeEffector.cs" />
     <Compile Include="World\Sprite.cs" />
-    <Compile Include="World\TrackingObject.cs" />
+    <Compile Include="World\PathTracker.cs" />
     <Compile Include="World\Weapon.cs" />
     <Compile Include="World\WorldSimulator.cs" />
   </ItemGroup>
