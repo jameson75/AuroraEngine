@@ -170,14 +170,16 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             return pathNode;
         }
 
-        public Vector3[] ToPoints(float StepSize, PathNode firstNode = null, PathNode lastNode = null)
+        public Vector3[] ToPoints(float stepSize, PathNode firstNode = null, PathNode lastNode = null)
         {
             List<Vector3> result = new List<Vector3>();
             float step = 0;
+            if (stepSize <= 0)
+                throw new ArgumentException("stepSize is not greater than zero.");
             while (step < Distance)
             {
                 result.Add(EvaluateNodeAtDistance(step).Transform.Translation);
-                step += StepSize;
+                step += stepSize;
             }
             result.Add(EvaluateNodeAtDistance(Distance).Transform.Translation);
             return result.ToArray();

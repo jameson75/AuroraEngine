@@ -49,7 +49,6 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Color = color;
         }
     }
-
    
     /// <summary>
     /// 
@@ -199,7 +198,6 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             TextureCoord = textureCoord;
         }
     }
-
 
     /// <summary>
     /// 
@@ -392,6 +390,5 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             //Matrix.SizeInBytes + Vector2.SizeInBytes * 3
             get {return Matrix.SizeInBytes; }
         }
-    }  
-
+    }
 }

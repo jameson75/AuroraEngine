@@ -36,6 +36,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Update(GameTime gameTime)
         {
+            /*
             PathNode lastNode = Path.Nodes.LastOrDefault();
             Transform sourceTransform = this.WorldToParent(Source.WorldTransform());
             if (lastNode == null ||
@@ -44,7 +45,20 @@ namespace CipherPark.AngelJacket.Core.World
                 Path.Nodes.Add(new PathNode() { Transform = sourceTransform });
                 if (Path.Nodes.Count > 1)
                     Path.GenerateLinearApproximation(16, Path.Nodes.Count - 2);
-            }            
+            }
+            */
+        }
+
+        public Transform Transform
+        {
+            get;
+            set;
+        }
+
+        public ITransformable TransformableParent
+        {
+            get;
+            set;
         }
     }
 }
