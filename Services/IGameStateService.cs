@@ -14,24 +14,32 @@ using CipherPark.AngelJacket.Core.World;
 
 namespace CipherPark.AngelJacket.Core.Services
 {
-    public class Player
-    {
-        public bool Active { get; set; }        
-        public bool HasControl { get; set; }        
-    }
-
-    public class GameState
-    {
-        public RunningState RunningState { get; set; }
-    }
-
-    public enum RunningState
-    {
-        Play
-    }
-
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IGameStateService
     {
         GameState State { get; }
+        GameTime GameTime { get; }
+        void Update(GameTime GameTime, GameState State);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class GameStateSerivce
+    {
+        public GameState State { get; set; }
+        public GameTime GameTime { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum GameState
+    {
+        Running,
+        Paused
+    }    
 }

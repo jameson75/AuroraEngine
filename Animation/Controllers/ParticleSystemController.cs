@@ -24,16 +24,19 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
     public class ParticleSystemController : AnimationController
     {
         private long? _animationStartTime = null;
-        private long? _lastEmissionTime = null;
+        private long? _lastSimulationTime = null;
         private Transform[] _lastEmitterWorldTransform = null;
 
         public ParticleSystem System { get; set; }
 
         public ParticleSolver Solver { get; set; }
 
-        public int EmissionRate { get; set; }
+        public float SimulationRate { get; set; }
 
-        public bool EnableDirectionalBlur { get; set; }
+        public ParticleSystemController()
+        {
+            
+        }
 
         public override void Reset()
         {
@@ -46,35 +49,38 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
             if (_animationStartTime == null)
                 _animationStartTime = gameTime.GetTotalSimtime();
 
-            if (_lastEmissionTime == null)
-                _lastEmissionTime = gameTime.GetTotalSimtime();
+            if (_lastSimulationTime == null)
+                _lastSimulationTime = gameTime.GetTotalSimtime();
 
             if (_lastEmitterWorldTransform == null )            
-                _lastEmitterWorldTransform = System.Emitters.Select(e => e.WorldTransform()).ToArray();                         
+                _lastEmitterWorldTransform = System.Emitters.Select(e => e.WorldTransform()).ToArray();                    
 
-            if (gameTime.GetTotalSimtime() - _lastEmissionTime > EmissionRate)
-            {
+            //Simulating a particle system (especially ones with physically-realistic solvers) can
+            //be computationally expensive. We allow the user of the this class to controll the
+            //rate at which simulation is performed.
+            if (gameTime.GetTotalSimtime() - _lastSimulationTime > SimulationRate)
+            {            
                 for (int i = 0; i < System.Emitters.Count; i++)
                 {
-                    var emittedParticles =  System.Emit(i);
-                    
-                    //****************************************************************************
-                    //NOTE: Directional Blur is used for effects light "streaks"/"light trails".
-                    //While, motion blur would be used for effects light a "sparks".
-                    //****************************************************************************
+                    //Kill dead particles.
+                    var deadParticles = System.Particles.Where(p => p.Age(gameTime.GetTotalSimtime()) > (long)p.Life).ToArray();
+                    System.Kill(deadParticles);
 
-                    if (EnableDirectionalBlur)
-                    {
-                        Vector3 blurDirection = Vector3.Normalize(System.Emitters[i].WorldTransform().Translation - _lastEmitterWorldTransform[i].Translation);                        
-                        emittedParticles.ForEach(p => p.InstanceData = new ParticleInstanceData() { DirectionalBlur = p.WorldToLocal(blurDirection) });                        
-                    }
+                    //Emit new particles.                    
+                    System.Emit(i);       
                 }
-            }
-          
-            if( Solver != null )
-                Solver.Step(gameTime, System);          
 
-            //TODO: Optionally, apply Motion blur to ALL particles here.
+                if( Solver != null )
+                    Solver.Step(gameTime, System); 
+            }              
+        }
+    }
+
+    public static class ParticleExtension
+    {
+        public static long Age(this Particle p, long currentSimTime)
+        {
+            return ( p.Life == 0 ) ? -1 : currentSimTime - p.Birth;
         }
     }
 }

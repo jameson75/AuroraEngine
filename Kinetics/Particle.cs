@@ -65,13 +65,13 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         public float Velocity { get; set; }
         #endregion
         
-        #region Particle Attributes
-        public ulong Age { get; set; }
+        #region Particle Attributes    
+        public long Birth { get; set; }
         public ulong Life { get; set; }
         public ParticleDescription Description { get; set; }
         public ParticleInstanceData InstanceData { get; set; }
         public bool IsVisible { get; set; }
-        #endregion          
+        #endregion      
     }
     
     ///// <summary>

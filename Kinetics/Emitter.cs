@@ -83,8 +83,8 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 float randomVelocity = (this.InitialVelocityRandomness == 0) ? this.InitialVelocity :
                     this.InitialVelocity + (float)randomGen.Next(this.InitialVelocityRandomness);               
                 Particle p = new Particle();
-                p.Life = randomLife;              
-                p.Age = 0;
+                p.Life = randomLife;
+                p.Birth = gameTime.GetTotalSimtime();                
                 p.Velocity = randomVelocity;
                 p.Transform = this.Transform;
                 p.Description = particleDesc;                
