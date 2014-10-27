@@ -11,6 +11,7 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.AngelJacket.Core.Services;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -46,7 +47,8 @@ namespace CipherPark.AngelJacket.Core.Kinetics
 
         public List<Particle> Spawn(int index = 0, ParticleDescription particleDescription = null, int count = 0)
         {
-            return _emitters[index].Spawn(particleDescription, count);
+            IGameStateService stateService = (IGameStateService)Game.Services.GetService(typeof(IGameStateService));           
+            return _emitters[index].Spawn(particleDescription, stateService.GameTime, count);
         }
 
         public List<Particle> Emit(int index = 0, ParticleDescription particleDescription = null, int count = 0)

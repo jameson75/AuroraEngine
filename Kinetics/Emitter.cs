@@ -69,8 +69,8 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         //    return pList;           
         //}       
 
-        public List<Particle> Spawn(ParticleDescription description, int count = 0)
-        {
+        public List<Particle> Spawn(ParticleDescription description, GameTime gameTime, int count = 0)
+        {          
             ParticleDescription particleDesc = (description != null) ? description : this.DefaultParticleDescription;            
             Random randomGen = new Random();
             List<Particle> pList = new List<Particle>();            

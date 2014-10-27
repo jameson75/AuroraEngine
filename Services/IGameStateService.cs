@@ -28,10 +28,20 @@ namespace CipherPark.AngelJacket.Core.Services
     /// <summary>
     /// 
     /// </summary>
-    public class GameStateSerivce
+    public class GameStateSerivce : IGameStateService
     {
-        public GameState State { get; set; }
-        public GameTime GameTime { get; set; }
+        IGameApp _game = null;
+        public GameStateSerivce(IGameApp game)
+        {
+            _game = game;
+        }
+        public GameState State { get; private set; }
+        public GameTime GameTime { get; private set; }
+        public void Update(GameTime gameTime, GameState state)
+        {
+            GameTime = gameTime;
+            State = state;
+        }
     }
 
     /// <summary>
