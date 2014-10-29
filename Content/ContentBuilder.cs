@@ -887,7 +887,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return new Mesh(device, meshDesc);
         }
 
-        public static Mesh BuildDynamicMesh<T>(Device device, byte[] shaderByteCode, T[] verts, int maxVertices, short[] indices, int maxIndices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
+        public static Mesh BuildDynamicMesh<T>(Device device, byte[] shaderByteCode, T[] verts, int maxVertices, short[] indices, int maxIndices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
         {
             MeshDescription meshDesc = new MeshDescription();
 
@@ -925,7 +925,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 meshDesc.IndexBuffer = iBuffer;
             }
 
-            meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            meshDesc.Topology = topology;
             meshDesc.BoundingBox = boundingBox;
             return new Mesh(device, meshDesc);
         }      

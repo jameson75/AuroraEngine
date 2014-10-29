@@ -89,7 +89,7 @@ namespace CipherPark.AngelJacket.Core.Animation
     public static class TransformableExtension
     {
 
-        public static Vector3 LocalToWorld(this ITransformable transformable, Vector3 normal)
+        public static Vector3 LocalToWorldNormal(this ITransformable transformable, Vector3 normal)
         {
             MatrixStack stack = new MatrixStack();
             stack.Push(transformable.Transform.ToMatrix());
@@ -102,7 +102,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             return Vector3.TransformNormal(normal, stack.Transform);
         }
 
-        public static Vector3 WorldToLocal(this ITransformable transformable, Vector3 normal)
+        public static Vector3 WorldToLocalNormal(this ITransformable transformable, Vector3 normal)
         {
             MatrixStack stack = new MatrixStack();
             stack.Push(Matrix.Invert(transformable.Transform.ToMatrix()));

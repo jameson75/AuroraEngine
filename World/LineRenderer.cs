@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using SharpDX;
+using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Float4 = SharpDX.Vector4;
@@ -24,16 +25,17 @@ namespace CipherPark.AngelJacket.Core.World
 {
     public class StreakRenderer
     {       
-        private StreakEffect _effect = null;
+        private SurfaceEffect _effect = null;
         private Mesh _mesh = null;
         private IGameApp _game = null;
-
+        
         private StreakRenderer()
-        {}
+        { }
         
         public static StreakRenderer Create(IGameApp game)
         {           
-            StreakEffect effect = new StreakEffect(game);
+            BasicEffectEx effect = new BasicEffectEx(game);
+            effect.EnableVertexColor = true;            
             return new StreakRenderer()
             {               
                 Width = 10.0f,
@@ -48,7 +50,8 @@ namespace CipherPark.AngelJacket.Core.World
                     0,
                     FlexboardVertex.InputElements,
                     FlexboardVertex.ElementSize,
-                    BoundingBoxExtension.Empty)                
+                    BoundingBoxExtension.Empty,
+                    PrimitiveTopology.LineStrip)                
             };
         }
 
@@ -58,27 +61,45 @@ namespace CipherPark.AngelJacket.Core.World
 
         public Path Path { get; set; }
 
-        public StreakEffect Effect { get { return _effect; } }
+        public SurfaceEffect Effect { get { return _effect; } }       
 
-        public void Draw(GameTime gameTime)
+        public void Draw(GameTime gameTime, ITransformable sceneCamera, ITransformable sceneRendererContainer)
         {
-            const int VERTICES_PER_QUAD = 4;
+            //TODO:
+            //Steps:
+            //Transform point to camera space.
+            //Project point to camera plane.
+            //Get direction from point to camera.
+            //Normalize.
+            //Transform direction to camera vector/normal to path streak space.
+            //Get cross product of slope and direction to camera vector.
+            //Normalize Cross product.
+            //Cross product is +X direction.          
+            const int VERTICES_PER_POINT = 2;   
+            float halfWidth = Width / 2.0f;         
+            
             Vector3[] points = this.Path.ToPoints(StepSize);
-
-            FlexboardVertex[] vertices = new FlexboardVertex[(points.Length - 1) * VERTICES_PER_QUAD];
-            Vector2[] texCoords = Content.ContentBuilder.CreateQuadTextureCoords();
-            float halfWidth = Width / 2.0f;
-            Vector2[] offsets = new Vector2[] { new Vector2(halfWidth, 0), 
-                                                new Vector2(halfWidth, StepSize), 
-                                                new Vector2(-halfWidth, StepSize), 
-                                                new Vector2(-halfWidth, 0) }; 
-            for (int i = 0; i < points.Length - 1; i++)
+            VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];
+            Vector2[] texCoords = Content.ContentBuilder.CreateQuadTextureCoords();            
+            Vector3[] offsets = new Vector3[VERTICES_PER_POINT] { new Vector3(halfWidth, 0, 0), new Vector3(-halfWidth, 0, 0) };                                  
+            for (int i = 0; i < points.Length; i++)
             {
-                Vector3 slopeDir = Vector3.Normalize(points[i+1] - points[i]);
-                for(int j = 0; j < VERTICES_PER_QUAD; j++)                
-                    vertices[i * VERTICES_PER_QUAD + j] = new FlexboardVertex(points[i], texCoords[j], offsets[j], slopeDir);                     
+                for (int j = 0; j < VERTICES_PER_POINT; j++)
+                {
+                    Vector3 v = points[i] + offsets[j];
+                    //Transform point to camera space.
+                    Vector3 vw = sceneRendererContainer.ParentToWorld(v);
+                    Vector3 vcs = sceneCamera.WorldToParent(vw);
+                    //Project point transformed point to camera z plane.
+                    Vector3 vpcs = vcs - (Vector3.Dot(vcs, Vector3.UnitZ) * Vector3.UnitZ);
+                    //Get direction to camera from projected point.
+                    Vector3 npcs = sceneCamera.Transform.Translation - vpcs;
+                    //Transform direction to container space.
+                    Vector3 nw = sceneCamera.ParentToWorldNormal(npcs);
+                    Vector3 n = sceneRendererContainer.WorldToParentNormal(nw);
+                }
             }
-            _mesh.UpdateVertexStream<FlexboardVertex>(vertices);
+            _mesh.UpdateVertexStream<VertexPositionColor>(vertices);
             _effect.World = Matrix.Identity;
             _mesh.Draw(gameTime);
         }      
@@ -99,7 +120,7 @@ namespace CipherPark.AngelJacket.Core.World
                 Renderer.Effect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
                 Renderer.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;
                 Renderer.Effect.Apply();
-                Renderer.Draw(gameTime);     
+                Renderer.Draw(gameTime, Scene.CameraNode, this);     
             }
         }
     }
@@ -135,6 +156,21 @@ namespace CipherPark.AngelJacket.Core.World
             Position = new Vector4(position, 1.0f);
             TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, offset.X, offset.Y);
             TextureCoord2 = new Vector4(slopeDir, 1.0f);
+        }
+    }
+
+    public static class StreakRendererTransformableExtension
+    {
+        public static Vector3 ParentToWorld(this ITransformable t, Vector3 p)
+        {
+            Matrix m = Matrix.Translation(p);
+            return t.ParentToWorld(m).TranslationVector;
+        }
+
+        public static Vector3 WorldToParent(this ITransformable t, Vector3 p)
+        {
+            Matrix m = Matrix.Translation(p);
+            return t.WorldToParent(m).TranslationVector;
         }
     }
 }
