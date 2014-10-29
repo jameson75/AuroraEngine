@@ -64,42 +64,34 @@ namespace CipherPark.AngelJacket.Core.World
         public SurfaceEffect Effect { get { return _effect; } }       
 
         public void Draw(GameTime gameTime, ITransformable sceneCamera, ITransformable sceneRendererContainer)
-        {
-            //TODO:
-            //Steps:
-            //Transform point to camera space.
-            //Project point to camera plane.
-            //Get direction from point to camera.
-            //Normalize.
-            //Transform direction to camera vector/normal to path streak space.
-            //Get cross product of slope and direction to camera vector.
-            //Normalize Cross product.
-            //Cross product is +X direction.          
+        {                     
             const int VERTICES_PER_POINT = 2;   
-            float halfWidth = Width / 2.0f;         
-            
+            float halfWidth = Width / 2.0f;                     
             Vector3[] points = this.Path.ToPoints(StepSize);
-            VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];
-            Vector2[] texCoords = Content.ContentBuilder.CreateQuadTextureCoords();            
-            Vector3[] offsets = new Vector3[VERTICES_PER_POINT] { new Vector3(halfWidth, 0, 0), new Vector3(-halfWidth, 0, 0) };                                  
-            for (int i = 0; i < points.Length; i++)
+            VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];                                         
+            for (int i = 0; i < points.Length; i+= VERTICES_PER_POINT)
             {
-                for (int j = 0; j < VERTICES_PER_POINT; j++)
-                {
-                    Vector3 v = points[i] + offsets[j];
-                    //Transform point to camera space.
-                    Vector3 vw = sceneRendererContainer.ParentToWorld(v);
-                    Vector3 vcs = sceneCamera.WorldToParent(vw);
-                    //Project point transformed point to camera z plane.
-                    Vector3 vpcs = vcs - (Vector3.Dot(vcs, Vector3.UnitZ) * Vector3.UnitZ);
-                    //Get direction to camera from projected point.
-                    Vector3 npcs = sceneCamera.Transform.Translation - vpcs;
-                    //Transform direction to container space.
-                    Vector3 nw = sceneCamera.ParentToWorldNormal(npcs);
-                    Vector3 n = sceneRendererContainer.WorldToParentNormal(nw);
-                }
+                Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);          
+                Vector3 v = points[i];
+                //Transform point to camera space.
+                Vector3 vw = sceneRendererContainer.ParentToWorldCoordinate(v);
+                Vector3 vcs = sceneCamera.WorldToParentCoordinate(vw);
+                //Project point transformed point to camera z plane.
+                Vector3 vpcs = vcs - (Vector3.Dot(vcs, Vector3.UnitZ) * Vector3.UnitZ);
+                //Get direction to camera from projected point.
+                Vector3 npcs = sceneCamera.Transform.Translation - vpcs;
+                //Transform direction to container space.
+                Vector3 nw = sceneCamera.ParentToWorldNormal(npcs);
+                Vector3 n = sceneRendererContainer.WorldToParentNormal(nw);
+                //Get cross product of slope and direction to camera.
+                Vector3 xDir = Vector3.Normalize(Vector3.Cross(nSlope, n));
+                vertices[i * VERTICES_PER_POINT] = new VertexPositionColor(v + xDir * halfWidth, Color.White.ToVector4());
+                vertices[i * VERTICES_PER_POINT + 1] = new VertexPositionColor(v + xDir * halfWidth, Color.White.ToVector4());
             }
-            _mesh.UpdateVertexStream<VertexPositionColor>(vertices);
+
+            //TODO: Create mesh quads from vertices.
+
+            _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);            
             _effect.World = Matrix.Identity;
             _mesh.Draw(gameTime);
         }      
@@ -156,21 +148,6 @@ namespace CipherPark.AngelJacket.Core.World
             Position = new Vector4(position, 1.0f);
             TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, offset.X, offset.Y);
             TextureCoord2 = new Vector4(slopeDir, 1.0f);
-        }
-    }
-
-    public static class StreakRendererTransformableExtension
-    {
-        public static Vector3 ParentToWorld(this ITransformable t, Vector3 p)
-        {
-            Matrix m = Matrix.Translation(p);
-            return t.ParentToWorld(m).TranslationVector;
-        }
-
-        public static Vector3 WorldToParent(this ITransformable t, Vector3 p)
-        {
-            Matrix m = Matrix.Translation(p);
-            return t.WorldToParent(m).TranslationVector;
         }
     }
 }

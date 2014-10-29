@@ -88,6 +88,63 @@ namespace CipherPark.AngelJacket.Core.Animation
     /// </summary>
     public static class TransformableExtension
     {
+        public static Vector3 ParentToWorldCoordinate(this ITransformable transformable, Vector3 postion)
+        {
+            if (transformable.TransformableParent != null)
+                return transformable.TransformableParent.LocalToWorldCoordinate(postion);
+            else
+                return postion;
+        }
+
+        public static Vector3 WorldToParentCoordinate(this ITransformable transformable, Vector3 position)
+        {
+            if (transformable.TransformableParent != null)
+                return transformable.TransformableParent.WorldToLocalCoordinate(position);
+            else
+                return position;
+        }
+
+        public static Vector3 LocalToWorldCoordinate(this ITransformable transformable, Vector3 position)
+        {
+            MatrixStack stack = new MatrixStack();
+            stack.Push(transformable.Transform.ToMatrix());
+            ITransformable node = transformable.TransformableParent;
+            while (node != null)
+            {
+                stack.Push(node.Transform.ToMatrix());
+                node = node.TransformableParent;
+            }
+            return Vector3.TransformCoordinate(position, stack.Transform);
+        }
+
+        public static Vector3 WorldToLocalCoordinate(this ITransformable transformable, Vector3 position)
+        {
+            MatrixStack stack = new MatrixStack();
+            stack.Push(Matrix.Invert(transformable.Transform.ToMatrix()));
+            ITransformable node = transformable.TransformableParent;
+            while (node != null)
+            {
+                stack.Push(Matrix.Invert(node.Transform.ToMatrix()));
+                node = node.TransformableParent;
+            }
+            return Vector3.TransformCoordinate(position, stack.ReverseTransform);
+        }
+
+        public static Vector3 ParentToWorldNormal(this ITransformable transformable, Vector3 normal)
+        {
+            if (transformable.TransformableParent != null)
+                return transformable.TransformableParent.LocalToWorldNormal(normal);
+            else
+                return normal;
+        }
+
+        public static Vector3 WorldToParentNormal(this ITransformable transformable, Vector3 normal)
+        {
+            if (transformable.TransformableParent != null)
+                return transformable.TransformableParent.WorldToLocalNormal(normal);
+            else
+                return normal;
+        }
 
         public static Vector3 LocalToWorldNormal(this ITransformable transformable, Vector3 normal)
         {
