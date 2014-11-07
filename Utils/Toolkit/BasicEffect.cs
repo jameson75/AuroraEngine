@@ -17,7 +17,6 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-
 namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 {
     public class BasicEffect

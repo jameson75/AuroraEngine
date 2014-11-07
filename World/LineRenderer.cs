@@ -38,20 +38,19 @@ namespace CipherPark.AngelJacket.Core.World
             effect.EnableVertexColor = true;            
             return new StreakRenderer()
             {               
-                Width = 10.0f,
+                Width = 100.0f,
                 StepSize = 10.0f,
                 _effect = effect,
-                _mesh = Content.ContentBuilder.BuildDynamicMesh<FlexboardVertex>(
+                _mesh = Content.ContentBuilder.BuildDynamicMesh<VertexPositionColor>(
                     game.GraphicsDevice,
                     effect.SelectShaderByteCode(),
                     null,
                     1000,
                     null,
                     0,
-                    FlexboardVertex.InputElements,
-                    FlexboardVertex.ElementSize,
-                    BoundingBoxExtension.Empty,
-                    PrimitiveTopology.LineStrip)                
+                    VertexPositionColor.InputElements,
+                    VertexPositionColor.ElementSize,
+                    BoundingBoxExtension.Empty, PrimitiveTopology.TriangleList)                
             };
         }
 
@@ -67,9 +66,9 @@ namespace CipherPark.AngelJacket.Core.World
         {                     
             const int VERTICES_PER_POINT = 2;   
             float halfWidth = Width / 2.0f;                     
-            Vector3[] points = this.Path.ToPoints(StepSize);
+            Vector3[] points = this.Path.ToPoints(Path.Distance /*StepSize*/);
             VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];                                         
-            for (int i = 0; i < points.Length; i+= VERTICES_PER_POINT)
+            for (int i = 0; i < points.Length; i++)
             {
                 Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);          
                 Vector3 v = points[i];
@@ -84,13 +83,22 @@ namespace CipherPark.AngelJacket.Core.World
                 Vector3 nw = sceneCamera.ParentToWorldNormal(npcs);
                 Vector3 n = sceneRendererContainer.WorldToParentNormal(nw);
                 //Get cross product of slope and direction to camera.
-                Vector3 xDir = Vector3.Normalize(Vector3.Cross(nSlope, n));
+                Vector3 xDir = Vector3.Normalize(Vector3.Cross(n, nSlope));
                 vertices[i * VERTICES_PER_POINT] = new VertexPositionColor(v + xDir * halfWidth, Color.White.ToVector4());
-                vertices[i * VERTICES_PER_POINT + 1] = new VertexPositionColor(v + xDir * halfWidth, Color.White.ToVector4());
+                vertices[i * VERTICES_PER_POINT + 1] = new VertexPositionColor(v - xDir * halfWidth, Color.White.ToVector4());
             }
 
-            //TODO: Create mesh quads from vertices.
-
+            VertexPositionColor[] meshVertices = new VertexPositionColor[(points.Length - 1) * 6];
+            for (int i = 0; i < vertices.Length; i += 4)
+            {
+                meshVertices[i] = vertices[i];
+                meshVertices[i + 1] = vertices[i + 1];
+                meshVertices[i + 2] = vertices[i + 2];
+                meshVertices[i + 3] = vertices[i + 2];
+                meshVertices[i + 4] = vertices[i + 1];
+                meshVertices[i + 5] = vertices[i + 3];
+            }
+             
             _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);            
             _effect.World = Matrix.Identity;
             _mesh.Draw(gameTime);
