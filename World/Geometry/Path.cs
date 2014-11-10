@@ -27,9 +27,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// </summary>
     public class Path
     {
+        public const int DefaultSamplesPerSegment = 16;
+
         private List<PathNode> _nodes = new List<PathNode>();
 
         private List<float> _approximateSegmentLengths = null;
+
+        private int _lastProcessedIndex = 0;
 
         /// <summary>
         /// 
@@ -65,20 +69,27 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// <summary>
         /// Generates and stores the linear-approximate length of each curve segment.
         /// </summary>
-        /// <param name="nSamplesPerSegment"></param>
-        /// <param name="iFirstNode">Index of the first node to start generating the approximation.</param>
+        /// <param name="nSamplesPerSegment">Number of samples taken between each node</param>
+        /// <param name="processEntirePath">Specifies whether to generate linear samples for the entire path or only for the portion of the path which hasn't been processed</param>
         /// <returns></returns>
-        public void GenerateLinearApproximation(int nSamplesPerSegment = 16)
+        public void GenerateLinearApproximation(int nSamplesPerSegment = DefaultSamplesPerSegment, bool processEntirePath = true)
         {
             if (nSamplesPerSegment <= 0)
                 throw new ArgumentOutOfRangeException("nSamplesPerSegment must be a positive, non-zero integer");
 
-            _approximateSegmentLengths = new List<float>();
+            if (processEntirePath)
+            {
+                _approximateSegmentLengths = new List<float>();
+                _lastProcessedIndex = 0;
+            }
+
+            //Determine the starting node index from which a linear approximation will be generated.
+            int si = processEntirePath ? 1 : _lastProcessedIndex + 1; 
 
             if (SmoothingEnabled)
             {
                 float stepSize = 1.0f / nSamplesPerSegment;
-                for (int i = 0; i < _nodes.Count; i++)
+                for (int i = si; i < _nodes.Count; i++)
                 {
                     PathNode n1 = _nodes[i - 1];
                     PathNode n2 = _nodes[i];
@@ -102,6 +113,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                         p0 = p;
                     }
                     _approximateSegmentLengths.Add(totalLength);
+                    _lastProcessedIndex = i;
                 }
             }
             else

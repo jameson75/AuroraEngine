@@ -230,7 +230,7 @@
     <Compile Include="Kinetics\Emitter.cs" />
     <Compile Include="World\Geometry\Track.cs" />
     <Compile Include="World\ISprite.cs" />
-    <Compile Include="World\LineRenderer.cs" />
+    <Compile Include="World\StreakRenderer.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />
     <Compile Include="World\Geometry\ReferenceGrid.cs" />

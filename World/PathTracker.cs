@@ -36,17 +36,14 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Update(GameTime gameTime)
         {
-            /*
             PathNode lastNode = Path.Nodes.LastOrDefault();
             Transform sourceTransform = this.WorldToParent(Source.WorldTransform());
-            if (lastNode == null ||
+            if (lastNode != null ||
                 PathNodeMinDistance < Vector3.Distance(sourceTransform.Translation, lastNode.Transform.Translation) )
             {
                 Path.Nodes.Add(new PathNode() { Transform = sourceTransform });
-                if (Path.Nodes.Count > 1)
-                    Path.GenerateLinearApproximation(16, Path.Nodes.Count - 2);
-            }
-            */
+                Path.GenerateLinearApproximation(Path.DefaultSamplesPerSegment, false);
+            }            
         }
 
         public Transform Transform
