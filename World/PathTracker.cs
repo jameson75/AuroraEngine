@@ -23,7 +23,7 @@ namespace CipherPark.AngelJacket.Core.World
     {
         private Path _path = null;
 
-        public ITransformable Source { get; set; }
+        public ITransformable Target { get; set; }
 
         public Path Path { get { return _path; } }
 
@@ -36,12 +36,11 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Update(GameTime gameTime)
         {
-            PathNode lastNode = Path.Nodes.LastOrDefault();
-            Transform sourceTransform = this.WorldToParent(Source.WorldTransform());
+            PathNode lastNode = Path.Nodes.LastOrDefault();            
             if (lastNode != null ||
-                PathNodeMinDistance < Vector3.Distance(sourceTransform.Translation, lastNode.Transform.Translation) )
+                PathNodeMinDistance < Vector3.Distance(Target.Transform.Translation, lastNode.Transform.Translation) )
             {
-                Path.Nodes.Add(new PathNode() { Transform = sourceTransform });
+                Path.Nodes.Add(new PathNode() { Transform = Target.Transform });
                 Path.GenerateLinearApproximation(Path.DefaultSamplesPerSegment, false);
             }            
         }

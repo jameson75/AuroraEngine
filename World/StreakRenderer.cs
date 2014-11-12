@@ -62,7 +62,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public SurfaceEffect Effect { get { return _effect; } }       
 
-        public void Draw(GameTime gameTime, ITransformable sceneCamera, ITransformable sceneRendererContainer)
+        public void Update(GameTime gameTime, ITransformable sceneCamera, ITransformable pathParentSpace)
         {                     
             const int VERTICES_PER_POINT = 2;   
             float halfWidth = Width / 2.0f;                     
@@ -73,7 +73,7 @@ namespace CipherPark.AngelJacket.Core.World
                 Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);          
                 Vector3 v = points[i];
                 //Transform point to camera space.
-                Vector3 vw = sceneRendererContainer.ParentToWorldCoordinate(v);
+                Vector3 vw = (pathParentSpace != null) ? pathParentSpace.ParentToWorldCoordinate(v) : v;
                 Vector3 vcs = sceneCamera.WorldToParentCoordinate(vw);
                 //Project point transformed point to camera z plane.
                 Vector3 vpcs = vcs - (Vector3.Dot(vcs, Vector3.UnitZ) * Vector3.UnitZ);
@@ -81,7 +81,7 @@ namespace CipherPark.AngelJacket.Core.World
                 Vector3 npcs = sceneCamera.Transform.Translation - vpcs;
                 //Transform direction to container space.
                 Vector3 nw = sceneCamera.ParentToWorldNormal(npcs);
-                Vector3 n = sceneRendererContainer.WorldToParentNormal(nw);
+                Vector3 n = ( pathParentSpace != null) ? pathParentSpace.WorldToParentNormal(nw) : nw;
                 //Get cross product of slope and direction to camera.
                 Vector3 xDir = Vector3.Normalize(Vector3.Cross(n, nSlope));
                 vertices[i * VERTICES_PER_POINT] = new VertexPositionColor(v + xDir * halfWidth, Color.White.ToVector4());
@@ -99,10 +99,14 @@ namespace CipherPark.AngelJacket.Core.World
                 meshVertices[i + 5] = vertices[i + 3];
             }
              
-            _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);            
+            _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        
+        }
+
+        public void Draw(GameTime gameTime)
+        {
             _effect.World = Matrix.Identity;
             _mesh.Draw(gameTime);
-        }      
+        }
     }
 
     public class StreakRendererSceneNode : Scene.SceneNode
@@ -113,6 +117,15 @@ namespace CipherPark.AngelJacket.Core.World
             : base(game)
         { }
 
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+            if (Renderer != null)
+            {              
+                Renderer.Update(gameTime, Scene.CameraNode, this);
+            }
+        }
+
         public override void Draw(GameTime gameTime)
         {
             if (Renderer != null)
@@ -120,7 +133,7 @@ namespace CipherPark.AngelJacket.Core.World
                 Renderer.Effect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
                 Renderer.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;
                 Renderer.Effect.Apply();
-                Renderer.Draw(gameTime, Scene.CameraNode, this);     
+                Renderer.Draw(gameTime);     
             }
         }
     }
