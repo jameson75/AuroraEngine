@@ -62,7 +62,10 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             {
                 if (_approximateSegmentLengths == null)
                     throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
-                return _approximateSegmentLengths.Sum();
+                float d = 0;
+                for (int i = 0; i < _approximateSegmentLengths.Count; i++)
+                    d += _approximateSegmentLengths[i];
+                return d;
             }
         }
 

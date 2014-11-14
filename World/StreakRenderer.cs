@@ -122,7 +122,7 @@ namespace CipherPark.AngelJacket.Core.World
             base.Update(gameTime);
             if (Renderer != null)
             {              
-                Renderer.Update(gameTime, Scene.CameraNode, this);
+                Renderer.Update(gameTime, Scene.CameraNode, null);
             }
         }
 
