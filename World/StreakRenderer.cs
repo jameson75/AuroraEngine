@@ -38,7 +38,7 @@ namespace CipherPark.AngelJacket.Core.World
             effect.EnableVertexColor = true;            
             return new StreakRenderer()
             {               
-                Width = 100.0f,
+                Width = 10.0f,
                 StepSize = 10.0f,
                 _effect = effect,
                 _mesh = Content.ContentBuilder.BuildDynamicMesh<VertexPositionColor>(
@@ -66,7 +66,7 @@ namespace CipherPark.AngelJacket.Core.World
         {                     
             const int VERTICES_PER_POINT = 2;   
             float halfWidth = Width / 2.0f;                     
-            Vector3[] points = this.Path.ToPoints(Path.Distance /*StepSize*/);
+            Vector3[] points = this.Path.ToPoints(StepSize);
             VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];                                         
             for (int i = 0; i < points.Length; i++)
             {
@@ -89,14 +89,28 @@ namespace CipherPark.AngelJacket.Core.World
             }
 
             VertexPositionColor[] meshVertices = new VertexPositionColor[(points.Length - 1) * 6];
-            for (int i = 0; i < vertices.Length; i += 4)
+
+            Color[] colors = new Color[] { Color.Red, Color.Green, Color.Blue };
+            int colorIndex = 0;
+
+            for (int i = 0; i < vertices.Length - 2; i += 2)
             {
-                meshVertices[i] = vertices[i];
-                meshVertices[i + 1] = vertices[i + 1];
-                meshVertices[i + 2] = vertices[i + 2];
-                meshVertices[i + 3] = vertices[i + 2];
-                meshVertices[i + 4] = vertices[i + 1];
-                meshVertices[i + 5] = vertices[i + 3];
+                int j = i * 3;
+                meshVertices[j] = vertices[i];
+                meshVertices[j].Color = colors[colorIndex].ToVector4();
+                meshVertices[j + 1] = vertices[i + 1];
+                meshVertices[j + 1].Color = colors[colorIndex].ToVector4();
+                meshVertices[j + 2] = vertices[i + 2];
+                meshVertices[j + 2].Color = colors[colorIndex].ToVector4();
+                colorIndex = (colorIndex == 2) ? 0 : colorIndex + 1;
+
+                meshVertices[j + 3] = vertices[i + 2];
+                meshVertices[j + 3].Color = colors[colorIndex].ToVector4();
+                meshVertices[j + 4] = vertices[i + 1];
+                meshVertices[j + 4].Color = colors[colorIndex].ToVector4();
+                meshVertices[j + 5] = vertices[i + 3];
+                meshVertices[j + 5].Color = colors[colorIndex].ToVector4();
+                colorIndex = (colorIndex == 2) ? 0 : colorIndex + 1;
             }
              
             _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        

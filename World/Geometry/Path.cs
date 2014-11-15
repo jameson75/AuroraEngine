@@ -62,7 +62,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             {
                 if (_approximateSegmentLengths == null)
                     throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
-                float d = 0;
+                float d = 0.0f;
                 for (int i = 0; i < _approximateSegmentLengths.Count; i++)
                     d += _approximateSegmentLengths[i];
                 return d;
@@ -151,6 +151,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
             float accumLength = 0;
             float pct = 0;
+
+            //TODO: Change code below NOT to use subtraction!!
 
             for (int i = 0; i < _approximateSegmentLengths.Count; i++)
             {
