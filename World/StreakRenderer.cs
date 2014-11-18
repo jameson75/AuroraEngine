@@ -79,7 +79,7 @@ namespace CipherPark.AngelJacket.Core.World
                 //Project point transformed point to camera z plane.
                 Vector3 vpcs = vcs - (Vector3.Dot(vcs, Vector3.UnitZ) * Vector3.UnitZ);
                 //Get direction to camera from projected point.
-                Vector3 npcs = sceneCamera.Transform.Translation - vpcs;
+                Vector3 npcs = Vector3.Normalize(sceneCamera.Transform.Translation - vpcs);
                 //Transform direction to container space.
                 Vector3 nw = sceneCamera.ParentToWorldNormal(npcs);
                 Vector3 n = ( pathParentSpace != null) ? pathParentSpace.WorldToParentNormal(nw) : nw;

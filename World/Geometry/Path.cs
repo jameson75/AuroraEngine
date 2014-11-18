@@ -149,17 +149,16 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             if (d < 0 || d > _approximateSegmentLengths.Sum())
                 return null;
 
-            float accumLength = 0;
+            float accumLength = 0;          
             float pct = 0;
 
             //TODO: Change code below NOT to use subtraction!!
 
             for (int i = 0; i < _approximateSegmentLengths.Count; i++)
-            {
-                float delta = d - accumLength;
-                if (delta <= _approximateSegmentLengths[i])
+            {                  
+                if (d >= accumLength && d <= accumLength + _approximateSegmentLengths[i] || i == _approximateSegmentLengths.Count - 1)
                 {
-                    pct = delta / _approximateSegmentLengths[i];
+                    pct = (d - accumLength) / _approximateSegmentLengths[i];
                     PathNode n1 = _nodes[i];
                     PathNode n2 = _nodes[i + 1];
                     PathNode n0 = (n1 != _nodes.First()) ? _nodes[i - 1] : n1;
