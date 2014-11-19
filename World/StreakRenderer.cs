@@ -70,46 +70,29 @@ namespace CipherPark.AngelJacket.Core.World
             VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];                                         
             for (int i = 0; i < points.Length; i++)
             {
-                /*
-                Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);          
-                Vector3 v = points[i];
+                Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);
+                Vector3 p = points[i];
                 //Transform point to camera space.
-                Vector3 vw = (pathParentSpace != null) ? pathParentSpace.ParentToWorldCoordinate(v) : v;
-                Vector3 vcs = sceneCamera.WorldToParentCoordinate(vw);
-                //Project point transformed point to camera z plane.
-                Vector3 vpcs = vcs - (Vector3.Dot(vcs, Vector3.UnitZ) * Vector3.UnitZ);
+                Vector3 vw = ((pathParentSpace != null) ? pathParentSpace.ParentToWorldCoordinate(p) : p);
+                Vector3 vw_camPos = vw - sceneCamera.Transform.Translation;
+                Vector3 camDir = Vector3.Normalize(sceneCamera.Camera.ViewMatrix.Column3.ToVector3());
+               //Project point transformed point to camera z plane.                
+                //(See tmpearce's explanation at http://stackoverflow.com/questions/9605556/how-to-project-a-3d-point-to-a-3d-plane#comment12185786_9605695)
+                Vector3 vpcs = vw - (Vector3.Dot(vw_camPos, camDir) * camDir);
                 //Get direction to camera from projected point.
                 Vector3 npcs = Vector3.Normalize(sceneCamera.Transform.Translation - vpcs);
-                //Transform direction to container space.
-                Vector3 nw = sceneCamera.ParentToWorldNormal(npcs);
-                Vector3 n = ( pathParentSpace != null) ? pathParentSpace.WorldToParentNormal(nw) : nw;
-                //Get cross product of slope and direction to camera.
-                Vector3 xDir = Vector3.Normalize(Vector3.Cross(n, nSlope));
-                vertices[i * VERTICES_PER_POINT] = new VertexPositionColor(v + xDir * halfWidth, Color.White.ToVector4());
-                vertices[i * VERTICES_PER_POINT + 1] = new VertexPositionColor(v - xDir * halfWidth, Color.White.ToVector4());
-                */
-
-                Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);
-                Vector3 v = points[i];
-                //Transform point to camera space.
-                Vector3 vw = (pathParentSpace != null) ? pathParentSpace.ParentToWorldCoordinate(v) : v;
-                Vector3 camDir = Vector3.Normalize(sceneCamera.Camera.ViewMatrix.Column3.ToVector3());
-                //Project point transformed point to camera z plane.
-                Vector3 vpcs = vw - (Vector3.Dot(vw, camDir) * camDir);
-                //Get direction to camera from projected point.
-                Vector3 npcs = sceneCamera.Transform.Translation - vpcs;
                 //Transform direction to container space.
                 Vector3 nw = npcs;
                 Vector3 n = (pathParentSpace != null) ? pathParentSpace.WorldToParentNormal(nw) : nw;
                 //Get cross product of slope and direction to camera.
                 Vector3 xDir = Vector3.Normalize(Vector3.Cross(n, nSlope));
-                vertices[i * VERTICES_PER_POINT] = new VertexPositionColor(v + xDir * halfWidth, Color.White.ToVector4());
-                vertices[i * VERTICES_PER_POINT + 1] = new VertexPositionColor(v - xDir * halfWidth, Color.White.ToVector4());
+                vertices[i * VERTICES_PER_POINT] = new VertexPositionColor(p + xDir * halfWidth, Color.White.ToVector4());
+                vertices[i * VERTICES_PER_POINT + 1] = new VertexPositionColor(p - xDir * halfWidth, Color.White.ToVector4());
             }
 
             VertexPositionColor[] meshVertices = new VertexPositionColor[(points.Length - 1) * 6];
 
-            Color[] colors = new Color[] { Color.Red, Color.Green, Color.Blue };
+            Color[] colors = new Color[] { Color.Red, Color.Green, Color.Blue, Color.Yellow };
             int colorIndex = 0;
 
             for (int i = 0; i < vertices.Length - 2; i += 2)
@@ -121,7 +104,7 @@ namespace CipherPark.AngelJacket.Core.World
                 meshVertices[j + 1].Color = colors[colorIndex].ToVector4();
                 meshVertices[j + 2] = vertices[i + 2];
                 meshVertices[j + 2].Color = colors[colorIndex].ToVector4();
-                colorIndex = (colorIndex == 2) ? 0 : colorIndex + 1;
+                colorIndex = (colorIndex == colors.Length - 1) ? 0 : colorIndex + 1;
 
                 meshVertices[j + 3] = vertices[i + 2];
                 meshVertices[j + 3].Color = colors[colorIndex].ToVector4();
@@ -129,7 +112,7 @@ namespace CipherPark.AngelJacket.Core.World
                 meshVertices[j + 4].Color = colors[colorIndex].ToVector4();
                 meshVertices[j + 5] = vertices[i + 3];
                 meshVertices[j + 5].Color = colors[colorIndex].ToVector4();
-                colorIndex = (colorIndex == 2) ? 0 : colorIndex + 1;
+                colorIndex = (colorIndex == colors.Length - 1) ? 0 : colorIndex + 1;
             }
              
             _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        

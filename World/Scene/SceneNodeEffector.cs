@@ -50,8 +50,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 Transform wsTrackedObjectTransform = TrackedObject.ParentToWorld(TrackedObject.Transform);
                 //Get the location of outer object in the center object's local space.
                 Vector3 csTrackedObjectLocation = CenterObject.WorldToLocal(wsTrackedObjectTransform).Translation;
-                //Project the vector on to the center object's y=0 plane.
-                //{Projection of a Vector to the nearest point on a plane : B = A - ( A dot N ) * N, where A is the vector N is the plane's normal.}
+                //Project the location to the center object's y=0 plane.
+                //{Projection of a Vector to the nearest point on a plane : B = A - ( A dot N ) * N.
+                //{A is the vector (from plane's origin to the location) and N is the plane's normal.}
                 //(See tmpearce's explanation at http://stackoverflow.com/questions/9605556/how-to-project-a-3d-point-to-a-3d-plane#comment12185786_9605695)
                 Vector3 pcsTrackedObjectLocation = csTrackedObjectLocation - (Vector3.Dot(csTrackedObjectLocation, Vector3.UnitY)) * Vector3.UnitY;
                 //Get distance of projected location.
