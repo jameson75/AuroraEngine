@@ -542,14 +542,14 @@ namespace CipherPark.AngelJacket.Core.Content
 
         #region Hexagon3D
 
-        public static Mesh BuildBasicHexagon3D(Device game, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildBasicHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             short[] indices = CreateHexagonIndices3D();
             VertexPositionColor[] verts = new VertexPositionColor[12];
             Vector3[] positions = CreateHexagonPoints3D(dimension);
             for(int i = 0; i < positions.Length; i++)
                 verts[i] = new VertexPositionColor(positions[i], color.ToVector4());               
-            return BuildMesh<VertexPositionColor>(game, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
+            return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
         }
 
         public static Mesh BuildBasicLitHexagon3D(Device game, byte[] shaderByteCode, BoundingBox dimension, Color color)
