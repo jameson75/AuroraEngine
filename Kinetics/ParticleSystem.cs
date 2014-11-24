@@ -150,6 +150,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         }
     }
 
+    /*
     public class PlexSystem : ParticleSystem
     {
         public PlexSystem(IGameApp game)
@@ -232,4 +233,5 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             base.Draw(gameTime);
         }
     }
+    */
 }
