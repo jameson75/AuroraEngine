@@ -43,9 +43,7 @@ namespace CipherPark.AngelJacket.Core.World
         public IGameApp Game { get { return _game; } }
         
         public Matrix ViewMatrix { get; set; }
-
-        //public Model LockonTarget { get; set; }        
-        
+             
         public Vector3 Location
         {
             get
@@ -75,8 +73,5 @@ namespace CipherPark.AngelJacket.Core.World
             Matrix viewTranslation = Matrix.Translation(-transform.Translation);
             return viewTranslation * viewRotation;
         }
-
-       
-
     }    
 }

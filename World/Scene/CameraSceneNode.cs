@@ -21,6 +21,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class CameraSceneNode : SceneNode
     {
+        private Transform _nodeTransform = Transform.Identity;
+
         public CameraSceneNode(IGameApp game)
             : base(game)
         { }       
@@ -38,13 +40,13 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public Camera Camera { get; set; }
 
         public override Transform Transform
-        {
+        {                        
             get
             {
                 if (Camera != null)
                     return Camera.ViewMatrixToTransform(Camera.ViewMatrix);
                 else
-                    return Transform.Identity; // _cachedTransform;
+                    return Transform.Identity;
             }
             set
             {
