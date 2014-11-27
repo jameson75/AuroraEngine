@@ -34,7 +34,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
             _game = game;
         }
 
-        public void Update(GameTime gameTime, SequencerContext context)
+        public void Update(GameTime gameTime, GameContext context)
         {
             if (!_isStarted)
                 Start(gameTime);
@@ -72,23 +72,30 @@ namespace CipherPark.AngelJacket.Core.Sequencer
     public abstract class SequenceEvent 
     { 
         public long Time { get; set; }
-        public abstract void Execute(GameTime gameTime, SequencerContext context);
-    }     
+        public abstract void Execute(GameTime gameTime, GameContext context);
+    }      
+}
 
-    public struct SequencerContext
+namespace CipherPark.AngelJacket.Core
+{
+    public struct GameContext
     {
-        public SequencerContext(GameAssets assets, Scene scene, WorldSimulator simulator, IUIRoot ui) : this()
-        {            
+        public GameContext(GameAssets assets, Scene scene, WorldSimulator simulator, IUIRoot ui)
+            : this()
+        {
             Assets = assets;
             Scene = scene;
             Simulator = simulator;
             UI = ui;
             Game = scene.Game;
-        } 
+        }
         public GameAssets Assets { get; private set; }
         public Scene Scene { get; private set; }
         public WorldSimulator Simulator { get; private set; }
         public IUIRoot UI { get; private set; }
         public IGameApp Game { get; private set; }
+
+        private static GameContext _empty = new GameContext();
+        public static GameContext Empty { get { return _empty; } }
     }
 }
