@@ -44,14 +44,19 @@ namespace CipherPark.AngelJacket.Core.World
         }
     }
 
-    public class Projectile : ComplexModel, IRigidBody
+    public class Projectile : IRigidBody
     {        
+        public Model Model { get; set; }
+
         #region IRigidBody 
         public Vector3 CenterOfMass { get; set; }
         #endregion
 
-        public Projectile(IGameApp game)
-            : base(game)
+        public Projectile(IGameApp game)           
         { }
+
+        public Transform Transform { get; set; }
+
+        public ITransformable TransformableParent { get; set; }
     }
 }

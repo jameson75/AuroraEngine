@@ -20,7 +20,7 @@ using CipherPark.AngelJacket.Core.Animation;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.AngelJacket.Core.World
 {
     /// <summary>
     /// 

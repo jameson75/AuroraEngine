@@ -20,7 +20,6 @@ using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Effects;
 //using CoreEffect = CipherPark.AngelJacket.Core.Effects.SurfaceEffect;
 using CipherPark.AngelJacket.Core.Kinetics;
-using CipherPark.AngelJacket.Core.Animation.Controllers;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -35,7 +34,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// 
     /// </summary>
-    public abstract class Model : ITransformable
+    public abstract class Model /*: ITransformable*/
     {
         private IGameApp _game = null;
         // private Mesh _mesh = null;        
@@ -50,11 +49,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public IGameApp Game { get { return _game; } }
           
-
+        /*
         public Transform Transform { get; set; }
 
         public ITransformable TransformableParent { get; set; }        
-    
+        */
+
         public SurfaceEffect Effect { get; set; }    
 
         public abstract void Draw(GameTime gameTime);      
@@ -64,10 +64,12 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public abstract BoundingBox BoundingBox { get; }
 
+        /*
         public void Move(Vector3 offset)
         {
             this.Transform = new Transform(this.Transform.Rotation, this.Transform.Translation + offset);
         }
+        */
     }
 
     public class BasicModel : Model
@@ -90,8 +92,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public override void Draw(GameTime gameTime)
         {
             if (Effect != null)
-            {
-                Effect.World = ((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
+            {                
                 OnApplyingEffect();
                 Effect.Apply();
                 if (Mesh != null)
@@ -144,8 +145,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             //How??
 
             if (Effect != null)
-            {
-                Effect.World = ((ITransformable)this).ParentToWorld(this.Transform).ToMatrix();
+            {                
                 OnApplyingEffect();
                 Effect.Apply();
                 foreach (Mesh mesh in Meshes)

@@ -22,7 +22,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
     public class ModelSceneNode : SceneNode
     {
         Transform _transform = Transform.Identity;       
-        Model _model = null;
+        //Model _model = null;
         
         public ModelSceneNode(IGameApp game)
             : base(game)
@@ -36,8 +36,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             Model = model;            
         }
 
-        public Model Model 
-        { 
+        public Model Model
+        {
+            /*
             get 
             { 
                 return _model; 
@@ -55,7 +56,10 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 
                 if (_model != null)               
                     ((ITransformable)_model).TransformableParent = this;                                  
-            }
+            }*/
+
+            get;
+            set; 
         }     
 
         public override Transform Transform 
@@ -87,10 +91,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         public override void Draw(GameTime gameTime)
         {
             if (Model != null)
-            {
-                //TODO: Change design so that Model.Draw() implementations aquire the Camera from a IViewportService
-                //and set the view and projecton matrices themselves.
-                
+            {             
+                Model.Effect.World = this.WorldTransform().ToMatrix();
                 Model.Effect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
                 Model.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;                
                 Model.Draw(gameTime);               
