@@ -22,25 +22,25 @@ using CipherPark.AngelJacket.Core.Animation.Controllers;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public static class Weapon 
+    public abstract class Weapon : IRigidBody
     {
-        public static RigidBodyAnimationController CreateDischargeAnimation(IRigidBody projectile)
+        public Transform Mount { get; set; }
+        public abstract void Fire();
+    }
+
+    public class Gun : Weapon
+    {
+        public override void Fire()
         {
-            //Create path...
-            Vector3[] path = new Vector3[]
-            { 
-                new Vector3(200, 20, 0),
-                new Vector3(200, 20, 200),
-                new Vector3(200, 20, 400),
-                new Vector3(0, 20, 400)
-            };
-            Motion motion = new Motion();
-            motion.LinearPath = path;
-            motion.LinearVelocity = 200.0f;
-            RigidBodyAnimationController animationPathController = new RigidBodyAnimationController(motion, projectile);
-            //IAnimationController projectileAnimationController = projectile.Animation;
-            //return new CompositeAnimationController(new IAnimationController[] { animationPathController, /*projectileAnimationController*/ });
-            return animationPathController;
+            
+        }
+    }
+
+    public class MissleLauncher : Weapon
+    {
+        public override void Fire()
+        {
+            
         }
     }
 

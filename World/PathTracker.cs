@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public class PathTracker : ITransformable
+    public class PathTracker
     {
         private Path _path = null;
 

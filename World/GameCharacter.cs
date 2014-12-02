@@ -19,6 +19,7 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Sequencer;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.AngelJacket.Core.Kinetics;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -33,7 +34,7 @@ namespace CipherPark.AngelJacket.Core.World
     /// <summary>
     /// 
     /// </summary>
-    public abstract class GameCharacter : ITransformable
+    public abstract class GameCharacter : IRigidBody
     {
         private IGameApp _game = null;
 
@@ -49,6 +50,8 @@ namespace CipherPark.AngelJacket.Core.World
         public IGameApp Game { get { return _game; } }
 
         public abstract void Draw(GameTime gameTime);
+
+        public Vector3 CenterOfMass { get; set; }
     }
 
     /// <summary>

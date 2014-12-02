@@ -27,8 +27,7 @@ namespace CipherPark.AngelJacket.Core.World
     {       
         private SurfaceEffect _effect = null;
         private Mesh _mesh = null;
-        private IGameApp _game = null;
-        
+                
         private StreakRenderer()
         { }
         
@@ -62,7 +61,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public SurfaceEffect Effect { get { return _effect; } }       
 
-        public void Update(GameTime gameTime, Scene.CameraSceneNode sceneCamera, ITransformable pathParentSpace)
+        public void Update(GameTime gameTime, Scene.CameraSceneNode sceneCamera, ITransformable pathParent)
         {                     
             const int VERTICES_PER_POINT = 2;   
             float halfWidth = Width / 2.0f;                     
@@ -73,7 +72,7 @@ namespace CipherPark.AngelJacket.Core.World
                 Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);
                 Vector3 p = points[i];
                 //Transform point to camera space.
-                Vector3 vw = ((pathParentSpace != null) ? pathParentSpace.ParentToWorldCoordinate(p) : p);
+                Vector3 vw = ((pathParent != null) ? pathParent.ParentToWorldCoordinate(p) : p);
                 Vector3 vw_camPos = vw - sceneCamera.Transform.Translation;
                 Vector3 camDir = Vector3.Normalize(sceneCamera.Camera.ViewMatrix.Column3.ToVector3());
                //Project point transformed point to camera z plane.                
@@ -83,7 +82,7 @@ namespace CipherPark.AngelJacket.Core.World
                 Vector3 npcs = Vector3.Normalize(sceneCamera.Transform.Translation - vpcs);
                 //Transform direction to container space.
                 Vector3 nw = npcs;
-                Vector3 n = (pathParentSpace != null) ? pathParentSpace.WorldToParentNormal(nw) : nw;
+                Vector3 n = (pathParent != null) ? pathParent.WorldToParentNormal(nw) : nw;
                 //Get cross product of slope and direction to camera.
                 Vector3 xDir = Vector3.Normalize(Vector3.Cross(n, nSlope));
                 vertices[i * VERTICES_PER_POINT] = new VertexPositionColor(p + xDir * halfWidth, Color.White.ToVector4());
@@ -151,6 +150,22 @@ namespace CipherPark.AngelJacket.Core.World
                 Renderer.Effect.Apply();
                 Renderer.Draw(gameTime);     
             }
+        }
+    }
+
+    public class LightTrail
+    {
+        private StreakRenderer _renderer = null;
+        private PathTracker _tracker = null;
+
+        public void Update(GameTime gameTime)
+        {
+
+        }
+
+        public void Draw(GameTime gameTime)
+        {
+
         }
     }
 
