@@ -23,29 +23,22 @@ using CipherPark.AngelJacket.Core.Effects;
 
 namespace CipherPark.AngelJacket.Core.World.Scene
 {
-    public class GameCharacterSceneNode : SceneNode
-    {           
-        GameCharacter _character = null;       
+    public class MountNode : SceneNode
+    {
+        public MountNode(IGameApp game, string name = null) : base(game, name)
+        { }
 
-        public GameCharacterSceneNode( GameCharacter character, string name = null)
-            : base(character.Game, name)
+        public void Mount(MountNode target)
         {
-            _character = character;
-            character.TransformableParent = this;
-        }
+            if (target.Parent == null)
+                throw new InvalidOperationException("Target mount node does not have a parent");
 
-        public GameCharacter GameCharacter
-        {
-            get
-            {
-                return _character;
-            }
-        }
-
-        public override void Draw(GameTime gameTime)
-        {           
-            GameCharacter.Draw(gameTime);                         
-            base.Draw(gameTime);
+            //convert the target mount node's parent's transform to the target mount node's space.
+            Transform parentTransformMNS = target.WorldToLocal(target.Parent.WorldTransform());
+            //calculate the new target mount node's parent transform.
+            Transform newParentTransform = target.Parent.WorldToParent(this.LocalToWorld(parentTransformMNS));
+            //set new parent transform.
+            target.Parent.Transform = newParentTransform;
         }
     }
 }

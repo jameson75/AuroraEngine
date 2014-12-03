@@ -10,7 +10,7 @@ using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Kinetics;
-using CipherPark.AngelJacket.Core.Animation.Controllers;
+using CipherPark.AngelJacket.Core.Services;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -22,41 +22,48 @@ using CipherPark.AngelJacket.Core.Animation.Controllers;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public abstract class Weapon : IRigidBody
+    public interface IWeapon
     {
-        public Transform Mount { get; set; }
-        public abstract void Fire();
+        void Fire(); 
     }
 
-    public class Gun : Weapon
+    public abstract class BasicWeapon : BasicWorldObject, IWeapon
     {
-        public override void Fire()
-        {
-            
-        }
-    }
-
-    public class MissleLauncher : Weapon
-    {
-        public override void Fire()
-        {
-            
-        }
-    }
-
-    public class Projectile : IRigidBody
-    {        
-        public Model Model { get; set; }
-
-        #region IRigidBody 
-        public Vector3 CenterOfMass { get; set; }
-        #endregion
-
-        public Projectile(IGameApp game)           
+        public BasicWeapon(IGameApp game)
+            : base(game)
         { }
 
-        public Transform Transform { get; set; }
+        public abstract void Fire();               
+    }
+ 
+    public class Gun : BasicWeapon
+    {
+        public Gun(IGameApp game)
+            : base(game)
+        { }
 
-        public ITransformable TransformableParent { get; set; }
+        public override void Fire()
+        {
+            
+        }   
+    }
+
+    public class MissleLauncher : BasicWeapon
+    {
+        public MissleLauncher(IGameApp game)
+            : base(game)
+        { }
+
+        public override void Fire()
+        {
+            
+        }
+    }
+
+    public class Projectile : BasicWorldObject
+    {
+        public Projectile(IGameApp game)
+            : base(game)
+        { }
     }
 }

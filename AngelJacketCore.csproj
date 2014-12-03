@@ -230,7 +230,8 @@
     <Compile Include="World\Kinetics\ConcentricForm.cs" />
     <Compile Include="World\Kinetics\IRigidBody.cs" />
     <Compile Include="World\Kinetics\Emitter.cs" />
-    <Compile Include="World\Scene\GameCharacterSceneNode.cs" />
+    <Compile Include="World\Scene\WorldObjectSceneNode.cs" />
+    <Compile Include="World\Scene\MountNode.cs" />
     <Compile Include="World\Track.cs" />
     <Compile Include="World\ISprite.cs" />
     <Compile Include="World\StreakRenderer.cs" />
@@ -248,6 +249,7 @@
     <Compile Include="World\Sprite.cs" />
     <Compile Include="World\PathTracker.cs" />
     <Compile Include="World\Weapon.cs" />
+    <Compile Include="World\WorldObject.cs" />
     <Compile Include="World\WorldSimulator.cs" />
   </ItemGroup>
   <ItemGroup>
