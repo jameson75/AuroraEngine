@@ -70,5 +70,7 @@ namespace CipherPark.AngelJacket.Core.World
         }
 
         public Vector3 CenterOfMass { get; set; }
+
+        public float Velocity { get; set; }
     }
 }

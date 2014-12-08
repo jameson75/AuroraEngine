@@ -12,5 +12,6 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     public interface IRigidBody : ITransformable
     {
         Vector3 CenterOfMass { get; set; }
+        float Velocity { get; set; }
     }
 }

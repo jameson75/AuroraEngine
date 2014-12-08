@@ -34,7 +34,7 @@ namespace CipherPark.AngelJacket.Core.World
     /// <summary>
     /// 
     /// </summary>
-    public interface IGameCharacter 
+    public interface IGameCharacter : ITransformable
     {
         List<IWeapon> Weapons { get; }
     }

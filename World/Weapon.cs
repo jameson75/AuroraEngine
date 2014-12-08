@@ -24,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.World
 {
     public interface IWeapon
     {
-        void Fire(); 
+        Projectile Fire(); 
     }
 
     public abstract class BasicWeapon : BasicWorldObject, IWeapon
@@ -33,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.World
             : base(game)
         { }
 
-        public abstract void Fire();               
+        public abstract Projectile Fire();               
     }
  
     public class Gun : BasicWeapon
@@ -42,9 +42,9 @@ namespace CipherPark.AngelJacket.Core.World
             : base(game)
         { }
 
-        public override void Fire()
+        public override Projectile Fire()
         {
-            
+            throw new NotImplementedException();
         }   
     }
 
@@ -54,9 +54,9 @@ namespace CipherPark.AngelJacket.Core.World
             : base(game)
         { }
 
-        public override void Fire()
+        public override Projectile Fire()
         {
-            
+            throw new NotImplementedException();
         }
     }
 
