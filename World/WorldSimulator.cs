@@ -22,16 +22,19 @@ namespace CipherPark.AngelJacket.Core.World
     {
         private IGameApp _game = null;
         private List<IAnimationController> _animationControllers = new List<IAnimationController>();
+        private CollisionDetector _collisionDetector = null;
 
         public IGameApp Game { get { return _game; } }    
         public List<IAnimationController> AnimationControllers { get { return _animationControllers; } }
-        
+        public CollisionDetector CollisionDetector { get { return _collisionDetector; } } 
+
         public WorldSimulator(IGameApp game)
         {
             _game = game;
+            _collisionDetector = new CollisionDetector(game);
         }
 
-        public void Update(GameTime gameTime, SimulationContext context)
+        public void Update(GameTime gameTime)
         {
             //Update animation controllers.
             //**********************************************************************************
@@ -47,33 +50,7 @@ namespace CipherPark.AngelJacket.Core.World
                     _animationControllers.Remove(controller);
             }
 
-            //Update scene based on the physical state of the scene objects.
-            foreach (SceneNode node in context.Scene.Nodes)
-                SimulatePhysics(node);
-        }
-
-        private void SimulatePhysics(SceneNode node)
-        {
-            foreach (SceneNode childNode in node.Children)
-                SimulatePhysics(childNode);
-        }
+            CollisionDetector.Update(gameTime);
+        }       
     }  
-
-    public struct SimulationContext
-    {
-        public Scene.Scene Scene { get; set; }
-        public UI.Components.IUIRoot UI { get; set; }
-
-        public SimulationContext(Scene.Scene scene, UI.Components.IUIRoot ui) : this()
-        {
-            Scene = scene;
-            UI = ui;
-        }
-    }
-
-    public abstract class SimulatorTask
-    {
-        public abstract void Step(long GameTime, SimulationContext context);
-        public abstract bool IsComplete { get; }
-    }
 }
