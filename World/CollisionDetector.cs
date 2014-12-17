@@ -20,6 +20,9 @@ using CipherPark.AngelJacket.Core.Services;
 
 namespace CipherPark.AngelJacket.Core.World
 {
+    /// <summary>
+    /// A collision detection system for world objects.
+    /// </summary>
     public class CollisionDetector
     {
         IGameApp _game = null;
@@ -27,31 +30,55 @@ namespace CipherPark.AngelJacket.Core.World
         List<ObservedWorldObject> observedObjects = new List<ObservedWorldObject>();
         List<ICollisionResponseHandler> registeredHandlers = new List<ICollisionResponseHandler>();        
 
+        /// <summary>
+        /// Instanciates new collision detector.
+        /// </summary>
+        /// <param name="game"></param>
         public CollisionDetector(IGameApp game)
         {
             _game = null;
         }
 
+        /// <summary>
+        /// Adds a world object to be observed for collision detection
+        /// </summary>
+        /// <param name="obj"></param>
         public void AddObservedObject(WorldObject obj)
         {
             observedObjects.Add(new ObservedWorldObject() { WorldObject = obj, PreviousTransform = obj.Transform });    
         }
 
+        /// <summary>
+        /// Removes an world object from collision detection observation
+        /// </summary>
+        /// <param name="obj"></param>
         public void RemoveObservedObject(WorldObject obj)
         {
             observedObjects.Remove(observedObjects.First(o => o.WorldObject == obj));
         }
 
+        /// <summary>
+        /// Registers a listener of colision events
+        /// </summary>
+        /// <param name="handler"></param>
         public void RegisterHandler(ICollisionResponseHandler handler)
         {
             registeredHandlers.Add(handler);
         }
 
+        /// <summary>
+        /// Unregisters a listener from collision events
+        /// </summary>
+        /// <param name="handler"></param>
         public void UnregisterHandler(ICollisionResponseHandler handler)
         {
             registeredHandlers.Remove(handler);
         }
 
+        /// <summary>
+        /// Updates the state of collision detection.
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
             IGameContextService contextService = (IGameContextService)_game.Services.GetService(typeof(IGameContextService));
@@ -63,85 +90,128 @@ namespace CipherPark.AngelJacket.Core.World
             if( _partitionTree == null )
                 _partitionTree = WorldSpacePartitionTree.CreateOctTree(actionBounds, 3);
 
-            _partitionTree.Assign(observedObjects.Select(o => o.WorldObject).ToList());
+            _partitionTree.Assign(observedObjects);
             List<WorldSpacePartitionNode> leafPartitions = _partitionTree.Leaves;
-            List<Tuple<WorldObject, WorldObject>> collidingPairs = new List<Tuple<WorldObject, WorldObject>>();
+            List<CollisionEvent> collisionEvents = new List<CollisionEvent>();
 
             //Narrow Phase
             //------------
             foreach(WorldSpacePartitionNode node in leafPartitions)
             {
-                foreach (WorldObject observedObject in node.WorldObjects)
+                foreach (ObservedWorldObject observedObject in node.WorldObjects)
                 {                    
-                    BoundingSphere wsSphereObservedObject = observedObject.BoundingSphereInWorldSpace();
-                    foreach(WorldObject targetObject in node.WorldObjects)
+                    //TODO: IMPORTANT - THIS SPHERE IS IN THE WRONG SPACE - NEEDS TO BE IN "ACTION SPACE" NOT "WORLD SPACE".
+                    BoundingSphere wsSphereObservedObject = observedObject.WorldObject.BoundingSphereInWorldSpace();
+                    foreach(ObservedWorldObject targetObject in node.WorldObjects)
                     {
-                        BoundingSphere wsSphereTargetObject = targetObject.BoundingSphereInWorldSpace();
+                        //TODO: IMPORTANT - THIS SPHERE IS IN THE WRONG SPACE - NEEDS TO BE IN "ACTION SPACE" NOT "WORLD SPACE".
+                        BoundingSphere wsSphereTargetObject = targetObject.WorldObject.BoundingSphereInWorldSpace();
+
+                        //*****************************************************************************************
+                        //TODO: Use the tutorial at the following link to implement
+                        //the translation of the observedObject to the targetObject frame-of-reference.
+                        //http://www.gamasutra.com/view/feature/131424/pool_hall_lessons_fast_accurate_.php?page=2
+                        //*****************************************************************************************
+                        /*
                         if( wsSphereObservedObject.Intersects(ref wsSphereTargetObject) )
-                        {
+                        {                           
                             //Add to colliding pairs if and only if it's a new pair.
-                            if (collidingPairs.Count(p => (p.Item1 == observedObject && p.Item2 == targetObject) ||
-                                                          (p.Item1 == targetObject && p.Item2 == observedObject)) == 0)
+                            if (collisionEvents.Count(p => (p.Item1 == observedObject && p.Item2 == targetObject) ||
+                                                           (p.Item1 == targetObject && p.Item2 == observedObject)) == 0)
                             {
-                                collidingPairs.Add(new Tuple<WorldObject, WorldObject>(observedObject, targetObject));
-                            }
+                                collisionEvents.Add(new Tuple<WorldObject, WorldObject>(observedObject, targetObject));
+                            }                            
                         }
+                        */
                     }
                 }               
             }
 
-            NotifyHandlers(collidingPairs);
+            NotifyHandlers(collisionEvents);
         }
 
-        private void NotifyHandlers(IEnumerable<Tuple<WorldObject, WorldObject>> collidingPairs)
+        /// <summary>
+        /// Notifies the registered listenees of any collision events that occured during the last call to Update().
+        /// </summary>
+        /// <param name="collisionEvent"></param>
+        private void NotifyHandlers(IEnumerable<CollisionEvent> collisionEvent)
         {   
-            foreach(var p in collidingPairs)
-                registeredHandlers.ForEach(h => h.OnCollision(p.Item1, p.Item2));
+            foreach(var p in collisionEvent)
+                registeredHandlers.ForEach(h => h.OnCollision(p));
         }
     }
 
+    /// <summary>
+    /// A contract for any listener of collision events.
+    /// </summary>
     public interface ICollisionResponseHandler
     {
-        void OnCollision(WorldObject obj1, WorldObject obj2);
+        void OnCollision(CollisionEvent collisionEvent);
     }
 
+    /// <summary>
+    /// Represents a oct-space partition tree for the world.
+    /// </summary>
     public class WorldSpacePartitionTree
     {
         private const int ChildNodesPerParent = 8;
         private WorldSpacePartitionNode _root = null;
         private List<WorldSpacePartitionNode> _leaves = null;
 
-        public static WorldSpacePartitionTree CreateOctTree(BoundingBox totalBounds, int nLevels)
+        /// <summary>
+        /// All the leaf nodes of the space partition tree.
+        /// </summary>
+        /// <remarks>
+        /// Leaf nodes are the only nodes in the tree that contain world objects.
+        /// </remarks>
+        public List<WorldSpacePartitionNode> Leaves { get { return _leaves; } }
+
+        /// <summary>
+        /// Creates a new WorldSpacePartitionTree with a specified total volumen and tree depth. 
+        /// </summary>
+        /// <param name="totalVolume"></param>
+        /// <param name="depth"></param>
+        /// <returns></returns>
+        public static WorldSpacePartitionTree CreateOctTree(BoundingBox totalVolume, int depth)
         {
             List<WorldSpacePartitionNode> allNodes = new List<WorldSpacePartitionNode>();
             WorldSpacePartitionTree newTree = new WorldSpacePartitionTree();
             WorldSpacePartitionNode rootNode = new WorldSpacePartitionNode()
             {
-                BoundingBox = totalBounds
+                BoundingBox = totalVolume
             };
-            _BuildOctTree(rootNode, totalBounds, nLevels);
+            _BuildOctTree(rootNode, totalVolume, depth);
             _FlattenToList(rootNode, allNodes);
             newTree._root = rootNode;
             newTree._leaves = allNodes.Where(n => n.Children.Count == 0).ToList();
             return newTree;
         }    
 
-        public void Assign(List<WorldObject> observedObjects)
+        /// <summary>
+        /// Assigns/Re-assigns each object in the world to one or more partition spaces.
+        /// </summary>
+        /// <remarks>An object may span more than one space, in which case, it is assinged to all spaces it spans</remarks>
+        /// <param name="observedObjects"></param>
+        public void Assign(List<ObservedWorldObject> observedObjects)
         {           
             foreach (WorldSpacePartitionNode leaf in _leaves)
             {
                 leaf.WorldObjects.Clear();
-                foreach (WorldObject wo in observedObjects)
+                foreach (ObservedWorldObject observed in observedObjects)
                 {
                     BoundingBox leafBounds = leaf.BoundingBox;
-                    if (wo.BoundingSphereInWorldSpace().Intersects(ref leafBounds))
-                        leaf.WorldObjects.Add(wo);
+                    if (observed.WorldObject.BoundingSphereInWorldSpace().Intersects(ref leafBounds))
+                        leaf.WorldObjects.Add(observed);
                 }
             }
-        }
+        }    
 
-        public List<WorldSpacePartitionNode> Leaves { get { return _leaves; } }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="bounds"></param>
+        /// <param name="nLevels"></param>
         private static void _BuildOctTree(WorldSpacePartitionNode root, BoundingBox bounds, int nLevels)
         {
             if (nLevels == 0)
@@ -190,6 +260,11 @@ namespace CipherPark.AngelJacket.Core.World
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="root"></param>
+        /// <param name="allNodes"></param>
         private static void _FlattenToList(WorldSpacePartitionNode root, List<WorldSpacePartitionNode> allNodes)
         {
             allNodes.Add(root);
@@ -197,32 +272,79 @@ namespace CipherPark.AngelJacket.Core.World
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class WorldSpacePartitionNode
     {
-        private List<WorldObject> _worldObject = new List<WorldObject>();
-        private List<WorldSpacePartitionNode> _children = new List<WorldSpacePartitionNode>();
-        private WorldSpacePartitionTree[] _adjacentNodes = new WorldSpacePartitionTree[6];
+        private List<ObservedWorldObject> _observedWorldObjects = new List<ObservedWorldObject>();
+        private List<WorldSpacePartitionNode> _children = new List<WorldSpacePartitionNode>();   
+   
+        /// <summary>
+        /// 
+        /// </summary>
         public BoundingBox BoundingBox { get; set; }
-        public List<WorldObject> WorldObjects { get; set; }
-        public List<WorldSpacePartitionNode> Children { get; set; }      
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<ObservedWorldObject> WorldObjects { get { return _observedWorldObjects; } }
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<WorldSpacePartitionNode> Children { get { return _children; } } 
+    }  
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ObservedWorldObject 
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public WorldObject WorldObject { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public Transform PreviousTransform { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an event of two world objects colliding.
+    /// </summary>
+    public class CollisionEvent
+    {
+        /// <summary>
+        /// First object involved in the collision.
+        /// </summary>
+        public WorldObject Object1 { get; set; }
+
+        /// <summary>
+        /// Second object involved in the collision.
+        /// </summary>        
+        public WorldObject Object2 { get; set; }
+
+        /// <summary>
+        /// The first object's location at the collision.
+        /// </summary>
+        public Vector3 Object1LocationAtCollision { get; set; }
+
+        /// <summary>
+        /// The second object's location at the collision.
+        /// </summary>
+        public Vector3 Object2LocationAtCollision { get; set; }
     }
 
     public static class WorldObjectExtension
     {
         public static BoundingSphere BoundingSphereInWorldSpace(this WorldObject wo)
         {
-             return new BoundingSphere(wo.WorldTransform().Translation, BoundingSphere.FromBox(wo.BoundingBox).Radius);
+            return new BoundingSphere(wo.WorldTransform().Translation, BoundingSphere.FromBox(wo.BoundingBox).Radius);
         }
 
         public static BoundingBox BoundingBoxInWorldSpace(this WorldObject wo)
         {
             return new BoundingBox(wo.ParentToWorldCoordinate(wo.BoundingBox.Minimum), wo.ParentToWorldCoordinate(wo.BoundingBox.Maximum));
         }
-    }
-
-    public class ObservedWorldObject 
-    {
-        public WorldObject WorldObject { get; set; }
-        public Transform PreviousTransform { get; set; }
     }
 }

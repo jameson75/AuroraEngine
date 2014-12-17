@@ -36,7 +36,9 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Update(GameTime gameTime)
         {
-            //Update animation controllers.
+            //I. Update animation controllers.
+            //--------------------------------
+
             //**********************************************************************************
             //NOTE: We use an auxilary controller collection to enumerate through, in 
             //the event that an updated controller alters this Simulator's Animation Controllers
@@ -50,6 +52,8 @@ namespace CipherPark.AngelJacket.Core.World
                     _animationControllers.Remove(controller);
             }
 
+            //II. Update collision detection.
+            //-------------------------------
             CollisionDetector.Update(gameTime);
         }       
     }  
