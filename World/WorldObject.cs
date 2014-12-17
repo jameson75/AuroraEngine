@@ -40,6 +40,8 @@ namespace CipherPark.AngelJacket.Core.World
         public Transform Transform { get; set; }
 
         public ITransformable TransformableParent { get; set; }
+
+        public abstract BoundingBox BoundingBox { get; }
     }
 
     public abstract class BasicWorldObject : WorldObject, IRigidBody
@@ -72,5 +74,16 @@ namespace CipherPark.AngelJacket.Core.World
         public Vector3 CenterOfMass { get; set; }
 
         public float Velocity { get; set; }
+
+        public BoundingBox BoundingBox
+        {
+            get
+            {
+                if (Model != null)
+                    return Model.BoundingBox;
+                else
+                    return BoundingBoxExtension.Empty;
+            }
+        }
     }
 }
