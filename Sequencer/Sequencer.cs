@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SharpDX;
 using CipherPark.AngelJacket.Core.Module;
 using CipherPark.AngelJacket.Core.World;
 using CipherPark.AngelJacket.Core.World.Scene;
@@ -80,7 +81,7 @@ namespace CipherPark.AngelJacket.Core
 {
     public struct GameContext
     {
-        public GameContext(GameAssets assets, Scene scene, WorldSimulator simulator, IUIRoot ui)
+        public GameContext(GameAssets assets, Scene scene, WorldSimulator simulator, IUIRoot ui, BoundingBox actionBounds)
             : this()
         {
             Assets = assets;
@@ -88,12 +89,14 @@ namespace CipherPark.AngelJacket.Core
             Simulator = simulator;
             UI = ui;
             Game = scene.Game;
+            ActionBounds = actionBounds;
         }
         public GameAssets Assets { get; private set; }
         public Scene Scene { get; private set; }
         public WorldSimulator Simulator { get; private set; }
         public IUIRoot UI { get; private set; }
         public IGameApp Game { get; private set; }
+        public BoundingBox ActionBounds { get; private set; }
 
         private static GameContext _empty = new GameContext();
         public static GameContext Empty { get { return _empty; } }

@@ -82,7 +82,7 @@ namespace CipherPark.AngelJacket.Core.World
         public void Update(GameTime gameTime)
         {
             IGameContextService contextService = (IGameContextService)_game.Services.GetService(typeof(IGameContextService));
-            BoundingBox actionBounds = contextService.Context.ActionBounds;            
+            BoundingBox actionBounds = contextService.Context.Value.ActionBounds;            
 
             //Broad Phase
             //-----------

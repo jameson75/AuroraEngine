@@ -69,6 +69,11 @@ namespace CipherPark.AngelJacket.Core.World
             VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];                                         
             for (int i = 0; i < points.Length; i++)
             {
+                //*****************************************************************************
+                //TODO: BELOW. WE'RE PERFORMING AN ORTHOGONAL PROJECTION. 
+                //REPLACE THIS AND PERFORM A PERSEPCTIVE PROJECTION.
+                //*****************************************************************************
+
                 Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);
                 Vector3 p = points[i];
                 //Transform point to camera space.

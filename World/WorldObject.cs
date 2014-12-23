@@ -75,7 +75,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public float Velocity { get; set; }
 
-        public BoundingBox BoundingBox
+        public override BoundingBox BoundingBox
         {
             get
             {
