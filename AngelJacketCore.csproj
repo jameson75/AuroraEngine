@@ -122,6 +122,7 @@
     <Compile Include="Effects\Obsolete\SHLightingEffect.cs" />
     <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Effects\SkysphereEffect.cs" />
+    <Compile Include="Utils\TransformBoundingElementExtensions.cs" />
     <Compile Include="World\CollisionDetector.cs" />
     <Compile Include="World\GameCharacter.cs" />
     <Compile Include="World\Kinetics\Force.cs" />

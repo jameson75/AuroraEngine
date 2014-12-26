@@ -281,9 +281,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         private static BoundingBox _empty = new BoundingBox(Vector3.Zero, Vector3.Zero);
 
         public static BoundingBox Transform(this BoundingBox boundingBox, Matrix matrix)
-        {
+        {           
             Vector4 vMin = Vector3.Transform(boundingBox.Minimum, matrix);
-            Vector4 vMax = Vector3.Transform(boundingBox.Maximum, matrix);
+            Vector4 vMax = Vector3.Transform(boundingBox.Maximum, matrix);         
             return new BoundingBox(new Vector3(vMin.X, vMin.Y, vMin.Z), new Vector3(vMax.X, vMax.Y, vMax.Z));
         }
 

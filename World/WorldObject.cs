@@ -40,8 +40,13 @@ namespace CipherPark.AngelJacket.Core.World
         public Transform Transform { get; set; }
 
         public ITransformable TransformableParent { get; set; }
+        
+        public BoundingSphere BoundingSphere 
+        { 
+            get { return BoundingSphere.FromBox(BoundingBox); } 
+        }
 
-        public abstract BoundingBox BoundingBox { get; }
+        public abstract BoundingBox BoundingBox { get; }        
     }
 
     public abstract class BasicWorldObject : WorldObject, IRigidBody

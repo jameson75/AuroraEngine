@@ -9,6 +9,7 @@ using CipherPark.AngelJacket.Core;
 using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Services;
+using CipherPark.AngelJacket.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -25,6 +26,7 @@ namespace CipherPark.AngelJacket.Core.World
     /// </summary>
     public class CollisionDetector
     {
+        const int PartitionTreeDepth = 3;
         IGameApp _game = null;
         WorldSpacePartitionTree _partitionTree = null;
         List<ObservedWorldObject> observedObjects = new List<ObservedWorldObject>();
@@ -81,48 +83,78 @@ namespace CipherPark.AngelJacket.Core.World
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            IGameContextService contextService = (IGameContextService)_game.Services.GetService(typeof(IGameContextService));
-            BoundingBox actionBounds = contextService.Context.Value.ActionBounds;            
+            //***********************************************************************************
+            //Basic, Broad-Phase collision detection using spatial partitioning.
+            //***********************************************************************************
 
-            //Broad Phase
-            //-----------
-            //1. Partition World Space.
+            List<CollisionEvent> collisionEvents = new List<CollisionEvent>();                 
+
+            //Stage I. Broad Phase
+            //--------------------
+            
+            //1. One-Time partition World Space into in a 3-level oct-tree.
+            IGameContextService contextService = (IGameContextService)_game.Services.GetService(typeof(IGameContextService));                     
             if( _partitionTree == null )
-                _partitionTree = WorldSpacePartitionTree.CreateOctTree(actionBounds, 3);
+                _partitionTree = WorldSpacePartitionTree.CreateOctTree(contextService.Context.Value.ActionBounds, PartitionTreeDepth);
 
-            _partitionTree.Assign(observedObjects);
-            List<WorldSpacePartitionNode> leafPartitions = _partitionTree.Leaves;
-            List<CollisionEvent> collisionEvents = new List<CollisionEvent>();
+            //2. Assign/Re-assign each observed object to all oct-tree leaves where a potential collision may occur.
+            _partitionTree.Assign(observedObjects);                  
 
-            //Narrow Phase
-            //------------
-            foreach(WorldSpacePartitionNode node in leafPartitions)
+            //Stage II. Narrow Phase
+            //----------------------
+            
+            //Test objects associated with each oct-tree leaf for potential collisions.
+
+            foreach(WorldSpacePartitionNode node in _partitionTree.Leaves)
             {
-                foreach (ObservedWorldObject observedObject in node.WorldObjects)
-                {                    
-                    //TODO: IMPORTANT - THIS SPHERE IS IN THE WRONG SPACE - NEEDS TO BE IN "ACTION SPACE" NOT "WORLD SPACE".
-                    BoundingSphere wsSphereObservedObject = observedObject.WorldObject.BoundingSphereInWorldSpace();
-                    foreach(ObservedWorldObject targetObject in node.WorldObjects)
+                foreach (ObservedWorldObject objectA in node.WorldObjects)
+                {                
+                    //TODO: Optimize by placing this code in the Assing() method of WorldPartitionTree and storing the values as member
+                    //variables.
+                    
+                    BoundingSphere sphereA = objectA.WorldObject.WorldBoundingSphere();
+                    Vector3 movementA = objectA.WorldObject.ParentToWorldNormal(Vector3.Normalize(objectA.WorldObject.Transform.Translation - objectA.PreviousTransform.Translation));
+                    float lengthA = Vector3.Distance(objectA.WorldObject.Transform.Translation, objectA.PreviousTransform.Translation);
+                    
+                    foreach(ObservedWorldObject objectB in node.WorldObjects)
                     {
-                        //TODO: IMPORTANT - THIS SPHERE IS IN THE WRONG SPACE - NEEDS TO BE IN "ACTION SPACE" NOT "WORLD SPACE".
-                        BoundingSphere wsSphereTargetObject = targetObject.WorldObject.BoundingSphereInWorldSpace();
+                        //TODO: Optimize by placing this code in the Assing() method of WorldPartitionTree and storing the values as member
+                        //variables.
+                        
+                        BoundingSphere sphereB = objectB.WorldObject.WorldBoundingSphere();
+                        Vector3 movementB = objectB.WorldObject.ParentToWorldNormal(Vector3.Normalize(objectB.WorldObject.Transform.Translation - objectB.PreviousTransform.Translation));
+                        float lengthB = Vector3.Distance(objectB.WorldObject.Transform.Translation, objectB.PreviousTransform.Translation);
+
+                        //TODO: Optimize by performing a lookup that disreguards this test if these two objects
+                        //have already been tested (ie: when objectA was objectB and objectB was objectA).
 
                         //*****************************************************************************************
-                        //TODO: Use the tutorial at the following link to implement
-                        //the translation of the observedObject to the targetObject frame-of-reference.
+                        //The following technique was dervied from this tutorial.
                         //http://www.gamasutra.com/view/feature/131424/pool_hall_lessons_fast_accurate_.php?page=2
                         //*****************************************************************************************
-                        /*
-                        if( wsSphereObservedObject.Intersects(ref wsSphereTargetObject) )
-                        {                           
-                            //Add to colliding pairs if and only if it's a new pair.
-                            if (collisionEvents.Count(p => (p.Item1 == observedObject && p.Item2 == targetObject) ||
-                                                           (p.Item1 == targetObject && p.Item2 == observedObject)) == 0)
-                            {
-                                collisionEvents.Add(new Tuple<WorldObject, WorldObject>(observedObject, targetObject));
-                            }                            
-                        }
-                        */
+                        
+                        //1. Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
+                        Vector3 movementArB = Vector3.Normalize(movementA - movementB);
+                        
+                        //2. Get the direction vector of A to B
+                        Vector3 dirAB = Vector3.Normalize(objectB.WorldObject.Transform.Translation - objectA.WorldObject.Transform.Translation);
+                        
+                        //3. Check to see if A is actually moving towards or away from B.
+                        if (Vector3.Dot(movementArB, dirAB) > 0 )
+                        {
+                            /*
+                            if( wsSphereObservedObject.Intersects(ref wsSphereTargetObject) )
+                            {                           
+                                //Add to colliding pairs if and only if it's a new pair.
+                                if (collisionEvents.Count(p => (p.Item1 == observedObject && p.Item2 == targetObject) ||
+                                                               (p.Item1 == targetObject && p.Item2 == observedObject)) == 0)
+                                {
+                                    collisionEvents.Add(new Tuple<WorldObject, WorldObject>(observedObject, targetObject));
+                                }                            
+                            }
+                            */
+
+                        }                       
                     }
                 }               
             }
@@ -200,7 +232,7 @@ namespace CipherPark.AngelJacket.Core.World
                 foreach (ObservedWorldObject observed in observedObjects)
                 {
                     BoundingBox leafBounds = leaf.BoundingBox;
-                    if (observed.WorldObject.BoundingSphereInWorldSpace().Intersects(ref leafBounds))
+                    if (observed.WorldObject.WorldBoundingSphere().Intersects(ref leafBounds))
                         leaf.WorldObjects.Add(observed);
                 }
             }
@@ -218,14 +250,17 @@ namespace CipherPark.AngelJacket.Core.World
                 return;
             else
             {
+                //Min, Max and Mid points of the root node's bounding box.
+
                 Vector3 Mid = new Vector3(bounds.Minimum.X + (bounds.Maximum.X - bounds.Minimum.X) / 2.0f,
                                           bounds.Minimum.Y + (bounds.Maximum.Y - bounds.Minimum.Y) / 2.0f,
                                           bounds.Minimum.Z + (bounds.Maximum.Z - bounds.Minimum.Z) / 2.0f);
                 Vector3 Max = bounds.Maximum;
                 Vector3 Min = bounds.Minimum;
 
-                //Min/Max of octree nodes' bounding boxes.
-                //Order of nodes: 
+                
+                //The goal is to divde the root node bounding box into 8 boxes.
+                //Order of child boxes...
                 //1-4, start from front-lower-left and move clockwise. 5-8, start from back-lower-left and move clockwise.
                 
                 Vector3[] vecMin = new Vector3[]
@@ -333,18 +368,5 @@ namespace CipherPark.AngelJacket.Core.World
         /// The second object's location at the collision.
         /// </summary>
         public Vector3 Object2LocationAtCollision { get; set; }
-    }
-
-    public static class WorldObjectExtension
-    {
-        public static BoundingSphere BoundingSphereInWorldSpace(this WorldObject wo)
-        {
-            return new BoundingSphere(wo.WorldTransform().Translation, BoundingSphere.FromBox(wo.BoundingBox).Radius);
-        }
-
-        public static BoundingBox BoundingBoxInWorldSpace(this WorldObject wo)
-        {
-            return new BoundingBox(wo.ParentToWorldCoordinate(wo.BoundingBox.Minimum), wo.ParentToWorldCoordinate(wo.BoundingBox.Maximum));
-        }
-    }
+    }    
 }
