@@ -28,7 +28,7 @@ namespace CipherPark.AngelJacket.Core.World
     {
         const int PartitionTreeDepth = 3;
         IGameApp _game = null;
-        WorldSpacePartitionTree _partitionTree = null;
+        //WorldSpacePartitionTree _partitionTree = null;
         List<ObservedWorldObject> observedObjects = new List<ObservedWorldObject>();
         List<ICollisionResponseHandler> registeredHandlers = new List<ICollisionResponseHandler>();        
 
@@ -91,7 +91,7 @@ namespace CipherPark.AngelJacket.Core.World
 
             //Stage I. Broad Phase
             //--------------------
-            
+            /*
             //1. One-Time partition World Space into in a 3-level oct-tree.
             IGameContextService contextService = (IGameContextService)_game.Services.GetService(typeof(IGameContextService));                     
             if( _partitionTree == null )
@@ -99,61 +99,89 @@ namespace CipherPark.AngelJacket.Core.World
 
             //2. Assign/Re-assign each observed object to all oct-tree leaves where a potential collision may occur.
             _partitionTree.Assign(observedObjects);                  
+            */
 
             //Stage II. Narrow Phase
             //----------------------
             
             //Test objects associated with each oct-tree leaf for potential collisions.
 
-            foreach(WorldSpacePartitionNode node in _partitionTree.Leaves)
+            //foreach(WorldSpacePartitionNode node in _partitionTree.Leaves)
             {
-                foreach (ObservedWorldObject objectA in node.WorldObjects)
-                {                
-                    //TODO: Optimize by placing this code in the Assing() method of WorldPartitionTree and storing the values as member
-                    //variables.
-                    
-                    BoundingSphere sphereA = objectA.WorldObject.WorldBoundingSphere();
-                    Vector3 movementA = objectA.WorldObject.ParentToWorldNormal(Vector3.Normalize(objectA.WorldObject.Transform.Translation - objectA.PreviousTransform.Translation));
-                    float lengthA = Vector3.Distance(objectA.WorldObject.Transform.Translation, objectA.PreviousTransform.Translation);
-                    
-                    foreach(ObservedWorldObject objectB in node.WorldObjects)
-                    {
-                        //TODO: Optimize by placing this code in the Assing() method of WorldPartitionTree and storing the values as member
-                        //variables.
-                        
-                        BoundingSphere sphereB = objectB.WorldObject.WorldBoundingSphere();
-                        Vector3 movementB = objectB.WorldObject.ParentToWorldNormal(Vector3.Normalize(objectB.WorldObject.Transform.Translation - objectB.PreviousTransform.Translation));
-                        float lengthB = Vector3.Distance(objectB.WorldObject.Transform.Translation, objectB.PreviousTransform.Translation);
+                foreach (ObservedWorldObject objectA in observedObjects)
+                { 
+                    //*****************************************************************************************
+                    //The following technique was dervied from this tutorial.
+                    //http://www.gamasutra.com/view/feature/131424/pool_hall_lessons_fast_accurate_.php?page=2
+                    // Legend:
+                    // vectorA - movement vector for object A.
+                    // vectorB - movement vector for object B.
+                    // vectorC - vector from A to B.
+                    // lengthD - length along vectorA from object A to closest point to object B. 
+                    // vectorArB - movement vector for oject A in object B's reference frame.
+                    // lengthTSquared -
+                    // lengthFSquared -
+                    // radiiAB - 
+                    //*****************************************************************************************
 
+                    //TODO: Optimize by placing this code in the Assign() method of WorldPartitionTree and storing the values as member
+                    //variables.                    
+                    BoundingSphere sphereA = objectA.WorldObject.WorldBoundingSphere();
+                    Vector3 vectorA = objectA.WorldObject.ParentToWorldNormal(objectA.WorldObject.Transform.Translation - objectA.PreviousTransform.Translation);                   
+                    
+                    foreach(ObservedWorldObject objectB in observedObjects)
+                    {
+                        //Prevent tests against self.
+                        if (objectA == objectB)
+                            continue;
+
+                        //TODO: Optimize by placing this code in the Assign() method of WorldPartitionTree and storing the values as member
+                        //variables.                        
+                        BoundingSphere sphereB = objectB.WorldObject.WorldBoundingSphere();
+                        Vector3 vectorB = objectB.WorldObject.ParentToWorldNormal(objectB.WorldObject.Transform.Translation - objectB.PreviousTransform.Translation);                        
+                       
                         //TODO: Optimize by performing a lookup that disreguards this test if these two objects
                         //have already been tested (ie: when objectA was objectB and objectB was objectA).
+                                  
+                        //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
+                        Vector3 vectorArB = vectorA - vectorB;
+                        Vector3 normalArB = Vector3.Normalize(vectorArB);
+                        
+                        //Get the direction vector of A to B, as well as the normal from A to B.
+                        Vector3 vectorC = objectB.WorldObject.Transform.Translation - objectA.WorldObject.Transform.Translation;                        
+                        
+                        //Get the signed length of the [relative-to-B] vector from object A to the closest co-linear point to object B.
+                        float lengthD = Vector3.Dot(normalArB, vectorC);
 
-                        //*****************************************************************************************
-                        //The following technique was dervied from this tutorial.
-                        //http://www.gamasutra.com/view/feature/131424/pool_hall_lessons_fast_accurate_.php?page=2
-                        //*****************************************************************************************
-                        
-                        //1. Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
-                        Vector3 movementArB = Vector3.Normalize(movementA - movementB);
-                        
-                        //2. Get the direction vector of A to B
-                        Vector3 dirAB = Vector3.Normalize(objectB.WorldObject.Transform.Translation - objectA.WorldObject.Transform.Translation);
-                        
-                        //3. Check to see if A is actually moving towards or away from B.
-                        if (Vector3.Dot(movementArB, dirAB) > 0 )
-                        {
-                            /*
-                            if( wsSphereObservedObject.Intersects(ref wsSphereTargetObject) )
-                            {                           
-                                //Add to colliding pairs if and only if it's a new pair.
-                                if (collisionEvents.Count(p => (p.Item1 == observedObject && p.Item2 == targetObject) ||
-                                                               (p.Item1 == targetObject && p.Item2 == observedObject)) == 0)
+                        //Check to see if A is actually moving towards or away from B.
+                        //Only if A is approaching B, do we check for a potential collision between A and B.                        
+                        if ( lengthD > 0 )
+                        {                            
+                            float lengthFSquared = vectorC.LengthSquared() - (lengthD * lengthD); 
+                            float radiiAB = (sphereA.Radius + sphereB.Radius);
+                            float radiiABSquared = radiiAB * radiiAB;                            
+                            
+                            //Test if spheres toucch at any point along their respective movement vectors.                            
+                            if (lengthFSquared < radiiABSquared)
+                            {
+                                float lengthTSquared = radiiABSquared - lengthFSquared;
+                                if (lengthTSquared > 0)
                                 {
-                                    collisionEvents.Add(new Tuple<WorldObject, WorldObject>(observedObject, targetObject));
-                                }                            
-                            }
-                            */
+                                    float distanceToCollisionA = lengthD - (float)Math.Sqrt(lengthTSquared);
+                                    Vector3 collisionPointA = Vector3.Normalize(vectorA) * distanceToCollisionA;
+                                    float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
+                                    float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
+                                    Vector3 collisionPointB = Vector3.Normalize(vectorB) * distanceToCollisionB;
 
+                                    collisionEvents.Add(new CollisionEvent()
+                                    {
+                                        Object1 = objectA.WorldObject,
+                                        Object2 = objectB.WorldObject,
+                                        Object1LocationAtCollision = collisionPointA,
+                                        Object2LocationAtCollision = collisionPointB
+                                    });
+                                }                                
+                            }                            
                         }                       
                     }
                 }               
@@ -226,14 +254,24 @@ namespace CipherPark.AngelJacket.Core.World
         /// <param name="observedObjects"></param>
         public void Assign(List<ObservedWorldObject> observedObjects)
         {           
-            foreach (WorldSpacePartitionNode leaf in _leaves)
-            {
-                leaf.WorldObjects.Clear();
+            foreach (WorldSpacePartitionNode leafNode in _leaves)
+            {               
+                leafNode.WorldObjects.Clear();
                 foreach (ObservedWorldObject observed in observedObjects)
                 {
-                    BoundingBox leafBounds = leaf.BoundingBox;
-                    if (observed.WorldObject.WorldBoundingSphere().Intersects(ref leafBounds))
-                        leaf.WorldObjects.Add(observed);
+                    //**************************************************************************
+                    //TODO: Fix the code below.
+                    //Need to figure out of the current node intersects the temporal volume.
+                    //**************************************************************************
+                    /*
+                    float temporalVectorLength = Vector3.Distance(observed.WorldObject.Transform.Translation, observed.PreviousTransform.Translation);
+                    Ray temporalRay = new Ray(observed.PreviousTransform.Translation,
+                                              observed.WorldObject.Transform.Translation - observed.PreviousTransform.Translation);
+                    float intersectionDistance = 0;
+                    if (leafNode.BoundingBox.Intersects(ref temporalRay, out intersectionDistance) &&
+                        intersectionDistance <= temporalVectorLength )
+                        leafNode.WorldObjects.Add(observed);
+                    */
                 }
             }
         }    
