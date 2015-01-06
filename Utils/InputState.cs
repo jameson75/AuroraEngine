@@ -596,6 +596,8 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         private void SetMouseCurrentPosition(MouseState state)
         {
+            //We leverage win32 native functions to accurately trap the mouse state.
+            //----------------------------------------------------------------------
             DrawingPoint mousePos = this.GetSystemCursorPosition();
             state.X = mousePos.X;
             state.Y = mousePos.Y;
@@ -637,8 +639,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             private delegate IntPtr WndProcDelegate(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
             private WndProcDelegate _hookWndProcDelegate = null;
             private Delegate _originalWndProcDelegate = null;
+            
             public void Initialize(IntPtr hWnd)
             {
+                //We hook into the running application's windows message pump.
+                //-----------------------------------------------------------
                 _hookWndProcDelegate = new WndProcDelegate(WndProc);             
                 IntPtr hookWndProcFuncPtr = Marshal.GetFunctionPointerForDelegate(_hookWndProcDelegate);
                 IntPtr originalWndProcFuncPtr = (UnsafeNativeMethods.SetWindowLong(hWnd, UnsafeNativeMethods.GWL_WNDPROC, hookWndProcFuncPtr));
@@ -647,10 +652,10 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
 
             private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
-            {
-                //OnWndProc(hWnd, msg, wParam, lParam);
+            {               
                 switch (msg)
                 {
+                    //Handle mouse wheel movements...
                     case WM_MOUSEWHEEL:
                         LastMouseWheelDelta = ((short)((int)wParam >> 16));                       
                         break;

@@ -17,7 +17,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// <param name="transformable"></param>
         /// <param name="sphere"></param>
         /// <returns></returns>
-        public static BoundingSphere ParentToWorldBoundingSphere(this ITransformable transformable, BoundingSphere sphere)
+        public static BoundingSphere LocalToWorldBoundingSphere(this ITransformable transformable, BoundingSphere sphere)
         {
             return new BoundingSphere(transformable.WorldTransform().Translation, sphere.Radius);
         }
@@ -28,9 +28,10 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// <param name="transformable"></param>
         /// <param name="box"></param>
         /// <returns></returns>
-        public static BoundingBox ParentToWorldBoundingBox(this ITransformable transformable, BoundingBox box)
+        public static BoundingBox LocalToWorldBoundingBox(this ITransformable transformable, BoundingBox box)
         {
-            return new BoundingBox(transformable.ParentToWorldCoordinate(box.Minimum), transformable.ParentToWorldCoordinate(box.Maximum));
+            Vector3 thisWorldPosition = transformable.WorldTransform().Translation;
+            return new BoundingBox(thisWorldPosition + box.Minimum, thisWorldPosition + box.Maximum);
         }
     }
 
@@ -46,7 +47,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// <returns></returns>
         public static BoundingSphere WorldBoundingSphere(this WorldObject wo)
         {
-            return wo.ParentToWorldBoundingSphere(wo.BoundingSphere);
+            return wo.LocalToWorldBoundingSphere(wo.BoundingSphere);
         }
 
         /// <summary>
@@ -56,7 +57,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// <returns></returns>
         public static BoundingBox WorldBoundingBox(this WorldObject wo)
         {
-            return wo.ParentToWorldBoundingBox(wo.BoundingBox);
+            return wo.LocalToWorldBoundingBox(wo.BoundingBox);
         }
     }
 }

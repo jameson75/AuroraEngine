@@ -119,8 +119,8 @@ namespace CipherPark.AngelJacket.Core.World
                     // vectorC - vector from A to B.
                     // lengthD - length along vectorA from object A to closest point to object B. 
                     // vectorArB - movement vector for oject A in object B's reference frame.
-                    // lengthTSquared -
-                    // lengthFSquared -
+                    // lengthTSquared - 
+                    // lengthFSquared - 
                     // radiiAB - 
                     //*****************************************************************************************
 
@@ -149,45 +149,74 @@ namespace CipherPark.AngelJacket.Core.World
                         
                         //Get the direction vector of A to B, as well as the normal from A to B.
                         Vector3 vectorC = objectB.WorldObject.Transform.Translation - objectA.WorldObject.Transform.Translation;                        
+                        float lengthC = vectorC.Length();
                         
-                        //Get the signed length of the [relative-to-B] vector from object A to the closest co-linear point to object B.
-                        float lengthD = Vector3.Dot(normalArB, vectorC);
+                        float radiiAB = (sphereA.Radius + sphereB.Radius);
+                        float radiiABSquared = radiiAB * radiiAB;
 
-                        //Check to see if A is actually moving towards or away from B.
-                        //Only if A is approaching B, do we check for a potential collision between A and B.                        
-                        if ( lengthD > 0 )
-                        {                            
-                            float lengthFSquared = vectorC.LengthSquared() - (lengthD * lengthD); 
-                            float radiiAB = (sphereA.Radius + sphereB.Radius);
-                            float radiiABSquared = radiiAB * radiiAB;                            
-                            
-                            //Test if spheres toucch at any point along their respective movement vectors.                            
-                            if (lengthFSquared < radiiABSquared)
+                        //We only continue checking for a collision if the 
+                        //distance A is moving [relative to B] is greater or equal to 
+                        //the distance between A and B minus their radii. If it's not,
+                        //then there's no collision (this frame).
+                        if (vectorArB.Length() >= lengthC - radiiAB)
+                        {
+                            //Get the signed length of the [relative-to-B] vector from object A to the closest co-linear point to object B.
+                            float lengthD = Vector3.Dot(normalArB, vectorC);
+
+                            //Check to see if A is actually moving towards or away from B.
+                            //Only if A is approaching B, do we check for a collision between A and B.                        
+                            if (lengthD > 0)
                             {
-                                float lengthTSquared = radiiABSquared - lengthFSquared;
-                                if (lengthTSquared > 0)
-                                {
-                                    float distanceToCollisionA = lengthD - (float)Math.Sqrt(lengthTSquared);
-                                    Vector3 collisionPointA = Vector3.Normalize(vectorA) * distanceToCollisionA;
-                                    float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
-                                    float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
-                                    Vector3 collisionPointB = Vector3.Normalize(vectorB) * distanceToCollisionB;
+                                float lengthFSquared = (lengthC * lengthC) - (lengthD * lengthD);                                
 
-                                    collisionEvents.Add(new CollisionEvent()
+                                // If the closest that A will get to B 
+                                // is more than the sum of their radii, there's no 
+                                // way they are going collide                          
+                                if (lengthFSquared < radiiABSquared)
+                                {
+                                    float lengthTSquared = radiiABSquared - lengthFSquared;
+                                    if (lengthTSquared > 0)
                                     {
-                                        Object1 = objectA.WorldObject,
-                                        Object2 = objectB.WorldObject,
-                                        Object1LocationAtCollision = collisionPointA,
-                                        Object2LocationAtCollision = collisionPointB
-                                    });
-                                }                                
-                            }                            
-                        }                       
+                                        BoundingBox boxA = objectA.WorldObject.WorldBoundingBox();
+                                        BoundingBox boxB = objectB.WorldObject.WorldBoundingBox();  
+                                        
+                                            
+                                        //if(boxA.Intersects(ref boxB))
+                                        {
+                                            float distanceToCollisionA = lengthD - (float)Math.Sqrt(lengthTSquared);
+                                            Vector3 collisionPointA = Vector3.Normalize(vectorA) * distanceToCollisionA;
+                                            float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
+                                            float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
+                                            Vector3 collisionPointB = Vector3.Normalize(vectorB) * distanceToCollisionB;
+
+                                            collisionEvents.Add(new CollisionEvent()
+                                            {
+                                                Object1 = objectA.WorldObject,
+                                                Object2 = objectB.WorldObject,
+                                                Object1LocationAtCollision = collisionPointA,
+                                                Object2LocationAtCollision = collisionPointB
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }               
             }
 
+            SnapshotPositions(observedObjects);
+
             NotifyHandlers(collisionEvents);
+        }
+
+        /// <summary>
+        /// Records the current position of each observed object as there respective previous position.
+        /// </summary>
+        /// <param name="observedObjects"></param>
+        private void SnapshotPositions(List<ObservedWorldObject> observedObjects)
+        {
+            observedObjects.ForEach(o => o.PreviousTransform = o.WorldObject.Transform);
         }
 
         /// <summary>
