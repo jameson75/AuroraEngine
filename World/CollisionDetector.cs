@@ -401,8 +401,15 @@ namespace CipherPark.AngelJacket.Core.World
             _children = new ColliderCollection();
             _children.CollectionChanged += Children_CollectionChanged;
         }
-
-        public abstract CollisionEvent DetectCollision(Vector3 direction, Collider targetCollider, Vector3 targetColliderDirection);
+      
+        /// <summary>
+        /// Detects wheter this collider will collide with a target collider in the current time window.        
+        /// </summary>
+        /// <param name="displacementVector">The world-space displacment vector of this collider</param>
+        /// <param name="targetCollider">The target collider which we are testing against</param>
+        /// <param name="targetColliderDisplacementVector">The world-space displacement vector to the target collider.</param>
+        /// <returns></returns>
+        public abstract CollisionEvent DetectCollision(Vector3 displacementVector, Collider targetCollider, Vector3 targetColliderDisplacementVector);
 
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
         {
@@ -450,12 +457,21 @@ namespace CipherPark.AngelJacket.Core.World
     public class PlaneCollider : Collider
     {
         public Plane Plane { get; set; }
-        public RectangleF Dimensions { get; set; }
+        public bool EnableFastMovingObjectDetection { get; set; }
 
         public override CollisionEvent DetectCollision(Vector3 direction, Collider targetCollider, Vector3 targetColliderDirection)
         {
-            //throw new NotImplementedException();
-            return null;
+            CollisionEvent collisionEvent = null;
+            if (EnableFastMovingObjectDetection)
+            {
+                if (targetCollider is SphereCollider)
+                {
+                    //The SphereCollider already has logic to detect fast moving sphere-plane collisions.
+                    //So, we defer to it (swapping the roles of course)
+                    collisionEvent = targetCollider.DetectCollision(targetColliderDirection, this, direction);
+                }
+            }
+            return collisionEvent;
         }
     }
 
@@ -464,11 +480,10 @@ namespace CipherPark.AngelJacket.Core.World
     /// </summary>
     public class SphereCollider : Collider
     {
-        public bool EnableFastMovingObjectDetection { get; set; }
-
         public BoundingSphere Sphere { get; set; }
+        public bool EnableFastMovingObjectDetection { get; set; }        
 
-        public override CollisionEvent DetectCollision(Vector3 direction, Collider targetCollider, Vector3 targetColliderDirection)
+        public override CollisionEvent DetectCollision(Vector3 displacementVector, Collider targetCollider, Vector3 targetColliderDisplacementVector)
         {
             CollisionEvent collisionEvent = null;
 
@@ -476,6 +491,7 @@ namespace CipherPark.AngelJacket.Core.World
             {
                 //Fast moving object collision detection
                 //--------------------------------------
+
                 if (targetCollider is SphereCollider)
                 {
                     //*****************************************************************************************
@@ -493,10 +509,10 @@ namespace CipherPark.AngelJacket.Core.World
                     //*****************************************************************************************
 
                     BoundingSphere sphereA = Sphere;
-                    Vector3 vectorA = direction;
-                
+                    Vector3 vectorA = displacementVector;
+
                     BoundingSphere sphereB = ((SphereCollider)targetCollider).Sphere;
-                    Vector3 vectorB = targetColliderDirection;
+                    Vector3 vectorB = targetColliderDisplacementVector;
 
                     //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
                     Vector3 vectorArB = vectorA - vectorB;
@@ -531,19 +547,19 @@ namespace CipherPark.AngelJacket.Core.World
                             {
                                 float lengthTSquared = radiiABSquared - lengthFSquared;
                                 if (lengthTSquared > 0)
-                                {                           
+                                {
                                     float distanceToCollisionA = lengthD - (float)Math.Sqrt(lengthTSquared);
-                                    Vector3 collisionPointA = Vector3.Normalize(vectorA) * distanceToCollisionA;
+                                    Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
                                     float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
                                     float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
-                                    Vector3 collisionPointB = Vector3.Normalize(vectorB) * distanceToCollisionB;
+                                    Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
                                     collisionEvent = new CollisionEvent()
                                     {
                                         Object1 = this,
                                         Object2 = targetCollider,
                                         Object1LocationAtCollision = collisionPointA,
                                         Object2LocationAtCollision = collisionPointB
-                                    };                                  
+                                    };
                                 }
                             }
                         }
@@ -552,32 +568,58 @@ namespace CipherPark.AngelJacket.Core.World
                 else if (targetCollider is PlaneCollider)
                 {
                     BoundingSphere sphereA = Sphere;
-                    Vector3 vectorA = direction;
-                    Vector3 vectorB = targetColliderDirection;
+                    Vector3 vectorA = displacementVector;
+                    Vector3 vectorB = targetColliderDisplacementVector;
 
                     //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
                     Vector3 vectorArB = vectorA - vectorB;
                     Vector3 normalArB = Vector3.Normalize(vectorArB);
 
                     //Calculate the closest point on the sphere to the plane.
-                    //This point will be the point that collides with the plane (assuming the plane nor sphere have rotational velocities).
-                    Plane p = ((PlaneCollider)targetCollider).Plane;
-                    Vector3 c = sphereA.Center;
-                    Vector3 xp = Vector3.Zero;
-                    Vector3 xs = Vector3.Zero;
-                    Collision.ClosestPointPlanePoint(ref p, ref c, out xp);
-                    Collision.ClosestPointSpherePoint(ref sphereA, ref xp, out xs);
+                    //This point will be the point that collides with the plane (assuming the plane nor sphere have rotational velocities).                    
+                    Plane p = Plane.Transform(((PlaneCollider)targetCollider).Plane, targetCollider.WorldTransform().ToMatrix());
+                    BoundingSphere s = new BoundingSphere(Vector3.TransformCoordinate(sphereA.Center, this.WorldTransform().ToMatrix()), sphereA.Radius);
+                    Vector3 c = s.Center;
+                    Vector3 closestPointOnPlane = Vector3.Zero;
+                    Vector3 closestPointOnSphere = Vector3.Zero;
+                    Collision.ClosestPointPlanePoint(ref p, ref c, out closestPointOnPlane);
+                    Collision.ClosestPointSpherePoint(ref sphereA, ref closestPointOnPlane, out closestPointOnSphere);
 
-                    //Calculate the where the sphere will make contact with the plane.
-                    Ray rayD = new Ray(xs, normalArB);
+                    //Calculate the point where the sphere will make contact with the plane, if at all.
+                    Ray rayD = new Ray(closestPointOnSphere, normalArB);
                     Vector3 contactPoint = Vector3.Zero;
-                    Collision.RayIntersectsPlane(ref rayD, ref p, out contactPoint);                    
+                    if (Collision.RayIntersectsPlane(ref rayD, ref p, out contactPoint))
+                    {
+                        //Calculate the distance to collision.
+                        float distanceToCollisionA = (contactPoint - closestPointOnSphere).Length();
+
+                        //If the collision will occur this frame then we generate a collision event for it.
+                        if (distanceToCollisionA >= vectorArB.Length())
+                        {
+                            Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
+                            float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
+                            float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
+                            Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
+                            collisionEvent = new CollisionEvent()
+                            {
+                                Object1 = this,
+                                Object2 = targetCollider,
+                                Object1LocationAtCollision = collisionPointA,
+                                Object2LocationAtCollision = collisionPointB
+                            };
+                        }
+                    }
                 }
                 else
                 {
                     //NOTE: Right now, 
                     //We Can only detect fast moving object collisions into another sphere collider.
                 }
+            }
+            else
+            {
+                //TODO: Determine whether the spheres intersect. 
+                //If they intersect, determine the contact point and their respective locations (in world-space).
             }
 
             return collisionEvent;
