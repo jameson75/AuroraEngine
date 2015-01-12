@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.World
         const int PartitionTreeDepth = 3;
         IGameApp _game = null;
         //WorldSpacePartitionTree _partitionTree = null;
-        List<ObservedWorldObject> observedObjects = new List<ObservedWorldObject>();
+        List<ObservedWorldObject> _observedObjects = new List<ObservedWorldObject>();
         List<ICollisionResponseHandler> registeredHandlers = new List<ICollisionResponseHandler>();        
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace CipherPark.AngelJacket.Core.World
         /// <param name="obj"></param>
         public void AddObservedObject(WorldObject obj)
         {
-            observedObjects.Add(new ObservedWorldObject() { WorldObject = obj, PreviousTransform = obj.Transform });    
+            _observedObjects.Add(new ObservedWorldObject() { WorldObject = obj, PreviousTransform = obj.Transform });    
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.World
         /// <param name="obj"></param>
         public void RemoveObservedObject(WorldObject obj)
         {
-            observedObjects.Remove(observedObjects.First(o => o.WorldObject == obj));
+            _observedObjects.Remove(_observedObjects.First(o => o.WorldObject == obj));
         }
 
         /// <summary>
@@ -82,6 +82,16 @@ namespace CipherPark.AngelJacket.Core.World
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
+        {
+            Update(gameTime, _observedObjects);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTme"></param>
+        /// <param name="observedObjects"></param>
+        private void Update(GameTime gameTme, List<ObservedWorldObject> observedObjects)
         {
             //***********************************************************************************
             //Basic, Broad-Phase collision detection using spatial partitioning.
@@ -109,100 +119,22 @@ namespace CipherPark.AngelJacket.Core.World
             //foreach(WorldSpacePartitionNode node in _partitionTree.Leaves)
             {
                 foreach (ObservedWorldObject objectA in observedObjects)
-                { 
-                    //*****************************************************************************************
-                    //The following technique was dervied from this tutorial.
-                    //http://www.gamasutra.com/view/feature/131424/pool_hall_lessons_fast_accurate_.php?page=2
-                    // Legend:
-                    // vectorA - movement vector for object A.
-                    // vectorB - movement vector for object B.
-                    // vectorC - vector from A to B.
-                    // lengthD - length along vectorA from object A to closest point to object B. 
-                    // vectorArB - movement vector for oject A in object B's reference frame.
-                    // lengthTSquared - 
-                    // lengthFSquared - 
-                    // radiiAB - 
-                    //*****************************************************************************************
-
-                    //TODO: Optimize by placing this code in the Assign() method of WorldPartitionTree and storing the values as member
-                    //variables.                    
-                    BoundingSphere sphereA = objectA.WorldObject.WorldBoundingSphere();
-                    Vector3 vectorA = objectA.WorldObject.ParentToWorldNormal(objectA.WorldObject.Transform.Translation - objectA.PreviousTransform.Translation);                   
-                    
-                    foreach(ObservedWorldObject objectB in observedObjects)
+                {
+                    Vector3 vectorA = objectA.WorldObject.ParentToWorldNormal(objectA.WorldObject.Transform.Translation - objectA.PreviousTransform.Translation);
+                    foreach (ObservedWorldObject objectB in observedObjects)
                     {
-                        //Prevent tests against self.
                         if (objectA == objectB)
                             continue;
 
-                        //TODO: Optimize by placing this code in the Assign() method of WorldPartitionTree and storing the values as member
-                        //variables.                        
-                        BoundingSphere sphereB = objectB.WorldObject.WorldBoundingSphere();
-                        Vector3 vectorB = objectB.WorldObject.ParentToWorldNormal(objectB.WorldObject.Transform.Translation - objectB.PreviousTransform.Translation);                        
-                       
                         //TODO: Optimize by performing a lookup that disreguards this test if these two objects
                         //have already been tested (ie: when objectA was objectB and objectB was objectA).
-                                  
-                        //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
-                        Vector3 vectorArB = vectorA - vectorB;
-                        Vector3 normalArB = Vector3.Normalize(vectorArB);
-                        
-                        //Get the direction vector of A to B, as well as the normal from A to B.
-                        Vector3 vectorC = objectB.WorldObject.Transform.Translation - objectA.WorldObject.Transform.Translation;                        
-                        float lengthC = vectorC.Length();
-                        
-                        float radiiAB = (sphereA.Radius + sphereB.Radius);
-                        float radiiABSquared = radiiAB * radiiAB;
 
-                        //We only continue checking for a collision if the 
-                        //distance A is moving [relative to B] is greater or equal to 
-                        //the distance between A and B minus their radii. If it's not,
-                        //then there's no collision (this frame).
-                        if (vectorArB.Length() >= lengthC - radiiAB)
-                        {
-                            //Get the signed length of the [relative-to-B] vector from object A to the closest co-linear point to object B.
-                            float lengthD = Vector3.Dot(normalArB, vectorC);
-
-                            //Check to see if A is actually moving towards or away from B.
-                            //Only if A is approaching B, do we check for a collision between A and B.                        
-                            if (lengthD > 0)
-                            {
-                                float lengthFSquared = (lengthC * lengthC) - (lengthD * lengthD);                                
-
-                                // If the closest that A will get to B 
-                                // is more than the sum of their radii, there's no 
-                                // way they are going collide                          
-                                if (lengthFSquared < radiiABSquared)
-                                {
-                                    float lengthTSquared = radiiABSquared - lengthFSquared;
-                                    if (lengthTSquared > 0)
-                                    {
-                                        BoundingBox boxA = objectA.WorldObject.WorldBoundingBox();
-                                        BoundingBox boxB = objectB.WorldObject.WorldBoundingBox();  
-                                        
-                                            
-                                        //if(boxA.Intersects(ref boxB))
-                                        {
-                                            float distanceToCollisionA = lengthD - (float)Math.Sqrt(lengthTSquared);
-                                            Vector3 collisionPointA = Vector3.Normalize(vectorA) * distanceToCollisionA;
-                                            float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
-                                            float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
-                                            Vector3 collisionPointB = Vector3.Normalize(vectorB) * distanceToCollisionB;
-
-                                            collisionEvents.Add(new CollisionEvent()
-                                            {
-                                                Object1 = objectA.WorldObject,
-                                                Object2 = objectB.WorldObject,
-                                                Object1LocationAtCollision = collisionPointA,
-                                                Object2LocationAtCollision = collisionPointB
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        Vector3 vectorB = objectB.WorldObject.ParentToWorldNormal(objectB.WorldObject.Transform.Translation - objectB.PreviousTransform.Translation);
+                        CollisionEvent collision = objectA.WorldObject.Collider.DetectCollision(vectorA, objectB.WorldObject.Collider, vectorB);
+                        if (collision != null)
+                            collisionEvents.Add(collision);
                     }
-                }               
+                }        
             }
 
             SnapshotPositions(observedObjects);
@@ -419,12 +351,12 @@ namespace CipherPark.AngelJacket.Core.World
         /// <summary>
         /// First object involved in the collision.
         /// </summary>
-        public WorldObject Object1 { get; set; }
+        public Collider Object1 { get; set; }
 
         /// <summary>
         /// Second object involved in the collision.
         /// </summary>        
-        public WorldObject Object2 { get; set; }
+        public Collider Object2 { get; set; }
 
         /// <summary>
         /// The first object's location at the collision.
@@ -435,5 +367,228 @@ namespace CipherPark.AngelJacket.Core.World
         /// The second object's location at the collision.
         /// </summary>
         public Vector3 Object2LocationAtCollision { get; set; }
-    }    
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public abstract class Collider : ITransformable
+    {
+        private ColliderCollection _children = null;
+
+        public ColliderCollection Children { get { return _children; } }
+
+        public WorldObject Container
+        {
+            get
+            {
+                ITransformable p = TransformableParent;
+                while (p != null)
+                {
+                    if (p is WorldObject)
+                        return (WorldObject)p;
+                }
+                return null;
+            }
+        }
+
+        public Transform Transform { get; set; }
+
+        public ITransformable TransformableParent { get; set; }
+
+        public Collider()
+        {
+            _children = new ColliderCollection();
+            _children.CollectionChanged += Children_CollectionChanged;
+        }
+
+        public abstract CollisionEvent DetectCollision(Vector3 direction, Collider targetCollider, Vector3 targetColliderDirection);
+
+        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    foreach (Collider child in args.NewItems)
+                        OnChildAdded(child);
+                    break;
+
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    foreach (Collider child in args.OldItems)
+                        OnChildRemoved(child);
+                    break;
+
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    foreach (Collider child in args.OldItems)
+                        OnChildRemoved(child);
+                    foreach (Collider child in args.NewItems)
+                        OnChildAdded(child);
+                    break;
+
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    OnChildReset();
+                    break;
+            }
+        }
+
+        protected virtual void OnChildAdded(Collider child)
+        {
+            if (child.TransformableParent != this)
+                child.TransformableParent = this;
+        }
+
+        protected virtual void OnChildRemoved(Collider child)
+        {
+            if (child.TransformableParent == this)
+                child.TransformableParent = null;
+        }
+
+        protected virtual void OnChildReset()
+        { }      
+    }
+
+    public class PlaneCollider : Collider
+    {
+        public Plane Plane { get; set; }
+        public RectangleF Dimensions { get; set; }
+
+        public override CollisionEvent DetectCollision(Vector3 direction, Collider targetCollider, Vector3 targetColliderDirection)
+        {
+            //throw new NotImplementedException();
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class SphereCollider : Collider
+    {
+        public bool EnableFastMovingObjectDetection { get; set; }
+
+        public BoundingSphere Sphere { get; set; }
+
+        public override CollisionEvent DetectCollision(Vector3 direction, Collider targetCollider, Vector3 targetColliderDirection)
+        {
+            CollisionEvent collisionEvent = null;
+
+            if (EnableFastMovingObjectDetection)
+            {
+                //Fast moving object collision detection
+                //--------------------------------------
+                if (targetCollider is SphereCollider)
+                {
+                    //*****************************************************************************************
+                    //The following technique was dervied from this tutorial.
+                    //http://www.gamasutra.com/view/feature/131424/pool_hall_lessons_fast_accurate_.php?page=2
+                    // Legend:
+                    // vectorA - movement vector for object A.
+                    // vectorB - movement vector for object B.
+                    // vectorC - vector from A to B.
+                    // lengthD - length along vectorA from object A to closest point to object B. 
+                    // vectorArB - movement vector for oject A in object B's reference frame.
+                    // lengthTSquared - 
+                    // lengthFSquared - 
+                    // radiiAB - 
+                    //*****************************************************************************************
+
+                    BoundingSphere sphereA = Sphere;
+                    Vector3 vectorA = direction;
+                
+                    BoundingSphere sphereB = ((SphereCollider)targetCollider).Sphere;
+                    Vector3 vectorB = targetColliderDirection;
+
+                    //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
+                    Vector3 vectorArB = vectorA - vectorB;
+                    Vector3 normalArB = Vector3.Normalize(vectorArB);
+
+                    //Get the direction vector of A to B, as well as the normal from A to B.
+                    Vector3 vectorC = targetCollider.WorldTransform().Translation - this.WorldTransform().Translation;
+                    float lengthC = vectorC.Length();
+
+                    float radiiAB = (sphereA.Radius + sphereB.Radius);
+                    float radiiABSquared = radiiAB * radiiAB;
+
+                    //We only continue checking for a collision if the 
+                    //distance A is moving [relative to B] is greater or equal to 
+                    //the distance between A and B minus their radii. If it's not,
+                    //then there's no collision (this frame).
+                    if (vectorArB.Length() >= lengthC - radiiAB)
+                    {
+                        //Get the signed length of the [relative-to-B] vector from object A to the closest co-linear point to object B.
+                        float lengthD = Vector3.Dot(normalArB, vectorC);
+
+                        //Check to see if A is actually moving towards or away from B.
+                        //Only if A is approaching B, do we check for a collision between A and B.                        
+                        if (lengthD > 0)
+                        {
+                            float lengthFSquared = (lengthC * lengthC) - (lengthD * lengthD);
+
+                            // If the closest that A will get to B 
+                            // is more than the sum of their radii, there's no 
+                            // way they are going collide                          
+                            if (lengthFSquared < radiiABSquared)
+                            {
+                                float lengthTSquared = radiiABSquared - lengthFSquared;
+                                if (lengthTSquared > 0)
+                                {                           
+                                    float distanceToCollisionA = lengthD - (float)Math.Sqrt(lengthTSquared);
+                                    Vector3 collisionPointA = Vector3.Normalize(vectorA) * distanceToCollisionA;
+                                    float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
+                                    float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
+                                    Vector3 collisionPointB = Vector3.Normalize(vectorB) * distanceToCollisionB;
+                                    collisionEvent = new CollisionEvent()
+                                    {
+                                        Object1 = this,
+                                        Object2 = targetCollider,
+                                        Object1LocationAtCollision = collisionPointA,
+                                        Object2LocationAtCollision = collisionPointB
+                                    };                                  
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (targetCollider is PlaneCollider)
+                {
+                    BoundingSphere sphereA = Sphere;
+                    Vector3 vectorA = direction;
+                    Vector3 vectorB = targetColliderDirection;
+
+                    //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
+                    Vector3 vectorArB = vectorA - vectorB;
+                    Vector3 normalArB = Vector3.Normalize(vectorArB);
+
+                    //Calculate the closest point on the sphere to the plane.
+                    //This point will be the point that collides with the plane (assuming the plane nor sphere have rotational velocities).
+                    Plane p = ((PlaneCollider)targetCollider).Plane;
+                    Vector3 c = sphereA.Center;
+                    Vector3 xp = Vector3.Zero;
+                    Vector3 xs = Vector3.Zero;
+                    Collision.ClosestPointPlanePoint(ref p, ref c, out xp);
+                    Collision.ClosestPointSpherePoint(ref sphereA, ref xp, out xs);
+
+                    //Calculate the where the sphere will make contact with the plane.
+                    Ray rayD = new Ray(xs, normalArB);
+                    Vector3 contactPoint = Vector3.Zero;
+                    Collision.RayIntersectsPlane(ref rayD, ref p, out contactPoint);                    
+                }
+                else
+                {
+                    //NOTE: Right now, 
+                    //We Can only detect fast moving object collisions into another sphere collider.
+                }
+            }
+
+            return collisionEvent;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ColliderCollection : System.Collections.ObjectModel.ObservableCollection<Collider>
+    {
+
+    }
 }

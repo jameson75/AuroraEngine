@@ -35,6 +35,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         }
     }
 
+    /*
     /// <summary>
     /// 
     /// </summary>
@@ -60,4 +61,5 @@ namespace CipherPark.AngelJacket.Core.Utils
             return wo.LocalToWorldBoundingBox(wo.BoundingBox);
         }
     }
+    */
 }

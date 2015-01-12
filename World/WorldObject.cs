@@ -25,6 +25,7 @@ namespace CipherPark.AngelJacket.Core.World
     public abstract class WorldObject : ITransformable
     {
         private IGameApp _game = null;
+        private Collider _collider = null;
 
         protected WorldObject(IGameApp game)
         {
@@ -41,12 +42,28 @@ namespace CipherPark.AngelJacket.Core.World
 
         public ITransformable TransformableParent { get; set; }
         
+        /*
         public BoundingSphere BoundingSphere 
         { 
             get { return BoundingSphere.FromBox(BoundingBox); } 
         }
+        */
 
-        public abstract BoundingBox BoundingBox { get; }        
+        public abstract BoundingBox BoundingBox { get; }
+
+        public Collider Collider
+        {
+            get { return _collider; }
+            set
+            {
+                if (_collider != null)
+                    _collider.TransformableParent = null;
+                if (value != null)
+                    value.TransformableParent = this;
+                _collider = value;
+            }
+        }
+                
     }
 
     public abstract class BasicWorldObject : WorldObject, IRigidBody
