@@ -1042,7 +1042,7 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion
 
         public static Vector3[] GenerateNormals(Vector3[] positions, short[] indices)
-        {
+        {           
             Vector3[] normals = new Vector3[positions.Length];
             short[] _indices = (indices != null) ? indices : Enumerable.Range(0, positions.Length).Select((r) => (short)r).ToArray();
             if (_indices != null)
