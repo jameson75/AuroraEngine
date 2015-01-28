@@ -544,7 +544,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// </summary>
         /// <param name="coplanarPoint"></param>
         /// <returns></returns>
-        private bool ContainsCoplanar(ref Vector3 coplanarPoint)
+        public bool ContainsCoplanar(ref Vector3 coplanarPoint)
         {
             Plane plane = GetPlane();
             Vector3[] _corners = GetCorners();

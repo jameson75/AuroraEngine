@@ -435,7 +435,7 @@ namespace CipherPark.AngelJacket.Core.World
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     OnChildReset();
                     break;
-            }
+            }         
         }
 
         protected virtual void OnChildAdded(Collider child)
@@ -451,12 +451,132 @@ namespace CipherPark.AngelJacket.Core.World
         }
 
         protected virtual void OnChildReset()
-        { }      
+        { }
+
+        protected CollisionEvent DeferDetectCollision(Vector3 displacementVector, Collider targetCollider, Vector3 targetColliderDisplacementVector)
+        {
+            CollisionEvent ce = targetCollider.DetectCollision(targetColliderDisplacementVector, this, displacementVector);
+            if (ce != null)
+                return new CollisionEvent()
+                {
+                    Object1 = ce.Object2,
+                    Object2 = ce.Object1,
+                    Object1LocationAtCollision = ce.Object2LocationAtCollision,
+                    Object2LocationAtCollision = ce.Object1LocationAtCollision
+                };
+            else
+                return null;
+        }
     }
 
-    public class PlaneCollider : Collider
+    public class BoundingBoxCollider : Collider
     {
-        public Plane Plane { get; set; }
+        public BoundingBoxOA Box { get; set; }
+
+        public bool EnableFastMovingObjectDetection { get; set; }
+
+        public override CollisionEvent DetectCollision(Vector3 displacementVector, Collider targetCollider, Vector3 targetColliderDisplacementVector)
+        {
+            CollisionEvent collisionEvent = null;
+            if (EnableFastMovingObjectDetection)
+            {
+                if (targetCollider is SphereCollider)
+                {
+                    
+                }
+                else if (targetCollider is QuadCollider)
+                {
+
+                }
+                else if (targetCollider is BoundingBoxCollider)
+                {
+                    BoundingBoxOA boxA = Box;
+                    Vector3 vectorA = displacementVector;
+
+                    BoundingBoxOA boxB = ((BoundingBoxCollider)targetCollider).Box;
+                    Vector3 vectorB = targetColliderDisplacementVector;
+
+                    //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
+                    Vector3 vectorArB = vectorA - vectorB;
+                    Vector3 normalArB = Vector3.Normalize(vectorArB);                    
+                    float? closestDistanceToContactArB = null;
+
+                    Vector3[] boxACorners = boxA.GetCorners();                    
+                    for (int i = 0; i < boxACorners.Length; i++)
+                    {
+                        Ray rayBoxCornerArB = new Ray(boxACorners[i], normalArB);
+                        Vector3 contactPoint = Vector3.Zero;
+                        if (boxB.Intersects(ref rayBoxCornerArB, out contactPoint))
+                        {
+                            float distanceToContactSquared = Vector3.DistanceSquared(rayBoxCornerArB.Position, contactPoint);
+                            if (distanceToContactSquared <= vectorArB.LengthSquared())
+                            {
+                                if (closestDistanceToContactArB == null || distanceToContactSquared < closestDistanceToContactArB.Value)                               
+                                    closestDistanceToContactArB = distanceToContactSquared;                                                
+                            }
+                        }
+                    }
+
+                    Vector3 vectorBrA = vectorB - vectorA;
+                    Vector3 normalBrA = Vector3.Normalize(vectorBrA);
+                    float? closestDistanceToContactBrA = null;
+
+                    Vector3[] boxBCorners = boxB.GetCorners();
+                    for (int i = 0; i < boxBCorners.Length; i++)
+                    {
+                        Ray rayBoxCornerBrA = new Ray(boxBCorners[i], normalBrA);
+                        Vector3 contactPoint = Vector3.Zero;
+                        if (boxA.Intersects(ref rayBoxCornerBrA, out contactPoint))
+                        {
+                            float distanceToContactSquared = Vector3.DistanceSquared(rayBoxCornerBrA.Position, contactPoint);
+                            if (distanceToContactSquared <= vectorBrA.LengthSquared())
+                            {
+                                if (closestDistanceToContactBrA == null || distanceToContactSquared < closestDistanceToContactBrA.Value)
+                                    closestDistanceToContactBrA = distanceToContactSquared;
+                            }
+                        }
+                    }
+
+                    if (closestDistanceToContactArB != null && closestDistanceToContactBrA.IsNullOrGreaterThanOrEqualTo(closestDistanceToContactArB.Value))
+                    {
+                        float distanceToCollisionA = closestDistanceToContactArB.Value;
+                        Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
+                        float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
+                        float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
+                        Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
+                        collisionEvent = new CollisionEvent()
+                        {
+                            Object1 = this,
+                            Object2 = targetCollider,
+                            Object1LocationAtCollision = collisionPointA,
+                            Object2LocationAtCollision = collisionPointB
+                        };
+                    }
+
+                    else if (closestDistanceToContactBrA != null)
+                    {
+                        float distanceToCollisionB = closestDistanceToContactBrA.Value;
+                        Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
+                        float stepPercentageToCollision = distanceToCollisionB / vectorB.Length();
+                        float distanceToCollisionA = vectorA.Length() * stepPercentageToCollision;
+                        Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
+                        collisionEvent = new CollisionEvent()
+                        {
+                            Object1 = this,
+                            Object2 = targetCollider,
+                            Object1LocationAtCollision = collisionPointA,
+                            Object2LocationAtCollision = collisionPointB
+                        };
+                    }
+                }
+            }
+            return collisionEvent;
+        }
+    }
+
+    public class QuadCollider : Collider
+    {
+        public BoundingQuadOA Quad { get; set; }
         public bool EnableFastMovingObjectDetection { get; set; }
 
         public override CollisionEvent DetectCollision(Vector3 direction, Collider targetCollider, Vector3 targetColliderDirection)
@@ -466,13 +586,25 @@ namespace CipherPark.AngelJacket.Core.World
             {
                 if (targetCollider is SphereCollider)
                 {
-                    //The SphereCollider already has logic to detect fast moving sphere-plane collisions.
-                    //So, we defer to it (swapping the roles of course)
-                    collisionEvent = targetCollider.DetectCollision(targetColliderDirection, this, direction);
+                    //The SphereCollider already has logic to detect fast moving sphere-quad/plane collisions.
+                    //So, we defer to it.
+                    collisionEvent = this.DeferDetectCollision(direction, targetCollider, targetColliderDirection);
+                }
+                else if (targetCollider is QuadCollider)
+                {
+                    
+                }
+                else if (targetCollider is BoundingBoxCollider)
+                {
+                    //The BoundingBoxCollider already has logic to detect fast moving boundingbox-quad/plane collisions.
+                    //So, we defer to it.
+                    collisionEvent = this.DeferDetectCollision(direction, targetCollider, targetColliderDirection);
                 }
             }
             return collisionEvent;
         }
+
+        public bool UseEntirePlane { get; set; }
     }
 
     /// <summary>
@@ -565,7 +697,7 @@ namespace CipherPark.AngelJacket.Core.World
                         }
                     }
                 }
-                else if (targetCollider is PlaneCollider)
+                else if (targetCollider is QuadCollider)
                 {
                     BoundingSphere sphereA = Sphere;
                     Vector3 vectorA = displacementVector;
@@ -577,7 +709,7 @@ namespace CipherPark.AngelJacket.Core.World
 
                     //Calculate the closest point on the sphere to the plane.
                     //This point will be the point that collides with the plane (assuming the plane nor sphere have rotational velocities).                    
-                    Plane p = Plane.Transform(((PlaneCollider)targetCollider).Plane, targetCollider.WorldTransform().ToMatrix());
+                    Plane p = Plane.Transform(((QuadCollider)targetCollider).Quad.GetPlane(), targetCollider.WorldTransform().ToMatrix());
                     BoundingSphere s = new BoundingSphere(Vector3.TransformCoordinate(sphereA.Center, this.WorldTransform().ToMatrix()), sphereA.Radius);
                     Vector3 c = s.Center;
                     Vector3 closestPointOnPlane = Vector3.Zero;
@@ -589,24 +721,29 @@ namespace CipherPark.AngelJacket.Core.World
                     Ray rayD = new Ray(closestPointOnSphere, normalArB);
                     Vector3 contactPoint = Vector3.Zero;
                     if (Collision.RayIntersectsPlane(ref rayD, ref p, out contactPoint))
-                    {
-                        //Calculate the distance to collision.
-                        float distanceToCollisionA = (contactPoint - closestPointOnSphere).Length();
-
-                        //If the collision will occur this frame then we generate a collision event for it.
-                        if (distanceToCollisionA >= vectorArB.Length())
+                    {                        
+                        //if we're not using the quads entire plane as a collision boundary,
+                        //make sure the [co-planar] contact point exists within the quad's borders.
+                        if (((QuadCollider)targetCollider).UseEntirePlane || ((QuadCollider)targetCollider).Quad.ContainsCoplanar(ref contactPoint))
                         {
-                            Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
-                            float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
-                            float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
-                            Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
-                            collisionEvent = new CollisionEvent()
+                            //Calculate the distance to collision.
+                            float distanceToCollisionA = (contactPoint - closestPointOnSphere).Length();
+
+                            //If the collision will occur this frame then we generate a collision event for it.
+                            if (distanceToCollisionA >= vectorArB.Length())
                             {
-                                Object1 = this,
-                                Object2 = targetCollider,
-                                Object1LocationAtCollision = collisionPointA,
-                                Object2LocationAtCollision = collisionPointB
-                            };
+                                Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
+                                float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
+                                float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
+                                Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
+                                collisionEvent = new CollisionEvent()
+                                {
+                                    Object1 = this,
+                                    Object2 = targetCollider,
+                                    Object1LocationAtCollision = collisionPointA,
+                                    Object2LocationAtCollision = collisionPointB
+                                };
+                            }
                         }
                     }
                 }
@@ -632,5 +769,42 @@ namespace CipherPark.AngelJacket.Core.World
     public class ColliderCollection : System.Collections.ObjectModel.ObservableCollection<Collider>
     {
 
+    }
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+public static class NullableFloatExtension
+{
+    public static bool IsNullOrEqualTo(this Nullable<float> f, float value)
+    {
+        return (f == null || f.Value == value);
+    }
+
+    public static bool IsNullOrLessThan(this Nullable<float> f, float value)
+    {
+        return (f == null || f.Value < value);
+    }
+
+    public static bool IsNullOrGreaterThan(this Nullable<float> f, float value)
+    {
+        return (f == null || f.Value > value);
+    }
+
+    public static bool IsNullOrNotEqualTo(this Nullable<float> f, float value)
+    {
+        return (f == null || f.Value != value);
+    }
+
+    public static bool IsNullOrLessThanOrEqualTo(this Nullable<float> f, float value)
+    {
+        return (f == null || f.Value <= value);
+    }
+
+    public static bool IsNullOrGreaterThanOrEqualTo(this Nullable<float> f, float value)
+    {
+        return (f == null || f.Value >= value);
     }
 }
