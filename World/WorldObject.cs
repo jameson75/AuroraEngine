@@ -5,6 +5,7 @@ using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.AngelJacket.Core.World.Collision;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
@@ -24,8 +25,8 @@ namespace CipherPark.AngelJacket.Core.World
 {
     public abstract class WorldObject : ITransformable
     {
-        private IGameApp _game = null;
         private Collider _collider = null;
+        private IGameApp _game = null;        
 
         protected WorldObject(IGameApp game)
         {
@@ -63,11 +64,11 @@ namespace CipherPark.AngelJacket.Core.World
                 _collider = value;
             }
         }
-                
     }
 
     public abstract class BasicWorldObject : WorldObject, IRigidBody
-    {
+    {       
+
         protected BasicWorldObject(IGameApp game) : base(game)
         { }      
 
@@ -106,6 +107,6 @@ namespace CipherPark.AngelJacket.Core.World
                 else
                     return BoundingBoxExtension.Empty;
             }
-        }
+        }        
     }
 }

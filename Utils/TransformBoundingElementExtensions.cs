@@ -16,17 +16,6 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// 
         /// </summary>
         /// <param name="transformable"></param>
-        /// <param name="sphere"></param>
-        /// <returns></returns>
-        public static BoundingSphere LocalToWorldBoundingSphere(this ITransformable transformable, BoundingSphere sphere)
-        {
-            return new BoundingSphere(transformable.WorldTransform().Translation, sphere.Radius);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="transformable"></param>
         /// <param name="box"></param>
         /// <returns></returns>
         public static BoundingBox LocalToWorldBoundingBox(this ITransformable transformable, BoundingBox box)
@@ -34,24 +23,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             Vector3 thisWorldPosition = transformable.WorldTransform().Translation;
             return new BoundingBox(thisWorldPosition + box.Minimum, thisWorldPosition + box.Maximum);
         }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class WorldObjectExtensionForBoundingElements
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="wo"></param>
-        /// <returns></returns>
-        public static BoundingBoxOA BoundingBoxOA(this WorldObject wo)
-        {
-            Vector3[] corners = wo.BoundingBox.GetCorners().Select(c => wo.LocalToWorldCoordinate(c)).ToArray();
-            return Utils.BoundingBoxOA.FromPoints(corners);
-        }
-    }
+    }   
 
     /// <summary>
     /// Represents and object aligned bounding box.
@@ -94,6 +66,8 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
         public static BoundingBoxOA FromPoints(Vector3[] points)
         {
             //******************************************************
@@ -113,6 +87,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             newBox.FrontBottomRight = points[6];
             newBox.FrontBottomLeft = points[7];
             return newBox;
+        }
+
+        public static BoundingBoxOA FromBox(BoundingBox box)
+        {
+            Vector3[] corners = box.GetCorners();
+            return Utils.BoundingBoxOA.FromPoints(corners);
         }
 
         /// <summary>
@@ -357,6 +337,21 @@ namespace CipherPark.AngelJacket.Core.Utils
                 FrontBottomLeft
             };
         }
+
+        public BoundingBoxOA Transform(Matrix m)
+        {
+            return new BoundingBoxOA()
+            {
+                BackBottomLeft = Vector3.TransformCoordinate(this.BackBottomLeft, m),
+                BackBottomRight = Vector3.TransformCoordinate(BackBottomRight, m),
+                BackTopLeft = Vector3.TransformCoordinate(BackTopLeft, m),
+                BackTopRight = Vector3.TransformCoordinate(BackTopRight, m),
+                FrontBottomLeft = Vector3.TransformCoordinate(FrontBottomLeft, m),
+                FrontBottomRight = Vector3.TransformCoordinate(FrontBottomRight, m),
+                FrontTopLeft = Vector3.TransformCoordinate(FrontTopLeft, m),
+                FrontTopRight = Vector3.TransformCoordinate(FrontTopRight, m),
+            };            
+        }
     }
 
     /// <summary>
@@ -412,7 +407,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             quad.BottomRight = points[2];
             quad.BottomLeft = points[3];
             return quad;
-        }
+        }      
 
         /// <summary>
         /// 
@@ -558,6 +553,17 @@ namespace CipherPark.AngelJacket.Core.Utils
                     return false;
             }
             return true;
+        }
+
+        public BoundingQuadOA Transform(Matrix m)
+        {
+            return new BoundingQuadOA()
+            {
+                BottomLeft = Vector3.TransformCoordinate(this.BottomLeft, m),
+                BottomRight = Vector3.TransformCoordinate(BottomRight, m),
+                TopLeft = Vector3.TransformCoordinate(TopLeft, m),
+                TopRight = Vector3.TransformCoordinate(TopRight, m),          
+            };
         }
     }
 

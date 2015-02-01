@@ -23,9 +23,15 @@ using CipherPark.AngelJacket.Core.Effects;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public class StreakRenderer
+    public interface IRenderer
+    {
+        SurfaceEffect Effect { get; set; }
+        void Update(GameTime gameTime);
+        void Draw(GameTime gameTime);
+    }
+
+    public class StreakRenderer : IRenderer
     {       
-        private SurfaceEffect _effect = null;
         private Mesh _mesh = null;
                 
         private StreakRenderer()
@@ -39,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.World
             {               
                 Width = 10.0f,
                 StepSize = 10.0f,
-                _effect = effect,
+                Effect = effect,
                 _mesh = Content.ContentBuilder.BuildDynamicMesh<VertexPositionColor>(
                     game.GraphicsDevice,
                     effect.SelectShaderByteCode(),
@@ -59,9 +65,13 @@ namespace CipherPark.AngelJacket.Core.World
 
         public Path Path { get; set; }
 
-        public SurfaceEffect Effect { get { return _effect; } }       
+        public ITransformable PathParent { get; set; }
 
-        public void Update(GameTime gameTime, Scene.CameraSceneNode sceneCamera, ITransformable pathParent)
+        public SurfaceEffect Effect { get; set; }
+
+        public Scene.CameraSceneNode SceneCamera { get; set; }
+
+        public void Update(GameTime gameTime)
         {                     
             const int VERTICES_PER_POINT = 2;   
             float halfWidth = Width / 2.0f;                     
@@ -77,17 +87,17 @@ namespace CipherPark.AngelJacket.Core.World
                 Vector3 nSlope = Vector3.Normalize((i < points.Length - 1) ? points[i + 1] - points[i] : points[i] - points[i - 1]);
                 Vector3 p = points[i];
                 //Transform point to camera space.
-                Vector3 vw = ((pathParent != null) ? pathParent.ParentToWorldCoordinate(p) : p);
-                Vector3 vw_camPos = vw - sceneCamera.Transform.Translation;
-                Vector3 camDir = Vector3.Normalize(sceneCamera.Camera.ViewMatrix.Column3.ToVector3());
+                Vector3 vw = ((PathParent != null) ? PathParent.ParentToWorldCoordinate(p) : p);
+                Vector3 vw_camPos = vw - SceneCamera.Transform.Translation;
+                Vector3 camDir = Vector3.Normalize(SceneCamera.Camera.ViewMatrix.Column3.ToVector3());
                //Project point transformed point to camera z plane.                
                 //(See tmpearce's explanation at http://stackoverflow.com/questions/9605556/how-to-project-a-3d-point-to-a-3d-plane#comment12185786_9605695)
                 Vector3 vpcs = vw - (Vector3.Dot(vw_camPos, camDir) * camDir);
                 //Get direction to camera from projected point.
-                Vector3 npcs = Vector3.Normalize(sceneCamera.Transform.Translation - vpcs);
+                Vector3 npcs = Vector3.Normalize(SceneCamera.Transform.Translation - vpcs);
                 //Transform direction to container space.
                 Vector3 nw = npcs;
-                Vector3 n = (pathParent != null) ? pathParent.WorldToParentNormal(nw) : nw;
+                Vector3 n = (PathParent != null) ? PathParent.WorldToParentNormal(nw) : nw;
                 //Get cross product of slope and direction to camera.
                 Vector3 xDir = Vector3.Normalize(Vector3.Cross(n, nSlope));
                 vertices[i * VERTICES_PER_POINT] = new VertexPositionColor(p + xDir * halfWidth, Color.White.ToVector4());
@@ -124,16 +134,16 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Draw(GameTime gameTime)
         {
-            _effect.World = Matrix.Identity;
+            Effect.World = Matrix.Identity;
             _mesh.Draw(gameTime);
         }
     }
 
-    public class StreakRendererSceneNode : Scene.SceneNode
+    public class RendererSceneNode : Scene.SceneNode
     {
-        public StreakRenderer Renderer { get; set; }
+        public IRenderer Renderer { get; set; }
 
-        public StreakRendererSceneNode(IGameApp game)
+        public RendererSceneNode(IGameApp game)
             : base(game)
         { }
 
@@ -141,8 +151,8 @@ namespace CipherPark.AngelJacket.Core.World
         {
             base.Update(gameTime);
             if (Renderer != null)
-            {              
-                Renderer.Update(gameTime, Scene.CameraNode, null);
+            {         
+                Renderer.Update(gameTime);
             }
         }
 

@@ -6,6 +6,7 @@ using SharpDX.Direct3D11;
 using SharpDX.DirectInput;
 using CipherPark.AngelJacket.Core;
 using CipherPark.AngelJacket.Core.World.Scene;
+using CipherPark.AngelJacket.Core.World.Collision;
 using CipherPark.AngelJacket.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////

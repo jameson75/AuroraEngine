@@ -7,7 +7,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Animation;
 
-namespace CipherPark.AngelJacket.Core.Kinetics
+namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public interface IRigidBody : ITransformable
     {
