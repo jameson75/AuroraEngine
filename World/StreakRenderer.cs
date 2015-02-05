@@ -25,7 +25,7 @@ namespace CipherPark.AngelJacket.Core.World
 {
     public interface IRenderer
     {
-        SurfaceEffect Effect { get; set; }
+        SurfaceEffect Effect { get; }
         void Update(GameTime gameTime);
         void Draw(GameTime gameTime);
     }

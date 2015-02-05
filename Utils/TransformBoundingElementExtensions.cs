@@ -352,6 +352,26 @@ namespace CipherPark.AngelJacket.Core.Utils
                 FrontTopRight = Vector3.TransformCoordinate(FrontTopRight, m),
             };            
         }
+
+        public void Inflate(float dx, float dy, float dz)
+        {
+            BackTopLeft += new Vector3(-dx, dy, dz);
+            BackTopRight += new Vector3(dx, dy, dz);
+            BackBottomRight += new Vector3(dx, -dy, dz);
+            BackBottomLeft += new Vector3(-dx, -dy, dz);
+
+            FrontTopLeft += new Vector3(-dx, dy, -dz);
+            FrontTopRight += new Vector3(dx, dy, -dz);
+            FrontBottomRight += new Vector3(dx, -dy, -dz);
+            FrontBottomLeft += new Vector3(-dx, -dy, -dz);
+        }
+
+        public BoundingBoxOA Inflate(ref BoundingBoxOA box, float dx, float dy, float dz)
+        {
+            BoundingBoxOA inflatedBox = box;
+            inflatedBox.Inflate(dx, dy, dz);
+            return inflatedBox;
+        }        
     }
 
     /// <summary>
@@ -491,7 +511,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new Vector3[]
             {
                 TopRight,
-                TopRight,
+                TopLeft,
                 BottomRight,
                 BottomLeft
             };

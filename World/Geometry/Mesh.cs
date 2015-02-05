@@ -20,7 +20,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
 {
-    public class Mesh     
+    public class Mesh : IDisposable
     {
         private DXBuffer _instanceBuffer = null;
         private DXBuffer _vertexBuffer = null;
@@ -32,7 +32,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private int _vertexStride = 0;
         private int _instanceStride = 0;
         private InputLayout _vertexLayout = null;
-        private int _maxInstanceCount = 0;        
+        private int _maxInstanceCount = 0;
+        private bool _isDisposed = false;
 
         private PrimitiveTopology _topology = PrimitiveTopology.TriangleList;
 
@@ -149,6 +150,34 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     _device.ImmediateContext.DrawIndexedInstanced(_indexCount, _instanceCount, 0, 0, 0);
                 }
             }           
+        }
+
+        public void Dispose()
+        {
+            if (_indexBuffer != null)
+            {
+                _indexBuffer.Dispose();
+                _indexCount = 0;
+            }
+
+            if (_instanceBuffer == null)
+            {
+                _instanceBuffer.Dispose();
+                _instanceCount = 0;
+            }
+
+            if (_vertexBuffer != null)
+            {
+                _vertexBuffer.Dispose();
+                _vertexCount = 0;
+            }
+
+            _isDisposed = true;            
+        }
+
+        public bool IsDisposed
+        {
+            get { return _isDisposed; }
         }
     }
 

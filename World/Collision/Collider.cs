@@ -46,12 +46,23 @@ namespace CipherPark.AngelJacket.Core.World.Collision
 
         public Transform Transform { get; set; }
 
-        public ITransformable TransformableParent { get; set; }
+        public ITransformable TransformableParent { get; set; }   
 
         public Collider()
         {
             _children = new ColliderCollection();
             _children.CollectionChanged += Children_CollectionChanged;
+        }
+
+        /// <summary>
+        /// Calculates the transform of this collider object before prior to displacement.
+        /// </summary>
+        /// <param name="displacementVector"></param>
+        /// <returns></returns>
+        public Transform PreviousWorldTransform(Vector3 displacementVector)
+        {
+            Transform worldTransform = this.WorldTransform();
+            return new Transform(worldTransform.Rotation, worldTransform.Translation - displacementVector);
         }
 
         /// <summary>

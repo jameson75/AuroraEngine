@@ -41,7 +41,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                 {
 
                 }
-                else if (targetCollider is BoundingBoxCollider)
+                else if (targetCollider is BoxCollider)
                 {
                     //The BoundingBoxCollider already has logic to detect fast moving boundingbox-quad/plane collisions.
                     //So, we defer to it.

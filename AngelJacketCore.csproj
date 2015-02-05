@@ -125,7 +125,7 @@
     <Compile Include="Utils\NullableFloatExtension.cs" />
     <Compile Include="Utils\TransformBoundingElementExtensions.cs" />
     <Compile Include="World\ColliderRenderer.cs" />
-    <Compile Include="World\Collision\BoundingBoxCollider.cs" />
+    <Compile Include="World\Collision\BoxCollider.cs" />
     <Compile Include="World\Collision\Collider.cs" />
     <Compile Include="World\Collision\CollisionDetector.cs" />
     <Compile Include="World\Collision\CollisionEvent.cs" />

@@ -21,7 +21,7 @@ using CipherPark.AngelJacket.Core.Utils;
 
 namespace CipherPark.AngelJacket.Core.World.Collision
 {
-    public class BoundingBoxCollider : Collider
+    public class BoxCollider : Collider
     {
         public BoundingBoxOA Box { get; set; }
 
@@ -40,12 +40,12 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                 {
 
                 }
-                else if (targetCollider is BoundingBoxCollider)
+                else if (targetCollider is BoxCollider)
                 {
                     BoundingBoxOA wboxA = Box.Transform(this.WorldTransform().ToMatrix());
                     Vector3 vectorA = displacementVector;
 
-                    BoundingBoxOA wboxB = ((BoundingBoxCollider)targetCollider).Box.Transform(targetCollider.WorldTransform().ToMatrix());
+                    BoundingBoxOA wboxB = ((BoxCollider)targetCollider).Box.Transform(targetCollider.WorldTransform().ToMatrix());
                     Vector3 vectorB = targetColliderDisplacementVector;
 
                     //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).

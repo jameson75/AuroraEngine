@@ -55,6 +55,9 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                     // radiiAB - 
                     //*****************************************************************************************
 
+                    Transform this_PreviousTransform = this.PreviousWorldTransform(displacementVector);
+                    Transform targetCollider_PreviousTransform = targetCollider.PreviousWorldTransform(targetColliderDisplacementVector);
+
                     BoundingSphere sphereA = Sphere;
                     Vector3 vectorA = displacementVector;
 
@@ -66,7 +69,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                     Vector3 normalArB = Vector3.Normalize(vectorArB);
 
                     //Get the direction vector of A to B, as well as the normal from A to B.
-                    Vector3 vectorC = targetCollider.WorldTransform().Translation - this.WorldTransform().Translation;
+                    Vector3 vectorC = targetCollider_PreviousTransform.Translation - this_PreviousTransform.Translation;
                     float lengthC = vectorC.Length();
 
                     float radiiAB = (sphereA.Radius + sphereB.Radius);
@@ -96,10 +99,10 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                                 if (lengthTSquared > 0)
                                 {
                                     float distanceToCollisionA = lengthD - (float)Math.Sqrt(lengthTSquared);
-                                    Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
+                                    Vector3 collisionPointA = this_PreviousTransform.Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
                                     float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
                                     float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
-                                    Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
+                                    Vector3 collisionPointB = targetCollider_PreviousTransform.Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
                                     collisionEvent = new CollisionEvent()
                                     {
                                         Object1 = this,
@@ -114,6 +117,9 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                 }
                 else if (targetCollider is QuadCollider)
                 {
+                    Transform this_PreviousTransform = this.PreviousWorldTransform(displacementVector);
+                    Transform targetCollider_PreviousTransform = targetCollider.PreviousWorldTransform(targetColliderDisplacementVector);
+
                     BoundingSphere sphereA = Sphere;
                     Vector3 vectorA = displacementVector;
                     Vector3 vectorB = targetColliderDisplacementVector;
