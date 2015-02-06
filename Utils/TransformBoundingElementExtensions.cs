@@ -202,9 +202,9 @@ namespace CipherPark.AngelJacket.Core.Utils
             for (int i = 0; i < quads.Length; i++)
             {
                 Plane plane = quads[i].GetPlane();
-               
+                CollisionDebugWriter.InitialIntersectBoxInfo(i, quads[i], ray);
                 //We discard any planes of this bounding box which are facing away from the ray's origin.                
-                if (Plane.DotCoordinate(plane, point) >= 0)
+                if (Plane.DotCoordinate(plane, ray.Position) >= 0)
                 {
                     //NOTE: At most, only one plane of the bounding box, that' either facing or coplanar to the ray's origin,
                     //can be intersected.
@@ -308,9 +308,9 @@ namespace CipherPark.AngelJacket.Core.Utils
             Vector3[] _corners = GetCorners();
             BoundingQuadOA front, back, top, bottom, left, right;
             front =     new BoundingQuadOA(_corners[4], _corners[5], _corners[6], _corners[7]); 
-            back =      new BoundingQuadOA(_corners[0], _corners[3], _corners[2], _corners[1]);  
+            back =      new BoundingQuadOA(_corners[1], _corners[0], _corners[3], _corners[2]);  
             top =       new BoundingQuadOA(_corners[0], _corners[1], _corners[5], _corners[4]);  
-            bottom =    new BoundingQuadOA(_corners[3], _corners[7], _corners[6], _corners[2]); 
+            bottom =    new BoundingQuadOA(_corners[2], _corners[3], _corners[7], _corners[6]); 
             left =      new BoundingQuadOA(_corners[0], _corners[4], _corners[7], _corners[3]); 
             right =     new BoundingQuadOA(_corners[5], _corners[1], _corners[2], _corners[6]);
             return new BoundingQuadOA[] { front, back, top, bottom, left, right };
@@ -459,7 +459,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         public bool Intersects(Ray ray, out Vector3 point)
         {
             Plane plane = GetPlane();           
-            return ray.Intersects(ref plane, out point) && ContainsCoplanar(ref point);            
+            return ray.Intersects(ref plane, out point) && ContainsCoplanar(ref ray.Position);            
         }
 
         /// <summary>
@@ -564,13 +564,19 @@ namespace CipherPark.AngelJacket.Core.Utils
             Plane plane = GetPlane();
             Vector3[] _corners = GetCorners();
             for (int i = 0; i < _corners.Length; i++)
-            {
-                Vector3 p1 = coplanarPoint;
-                Vector3 p2 = _corners[i];
-                Vector3 p3 = i < _corners.Length - 1 ? _corners[i + 1] : _corners[0];
-                Plane p = new Plane(p1, p2, p3);
-                if (Vector3.Normalize(p.Normal) != Vector3.Normalize(plane.Normal))
-                    return false;
+            {                
+                if (coplanarPoint == _corners[i])
+                    return true;
+                else
+                {
+                    Vector3 p1 = coplanarPoint;
+                    Vector3 p2 = _corners[i];
+                    Vector3 p3 = i < _corners.Length - 1 ? _corners[i + 1] : _corners[0];
+                    Plane p = new Plane(p1, p2, p3);
+                    CollisionDebugWriter.ContainsCoplanarInfo(p, plane);
+                    if (Vector3.Normalize(p.Normal) != Vector3.Normalize(plane.Normal))
+                        return false;
+                }
             }
             return true;
         }
@@ -585,6 +591,12 @@ namespace CipherPark.AngelJacket.Core.Utils
                 TopRight = Vector3.TransformCoordinate(TopRight, m),          
             };
         }
+
+        public override string ToString()
+        {
+            return string.Format("TopLeft: {0}, TopRight: {1}, BottomRignit: {2}, BottomLeft: {3}",
+                                  TopLeft, TopRight, BottomRight, BottomLeft);
+        }
     }
 
     /// <summary>
@@ -596,5 +608,106 @@ namespace CipherPark.AngelJacket.Core.Utils
         Front,
         CoplanarExterior,
         Intersects
+    }
+    
+    public static class CollisionDebugWriter
+    {
+        public static bool WriteEnabled = false;
+
+        internal static void InitialIntersectBoxInfo(int i, BoundingQuadOA quad, Ray ray)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("Initial Intersect Box Info");
+            string quadName = null;
+            switch (i)
+            {
+                case 0:
+                    quadName = "Front";
+                    break;
+                case 1:
+                    quadName = "Back";
+                    break;
+                case 2:
+                    quadName = "Top";
+                    break;
+                case 3:
+                    quadName = "Bottom";
+                    break;
+                case 4:
+                    quadName = "Left";
+                    break;
+                case 5:
+                    quadName = "Right";
+                    break;               
+            }
+
+            sb.AppendLineFormat("Quad Index: {0}", i);
+            sb.AppendLineFormat("Quad Name: {0}", quadName);
+            sb.AppendLineFormat("Quad Details: {0}", quad);
+            sb.AppendLineFormat("Quad Plane: {0}", quad.GetPlane());
+            sb.AppendLineFormat("Ray: {0}", ray);
+            float d = Plane.DotCoordinate(quad.GetPlane(), ray.Position);
+            sb.AppendLineFormat("Quad-Ray Dot Product {0}; RESULT: {1}", d, d >= 0 ? "pass" : "fail");
+            WriteInfo(sb);
+        }
+
+        internal static void ContainsCoplanarInfo(Plane p1, Plane p2)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("Contains Coplanar Info");
+            sb.AppendLineFormat("Plane 1: {0}; Plane 2: {1}", p1, 12);
+            WriteInfo(sb);
+        }
+
+        internal static void BoxCornerInfo(int i, Vector3 position, Vector3 normalArB)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("Box Corner Info");
+            string cornerName = null;
+            switch (i)
+            {
+                case 0:
+                    cornerName = "Back_Top_Left";
+                    break;
+                case 1:
+                    cornerName = "Back_Top_Right";
+                    break;
+                case 2:
+                    cornerName = "Back_Bottom_Right";
+                    break;
+                case 3:
+                    cornerName = "Back_Bottom_Left";
+                    break;
+                case 4:
+                    cornerName = "Front_Top_Left";
+                    break;
+                case 5:
+                    cornerName = "Front_Top_Right";
+                    break;
+                case 6:
+                    cornerName = "Front_Bottom_Right";
+                    break;
+                case 7:
+                    cornerName = "Front_Bottom_Left";
+                    break;
+            }
+           
+            sb.AppendLineFormat("Corner Index: {0}; ", i);
+            sb.AppendLineFormat("Corner Name: \"{0}\"; ", cornerName);
+            sb.AppendLineFormat("Corner World Position: {0}; ", position);
+            sb.AppendLineFormat("Corner Relative World Normal {0}; ", normalArB);
+            WriteInfo(sb);
+        }
+
+        public static void WriteInfo(System.Text.StringBuilder sb)
+        {
+            if (WriteEnabled)
+                Console.Write(sb);
+        }
+
+        public static void AppendLineFormat(this System.Text.StringBuilder sb, string format, params object[] args)
+        {
+            sb.AppendLine(string.Format(format, args));
+        }
     }
 }

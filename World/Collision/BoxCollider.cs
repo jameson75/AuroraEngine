@@ -42,10 +42,13 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                 }
                 else if (targetCollider is BoxCollider)
                 {
-                    BoundingBoxOA wboxA = Box.Transform(this.WorldTransform().ToMatrix());
+                    Transform this_PreviousTransform = this.PreviousWorldTransform(displacementVector);
+                    Transform targetCollider_PreviousTransform = targetCollider.PreviousWorldTransform(targetColliderDisplacementVector);
+
+                    BoundingBoxOA wboxA = Box.Transform(this_PreviousTransform.ToMatrix());
                     Vector3 vectorA = displacementVector;
 
-                    BoundingBoxOA wboxB = ((BoxCollider)targetCollider).Box.Transform(targetCollider.WorldTransform().ToMatrix());
+                    BoundingBoxOA wboxB = ((BoxCollider)targetCollider).Box.Transform(targetCollider_PreviousTransform.ToMatrix());
                     Vector3 vectorB = targetColliderDisplacementVector;
 
                     //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
@@ -58,6 +61,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                     {                       
                         Ray rayBoxCornerArB = new Ray(boxACorners[i], normalArB);
                         Vector3 contactPoint = Vector3.Zero;
+                        CollisionDebugWriter.BoxCornerInfo(i, boxACorners[i], normalArB);
                         if (wboxB.Intersects(ref rayBoxCornerArB, out contactPoint))
                         {
                             float distanceToContactSquared = Vector3.DistanceSquared(rayBoxCornerArB.Position, contactPoint);
@@ -92,10 +96,10 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                     if (closestDistanceToContactArB != null && closestDistanceToContactBrA.IsNullOrGreaterThanOrEqualTo(closestDistanceToContactArB.Value))
                     {
                         float distanceToCollisionA = closestDistanceToContactArB.Value;
-                        Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
+                        Vector3 collisionPointA = this_PreviousTransform.Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
                         float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
                         float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
-                        Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
+                        Vector3 collisionPointB = targetCollider_PreviousTransform.Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
                         collisionEvent = new CollisionEvent()
                         {
                             Object1 = this,
@@ -108,10 +112,10 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                     else if (closestDistanceToContactBrA != null)
                     {
                         float distanceToCollisionB = closestDistanceToContactBrA.Value;
-                        Vector3 collisionPointB = targetCollider.WorldTransform().Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
+                        Vector3 collisionPointB = targetCollider_PreviousTransform.Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
                         float stepPercentageToCollision = distanceToCollisionB / vectorB.Length();
                         float distanceToCollisionA = vectorA.Length() * stepPercentageToCollision;
-                        Vector3 collisionPointA = this.WorldTransform().Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
+                        Vector3 collisionPointA = this_PreviousTransform.Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
                         collisionEvent = new CollisionEvent()
                         {
                             Object1 = this,
