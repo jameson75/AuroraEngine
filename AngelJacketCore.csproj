@@ -122,6 +122,8 @@
     <Compile Include="Effects\Obsolete\SHLightingEffect.cs" />
     <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Effects\SkysphereEffect.cs" />
+    <Compile Include="Utils\BoundingBoxOA.cs" />
+    <Compile Include="Utils\BoundingQuadOA.cs" />
     <Compile Include="Utils\NullableFloatExtension.cs" />
     <Compile Include="Utils\TransformBoundingElementExtensions.cs" />
     <Compile Include="World\ColliderRenderer.cs" />

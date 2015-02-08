@@ -56,6 +56,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                     Vector3 normalArB = Vector3.Normalize(vectorArB);
                     float? closestDistanceToContactArB = null;
 
+                    CollisionDebugWriter.ClearBufferedOut();
                     Vector3[] boxACorners = wboxA.GetCorners();
                     for (int i = 0; i < boxACorners.Length; i++)
                     {                       
