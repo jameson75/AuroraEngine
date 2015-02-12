@@ -21,16 +21,12 @@ namespace CipherPark.AngelJacket.Core.Animation
     {
         public SpatialAnimation()
         { }
+       
 
-        public SpatialAnimation(ITransformable target)
-        {
-            LocalChild = target;
-        }
-
-        public SpatialAnimation(ITransformable target, IEnumerable<AnimationKeyFrame> keyFrames)
+        public SpatialAnimation(IEnumerable<AnimationKeyFrame> keyFrames, ITransformable localChild = null)
             : base(keyFrames)
         {
-            LocalChild = target;
+            LocalChild = localChild;
         }      
 
         public ITransformable LocalChild { get; set; }

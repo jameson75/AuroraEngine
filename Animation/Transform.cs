@@ -45,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.Animation
             Translation = translation;
         }
 
-        public Transform(Quaternion rotation, Vector3? translation)
+        public Transform(Quaternion rotation, Vector3? translation = null)
             : this()
         {
             Rotation = rotation;

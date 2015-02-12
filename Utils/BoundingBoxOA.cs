@@ -185,7 +185,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             for (int i = 0; i < quads.Length; i++)
             {
                 Plane plane = quads[i].GetPlane();
-                CollisionDebugWriter.IntersectsBoxInfo(i, quads[i], ray);
+                //CollisionDebugWriter.IntersectsBoxInfo(i, quads[i], ray);
                 //We discard any planes of this bounding box which are facing away from the ray's origin.                
                 if (Plane.DotCoordinate(plane, ray.Position) >= 0)
                 {

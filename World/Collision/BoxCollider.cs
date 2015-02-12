@@ -56,13 +56,13 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                     Vector3 normalArB = Vector3.Normalize(vectorArB);
                     float? closestDistanceToContactArB = null;
 
-                    CollisionDebugWriter.ClearBufferedOut();
+                    //CollisionDebugWriter.ClearBufferedOut();
                     Vector3[] boxACorners = wboxA.GetCorners();
                     for (int i = 0; i < boxACorners.Length; i++)
                     {                       
                         Ray rayBoxCornerArB = new Ray(boxACorners[i], normalArB);
                         Vector3 contactPoint = Vector3.Zero;
-                        CollisionDebugWriter.BoxCornerInfo(i, boxACorners[i], normalArB);
+                        //CollisionDebugWriter.BoxCornerInfo(i, boxACorners[i], normalArB);
                         if (wboxB.Intersects(ref rayBoxCornerArB, out contactPoint))
                         {
                             float distanceToContactSquared = Vector3.DistanceSquared(rayBoxCornerArB.Position, contactPoint);

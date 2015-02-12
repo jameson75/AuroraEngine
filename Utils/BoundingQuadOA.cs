@@ -94,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         {
             Plane plane = GetPlane();
             float dotProduct = Plane.DotCoordinate(plane, ray.Position);
-            CollisionDebugWriter.IntersectsQuadInfo(ray, plane, dotProduct);
+            //CollisionDebugWriter.IntersectsQuadInfo(ray, plane, dotProduct);
             if (dotProduct == 0)
             {
                 point = ray.Position;
@@ -211,11 +211,11 @@ namespace CipherPark.AngelJacket.Core.Utils
                 Vector3 p2 = _corners[i];
                 Vector3 p3 = i < _corners.Length - 1 ? _corners[i + 1] : _corners[0];
                 Vector3 c = Vector3.Normalize(Vector3.Cross(p2 - p1, p3 - p2));
-                CollisionDebugWriter.QuadContainsCoplanarPointInfo(c, plane, coplanarPoint);
+                //CollisionDebugWriter.QuadContainsCoplanarPointInfo(c, plane, coplanarPoint);
                 if (c != Vector3.Normalize(plane.Normal) && c != Vector3.Zero)
                     return false;                
             }
-            CollisionDebugWriter.QuadContainsCoplanarSuccessInfo();
+            //CollisionDebugWriter.QuadContainsCoplanarSuccessInfo();
             return true;
         }
 
