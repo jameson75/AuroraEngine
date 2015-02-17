@@ -41,7 +41,8 @@ namespace CipherPark.AngelJacket.Core.World.Collision
 
                 }
                 else if (targetCollider is BoxCollider)
-                {
+                {    
+                    /*
                     Transform this_PreviousTransform = this.PreviousWorldTransform(displacementVector);
                     Transform targetCollider_PreviousTransform = targetCollider.PreviousWorldTransform(targetColliderDisplacementVector);
 
@@ -125,6 +126,44 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                             Object2LocationAtCollision = collisionPointB
                         };
                     }
+                    */
+
+                    Transform this_PreviousTransform = this.PreviousWorldTransform(displacementVector);
+                    Transform targetCollider_PreviousTransform = targetCollider.PreviousWorldTransform(targetColliderDisplacementVector);
+
+                    BoundingBoxOA wboxA = Box.Transform(this_PreviousTransform.ToMatrix());
+                    Vector3 vectorA = displacementVector;
+
+                    BoundingBoxOA wboxB = ((BoxCollider)targetCollider).Box.Transform(targetCollider_PreviousTransform.ToMatrix());
+                    Vector3 vectorB = targetColliderDisplacementVector;
+
+                    //Calculate the movement vector for A relative to B. (ie: in B's frame of reference).
+                    Vector3 vectorArB = vectorA - vectorB;
+                    Vector3 normalArB = Vector3.Normalize(vectorArB);
+
+                    BoundingQuadOA[] wQuadsA = wboxA.GetQuads();
+                    BoundingQuadOA[] wQuadsB = wboxB.GetQuads();
+
+                    foreach (BoundingQuadOA wQuadA in wQuadsA)
+                    {
+                        Vector3[] wQuadPointsA = wQuadA.GetCorners();                        
+                        foreach (BoundingQuadOA wQuadB in wQuadsB)
+                        {                           
+                            Vector3[] wQuadPointsB = wQuadB.GetCorners();
+                            Vector3[] pQuadPointsA = wQuadPointsA.Select(p => wQuadB.GetPlane().ProjectPoint(p, normalArB).Value).ToArray();
+                            List<Vector3> polyPointsG1 = new List<Vector3>();
+                            List<Vector3> polyPointsG2 = new List<Vector3>();
+                            List<Tuple<Vector3, Vector3>> edgeMap = new List<Tuple<Vector3, Vector3>>();
+                            for( int i = 0; i < pQuadPointsA.Length; i++)
+                            {
+                                Vector3 pEdgeAP1 = pQuadPointsA[i];
+                                Vector3 pEdgeAP2 = (i < pQuadPointsA.Length - 1) ? pQuadPointsA[i + 1] : pQuadPointsA[0];
+                                if (wQuadB.ContainsCoplanar(ref pEdgeAP1))
+                                    polyPointsG1.Add(pQuadPointA);
+                                foreach(Vector3 
+                            }
+                        }
+                    }              
                 }
             }
             return collisionEvent;
