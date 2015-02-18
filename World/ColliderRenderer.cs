@@ -227,12 +227,8 @@ namespace CipherPark.AngelJacket.Core.World
             const float EdgeLength = 5.0f;
             QuadCollider quadCollider = (QuadCollider)Collider;
             Vector3[] corners = quadCollider.Quad.GetCorners();
-            Vector3[] doubledCorners = corners.Union(corners).ToArray();
-            BoundingBoxOA renderBox = BoundingBoxOA.FromPoints(doubledCorners);
-            renderBox.Inflate(0, 0, EdgeLength);
-
-            Vector3[] allCorners = renderBox.GetCorners();
-            Vector3[] points = new Vector3[24];
+            Vector3[] allCorners = corners.Concat(corners).ToArray();           
+            Vector3[] points = new Vector3[32];
             short[] indices = new short[48];
 
             for (int i = 0; i < allCorners.Length; i++)
@@ -250,8 +246,10 @@ namespace CipherPark.AngelJacket.Core.World
                 indices[n + 1] = (short)(v + 1);
                 indices[n + 2] = (short)v;
                 indices[n + 3] = (short)(v + 2);
-                indices[n + 4] = (short)(v + 1);
-                indices[n + 5] = (short)(v + 2);
+
+                //TODO:Since I've decided to change the shape of the rendered brackets, get rid of these two last indices...
+                indices[n + 4] = 0; //(short)(v + 1);
+                indices[n + 5] = 0; // (short)(v + 2);
             }
 
             VertexPositionColor[] vertices = points.Select(p => new VertexPositionColor()

@@ -235,6 +235,17 @@ namespace CipherPark.AngelJacket.Core.Utils
             return string.Format("TopLeft: {0}, TopRight: {1}, BottomRignit: {2}, BottomLeft: {3}",
                                   TopLeft, TopRight, BottomRight, BottomLeft);
         }
+
+        public static BoundingQuadOA FromBox(BoundingBox boundingBox)
+        {
+            return new BoundingQuadOA()
+            {
+                TopLeft = new Vector3(boundingBox.Minimum.X, 0, boundingBox.Maximum.Z),
+                TopRight = new Vector3(boundingBox.Maximum.X, 0, boundingBox.Maximum.Z),
+                BottomRight = new Vector3(boundingBox.Maximum.X, 0, boundingBox.Minimum.Z),
+                BottomLeft = new Vector3(boundingBox.Minimum.X, 0, boundingBox.Minimum.Z)
+            };
+        }
     }
     
     /// <summary>

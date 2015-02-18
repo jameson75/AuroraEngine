@@ -159,7 +159,10 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                                 Vector3 pEdgeAP1 = pQuadPointsA[i];
                                 Vector3 pEdgeAP2 = (i < pQuadPointsA.Length - 1) ? pQuadPointsA[i + 1] : pQuadPointsA[0];
                                 if (wQuadB.ContainsCoplanar(ref pEdgeAP1))
-                                    polyPointsG1.Add(pQuadPointA);
+                                    polyPointsG1.Add(pEdgeAP1);
+                                
+                                
+                                
                                 foreach(Vector3 
                             }
                         }

@@ -480,4 +480,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             return p.Normal * p.D;
         }
     }
+
+    public static class CollisionExtension
+    {
+        public bool LineIntersectLine(Vector3 pA1, Vector3 pA2, Vector3 pB1, Vector3 pB2)
+        {
+            
+        }
+    }
 }
