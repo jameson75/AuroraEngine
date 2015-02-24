@@ -151,25 +151,45 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                         {                           
                             Vector3[] wQuadPointsB = wQuadB.GetCorners();
                             Vector3[] pQuadPointsA = wQuadPointsA.Select(p => wQuadB.GetPlane().ProjectPoint(p, normalArB).Value).ToArray();
-                            List<Vector3> polyPointsG1 = new List<Vector3>();
-                            List<Vector3> polyPointsG2 = new List<Vector3>();
+                            List<Vector3> polyPoints = new List<Vector3>();
                             List<Tuple<Vector3, Vector3>> edgeMap = new List<Tuple<Vector3, Vector3>>();
                             for( int i = 0; i < pQuadPointsA.Length; i++)
                             {
-                                Vector3 pEdgeAP1 = pQuadPointsA[i];
-                                Vector3 pEdgeAP2 = (i < pQuadPointsA.Length - 1) ? pQuadPointsA[i + 1] : pQuadPointsA[0];
-                                if (wQuadB.ContainsCoplanar(ref pEdgeAP1))
-                                    polyPointsG1.Add(pEdgeAP1);
-                                
-                                
-                                
-                                foreach(Vector3 
-                            }
+                                Vector3 pEdgePointA1 = pQuadPointsA[i];
+                                Vector3 pEdgePointA2 = pQuadPointsA.NextOrFirst(i);
+                                if (wQuadB.ContainsCoplanar(ref pEdgePointA1))
+                                    polyPoints.Add(pEdgePointA1);
+                                List <Vector3> intersectingPoints = new List<Vector3>();
+                                for (int j = 0; j < wQuadPointsB.Length; j++)
+                                {
+                                    Vector3 wEdgePointB1 = wQuadPointsB[i];
+                                    Vector3 wEdgePointB2 = pQuadPointsA.NextOrFirst(i);
+                                    Vector3 intersection = Vector3.Zero;
+                                    if (CollisionExtension.LineIntersectLine(pEdgePointA1, pEdgePointA2, wEdgePointB1, wEdgePointB2, out intersection) && 
+                                        intersection != pEdgePointA1 &&
+                                        intersection != pEdgePointA2 &&
+                                        intersection != wEdgePointB1 &&
+                                        intersection != wEdgePointB2)
+                                    {
+                                        intersectingPoints.Add(intersection);                                           
+                                    }                                   
+                                }
+                                intersectingPoints.OrderBy(p => Vector3.DistanceSquared(pEdgePointA1, p));
+                                polyPoints.AddRange(intersectingPoints);
+                            }                   
                         }
                     }              
                 }
             }
             return collisionEvent;
+        }
+    }
+
+    public static class _IEnumerableExtension
+    {
+        public static T NextOrFirst<T>(this IEnumerable<T> e, int i)
+        {
+            return (i < e.Count() - i) ? e.ElementAt(i) : e.FirstOrDefault();
         }
     }
 }

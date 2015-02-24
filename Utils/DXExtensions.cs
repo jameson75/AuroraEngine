@@ -483,9 +483,21 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public static class CollisionExtension
     {
-        public bool LineIntersectLine(Vector3 pA1, Vector3 pA2, Vector3 pB1, Vector3 pB2)
+        public static bool LineIntersectLine(Vector3 pA1, Vector3 pA2, Vector3 pB1, Vector3 pB2, out Vector3 intersection)
         {
-            
+            Ray rA = new Ray(pA1, pA2 - pA1);
+            Ray rB = new Ray(pB1, pB2 - pB1);        
+            if (rA.Intersects(ref rB, out intersection))
+            {
+                float dA = Vector3.DistanceSquared(pA1, pA2);
+                float dB = Vector3.DistanceSquared(pB1, pB2);
+                float dAI = Vector3.DistanceSquared(pA1, intersection);
+                float dBI = Vector3.DistanceSquared(pB1, intersection);
+                if (dAI <= dA && dBI <= dB)
+                    return true;
+            }
+            intersection = Vector3.Zero;
+            return false;
         }
     }
 }
