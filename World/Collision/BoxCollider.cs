@@ -149,10 +149,12 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                         Vector3[] wQuadPointsA = wQuadA.GetCorners();                        
                         foreach (BoundingQuadOA wQuadB in wQuadsB)
                         {                           
+                            //Get Projected-Overlapping-Poly
+                            //------------------------------
+
                             Vector3[] wQuadPointsB = wQuadB.GetCorners();
                             Vector3[] pQuadPointsA = wQuadPointsA.Select(p => wQuadB.GetPlane().ProjectPoint(p, normalArB).Value).ToArray();
-                            List<Vector3> polyPoints = new List<Vector3>();
-                            List<Tuple<Vector3, Vector3>> edgeMap = new List<Tuple<Vector3, Vector3>>();
+                            List<Vector3> polyPoints = new List<Vector3>();                           
                             for( int i = 0; i < pQuadPointsA.Length; i++)
                             {
                                 Vector3 pEdgePointA1 = pQuadPointsA[i];
@@ -165,19 +167,18 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                                     Vector3 wEdgePointB1 = wQuadPointsB[i];
                                     Vector3 wEdgePointB2 = pQuadPointsA.NextOrFirst(i);
                                     Vector3 intersection = Vector3.Zero;
-                                    if (CollisionExtension.LineIntersectLine(pEdgePointA1, pEdgePointA2, wEdgePointB1, wEdgePointB2, out intersection) && 
-                                        intersection != pEdgePointA1 &&
-                                        intersection != pEdgePointA2 &&
-                                        intersection != wEdgePointB1 &&
-                                        intersection != wEdgePointB2)
+                                    if (CollisionExtension.LineIntersectLine(pEdgePointA1, pEdgePointA2, wEdgePointB1, wEdgePointB2, out intersection))                                   
                                     {
-                                        intersectingPoints.Add(intersection);                                           
+                                        if(!polyPoints.Contains(intersection))                                        
+                                            intersectingPoints.Add(intersection);                                           
                                     }                                   
                                 }
-                                intersectingPoints.OrderBy(p => Vector3.DistanceSquared(pEdgePointA1, p));
+                                intersectingPoints.OrderBy(p => Vector3.DistanceSquared(pEdgePointA1, p));                               
                                 polyPoints.AddRange(intersectingPoints);
                             }                   
-                        }
+                            
+                            //TODO: Insert overlapping corners of Quad B into polypoints.
+                        }                        
                     }              
                 }
             }
