@@ -41,8 +41,10 @@ namespace CipherPark.AngelJacket.Core.World.Collision
 
                 }
                 else if (targetCollider is BoxCollider)
-                {    
+                {
+                    #region Obsolete
                     /*
+                    
                     Transform this_PreviousTransform = this.PreviousWorldTransform(displacementVector);
                     Transform targetCollider_PreviousTransform = targetCollider.PreviousWorldTransform(targetColliderDisplacementVector);
 
@@ -127,6 +129,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                         };
                     }
                     */
+                    #endregion
 
                     Transform this_PreviousTransform = this.PreviousWorldTransform(displacementVector);
                     Transform targetCollider_PreviousTransform = targetCollider.PreviousWorldTransform(targetColliderDisplacementVector);
@@ -154,14 +157,15 @@ namespace CipherPark.AngelJacket.Core.World.Collision
 
                             Vector3[] wQuadPointsB = wQuadB.GetCorners();
                             Vector3[] pQuadPointsA = wQuadPointsA.Select(p => wQuadB.GetPlane().ProjectPoint(p, normalArB).Value).ToArray();
-                            List<Vector3> polyPoints = new List<Vector3>();                           
+                            List<Vector3> polyPoints = new List<Vector3>();
+                            List<Tuple<Vector3, Vector3, Vector3>> interesectionMap = new List<Tuple<Vector3, Vector3, Vector3>>();                           
                             for( int i = 0; i < pQuadPointsA.Length; i++)
                             {
                                 Vector3 pEdgePointA1 = pQuadPointsA[i];
                                 Vector3 pEdgePointA2 = pQuadPointsA.NextOrFirst(i);
                                 if (wQuadB.ContainsCoplanar(ref pEdgePointA1))
                                     polyPoints.Add(pEdgePointA1);
-                                List <Vector3> intersectingPoints = new List<Vector3>();
+                                List <Vector3> intersectingPoints = new List<Vector3>();                                
                                 for (int j = 0; j < wQuadPointsB.Length; j++)
                                 {
                                     Vector3 wEdgePointB1 = wQuadPointsB[i];
@@ -169,15 +173,36 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                                     Vector3 intersection = Vector3.Zero;
                                     if (CollisionExtension.LineIntersectLine(pEdgePointA1, pEdgePointA2, wEdgePointB1, wEdgePointB2, out intersection))                                   
                                     {
-                                        if(!polyPoints.Contains(intersection))                                        
-                                            intersectingPoints.Add(intersection);                                           
+                                        if (!polyPoints.Contains(intersection))
+                                        {
+                                            intersectingPoints.Add(intersection);
+                                            interesectionMap.Add(new Tuple<Vector3, Vector3, Vector3>(pEdgePointA1, wEdgePointB1, intersection));
+                                        }
                                     }                                   
                                 }
                                 intersectingPoints.OrderBy(p => Vector3.DistanceSquared(pEdgePointA1, p));                               
                                 polyPoints.AddRange(intersectingPoints);
-                            }                   
-                            
-                            //TODO: Insert overlapping corners of Quad B into polypoints.
+                            }
+
+                            BoundingQuadOA pQuadA = BoundingQuadOA.FromPoints(pQuadPointsA);
+                            for(int i = 0; i < wQuadPointsB.Length; i++)
+                            {
+                                Vector3 wQuadPointB = wQuadPointsB[i];
+                                if (pQuadA.ContainsCoplanar(ref wQuadPointB) &&
+                                    !polyPoints.Contains(wQuadPointB))
+                                {
+                                    var tuple = interesectionMap.FirstOrDefault(t => t.Item2 == wQuadPointB);
+                                    if (tuple != null)
+                                    {
+                                        int index = polyPoints.IndexOf(tuple.Item3);
+                                        polyPoints.Insert(index, wQuadPointB);
+                                    }
+                                    else
+                                        polyPoints.Add(wQuadPointB);
+                                }
+                            }
+
+                            //TODO: 
                         }                        
                     }              
                 }
