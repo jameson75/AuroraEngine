@@ -155,58 +155,90 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                             //Get Projected-Overlapping-Poly
                             //------------------------------
 
+                            //Acquire the corners of quad B.
                             Vector3[] wQuadPointsB = wQuadB.GetCorners();
+
+                            //Project quad A onto the surface of quad B along A's (relative) momentum vector and aquire it's corners.
                             Vector3[] pQuadPointsA = wQuadPointsA.Select(p => wQuadB.GetPlane().ProjectPoint(p, normalArB).Value).ToArray();
-                            List<Vector3> polyPoints = new List<Vector3>();
-                            List<Tuple<Vector3, Vector3, Vector3>> interesectionMap = new List<Tuple<Vector3, Vector3, Vector3>>();                           
+
+                            //We now use the intersection of projected quad A and quad B to determine all posible collision points.
+                            List<Vector3> potentialCollisionPoints = new List<Vector3>();                            
                             for( int i = 0; i < pQuadPointsA.Length; i++)
                             {
                                 Vector3 pEdgePointA1 = pQuadPointsA[i];
                                 Vector3 pEdgePointA2 = pQuadPointsA.NextOrFirst(i);
-                                if (wQuadB.ContainsCoplanar(ref pEdgePointA1))
-                                    polyPoints.Add(pEdgePointA1);
+
+                                //If the point of the projected quad, A, exists in the interior of quad B, then it is a potential collision point.
+                                if (wQuadB.ContainsCoplanar(ref pEdgePointA1) && !potentialCollisionPoints.Contains(pEdgePointA1))
+                                    potentialCollisionPoints.Add(pEdgePointA1);
+                                
+                                //Every edge-intersection between projected quad, A, and quad B is an potential collision point.
                                 List <Vector3> intersectingPoints = new List<Vector3>();                                
                                 for (int j = 0; j < wQuadPointsB.Length; j++)
                                 {
                                     Vector3 wEdgePointB1 = wQuadPointsB[i];
                                     Vector3 wEdgePointB2 = pQuadPointsA.NextOrFirst(i);
                                     Vector3 intersection = Vector3.Zero;
-                                    if (CollisionExtension.LineIntersectLine(pEdgePointA1, pEdgePointA2, wEdgePointB1, wEdgePointB2, out intersection))                                   
-                                    {
-                                        if (!polyPoints.Contains(intersection))
-                                        {
-                                            intersectingPoints.Add(intersection);
-                                            interesectionMap.Add(new Tuple<Vector3, Vector3, Vector3>(pEdgePointA1, wEdgePointB1, intersection));
-                                        }
-                                    }                                   
+                                    if (CollisionExtension.LineIntersectLine(pEdgePointA1, pEdgePointA2, wEdgePointB1, wEdgePointB2, out intersection) &&  !potentialCollisionPoints.Contains(intersection))                                                                                        
+                                        intersectingPoints.Add(intersection);                                                                                                                    
                                 }
-                                intersectingPoints.OrderBy(p => Vector3.DistanceSquared(pEdgePointA1, p));                               
-                                polyPoints.AddRange(intersectingPoints);
+                                //We ensure the intersections points detected between the current edge in projected quad A and all the edges in quad B
+                                //are ordered closest-to-furthest. (It's possible that A and B are oriented in such a way that the intersection
+                                //points were detected furthest-to-closest).
+                                intersectingPoints.OrderBy(p => Vector3.DistanceSquared(pEdgePointA1, p));                                                               
+                                potentialCollisionPoints.AddRange(intersectingPoints);
                             }
 
+                            //If the point of the projected quad, A, exists in the interior of quad B, then it is a potential collision point.
                             BoundingQuadOA pQuadA = BoundingQuadOA.FromPoints(pQuadPointsA);
                             for(int i = 0; i < wQuadPointsB.Length; i++)
                             {
                                 Vector3 wQuadPointB = wQuadPointsB[i];
-                                if (pQuadA.ContainsCoplanar(ref wQuadPointB) &&
-                                    !polyPoints.Contains(wQuadPointB))
+                                if (pQuadA.ContainsCoplanar(ref wQuadPointB) && !potentialCollisionPoints.Contains(wQuadPointB))                            
+                                    potentialCollisionPoints.Add(wQuadPointB);                                
+                            }
+
+                            //Shoot rays from the all potential collision points to quadA, tracking the distance of the ray with the shortest
+                            //distance to intersection (if any).
+                            //CollisionDebugWriter.ClearBufferedOut();
+                            float? closestDistanceToContactArB = null;                          
+                            foreach (Vector3 polyPoint in potentialCollisionPoints)
+                            {
+                                Ray rayPolyPointArB = new Ray(polyPoint, normalArB);
+                                Vector3 contactPoint = Vector3.Zero;
+                                //CollisionDebugWriter.BoxCornerInfo(i, polyPoint, normalArB);
+                                if (wboxB.Intersects(ref rayPolyPointArB, out contactPoint))
                                 {
-                                    var tuple = interesectionMap.FirstOrDefault(t => t.Item2 == wQuadPointB);
-                                    if (tuple != null)
+                                    float distanceToContactSquared = Vector3.DistanceSquared(rayPolyPointArB.Position, contactPoint);
+                                    if (distanceToContactSquared <= vectorArB.LengthSquared())
                                     {
-                                        int index = polyPoints.IndexOf(tuple.Item3);
-                                        polyPoints.Insert(index, wQuadPointB);
+                                        if (closestDistanceToContactArB == null || distanceToContactSquared < closestDistanceToContactArB.Value)
+                                            closestDistanceToContactArB = distanceToContactSquared;
                                     }
-                                    else
-                                        polyPoints.Add(wQuadPointB);
                                 }
                             }
 
-                            //TODO: 
+                            //If an actual collision event was found from out of all the potential collisions, create and return a collision event.
+                            if (closestDistanceToContactArB != null)
+                            {
+                                float distanceToCollisionA = closestDistanceToContactArB.Value;
+                                Vector3 collisionPointA = this_PreviousTransform.Translation + Vector3.Normalize(vectorA) * distanceToCollisionA;
+                                float stepPercentageToCollision = distanceToCollisionA / vectorA.Length();
+                                float distanceToCollisionB = vectorB.Length() * stepPercentageToCollision;
+                                Vector3 collisionPointB = targetCollider_PreviousTransform.Translation + Vector3.Normalize(vectorB) * distanceToCollisionB;
+                                collisionEvent = new CollisionEvent()
+                                {
+                                    Object1 = this,
+                                    Object2 = targetCollider,
+                                    Object1LocationAtCollision = collisionPointA,
+                                    Object2LocationAtCollision = collisionPointB
+                                };
+                            }
                         }                        
                     }              
                 }
             }
+
             return collisionEvent;
         }
     }
