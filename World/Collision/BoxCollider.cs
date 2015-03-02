@@ -187,61 +187,61 @@ namespace CipherPark.AngelJacket.Core.World.Collision
             return collisionEvent;
         }
 
-        private void GetClosestDistanceToCollision(BoundingBoxOA wboxA, BoundingBoxOA wboxB, Vector3 movementVector, out float? closestDistanceToContact)
+        private void GetClosestDistanceToCollision(BoundingBoxOA wboxS, BoundingBoxOA wboxT, Vector3 movementVector, out float? closestDistanceToContact)
         {
-            BoundingQuadOA[] wQuadsA = wboxA.GetQuads();
-            BoundingQuadOA[] wQuadsB = wboxB.GetQuads();
+            BoundingQuadOA[] wQuadsS = wboxS.GetQuads();
+            BoundingQuadOA[] wQuadsT = wboxT.GetQuads();
             Vector3 movementNormal = Vector3.Normalize(movementVector);
             List<Vector3> potentialCollisionPoints = new List<Vector3>();
 
             List<Vector3> debug = new List<Vector3>();
 
-            foreach (BoundingQuadOA wQuadA in wQuadsA)
+            foreach (BoundingQuadOA wQuadS in wQuadsS)
             {
-                Vector3[] wQuadPointsA = wQuadA.GetCorners();
-                foreach (BoundingQuadOA wQuadB in wQuadsB)
+                Vector3[] wQuadPointsS = wQuadS.GetCorners();
+                foreach (BoundingQuadOA wQuadT in wQuadsT)
                 {
                     //Get Projected-Overlapping-Poly
                     //------------------------------                            
-                    Vector3[] wQuadPointsB = wQuadB.GetCorners();
-                    if (wQuadA.CanProjectOnTo(wQuadB, movementNormal))
+                    Vector3[] wQuadPointsT = wQuadT.GetCorners();
+                    if (wQuadS.CanProjectOnTo(wQuadT, movementNormal))
                     {
                         //Project quad A onto the surface of quad B along A's (relative) momentum vector and aquire it's corners.
-                        BoundingQuadOA pQuadA = wQuadA.ProjectOnTo(wQuadB, movementNormal);
-                        Vector3[] pQuadPointsA = pQuadA.GetCorners();                        
+                        BoundingQuadOA pQuadS = wQuadS.ProjectOnTo(wQuadT, movementNormal);
+                        Vector3[] pQuadPointsS = pQuadS.GetCorners();                        
 
                         //We now use the intersection of projected quad A and quad B to determine all posible collision points.
-                        for (int i = 0; i < pQuadPointsA.Length; i++)
+                        for (int i = 0; i < pQuadPointsS.Length; i++)
                         {
-                            Vector3 pEdgePointA1 = pQuadPointsA[i];
-                            Vector3 pEdgePointA2 = pQuadPointsA.NextOrFirst(i);
+                            Vector3 pEdgePointS1 = pQuadPointsS[i];
+                            Vector3 pEdgePointS2 = pQuadPointsS.NextOrFirst(i);
 
                             //If the point of the projected quad, A, exists in the interior of quad B, then it is a potential collision point.
-                            if (wQuadB.ContainsCoplanar(ref pEdgePointA1) && !potentialCollisionPoints.Contains(pEdgePointA1))
-                                potentialCollisionPoints.Add(pEdgePointA1);
+                            if (wQuadT.ContainsCoplanar(ref pEdgePointS1) && !potentialCollisionPoints.Contains(pEdgePointS1))
+                                potentialCollisionPoints.Add(pEdgePointS1);
 
                             //Every edge-intersection between projected quad, A, and quad B is an potential collision point.                          
-                            for (int j = 0; j < wQuadPointsB.Length; j++)
+                            for (int j = 0; j < wQuadPointsT.Length; j++)
                             {
-                                Vector3 wEdgePointB1 = wQuadPointsB[i];
-                                Vector3 wEdgePointB2 = pQuadPointsA.NextOrFirst(i);
+                                Vector3 wEdgePointT1 = wQuadPointsT[j];
+                                Vector3 wEdgePointT2 = wQuadPointsT.NextOrFirst(j);
                                 Vector3 intersection = Vector3.Zero;
-                                if (CollisionExtension.LineIntersectLine(pEdgePointA1, pEdgePointA2, wEdgePointB1, wEdgePointB2, out intersection) &&
+                                if (CollisionExtension.LineIntersectLine(pEdgePointS1, pEdgePointS2, wEdgePointT1, wEdgePointT2, out intersection) &&
                                     intersection != Vector3.Zero &&
                                     !potentialCollisionPoints.Contains(intersection))
                                 {
                                     potentialCollisionPoints.Add(intersection);
-                                    debug.Add(intersection);
+                                    debug.Add(intersection);                                   
                                 }
                             }                                                       
                         }
 
                         //If the point of the projected quad, A, exists in the interior of quad B, then it is a potential collision point.                               
-                        for (int i = 0; i < wQuadPointsB.Length; i++)
+                        for (int i = 0; i < wQuadPointsT.Length; i++)
                         {
-                            Vector3 wQuadPointB = wQuadPointsB[i];
-                            if (pQuadA.ContainsCoplanar(ref wQuadPointB) && !potentialCollisionPoints.Contains(wQuadPointB))
-                                potentialCollisionPoints.Add(wQuadPointB);
+                            Vector3 wQuadPointT = wQuadPointsT[i];
+                            if (pQuadS.ContainsCoplanar(ref wQuadPointT) && !potentialCollisionPoints.Contains(wQuadPointT))
+                                potentialCollisionPoints.Add(wQuadPointT);
                         }
                     }
                 }
@@ -256,7 +256,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                 Ray rayFromPotentialCollisionPoint = new Ray(potentialCollisionPoint, -movementNormal);
                 Vector3 contactPoint = Vector3.Zero;
                 //CollisionDebugWriter.BoxCornerInfo(i, polyPoint, normalArB);
-                if (wboxA.Intersects(ref rayFromPotentialCollisionPoint, out contactPoint))
+                if (wboxS.Intersects(ref rayFromPotentialCollisionPoint, out contactPoint))
                 {
                     float distanceToContactSquared = Vector3.DistanceSquared(rayFromPotentialCollisionPoint.Position, contactPoint);
                     if (distanceToContactSquared <= movementVector.LengthSquared())
@@ -281,10 +281,16 @@ namespace CipherPark.AngelJacket.Core.World.Collision
     {
         public static bool CanProjectOnTo(this BoundingQuadOA source, BoundingQuadOA target, Vector3 direction)
         {
-            //We consider the source "projectable" on to the target only if target's plane faces
-            //all corners of the source quad.
             Vector3[] corners = source.GetCorners();
             Plane targetPlane = target.GetPlane();
+            
+            //We consider the source "projectable" on to the target only if the target and source planes face
+            //one another and all corners of the source quad are on the same side (front, obviously) of the target
+            //quad.
+
+            if (Vector3.Dot(source.GetPlane().Normal, target.GetPlane().Normal) <= 0)
+                return false;
+
             for (int i = 0; i < corners.Length; i++)
             {
                 if (Plane.DotCoordinate(targetPlane, corners[i]) <= 0)

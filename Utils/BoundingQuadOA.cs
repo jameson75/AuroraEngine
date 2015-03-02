@@ -246,7 +246,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         public override string ToString()
         {
-            return string.Format("TopLeft: {0}, TopRight: {1}, BottomRignit: {2}, BottomLeft: {3}",
+            return string.Format("TopLeft: {0}, TopRight: {1}, BottomRight: {2}, BottomLeft: {3}",
                                   TopLeft, TopRight, BottomRight, BottomLeft);
         }
 
