@@ -486,9 +486,16 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static bool LineIntersectLine(Vector3 pA1, Vector3 pA2, Vector3 pB1, Vector3 pB2, out Vector3 intersection)
         {
             Ray rA = new Ray(pA1, pA2 - pA1);
-            Ray rB = new Ray(pB1, pB2 - pB1);        
-            if (rA.Intersects(ref rB, out intersection))
-            {
+            Ray rB = new Ray(pB1, pB2 - pB1); 
+       
+            //NOTE: When the two rays are coincident, the sharpdx library returns
+            //true, and returns an intersection of Vector3.Zero. 
+            //This is to ambiguous for our purposes.
+            //As a rule in this engine, neither conicident rays nor lines are considered
+            //to be intersecting,  since we cannot define a single point of intersection.    
+                   
+            if (rA.Intersects(ref rB, out intersection) && !AreRaysCoincident(rA, rB))
+            {               
                 float dA = Vector3.DistanceSquared(pA1, pA2);
                 float dB = Vector3.DistanceSquared(pB1, pB2);
                 float dAI = Vector3.DistanceSquared(pA1, intersection);
@@ -497,6 +504,25 @@ namespace CipherPark.AngelJacket.Core.Utils
                     return true;
             }
             intersection = Vector3.Zero;
+            return false;
+        }
+
+        public static bool AreRaysCoincident(Ray ray1, Ray ray2)
+        {
+            Vector3 cross;
+            Vector3.Cross(ref ray1.Direction, ref ray2.Direction, out cross);
+            float denominator = cross.Length();
+            //Lines are parallel.
+            if (Math.Abs(denominator) < MathUtil.ZeroTolerance)
+            {
+                //Lines are parallel and on top of each other.
+                if (Math.Abs(ray2.Position.X - ray1.Position.X) < MathUtil.ZeroTolerance &&
+                    Math.Abs(ray2.Position.Y - ray1.Position.Y) < MathUtil.ZeroTolerance &&
+                    Math.Abs(ray2.Position.Z - ray1.Position.Z) < MathUtil.ZeroTolerance)
+                {                    
+                    return true;
+                }
+            }
             return false;
         }
     }

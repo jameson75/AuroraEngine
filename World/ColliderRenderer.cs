@@ -116,7 +116,8 @@ namespace CipherPark.AngelJacket.Core.World
             const float EdgeLength = 5.0f;
             BoxCollider boxCollider = (BoxCollider)Collider;
             BoundingBoxOA renderBox = boxCollider.Box;
-            renderBox.Inflate(EdgeLength, EdgeLength, EdgeLength);
+            const float Padding = 0.5f;
+            renderBox.Inflate(Padding, Padding, Padding);
 
             Vector3[] corners = renderBox.GetCorners();
             Vector3[] points = new Vector3[32];
@@ -174,8 +175,7 @@ namespace CipherPark.AngelJacket.Core.World
             BoundingBox renderBox = BoundingBox.FromSphere(sphereCollider.Sphere);          
             Vector3[] corners = renderBox.GetCorners();
             Vector3[] points = new Vector3[32];
-            short[] indices = new short[48];
-            
+            short[] indices = new short[48];            
 
             for (int i = 0; i < corners.Length; i++)
             {

@@ -92,13 +92,27 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// <returns></returns>
         public bool Intersects(Ray ray, out Vector3 point)
         {
-            Plane plane = GetPlane();
-            float dotProduct = Plane.DotCoordinate(plane, ray.Position);
-            //CollisionDebugWriter.IntersectsQuadInfo(ray, plane, dotProduct);
-            if (dotProduct == 0)
+            Plane plane = GetPlane();           
+
+            //Handle situations where the position of the ray exists on the quad's plane.
+            if (Plane.DotCoordinate(plane, ray.Position) == 0)
             {
-                point = ray.Position;
-                return ContainsCoplanar(ref point);
+                //If the ray and quad are coplanar, we don't consider this an intersection.
+                //Our rule in this game engine is that quads cannot be intersected by coplanar quads nor coplanar edges.
+                if (Plane.DotNormal(plane, ray.Direction) == 0)
+                {
+                    point = Vector3.Zero;
+                    return false;
+                }
+                //The ray's starting point exists on the quad's plane but the ray isn't coplanar.
+                //We want to consider this to be an intersection. However, I believe that the 
+                //sharpdx library doesn't recognize this as an intersection.
+                //Therefore, we explicitly handle this case.
+                else
+                {
+                    point = ray.Position;
+                    return ContainsCoplanar(ref point);
+                }
             }
             else               
                 return ray.Intersects(ref plane, out point) && ContainsCoplanar(ref point);            
