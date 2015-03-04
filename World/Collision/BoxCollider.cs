@@ -293,12 +293,10 @@ namespace CipherPark.AngelJacket.Core.World.Collision
 
             for (int i = 0; i < corners.Length; i++)
             {
-                if (Plane.DotCoordinate(targetPlane, corners[i]) <= 0)
-                    return false;
-
                 if (new Ray(corners[i], direction).Intersects(ref targetPlane) == false)
                     return false;
             }
+
             return true;
         }
 
