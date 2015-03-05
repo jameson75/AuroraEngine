@@ -273,7 +273,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
     {
         public static T NextOrFirst<T>(this IEnumerable<T> e, int i)
         {
-            return (i < e.Count() - i) ? e.ElementAt(i) : e.FirstOrDefault();
+            return (i < e.Count() - 1) ? e.ElementAt(i) : e.FirstOrDefault();
         }
     }
 
@@ -282,17 +282,16 @@ namespace CipherPark.AngelJacket.Core.World.Collision
         public static bool CanProjectOnTo(this BoundingQuadOA source, BoundingQuadOA target, Vector3 direction)
         {
             Vector3[] corners = source.GetCorners();
-            Plane targetPlane = target.GetPlane();
-            
-            //We consider the source "projectable" on to the target only if the target and source planes face
-            //one another and all corners of the source quad are on the same side (front, obviously) of the target
-            //quad.
-
-            if (Vector3.Dot(source.GetPlane().Normal, target.GetPlane().Normal) <= 0)
+            Plane targetPlane = target.GetPlane();            
+           
+            if (Vector3.Dot(source.GetPlane().Normal, target.GetPlane().Normal) >= 0)
                 return false;
 
             for (int i = 0; i < corners.Length; i++)
             {
+                if (Plane.DotCoordinate(targetPlane, corners[i]) <= 0)
+                    return false;
+
                 if (new Ray(corners[i], direction).Intersects(ref targetPlane) == false)
                     return false;
             }
