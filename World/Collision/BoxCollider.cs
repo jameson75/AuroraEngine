@@ -280,18 +280,21 @@ namespace CipherPark.AngelJacket.Core.World.Collision
     public static class BoundingQuadOAExtension
     {
         public static bool CanProjectOnTo(this BoundingQuadOA source, BoundingQuadOA target, Vector3 direction)
-        {
+        {          
             Vector3[] corners = source.GetCorners();
             Plane targetPlane = target.GetPlane();            
-           
+            
+            //Condition I: Plane normals must face each other.    
             if (Vector3.Dot(source.GetPlane().Normal, target.GetPlane().Normal) >= 0)
                 return false;
 
             for (int i = 0; i < corners.Length; i++)
             {
+                //Condition II: All corners of the source must exist on the positive side of the target plane.
                 if (Plane.DotCoordinate(targetPlane, corners[i]) <= 0)
                     return false;
 
+                //Condition III: All corners must intersect the target along a ray in the specified direction.
                 if (new Ray(corners[i], direction).Intersects(ref targetPlane) == false)
                     return false;
             }
