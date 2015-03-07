@@ -26,7 +26,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
         private const string vector4Pattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*,\s*(?:(?:z\s*=\s*(?<z>[0-9]))|(?<z>[0-9]))?\s*,\s*(?:(?:w\s*=\s*(?<w>[0-9]))|(?<w>[0-9]))?\s*}$";
         private const string rectanglePattern = @"^{\s*(?:(?:x\s*=\s*(?<x>[0-9]))|(?<x>[0-9]))?\s*,\s*(?:(?:y\s*=\s*(?<y>[0-9]))|(?<y>[0-9]))?\s*,\s*(?:(?:(?:width|w)\s*=\s*(?<width>[0-9]))|(?<width>[0-9]))?\s*,\s*(?:(?:(?:height|h)\s*=\s*(?<height>[0-9]))|(?<height>[0-9]))?\s*}$";
         private const string boundaryPattery = @"^{\s*(?:(?:l\s*=\s*(?<l>[0-9]))|(?<l>[0-9]))?\s*,\s*(?:(?:t\s*=\s*(?<t>[0-9]))|(?<t>[0-9]))?\s*,\s*(?:(?:(?:r)\s*=\s*(?<r>[0-9]))|(?<r>[0-9]))?\s*,\s*(?:(?:(?:b)\s*=\s*(?<b>[0-9]))|(?<b>[0-9]))?\s*}$";
-        private const string drawingSizePattern = @"^{\s*(?:(?:w\s*=\s*(?<w>[0-9]))|(?<w>[0-9]))?\s*,\s*(?:(?:h\s*=\s*(?<h>[0-9]))|(?<h>[0-9]))?\s*}$";
+        private const string Size2Pattern = @"^{\s*(?:(?:w\s*=\s*(?<w>[0-9]))|(?<w>[0-9]))?\s*,\s*(?:(?:h\s*=\s*(?<h>[0-9]))|(?<h>[0-9]))?\s*}$";
 
         public static Vector4 ParseVector4(string value)
         {            
@@ -73,37 +73,37 @@ namespace CipherPark.AngelJacket.Core.UI.Design
             return vector;
         }
 
-        public static DrawingSize ParseDrawingSize(string value)
+        public static Size2 ParseSize2(string value)
         {
-            DrawingSize size = new DrawingSize();
-            Match match = Regex.Match(value, drawingSizePattern, RegexOptions.IgnoreCase);
+            Size2 size = new Size2();
+            Match match = Regex.Match(value, Size2Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 size.Width = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["w"].Value);
                 size.Height = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["h"].Value);
             }
             else
-                throw new IOException("Invalid format for type DrawingSize");
+                throw new IOException("Invalid format for type Size2");
             return size;
         }
 
-        public static DrawingSizeF ParseDrawingSizeF(string value)
+        public static Size2F ParseSize2F(string value)
         {
-            DrawingSizeF size = new DrawingSizeF();
-            Match match = Regex.Match(value, drawingSizePattern, RegexOptions.IgnoreCase);
+            Size2F size = new Size2F();
+            Match match = Regex.Match(value, Size2Pattern, RegexOptions.IgnoreCase);
             if (match.Success)  
             {
                 size.Width = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["w"].Value);
                 size.Height = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["h"].Value);
             }
             else
-                throw new IOException("Invalid format for type DrawingSizeF");
+                throw new IOException("Invalid format for type Size2F");
             return size;
         }
 
-        public static DrawingPoint ParseDrawingPoint(string value)
+        public static Point ParsePoint(string value)
         {
-            DrawingPoint size = new DrawingPoint();
+            Point size = new Point();
             Match match = Regex.Match(value, vector2Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
@@ -111,13 +111,13 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                 size.Y = UIControlPropertyParser.ParseOrDefaultInt(match.Groups["y"].Value);
             }
             else
-                throw new IOException("Invalid format for type DrawingPoint");
+                throw new IOException("Invalid format for type Point");
             return size;
         }
 
-        public static DrawingPointF ParseDrawingPointF(string value)
+        public static Vector2 ParseDrawingPointF(string value)
         {
-            DrawingPointF size = new DrawingPointF();
+            Vector2 size = new Vector2();
             Match match = Regex.Match(value, vector2Pattern, RegexOptions.IgnoreCase);
             if (match.Success)
             {
@@ -125,7 +125,7 @@ namespace CipherPark.AngelJacket.Core.UI.Design
                 size.Y = UIControlPropertyParser.ParseOrDefaultFloat(match.Groups["y"].Value);
             }
             else
-                throw new IOException("Invalid format for type DrawingPoint");
+                throw new IOException("Invalid format for type Point");
             return size;
         }
 

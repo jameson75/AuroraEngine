@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using SharpDX;
 using SharpDX.DirectInput;
 using SharpDX.XInput;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -501,20 +503,20 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
 
-        public DrawingPoint GetMouseLocation()
+        public Point GetMouseLocation()
         {
             if (mouseStateWindow == null)
-                return new DrawingPoint(-1, -1);
+                return new Point(-1, -1);
             else
-                return new DrawingPoint(mouseStateWindow.NewState.X, mouseStateWindow.NewState.Y);
+                return new Point(mouseStateWindow.NewState.X, mouseStateWindow.NewState.Y);
         }
 
-        public DrawingPoint GetPreviousMouseLocation()
+        public Point GetPreviousMouseLocation()
         {
             if (mouseStateWindow == null)
-                return new DrawingPoint(-1, -1);
+                return new Point(-1, -1);
             else
-                return new DrawingPoint(mouseStateWindow.OldState.X, mouseStateWindow.OldState.Y);
+                return new Point(mouseStateWindow.OldState.X, mouseStateWindow.OldState.Y);
         }
 
         public int GetMouseWheelDelta()
@@ -583,29 +585,20 @@ namespace CipherPark.AngelJacket.Core.Utils
         public class ControllerStateWindow : StateWindow<ControllerState, GamepadButtonFlags>
         {
             public Controller GameController { get; set; }
-        }
-
-        //public class KeyboardStateWindow
-        //{
-        //    private Dictionary<Keys, long> _keyPressTime = null;
-        //    public KeyboardState OldState {get; set; }
-        //    public KeyboardState NewState { get; set; }
-        //    public Dictionary<Keys, long> KeyPressTime { get { return _keyPressTime; } }
-        //    public KeyboardStateWindow() { _keyPressTime = new Dictionary<Keys,long>(); }
-        //}             
+        }      
 
         private void SetMouseCurrentPosition(MouseState state)
         {
             //We leverage win32 native functions to accurately trap the mouse state.
             //----------------------------------------------------------------------
-            DrawingPoint mousePos = this.GetSystemCursorPosition();
+            Point mousePos = this.GetSystemCursorPosition();
             state.X = mousePos.X;
             state.Y = mousePos.Y;
             state.Z = _messageHook.LastMouseWheelDelta;
             _messageHook.LastMouseWheelDelta = 0;
         }
         
-        private DrawingPoint GetSystemCursorPosition()
+        private Point GetSystemCursorPosition()
         {         
             UnsafeNativeMethods.WIN32_POINT point;
             if (!UnsafeNativeMethods.GetCursorPos(out point))
@@ -614,7 +607,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             if(!UnsafeNativeMethods.ScreenToClient(this._game.DeviceHwnd, ref point))
                 throw new InvalidOperationException("Failed converting mouse position to client coordinates.");
 
-            return new DrawingPoint(point.X, point.Y);            
+            return new Point(point.X, point.Y);            
         }
         
         private static class UnsafeNativeMethods
@@ -636,19 +629,22 @@ namespace CipherPark.AngelJacket.Core.Utils
         private class HwndMessageHook
         {
             private const int WM_MOUSEWHEEL = 0x020A;
+            private const int GWL_WNDPROC = -4;
+
             private delegate IntPtr WndProcDelegate(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
             private WndProcDelegate _hookWndProcDelegate = null;
             private Delegate _originalWndProcDelegate = null;
             
             public void Initialize(IntPtr hWnd)
             {
-                //We hook into the running application's windows message pump.
+                //We hook into the running application's windows message pump.               
                 //-----------------------------------------------------------
-                _hookWndProcDelegate = new WndProcDelegate(WndProc);             
+                _hookWndProcDelegate = new WndProcDelegate(WndProc);                
                 IntPtr hookWndProcFuncPtr = Marshal.GetFunctionPointerForDelegate(_hookWndProcDelegate);
-                IntPtr originalWndProcFuncPtr = (UnsafeNativeMethods.SetWindowLong(hWnd, UnsafeNativeMethods.GWL_WNDPROC, hookWndProcFuncPtr));
-                if (originalWndProcFuncPtr != IntPtr.Zero)
-                    _originalWndProcDelegate = Marshal.GetDelegateForFunctionPointer(originalWndProcFuncPtr, typeof(WndProcDelegate));                
+                IntPtr originalWndProcFuncPtr = UnsafeNativeMethods.GetWindowLong(hWnd, GWL_WNDPROC);
+                //UnsafeNativeMethods.SetWindowLong(hWnd, GWL_WNDPROC, hookWndProcFuncPtr);                
+                //if (originalWndProcFuncPtr != IntPtr.Zero)
+                //    _originalWndProcDelegate = Marshal.GetDelegateForFunctionPointer(originalWndProcFuncPtr, typeof(WndProcDelegate));                
             }
 
             private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
@@ -665,7 +661,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
             private static class UnsafeNativeMethods
             {
-                public const int GWL_WNDPROC = -4;
+               
 
                 [DllImport("user32.dll")]
                 public static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);

@@ -74,8 +74,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnLayoutChanged()
         {
-            _label.Position = new DrawingPointF(0, this.Bounds.Bottom - _label.Size.Height);
-            _checkedContentControl.Position = new DrawingPointF(this.Bounds.Left - this.Size.Width, this.Bounds.Bottom - _checkedContentControl.Size.Height);
+            _label.Position = new Vector2(0, this.Bounds.Bottom - _label.Size.Height);
+            _checkedContentControl.Position = new Vector2(this.Bounds.Left - this.Size.Width, this.Bounds.Bottom - _checkedContentControl.Size.Height);
             _uncheckedContentControl.Position = _checkedContentControl.Position;
         }
 

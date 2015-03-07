@@ -136,7 +136,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnLayoutChanged()
         {           
-            _mainPanel.Position = DrawingPointFExtension.Zero;
+            _mainPanel.Position = Vector2Extension.Zero;
             _mainPanel.Size = this.Size;
         }
 

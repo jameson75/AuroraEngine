@@ -78,22 +78,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 {
                     case DockSide.Left:
                         container.Position = clientAreaRect.Position();
-                        container.Size = new DrawingSizeF(container.Size.Width, clientAreaRect.Height);
+                        container.Size = new Size2F(container.Size.Width, clientAreaRect.Height);
                         clientAreaRect.Left += container.Size.Width;
                         break;
                     case DockSide.Top:
                         container.Position = clientAreaRect.Position();
-                        container.Size = new DrawingSizeF(clientAreaRect.Width, container.Size.Height);
+                        container.Size = new Size2F(clientAreaRect.Width, container.Size.Height);
                         clientAreaRect.Top += container.Size.Height;
                         break;
                     case DockSide.Right:
-                        container.Position = new DrawingPointF(clientAreaRect.Right - container.Size.Width, clientAreaRect.Top);
-                        container.Size = new DrawingSizeF(container.Size.Width, clientAreaRect.Height);
+                        container.Position = new Vector2(clientAreaRect.Right - container.Size.Width, clientAreaRect.Top);
+                        container.Size = new Size2F(container.Size.Width, clientAreaRect.Height);
                         clientAreaRect.Right -= container.Size.Width;
                         break;
                     case DockSide.Bottom:
-                        container.Position = new DrawingPointF(clientAreaRect.Left, clientAreaRect.Bottom - container.Size.Height);
-                        container.Size = new DrawingSizeF(clientAreaRect.Width, container.Size.Height);
+                        container.Position = new Vector2(clientAreaRect.Left, clientAreaRect.Bottom - container.Size.Height);
+                        container.Size = new Size2F(clientAreaRect.Width, container.Size.Height);
                         clientAreaRect.Bottom -= container.Size.Height;
                         break;
                 }                

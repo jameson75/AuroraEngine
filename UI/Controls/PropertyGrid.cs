@@ -82,7 +82,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
                 BufferedInputState bufferedInputState = inputServices.GetBufferedInputState();
 
-                bool selectPreviousKeyDown = (bufferedInputState.IsKeyDown(Key.UpArrow)) ||                                            
+                bool selectPreviousKeyDown = (bufferedInputState.IsKeyDown(Key.Up)) ||                                            
                                              (bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp));
 
                 bool selectNextKeyDown = (bufferedInputState.IsKeyDown(Key.Down)) ||
@@ -119,7 +119,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //    //float maxItemHeight = 0;
         //    //foreach (PropertyGridItem item in this.Items)
         //    //{
-        //    //    item.Position = new DrawingPointF(previousItemsTotalWidth, previousColumnsHeight);
+        //    //    item.Position = new Vector2(previousItemsTotalWidth, previousColumnsHeight);
         //    //    previousItemsTotalWidth += item.Size.Width;
         //    //    maxItemHeight = Math.Max(maxItemHeight, item.Size.Width);
         //    //    currentColumnIndex++;
@@ -146,12 +146,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             childLabel = new Label(visualRoot, nameContent);    
             childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Left;
             childLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
-            childLabel.Size = new DrawingSizeF(100.0f, 1.0f);
+            childLabel.Size = new Size2F(100.0f, 1.0f);
             this.Children.Add(childLabel);
             selectedChildLabel = new Label(visualRoot, selectNameContent);
             selectedChildLabel.HorizontalAlignment = Controls.HorizontalAlignment.Left;
             selectedChildLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
-            selectedChildLabel.Size = new DrawingSizeF(100.0f, 1.0f);
+            selectedChildLabel.Size = new Size2F(100.0f, 1.0f);
             selectedChildLabel.Visible = false;
             this.Children.Add(selectedChildLabel);
             this.Size = nameContent.Font.MeasureString(nameContent.Text);
@@ -182,12 +182,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnLayoutChanged()
         {
-            DrawingSizeF nameControlSize = childLabel.Size;
+            Size2F nameControlSize = childLabel.Size;
             UIControl valueControl = Children.FirstOrDefault(c => c != childLabel && c != selectedChildLabel);
             if (valueControl != null)
             {
-                valueControl.Position = new DrawingPointF(nameControlSize.Width, 0.0f);
-                valueControl.Size = new DrawingSizeF(this.Size.Width - nameControlSize.Width, this.Size.Height);
+                valueControl.Position = new Vector2(nameControlSize.Width, 0.0f);
+                valueControl.Size = new Size2F(this.Size.Width - nameControlSize.Width, this.Size.Height);
             }
             base.OnLayoutChanged();
         }       

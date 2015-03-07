@@ -16,14 +16,14 @@ using CipherPark.AngelJacket.Core.Module;
 
 namespace CipherPark.AngelJacket.Core.Animation
 {
-    public class DrawingSizeAnimation : KeyframeAnimation
+    public class Size2Animation : KeyframeAnimation
     {
-        public DrawingSizeF GetValueAtT(ulong t)
+        public Size2F GetValueAtT(ulong t)
         {
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
-            DrawingSizeF frameVal0 = (f0.Value != null) ? (DrawingSizeF)f0.Value : Utils.DrawingSizeFExtension.Zero;
-            DrawingSizeF frameVal1 = (f1 != null && f1.Value != null) ? (DrawingSizeF)f1.Value : Utils.DrawingSizeFExtension.Zero;
+            Size2F frameVal0 = (f0.Value != null) ? (Size2F)f0.Value : Utils.Size2FExtension.Zero;
+            Size2F frameVal1 = (f1 != null && f1.Value != null) ? (Size2F)f1.Value : Utils.Size2FExtension.Zero;
             if (f1 == null)
                 return frameVal0;
             else
@@ -33,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                 {
                     float w = (float)Lerp(frameVal0.Width, frameVal1.Height, pctT);
                     float h = (float)Lerp(frameVal0.Width, frameVal1.Height, pctT);
-                    return new DrawingSizeF(w, h);
+                    return new Size2F(w, h);
                 }
                 else
                 {
@@ -43,7 +43,7 @@ namespace CipherPark.AngelJacket.Core.Animation
                     //    {
 
                     //    }
-                    return Utils.DrawingSizeFExtension.Zero;
+                    return Utils.Size2FExtension.Zero;
                 }
             }
         }

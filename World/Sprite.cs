@@ -120,16 +120,16 @@ namespace CipherPark.AngelJacket.Core.World
 
         public Vector2 Position { get; set; }
 
-        public DrawingSize Size
+        public Size2 Size
         {
             get
             {
                 if (Texture == null)
-                    return DrawingSizeExtension.Zero;
+                    return Size2Extension.Zero;
                 else
                 {
                     Texture2DDescription desc = Texture.ResourceAs<Texture2D>().Description;
-                    return new DrawingSize(desc.Width, desc.Height);
+                    return new Size2(desc.Width, desc.Height);
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public Color Tint { get; set; }
 
-        public RectangleF Bounds { get { return RectangleFExtension.CreateLTWH(Position.X, Position.Y, this.Size.Width, this.Size.Height); } }
+        public RectangleF Bounds { get { return new RectangleF(Position.X, Position.Y, this.Size.Width, this.Size.Height); } }
 
         public Rectangle? SourceRectangle { get; set; }
 

@@ -60,9 +60,11 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             foreach (SceneNode node in Nodes)
                 _DrawNodeHierarchy(gameTime, node);            
             //CameraNode.Camera.PostEffectChain.End(gameTime);
+            
             CameraNode.Camera.PostEffectChain.InputTexture = Game.RenderTargetShaderResource;
-            CameraNode.Camera.PostEffectChain.OutputTexture = Game.RenderTarget;
+            CameraNode.Camera.PostEffectChain.OutputView = Game.RenderTarget;
             CameraNode.Camera.PostEffectChain.Apply();
+
             _DrawSprites(gameTime);
             OnEndDraw();            
         }

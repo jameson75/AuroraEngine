@@ -44,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public ShaderResourceView InputTexture { get; set; }
 
-        public RenderTargetView OutputTexture { get; set; }
+        public RenderTargetView OutputView { get; set; }
 
         public BlendState BlendState { get; set; }
 
@@ -179,8 +179,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
 
             //5. We replace the temp render targets in the graphics output with the chain output texture.
-            _game.GraphicsDeviceContext.ClearRenderTargetView(OutputTexture, Color.Black);
-            _game.GraphicsDeviceContext.OutputMerger.SetTargets(OutputTexture);            
+            _game.GraphicsDeviceContext.ClearRenderTargetView(OutputView, Color.Black);
+            _game.GraphicsDeviceContext.OutputMerger.SetTargets(OutputView);            
 
             //6. We render the texture drawn by the very last post effect to this chain's output texture.
             //NOTE: We specify an optional blend state to allow for blending effects like overlays.

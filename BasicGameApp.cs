@@ -143,7 +143,7 @@ namespace CipherPark.AngelJacket.Core
             dsvd.Flags = DepthStencilViewFlags.None;
             dsvd.Format = BestSupportedDepthStencilFormat(_graphicsDevice, false);
             _depthStencilView = new DepthStencilView(_graphicsDevice, _depthStencilBuffer, dsvd);
-            _graphicsDeviceContext.Rasterizer.SetViewports(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f));
+            _graphicsDeviceContext.Rasterizer.SetViewports(new [] { new ViewportF(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f) });
             _graphicsDeviceContext.OutputMerger.SetTargets(DepthStencil, RenderTarget);
             
             DepthStencilStateDescription depthStencilStateDesc = DepthStencilStateDescription.Default();

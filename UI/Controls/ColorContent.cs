@@ -24,7 +24,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         Texture2D _backgroundTexture = null;
         IntPtr _nativeColorData = IntPtr.Zero;
         bool _textureResourcesCreated = false;
-        readonly DrawingSizeF DefaultTextureSize = new DrawingSizeF(100.0f, 100.0f);
+        readonly Size2F DefaultTextureSize = new Size2F(100.0f, 100.0f);
 
         public ColorContent()
         { }
@@ -52,7 +52,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 if (!_textureResourcesCreated)
                     CreateTextureResources();
-                DrawingPointF contentSurfacePosition = Container.PositionToSurface(Container.Position);
+                Vector2 contentSurfacePosition = Container.PositionToSurface(Container.Position);
                 float scaleX = Container.Bounds.Width / DefaultTextureSize.Width;
                 float scaleY = Container.Bounds.Height / DefaultTextureSize.Height;
                 TransformationMatrix = Matrix.Transformation2D(Vector2.Zero,

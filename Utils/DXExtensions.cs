@@ -20,7 +20,7 @@ namespace CipherPark.AngelJacket.Core.Utils
     /// </summary>
     public static class RectangleExtension
     {
-        public static bool Contains(this Rectangle r, DrawingPoint point)
+        public static bool Contains(this Rectangle r, Point point)
         {
             return r.X <= point.X && r.X + r.Width >= point.X &&
                    r.Y <= point.Y && r.Y + r.Height >= point.Y;
@@ -31,15 +31,10 @@ namespace CipherPark.AngelJacket.Core.Utils
             return new Vector2(r.X, r.Y);
         }       
 
-        public static DrawingSize Size(this Rectangle r)
+        public static Size2 Size(this Rectangle r)
         {
-            return new DrawingSize(r.Right - r.Left, r.Bottom - r.Top);
-        }
-
-        public static Rectangle CreateLTWH(int l, int t, int width, int height)
-        {
-            return new Rectangle(l, t, l + width, t + height);
-        }
+            return new Size2(r.Right - r.Left, r.Bottom - r.Top);
+        }      
     }
 
     /// <summary>
@@ -88,36 +83,31 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         public static RectangleF Empty { get { return _empty; } }
 
-        public static bool Contains(this RectangleF r, DrawingPointF point)
+        public static bool Contains(this RectangleF r, Vector2 point)
         {
             return r.X <= point.X && r.X + r.Width >= point.X &&
                    r.Y <= point.Y && r.Y + r.Height >= point.Y;
         }
 
-        public static bool Contains(this RectangleF r, DrawingPoint point)
+        public static bool Contains(this RectangleF r, Point point)
         {
             return r.X <= point.X && r.X + r.Width >= point.X &&
                    r.Y <= point.Y && r.Y + r.Height >= point.Y;
         }
 
-        public static DrawingSizeF Size(this RectangleF r)
+        public static Size2F Size(this RectangleF r)
         {
-            return new DrawingSizeF(r.Right - r.Left, r.Bottom - r.Top);
+            return new Size2F(r.Right - r.Left, r.Bottom - r.Top);
         }
 
         public static Vector2 Position(this RectangleF r)
         {
             return new Vector2(r.Left, r.Top);
-        }
-
-        public static RectangleF CreateLTWH(float l, float t, float width, float height)
-        {
-            return new RectangleF(l, t, l + width, t + height);
-        }
+        }        
 
         public static void AlignRectangle(this RectangleF thisRect, ref RectangleF rectangle, RectangleAlignment alignment)
         {
-            DrawingSizeF originalSize = rectangle.Size();
+            Size2F originalSize = rectangle.Size();
 
             //LEFT            
             if (alignment.HasFlag(RectangleAlignment.Left))            
@@ -156,33 +146,33 @@ namespace CipherPark.AngelJacket.Core.Utils
     /// <summary>
     /// 
     /// </summary>
-    public static class DrawingSizeFExtension
+    public static class Size2FExtension
     {
-        private static DrawingSizeF _zero = new DrawingSizeF(0, 0);
+        private static Size2F _zero = new Size2F(0, 0);
 
-        public static DrawingSizeF Zero { get { return _zero; } }
+        public static Size2F Zero { get { return _zero; } }
 
-        public static DrawingSizeF Add(this DrawingSizeF s, DrawingSizeF s2)
+        public static Size2F Add(this Size2F s, Size2F s2)
         {
-            return new DrawingSizeF(s.Width + s2.Width, s.Height + s2.Height);
+            return new Size2F(s.Width + s2.Width, s.Height + s2.Height);
         }
 
-        public static DrawingSizeF Add(this DrawingSizeF s, float w, float h)
+        public static Size2F Add(this Size2F s, float w, float h)
         {
-            return Add(s, new DrawingSizeF(w, h));
+            return Add(s, new Size2F(w, h));
         }
 
-        public static DrawingSize ToDrawingSize(this DrawingSizeF sizeF)
+        public static Size2 ToSize2(this Size2F sizeF)
         {
-            return new DrawingSize(Convert.ToInt32(Math.Ceiling(sizeF.Width)), Convert.ToInt32(Math.Ceiling(sizeF.Height)));
+            return new Size2(Convert.ToInt32(Math.Ceiling(sizeF.Width)), Convert.ToInt32(Math.Ceiling(sizeF.Height)));
         } 
 
-        public static Vector2 ToVector2(this DrawingSizeF sizeF)
+        public static Vector2 ToVector2(this Size2F sizeF)
         {
             return new Vector2(sizeF.Width, sizeF.Height);
         }  
   
-        public static float AspectRatio(this DrawingSizeF sizeF)
+        public static float AspectRatio(this Size2F sizeF)
         {
             return sizeF.Width / sizeF.Height;
         }
@@ -191,28 +181,28 @@ namespace CipherPark.AngelJacket.Core.Utils
     /// <summary>
     /// 
     /// </summary>
-    public static class DrawingSizeExtension
+    public static class Size2Extension
     {
-        private static DrawingSize _zero = new DrawingSize(0, 0);
+        private static Size2 _zero = new Size2(0, 0);
 
-        public static DrawingSize Zero { get { return _zero; } }
+        public static Size2 Zero { get { return _zero; } }
 
-        public static DrawingSize Add(this DrawingSize s, DrawingSize s2)
+        public static Size2 Add(this Size2 s, Size2 s2)
         {
-            return new DrawingSize(s.Width + s2.Width, s.Height + s2.Height);
+            return new Size2(s.Width + s2.Width, s.Height + s2.Height);
         }
 
-        public static DrawingSizeF ToDrawingSizeF(this DrawingSize size)
+        public static Size2F ToSize2F(this Size2 size)
         {
-            return new DrawingSizeF(Convert.ToSingle(size.Width), Convert.ToSingle(size.Height));
+            return new Size2F(Convert.ToSingle(size.Width), Convert.ToSingle(size.Height));
         }
 
-        public static Vector2 ToVector2(this DrawingSize size)
+        public static Vector2 ToVector2(this Size2 size)
         {
             return new Vector2(Convert.ToSingle(size.Width), Convert.ToSingle(size.Height));
         }
 
-        public static float AspectRatio(this DrawingSize sizeF)
+        public static float AspectRatio(this Size2 sizeF)
         {
             return (float)sizeF.Width / (float)sizeF.Height;
         }
@@ -221,23 +211,25 @@ namespace CipherPark.AngelJacket.Core.Utils
     /// <summary>
     /// 
     /// </summary>
-    public static class DrawingPointExtension
+    public static class PointExtension
     {
-        private static DrawingPoint _zero = new DrawingPoint(0, 0);
+        private static Point _zero = new Point(0, 0);
 
-        public static DrawingPoint Zero { get { return _zero; } }
+        public static Point Zero { get { return _zero; } }
 
-        public static DrawingPoint Add(this DrawingPoint s, DrawingPoint s2)
+        public static Point Add(this Point s, Point s2)
         {
-            return new DrawingPoint(s.X + s2.X, s.Y + s2.Y);
+            return new Point(s.X + s2.X, s.Y + s2.Y);
         }
 
-        public static DrawingPointF ToDrawingPointF(this DrawingPoint point)
-        {
-            return new DrawingPointF(Convert.ToInt32(point.X), Convert.ToInt32(point.Y));
-        }
+        /* Vector2 is deprecated */
+        //
+        //public static Vector2 ToVector2(this Point point)
+        //{
+        //    return new Vector2(Convert.ToInt32(point.X), Convert.ToInt32(point.Y));
+        //}
 
-        public static Vector2 ToVector2(this DrawingPoint point)
+        public static Vector2 ToVector2(this Point point)
         {
             return new Vector2(Convert.ToSingle(point.X), Convert.ToSingle(point.Y));
         }
@@ -246,28 +238,28 @@ namespace CipherPark.AngelJacket.Core.Utils
     /// <summary>
     /// 
     /// </summary>
-    public static class DrawingPointFExtension
+    public static class Vector2Extension
     {
-        private static DrawingPointF _zero = new DrawingPointF(0, 0);
+        private static Vector2 _zero = new Vector2(0, 0);
 
-        public static DrawingPointF Zero { get { return _zero; } }
+        public static Vector2 Zero { get { return _zero; } }
 
-        public static DrawingPoint ToDrawingPoint(this DrawingPointF pointF)
+        public static Point ToPoint(this Vector2 pointF)
         {
-            return new DrawingPoint(Convert.ToInt32(Math.Floor(pointF.X)), Convert.ToInt32(Math.Floor(pointF.Y)));
+            return new Point(Convert.ToInt32(Math.Floor(pointF.X)), Convert.ToInt32(Math.Floor(pointF.Y)));
         }
 
-        public static DrawingPointF Add(this DrawingPointF s, DrawingPointF s2)
+        public static Vector2 Add(this Vector2 s, Vector2 s2)
         {
-            return new DrawingPointF(s.X + s2.X, s.Y + s2.Y);
+            return new Vector2(s.X + s2.X, s.Y + s2.Y);
         }
 
-        public static DrawingPointF Subtract(this DrawingPointF s, DrawingPointF s2)
+        public static Vector2 Subtract(this Vector2 s, Vector2 s2)
         {
-            return new DrawingPointF(s.X - s2.X, s.Y - s2.Y);
+            return new Vector2(s.X - s2.X, s.Y - s2.Y);
         }
 
-        public static Vector2 ToVector2(this DrawingPointF pointF)
+        public static Vector2 ToVector2(this Vector2 pointF)
         {
             return new Vector2(pointF.X, pointF.Y);
         }
@@ -485,8 +477,8 @@ namespace CipherPark.AngelJacket.Core.Utils
     {
         public static bool LineIntersectLine(Vector3 pA1, Vector3 pA2, Vector3 pB1, Vector3 pB2, out Vector3 intersection)
         {
-            Ray rA = new Ray(pA1, pA2 - pA1);
-            Ray rB = new Ray(pB1, pB2 - pB1); 
+            Ray rA = new Ray(pA1, Vector3.Normalize(pA2 - pA1));
+            Ray rB = new Ray(pB1, Vector3.Normalize(pB2 - pB1)); 
        
             //NOTE: When the two rays are coincident, the sharpdx library returns
             //true, and returns an intersection of Vector3.Zero. 
@@ -494,7 +486,8 @@ namespace CipherPark.AngelJacket.Core.Utils
             //As a rule in this engine, neither conicident rays nor lines are considered
             //to be intersecting,  since we cannot define a single point of intersection.    
                    
-            if (rA.Intersects(ref rB, out intersection) && !AreRaysCoincident(rA, rB))
+            //if (rA.Intersects(ref rB, out intersection) && !AreRaysCoincident(rA, rB))
+            if (RayIntersectsRay(ref rA, ref rB, out intersection) == RayRayIntersection.Intersect)
             {               
                 float dA = Vector3.DistanceSquared(pA1, pA2);
                 float dB = Vector3.DistanceSquared(pB1, pB2);
@@ -505,25 +498,98 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
             intersection = Vector3.Zero;
             return false;
-        }
+        }       
 
-        public static bool AreRaysCoincident(Ray ray1, Ray ray2)
-        {
-            Vector3 cross;
-            Vector3.Cross(ref ray1.Direction, ref ray2.Direction, out cross);
-            float denominator = cross.Length();
-            //Lines are parallel.
-            if (Math.Abs(denominator) < MathUtil.ZeroTolerance)
-            {
-                //Lines are parallel and on top of each other.
-                if (Math.Abs(ray2.Position.X - ray1.Position.X) < MathUtil.ZeroTolerance &&
-                    Math.Abs(ray2.Position.Y - ray1.Position.Y) < MathUtil.ZeroTolerance &&
-                    Math.Abs(ray2.Position.Z - ray1.Position.Z) < MathUtil.ZeroTolerance)
-                {                    
-                    return true;
-                }
-            }
-            return false;
-        }
+        public static RayRayIntersection RayIntersectsRay(ref Ray ray1, ref Ray ray2, out Vector3 point) 
+        { 
+            //Source: Real-Time Rendering, Third Edition 
+            //Reference: Page 780  
+             Vector3 cross; 
+ 
+             Vector3.Cross(ref ray1.Direction, ref ray2.Direction, out cross); 
+             float denominator = cross.Length(); 
+ 
+             //Lines are parallel. 
+             if (MathUtil.IsZero(denominator)) 
+             { 
+                 //Lines are parallel and on top of each other. 
+                 if (MathUtil.NearEqual(ray2.Position.X, ray1.Position.X) && 
+                     MathUtil.NearEqual(ray2.Position.Y, ray1.Position.Y) && 
+                     MathUtil.NearEqual(ray2.Position.Z, ray1.Position.Z)) 
+                 { 
+                     point = Vector3.Zero; 
+                     return RayRayIntersection.Overlap; 
+                 } 
+             }  
+ 
+             denominator = denominator * denominator;  
+ 
+             //3x3 matrix for the first ray. 
+             float m11 = ray2.Position.X - ray1.Position.X; 
+             float m12 = ray2.Position.Y - ray1.Position.Y; 
+             float m13 = ray2.Position.Z - ray1.Position.Z; 
+             float m21 = ray2.Direction.X; 
+             float m22 = ray2.Direction.Y; 
+             float m23 = ray2.Direction.Z; 
+             float m31 = cross.X; 
+             float m32 = cross.Y; 
+             float m33 = cross.Z;  
+ 
+             //Determinant of first matrix. 
+             float dets = 
+                 m11 * m22 * m33 + 
+                 m12 * m23 * m31 + 
+                 m13 * m21 * m32 - 
+                 m11 * m23 * m32 - 
+                 m12 * m21 * m33 - 
+                 m13 * m22 * m31;  
+ 
+             //3x3 matrix for the second ray. 
+             m21 = ray1.Direction.X; 
+             m22 = ray1.Direction.Y; 
+             m23 = ray1.Direction.Z;  
+ 
+             //Determinant of the second matrix. 
+             float dett = 
+                 m11 * m22 * m33 + 
+                 m12 * m23 * m31 + 
+                 m13 * m21 * m32 - 
+                 m11 * m23 * m32 - 
+                 m12 * m21 * m33 - 
+                 m13 * m22 * m31;  
+ 
+             //t values of the point of intersection. 
+             float s = dets / denominator; 
+             float t = dett / denominator;
+
+             if (float.IsNaN(s) || float.IsNaN(t))
+             {
+                 point = Vector3.Zero;
+                 return RayRayIntersection.None;
+             }
+
+             //The points of intersection. 
+             Vector3 point1 = ray1.Position + (Math.Max(s, 0) * ray1.Direction); 
+             Vector3 point2 = ray2.Position + (Math.Max(t, 0) * ray2.Direction);  
+ 
+             //If the points are not equal, no intersection has occurred. 
+             if (!MathUtil.NearEqual(point2.X, point1.X) || 
+                 !MathUtil.NearEqual(point2.Y, point1.Y) || 
+                 !MathUtil.NearEqual(point2.Z, point1.Z)) 
+             { 
+                 point = Vector3.Zero; 
+                 return RayRayIntersection.None; 
+             }  
+ 
+             point = point1;
+             return RayRayIntersection.Intersect;
+         } 
+    }
+
+    public enum RayRayIntersection
+    {
+        None,
+        Intersect,
+        Overlap
     }
 }

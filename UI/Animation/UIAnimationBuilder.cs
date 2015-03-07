@@ -20,7 +20,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
         public static CompositeAnimationController BuildAlertBoxAnimation(IUIRoot ui, AlertBox alertControl, ColorContent backgroundContent, TextContent messageContent, ulong displayTime)
         {
             RectangleF finalPanelRect = alertControl.Bounds;
-            RectangleF initialPanelRect = new RectangleF(0, finalPanelRect.Top, 0, finalPanelRect.Bottom);
+            RectangleF initialPanelRect = new RectangleF(0, finalPanelRect.Top, 0, finalPanelRect.Height);
             finalPanelRect.AlignRectangle(ref initialPanelRect, RectangleAlignment.Centered);
             alertControl.Position = initialPanelRect.Position();
             alertControl.Size = initialPanelRect.Size();           
@@ -51,7 +51,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
         {
             CompositeAnimationController compositeController = new CompositeAnimationController();       
             RectangleF finalMenuRect = menu.Bounds; 
-            RectangleF initialPanelRect = new RectangleF(finalMenuRect.Left, finalMenuRect.Bottom, finalMenuRect.Left, finalMenuRect.Bottom);
+            RectangleF initialPanelRect = new RectangleF(finalMenuRect.Left, finalMenuRect.Bottom, finalMenuRect.Width, finalMenuRect.Height);
             menu.SuspendLayout = true;
             menu.Position = initialPanelRect.Position();
             menu.Size = initialPanelRect.Size();
@@ -66,8 +66,8 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             for(int i = 0; i < menu.Items.Count; i++)
             {
                 MenuItemAnimationController itemController = new MenuItemAnimationController();
-                DrawingPointF finalPosition = menu.Items[i].Position;
-                DrawingPointF initialPosition = new DrawingPointF(-menu.Items[i].Size.Width, menu.Items[i].Position.Y);
+                Vector2 finalPosition = menu.Items[i].Position;
+                Vector2 initialPosition = new Vector2(-menu.Items[i].Size.Width, menu.Items[i].Position.Y);
                 itemController.SetPositionAtT(0, initialPosition);
                 itemController.SetPositionAtT(animationTime, initialPosition);
                 itemController.SetPositionAtT(animationTime + 250, finalPosition);

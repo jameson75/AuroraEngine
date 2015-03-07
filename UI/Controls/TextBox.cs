@@ -104,7 +104,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         protected override void OnDraw(GameTime gameTime)
         {
-            if (this.Size == DrawingSizeFExtension.Zero)
+            if (this.Size == Size2FExtension.Zero)
                 return;
           
             /*
@@ -170,15 +170,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             //****************************************************************************************************
             _caret = new ContentControl(this.VisualRoot, new ColorContent(Color.White));    
             this.Children.Add(_caret);
-            _caret.Position = new DrawingPointF(0f, this.Bounds.Height - 15f);
-            _caret.Size = new DrawingSizeF(5f, 10f);
+            _caret.Position = new Vector2(0f, this.Bounds.Height - 15f);
+            _caret.Size = new Size2F(5f, 10f);
             _caret.Visible = false;
         }
 
         private void UpdateCaretPosition()
         {
             if(_textContent.Text != null )
-                _caret.Position = new DrawingPointF(_textContent.GetTextLength(0, _textContent.Text.Length), _caret.Position.Y);
+                _caret.Position = new Vector2(_textContent.GetTextLength(0, _textContent.Text.Length), _caret.Position.Y);
         }
 
         protected virtual void OnEnterKey()

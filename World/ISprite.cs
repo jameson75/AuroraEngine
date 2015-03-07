@@ -13,7 +13,7 @@ namespace CipherPark.AngelJacket.Core.World
         Vector2 Position { get; }
         float Rotation { get; }
         Vector2 Scale { get; }
-        DrawingSize Size { get; }
+        Size2 Size { get; }
         Rectangle? SourceRectangle { get; }
         SpriteEffects SpriteEffects { get; }
         ShaderResourceView Texture { get; }

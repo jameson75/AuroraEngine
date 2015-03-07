@@ -35,7 +35,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         FocusManager FocusManager { get; }
 
-        DrawingSizeF ScreenSize { get; }
+        Size2F ScreenSize { get; }
 
         List<IAnimationController> Animations { get; }
 

@@ -41,7 +41,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (Container == null)
                 throw new InvalidOperationException("No container for this content was specified.");
             
-            DrawingPointF contentSurfacePosition = Container.PositionToSurface(Container.Position);
+            Vector2 contentSurfacePosition = Container.PositionToSurface(Container.Position);
             this.BeginDraw();
             //if (!HasDrawParameters)
             //    Container.ControlSpriteBatch.Begin();
@@ -60,8 +60,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 return RectangleF.Empty;
             else
             {
-                DrawingSizeF textSize = Font.MeasureString(Text);
-                return RectangleFExtension.CreateLTWH(0, 0, (int)Math.Ceiling(textSize.Width),(int) Math.Ceiling(textSize.Height));
+                Size2F textSize = Font.MeasureString(Text);
+                return new RectangleF(0, 0, (int)Math.Ceiling(textSize.Width),(int) Math.Ceiling(textSize.Height));
             }
         }
 

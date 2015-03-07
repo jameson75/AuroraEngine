@@ -56,13 +56,13 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             UnsafeNativeMethods.DrawString(this.NativeObject, spriteBatch.NativeObject, text, new XMFLOAT2(position), new XVECTOR4(color), rotation, new XMFLOAT2(origin), new XMFLOAT2(scale), effects, layerDepth);
         }
 
-        public DrawingSizeF MeasureString(string text)
+        public Size2F MeasureString(string text)
         {
             XVECTOR4 metrics = UnsafeNativeMethods.MeasureString(this._nativeObject, text);
             //NOTE: The DirectXTK SpriteFont::MeasureString() doesn't account for trailings
             //spaces. We call our helper method for a work around.
             float trailingSpacesLength = MeasureTrailingSpaces(text);
-            return new DrawingSizeF(metrics.C1 + trailingSpacesLength, metrics.C2);
+            return new Size2F(metrics.C1 + trailingSpacesLength, metrics.C2);
         }
 
         public bool ContainsCharacter(char character)

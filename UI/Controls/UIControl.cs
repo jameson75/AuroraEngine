@@ -26,8 +26,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private SpriteBatch _spriteBatch = null;
         //private bool _isInitialized = false;
         private UIControlCollection _children = null;
-        private DrawingSizeF _size = DrawingSizeFExtension.Zero;
-        private DrawingPointF _position = DrawingPointFExtension.Zero;
+        private Size2F _size = Size2FExtension.Zero;
+        private Vector2 _position = Vector2Extension.Zero;
         private UIControl _parent = null;
         private bool _visible = false;
         private bool _enabled = false;
@@ -87,7 +87,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Guid LayoutId { get; set; }
 
-        public DrawingPointF Position
+        public Vector2 Position
         {
             get
             {
@@ -101,7 +101,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public DrawingSizeF Size
+        public Size2F Size
         {
             get
             {
@@ -328,7 +328,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //    return BoundingBox.CreateFromPoints(transformedCorners);
         //}      
 #endregion       
-        public RectangleF Bounds { get { return RectangleFExtension.CreateLTWH(Position.X, Position.Y, this.Size.Width, this.Size.Height); } }
+        public RectangleF Bounds { get { return new RectangleF(Position.X, Position.Y, this.Size.Width, this.Size.Height); } }
         public virtual RectangleF ClientRectangle { get { return new RectangleF(0, 0, this.Size.Width, this.Size.Height); } }
         public BoundaryF Padding { get; set; }
         public BoundaryF Margin { get; set; }
@@ -382,18 +382,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public RectangleF BoundsToSurface(RectangleF bounds)
         {
-            DrawingPointF boundsOrigin = new DrawingPointF(bounds.Left, bounds.Top);
-            DrawingPointF surfaceBoundsOrigin = PositionToSurface(boundsOrigin);
-            return RectangleFExtension.CreateLTWH(surfaceBoundsOrigin.X, surfaceBoundsOrigin.Y, bounds.Width, bounds.Height);
+            Vector2 boundsOrigin = new Vector2(bounds.Left, bounds.Top);
+            Vector2 surfaceBoundsOrigin = PositionToSurface(boundsOrigin);
+            return new RectangleF(surfaceBoundsOrigin.X, surfaceBoundsOrigin.Y, bounds.Width, bounds.Height);
         }        
 
-        public DrawingPointF PositionToSurface(DrawingPointF position)
+        public Vector2 PositionToSurface(Vector2 position)
         {
-            DrawingPointF transformedPosition = position;
+            Vector2 transformedPosition = position;
             UIControl root = this.Parent;
             while (root != null)
             {
-                transformedPosition = DrawingPointFExtension.Add(transformedPosition, root.Position);
+                transformedPosition = Vector2Extension.Add(transformedPosition, root.Position);
                 root = root.Parent;
             }
             return transformedPosition;
@@ -401,18 +401,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public RectangleF BoundsToLocal(RectangleF surfaceBounds)
         {
-            DrawingPointF surfaceBoundsOrigin = new DrawingPointF(surfaceBounds.Left, surfaceBounds.Top);
-            DrawingPointF boundsOrigin = PositionToLocal(surfaceBoundsOrigin);
-            return RectangleFExtension.CreateLTWH(boundsOrigin.X, boundsOrigin.Y, surfaceBounds.Width, surfaceBounds.Height);
+            Vector2 surfaceBoundsOrigin = new Vector2(surfaceBounds.Left, surfaceBounds.Top);
+            Vector2 boundsOrigin = PositionToLocal(surfaceBoundsOrigin);
+            return new RectangleF(boundsOrigin.X, boundsOrigin.Y, surfaceBounds.Width, surfaceBounds.Height);
         }
 
-        public DrawingPointF PositionToLocal(DrawingPointF position)
+        public Vector2 PositionToLocal(Vector2 position)
         {
-            DrawingPointF transformedPosition = position;
+            Vector2 transformedPosition = position;
             UIControl root = this.Parent;
             while (root != null)
             {
-                transformedPosition = DrawingPointFExtension.Subtract(transformedPosition, root.Position);
+                transformedPosition = Vector2Extension.Subtract(transformedPosition, root.Position);
                 root = root.Parent;
             }
             return transformedPosition;

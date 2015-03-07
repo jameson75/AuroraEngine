@@ -115,14 +115,14 @@ namespace CipherPark.AngelJacket.Core.Animation
             return ((BooleanAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
 
-        protected DrawingPointF GetPropertyDrawingPointValueAtT(string propertyName, ulong t)
+        protected Vector2 GetPropertyPointValueAtT(string propertyName, ulong t)
         {
-            return ((DrawingPointAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
+            return ((PointAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
 
-        protected DrawingSizeF GetPropertyDrawingSizeValueAtT(string propertyName, ulong t)
+        protected Size2F GetPropertySize2ValueAtT(string propertyName, ulong t)
         {
-            return ((DrawingSizeAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
+            return ((Size2Animation)AnimatedProperties[propertyName]).GetValueAtT(t);
         }
         
         protected RectangleF GetPropertyRectangleValueAtT(string propertyName, ulong t)

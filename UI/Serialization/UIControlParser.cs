@@ -33,10 +33,10 @@ namespace CipherPark.AngelJacket.Core.UI.Design
         public virtual void Parse(UITree tree, XElement element, UIControl control)
         {
             if (element.Attribute(PositionAttributeName) != null)
-                control.Position = UIControlPropertyParser.ParseDrawingPointF(element.Attribute(PositionAttributeName).Value);
+                control.Position = UIControlPropertyParser.ParseVector2(element.Attribute(PositionAttributeName).Value);
 
             if (element.Attribute(SizeAttributeName) != null)
-                control.Size = UIControlPropertyParser.ParseDrawingSizeF(element.Attribute(SizeAttributeName).Value);
+                control.Size = UIControlPropertyParser.ParseSize2F(element.Attribute(SizeAttributeName).Value);
 
             if (element.Attribute(NameAttributeName) != null)
                 control.Name = element.Attribute(NameAttributeName).Value;

@@ -62,11 +62,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         //public IUITheme Theme { get { return theme; } }
 
-        public DrawingSizeF ScreenSize
+        public Size2F ScreenSize
         {
             get
             {
-                return new DrawingSizeF(_game.RenderTarget.ResourceAs<Texture2D>().Description.Width,
+                return new Size2F(_game.RenderTarget.ResourceAs<Texture2D>().Description.Width,
                                         _game.RenderTarget.ResourceAs<Texture2D>().Description.Height);                                                       
 
             }

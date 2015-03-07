@@ -44,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private CameraMode cameraMode = CameraMode.None;
         private RectangleF rotationRectangle = RectangleF.Empty;
         private float rotationEllipseDiameter = 0f;
-        private DrawingPoint mouseMoveFrom = new DrawingPoint(0, 0);
+        private Point mouseMoveFrom = new Point(0, 0);
         private bool rotateAboutZ = false;
         private SceneNode _selectedNode = null;
 
@@ -81,7 +81,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         protected override void OnSizeChanged()
         {
             rotationEllipseDiameter = this.Bounds.Width / 3.0f;
-            rotationRectangle = RectangleFExtension.CreateLTWH((this.Bounds.Width - rotationEllipseDiameter) / 2, (this.Bounds.Height - rotationEllipseDiameter) / 2, rotationEllipseDiameter, rotationEllipseDiameter);
+            rotationRectangle = new RectangleF((this.Bounds.Width - rotationEllipseDiameter) / 2, (this.Bounds.Height - rotationEllipseDiameter) / 2, rotationEllipseDiameter, rotationEllipseDiameter);
             base.OnSizeChanged();
         }
 
@@ -105,7 +105,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 OnMouseWheel(inputState.GetMouseWheelDelta());
         }
 
-        protected void OnMouseDown(InputState.MouseButton mouseButton, DrawingPoint location)
+        protected void OnMouseDown(InputState.MouseButton mouseButton, Point location)
         {          
             switch (this.actionMode)
             {
@@ -123,11 +123,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 case ActionMode.Select:
                     if (mouseButton == InputState.MouseButton.Left)
                     {
-                        Viewport vp = Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0];
+                        ViewportF vp = Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0];
                         //Vector3 mousePointNear = vp.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
                         //Vector3 mousePointFar = vp.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
-                        Vector3 mousePointNear = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), vp.TopLeftX, vp.TopLeftX, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
-                        Vector3 mousePointFar = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), vp.TopLeftX, vp.TopLeftX, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
+                        Vector3 mousePointNear = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
+                        Vector3 mousePointFar = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
                         Vector3 mouseRay = mousePointFar - mousePointNear;
                         mouseRay.Normalize();
                         System.Diagnostics.Trace.WriteLine(mousePointNear);
@@ -173,12 +173,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             return false;
         }
 
-        protected void OnMouseUp(InputState.MouseButton mouseButton, DrawingPoint location)
+        protected void OnMouseUp(InputState.MouseButton mouseButton, Point location)
         {          
             if (this.Capture)
             {
                 this.Capture = false;
-                this.mouseMoveFrom = new DrawingPoint(0,0);
+                this.mouseMoveFrom = new Point(0,0);
             }
         }
 
@@ -187,7 +187,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             CurrentCamera.ViewMatrix = CurrentCamera.ViewMatrix * Matrix.Translation(0, 0, -mouseWheelDelta / 5);            
         }
 
-        protected void OnMouseMove(InputState.MouseButton[] mouseButtonsDown, DrawingPoint location)
+        protected void OnMouseMove(InputState.MouseButton[] mouseButtonsDown, Point location)
         {         
             switch (actionMode)
             {

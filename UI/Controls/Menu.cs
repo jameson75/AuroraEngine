@@ -171,21 +171,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             subMenu.BeginContext(this);
 
-            DrawingPointF subMenuRelativePosition = DrawingPointFExtension.Zero;
+            Vector2 subMenuRelativePosition = Vector2Extension.Zero;
 
             switch (subMenu.DisplaySide)
             {
                 case ContextMenuDisplaySide.Left:
-                    subMenuRelativePosition = new DrawingPointF(this.Position.X - subMenu.Bounds.Width, this.Position.Y);
+                    subMenuRelativePosition = new Vector2(this.Position.X - subMenu.Bounds.Width, this.Position.Y);
                     break;
                 case ContextMenuDisplaySide.Above:
-                    subMenuRelativePosition = new DrawingPointF(this.Position.X, this.Position.Y - subMenu.Bounds.Height);
+                    subMenuRelativePosition = new Vector2(this.Position.X, this.Position.Y - subMenu.Bounds.Height);
                     break;
                 case ContextMenuDisplaySide.Right:
-                    subMenuRelativePosition = new DrawingPointF(this.Bounds.Right, this.Position.Y);
+                    subMenuRelativePosition = new Vector2(this.Bounds.Right, this.Position.Y);
                     break;
                 case ContextMenuDisplaySide.Bottom:
-                    subMenuRelativePosition = new DrawingPointF(this.Bounds.X, this.Bounds.Bottom);
+                    subMenuRelativePosition = new Vector2(this.Bounds.X, this.Bounds.Bottom);
                     break;
             }
 
@@ -247,7 +247,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
                 BufferedInputState bufferedInputState = inputServices.GetBufferedInputState();
 
-                bool selectPreviousKeyDown = (Orientation == MenuOrientation.Vertical && bufferedInputState.IsKeyDown(Key.UpArrow)) ||
+                bool selectPreviousKeyDown = (Orientation == MenuOrientation.Vertical && bufferedInputState.IsKeyDown(Key.Up)) ||
                                              (Orientation == MenuOrientation.Horizontal && bufferedInputState.IsKeyDown(Key.Left)) ||
                                              (Orientation == MenuOrientation.Vertical && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadUp)) ||
                                              (Orientation == MenuOrientation.Horizontal && bufferedInputState.InputState.IsGamepadButtonHit(0, SharpDX.XInput.GamepadButtonFlags.DPadLeft));
@@ -294,8 +294,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 //if (this.Items.Count == 1)
                 //    this.Size = item.Size;
                 //else
-                //    this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
-                this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Items.Max(x => x.Size.Width) , this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Items.Max(x => x.Size.Height));
+                //    this.Size = (this.Orientation == MenuOrientation.Vertical) ? new Size2F(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new Size2F(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
+                this.Size = (this.Orientation == MenuOrientation.Vertical) ? new Size2F(this.Items.Max(x => x.Size.Width) , this.Items.Sum(x => x.Bounds.Height)) : new Size2F(this.Items.Sum(x => x.Bounds.Width), this.Items.Max(x => x.Size.Height));
             }
             base.OnItemAdded(item);
         }
@@ -306,9 +306,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             //if (AutoSize)
             //{
             //    if (this.Items.Count == 0)
-            //        this.Size = DrawingSizeFExtension.Zero;
+            //        this.Size = Size2FExtension.Zero;
             //    else
-            //        this.Size = (this.Orientation == MenuOrientation.Vertical) ? new DrawingSizeF(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new DrawingSizeF(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
+            //        this.Size = (this.Orientation == MenuOrientation.Vertical) ? new Size2F(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new Size2F(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
             //}
             SelectedItemIndex = -1;
         }
@@ -324,8 +324,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //                offset += this.Margin.Top;
         //            else
         //                offset += Items[i - 1].Padding.Bottom;
-        //            Items[i].Position = new DrawingPointF(this.Margin.Left, offset);
-        //            Items[i].Size = new DrawingSizeF(this.Size.Width - this.Margin.Right, Items[i].Size.Height);
+        //            Items[i].Position = new Vector2(this.Margin.Left, offset);
+        //            Items[i].Size = new Size2F(this.Size.Width - this.Margin.Right, Items[i].Size.Height);
         //            offset += Items[0].Size.Height;
         //        }
         //    }
@@ -337,8 +337,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //                offset += this.Margin.Left;
         //            else
         //                offset += Items[i - 1].Padding.Right;
-        //            Items[i].Position = new DrawingPointF(offset, this.Margin.Top);
-        //            Items[i].Size = new DrawingSizeF(Items[i].Size.Width, this.Size.Height - this.Margin.Bottom);
+        //            Items[i].Position = new Vector2(offset, this.Margin.Top);
+        //            Items[i].Size = new Size2F(Items[i].Size.Width, this.Size.Height - this.Margin.Bottom);
         //            offset += Items[0].Size.Width;
         //        }
         //    }
@@ -427,21 +427,21 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             _contextMenu.BeginContext(this);
 
-            DrawingPointF subMenuRelativePosition = DrawingPointFExtension.Zero;
+            Vector2 subMenuRelativePosition = Vector2Extension.Zero;
 
             switch (_contextMenu.DisplaySide)
             {
                 case ContextMenuDisplaySide.Left:
-                    subMenuRelativePosition = new DrawingPointF(this.Position.X - _contextMenu.Bounds.Width, this.Position.Y);
+                    subMenuRelativePosition = new Vector2(this.Position.X - _contextMenu.Bounds.Width, this.Position.Y);
                     break;
                 case ContextMenuDisplaySide.Above:
-                    subMenuRelativePosition = new DrawingPointF(this.Position.X, this.Position.Y - _contextMenu.Bounds.Height);
+                    subMenuRelativePosition = new Vector2(this.Position.X, this.Position.Y - _contextMenu.Bounds.Height);
                     break;
                 case ContextMenuDisplaySide.Right:
-                    subMenuRelativePosition = new DrawingPointF(this.Bounds.Right, this.Position.Y);
+                    subMenuRelativePosition = new Vector2(this.Bounds.Right, this.Position.Y);
                     break;
                 case ContextMenuDisplaySide.Bottom:
-                    subMenuRelativePosition = new DrawingPointF(this.Bounds.X, this.Bounds.Bottom);
+                    subMenuRelativePosition = new Vector2(this.Bounds.X, this.Bounds.Bottom);
                     break;
             }
 

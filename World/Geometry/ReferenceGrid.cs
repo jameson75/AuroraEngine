@@ -18,7 +18,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         private Mesh _mesh = null;
         private BasicEffect _effect = null;
 
-        public ReferenceGrid(SharpDX.Direct3D11.Device device, DrawingSizeF gridSize, Vector2 gridSteps, Color4 color)
+        public ReferenceGrid(SharpDX.Direct3D11.Device device, Size2F gridSize, Vector2 gridSteps, Color4 color)
         {
             Transform = Matrix.Identity;
 

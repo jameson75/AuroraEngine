@@ -107,7 +107,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Create descriptions for textures and samplers
             //---------------------------------------------
-            DrawingSize gameScreenSize = new DrawingSize(_game.RenderTarget.ResourceAs<Texture2D>().Description.Width, _game.RenderTarget.ResourceAs<Texture2D>().Description.Height);
+            Size2 gameScreenSize = new Size2(_game.RenderTarget.ResourceAs<Texture2D>().Description.Width, _game.RenderTarget.ResourceAs<Texture2D>().Description.Height);
             Texture2DDescription textureDesc = CreateCommonTextureDesc(gameScreenSize);
             ShaderResourceViewDescription shaderResourceViewDesc = CreateCommonShaderResourceViewDesc(textureDesc);
             RenderTargetViewDescription renderTargetViewDesc = CreateCommonRenderTargetViewDesc(textureDesc);

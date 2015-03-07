@@ -34,9 +34,9 @@ namespace CipherPark.AngelJacket.Core.Animation
                 {
                     float left = (float)Lerp(frameVal0.Left, frameVal1.Left, pctT);
                     float top = (float)Lerp(frameVal0.Top, frameVal1.Top, pctT);
-                    float right = (float)Lerp(frameVal0.Right, frameVal1.Right, pctT);
-                    float bottom = (float)Lerp(frameVal0.Bottom, frameVal1.Bottom, pctT);
-                    return new RectangleF(left, top, right, bottom);
+                    float width = (float)Lerp(frameVal0.Right, frameVal1.Width, pctT);
+                    float height = (float)Lerp(frameVal0.Bottom, frameVal1.Height, pctT);
+                    return new RectangleF(left, top, width, height);
                 }
                 else
                 {

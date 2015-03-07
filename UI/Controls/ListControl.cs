@@ -201,7 +201,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 float maxItemWidth = 0f;
                 foreach (ListControlItem item in this.Items)
                 {
-                    item.Position = new DrawingPointF(previousColumnsWidth, previousItemsTotalHeight);
+                    item.Position = new Vector2(previousColumnsWidth, previousItemsTotalHeight);
                     previousItemsTotalHeight += item.Size.Height;
                     maxItemWidth = Math.Max(maxItemWidth, item.Size.Width);
                     currentRowIndex++;
@@ -221,7 +221,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 float maxItemHeight = 0;
                 foreach (ListControlItem item in this.Items)
                 {
-                    item.Position = new DrawingPointF(previousItemsTotalWidth, previousColumnsHeight);
+                    item.Position = new Vector2(previousItemsTotalWidth, previousColumnsHeight);
                     previousItemsTotalWidth += item.Size.Width;
                     maxItemHeight = Math.Max(maxItemHeight, item.Size.Width);
                     currentColumnIndex++;
@@ -275,7 +275,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
     public class ListControlItem : ItemControl
     {
-        public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10f, 10f);
+        public static readonly Size2F DefaultItemTextMargin = new Size2F(10f, 10f);
 
         private CommandControlWireUp _wireUp = null;
         

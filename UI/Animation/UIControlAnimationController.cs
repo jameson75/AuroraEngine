@@ -65,10 +65,10 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
                 Target.Enabled = GetPropertyBooleanValueAtT(UIControlPropertyNames.Enabled, timeT);
 
             if (TargetPropertyExists(UIControlPropertyNames.Position))
-                Target.Position = GetPropertyDrawingPointValueAtT(UIControlPropertyNames.Position, timeT);
+                Target.Position = GetPropertyPointValueAtT(UIControlPropertyNames.Position, timeT);
 
             if (TargetPropertyExists(UIControlPropertyNames.Size))
-                Target.Size = GetPropertyDrawingSizeValueAtT(UIControlPropertyNames.Size, timeT);
+                Target.Size = GetPropertySize2ValueAtT(UIControlPropertyNames.Size, timeT);
 
             if (TargetPropertyExists(UIControlPropertyNames.Visible))
                 Target.Visible = GetPropertyBooleanValueAtT(UIControlPropertyNames.Visible, timeT);
@@ -101,33 +101,33 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             SetPropertyKeyFrame(UIControlPropertyNames.Enabled, new AnimationKeyFrame(timeT, value));
         }
 
-        public DrawingPointF GetPositionAtT(ulong timeT)
+        public Vector2 GetPositionAtT(ulong timeT)
         {
             if (TargetPropertyExists(UIControlPropertyNames.Position))
-                return GetPropertyDrawingPointValueAtT(UIControlPropertyNames.Position, timeT);
+                return GetPropertyPointValueAtT(UIControlPropertyNames.Position, timeT);
             else
                 return Target.Position;
         }
 
-        public void SetPositionAtT(ulong timeT, DrawingPointF value)
+        public void SetPositionAtT(ulong timeT, Vector2 value)
         {
             if (!TargetPropertyExists(UIControlPropertyNames.Position))
-                AddPropertyAnimation(UIControlPropertyNames.Position, new DrawingPointAnimation());
+                AddPropertyAnimation(UIControlPropertyNames.Position, new PointAnimation());
             SetPropertyKeyFrame(UIControlPropertyNames.Position, new AnimationKeyFrame(timeT, value));
         }
 
-        public DrawingSizeF GetSizeAtT(ulong timeT)
+        public Size2F GetSizeAtT(ulong timeT)
         {
             if (TargetPropertyExists(UIControlPropertyNames.Size))
-                return GetPropertyDrawingSizeValueAtT(UIControlPropertyNames.Size, timeT);
+                return GetPropertySize2ValueAtT(UIControlPropertyNames.Size, timeT);
             else
                 return Target.Size;
         }
 
-        public void SetEnabledAtT(ulong timeT, DrawingSizeF value)
+        public void SetEnabledAtT(ulong timeT, Size2F value)
         {
             if (!TargetPropertyExists(UIControlPropertyNames.Size))
-                AddPropertyAnimation(UIControlPropertyNames.Size, new DrawingSizeAnimation());
+                AddPropertyAnimation(UIControlPropertyNames.Size, new Size2Animation());
             SetPropertyKeyFrame(UIControlPropertyNames.Size, new AnimationKeyFrame(timeT, value));
         }
 
@@ -167,7 +167,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             if (TargetPropertyExists(UIControlPropertyNames.PositionAndSize))
                 return GetPropertyRectangleValueAtT(UIControlPropertyNames.PositionAndSize, timeT);
             else
-                return RectangleFExtension.CreateLTWH(Target.Position.X, Target.Position.Y, Target.Size.Width, Target.Size.Height);
+                return new RectangleF(Target.Position.X, Target.Position.Y, Target.Size.Width, Target.Size.Height);
         }
 
         public void SetPositionAndSizeAtT(ulong timeT, RectangleF value)

@@ -81,7 +81,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (this._content != null)
                 this.Size = this.Content.CalculateSmallestBoundingRect().Size();
             else
-                this.Size = DrawingSizeFExtension.Zero;
+                this.Size = Size2FExtension.Zero;
         }
     }
 }

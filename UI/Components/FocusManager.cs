@@ -342,11 +342,11 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             return control.VisibleInTree && control.EnabledInTree;
         }       
 
-        private static UIControl GetFirstHitInZOrder(IEnumerable<UIControl> siblings, DrawingPoint mouseLocation, bool mustBeVisible = true, bool mustBeEnabled = true)
+        private static UIControl GetFirstHitInZOrder(IEnumerable<UIControl> siblings, Point mouseLocation, bool mustBeVisible = true, bool mustBeEnabled = true)
         {
             UIControl[] zOrderedSiblings = FocusManager.ToZOrderedControlArray(siblings);
             for (int i = 0; i < zOrderedSiblings.Length; i++)
-                if ((zOrderedSiblings[i].Visible || !mustBeVisible) && (zOrderedSiblings[i].Enabled|| !mustBeEnabled) && zOrderedSiblings[i].BoundsToSurface(zOrderedSiblings[i].Bounds).Contains(mouseLocation.ToDrawingPointF()))
+                if ((zOrderedSiblings[i].Visible || !mustBeVisible) && (zOrderedSiblings[i].Enabled|| !mustBeEnabled) && zOrderedSiblings[i].BoundsToSurface(zOrderedSiblings[i].Bounds).Contains(mouseLocation.ToVector2()))
                     return zOrderedSiblings[i];
             return null;
         }                
@@ -372,7 +372,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 return null;
         }
 
-        private static void PopulateHitList(IEnumerable<UIControl> controls, DrawingPoint mouseLocation, IList<UIControl> hitList)
+        private static void PopulateHitList(IEnumerable<UIControl> controls, Point mouseLocation, IList<UIControl> hitList)
         {
             UIControl hitControl = FocusManager.GetFirstHitInZOrder(controls, mouseLocation); //NOTE: we get the first VISIBLE hit sibling.
             if (hitControl != null)

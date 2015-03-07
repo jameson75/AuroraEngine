@@ -91,14 +91,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 {
                     float positionX = newPositionX.HasValue ? newPositionX.Value : child.Position.X;
                     float positionY = newPositionY.HasValue ? newPositionY.Value : child.Position.Y;
-                    child.Position = new DrawingPointF(positionX, positionY);
+                    child.Position = new Vector2(positionX, positionY);
                 }
 
                 if (newWidth.HasValue || newHeight.HasValue)
                 {
                     float width = newWidth.HasValue ? newWidth.Value : child.Bounds.Width;
                     float height = newHeight.HasValue ? newHeight.Value : child.Bounds.Height;
-                    child.Size = new DrawingSizeF(width, height);
+                    child.Size = new Size2F(width, height);
                 }
             }
         }    
@@ -197,14 +197,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 {
                     float positionX = newPositionX.HasValue ? newPositionX.Value : child.Position.X;
                     float positionY = newPositionY.HasValue ? newPositionY.Value : child.Position.Y;
-                    child.Position = new DrawingPointF(positionX, positionY);
+                    child.Position = new Vector2(positionX, positionY);
                 }
 
                 if (newWidth.HasValue || newHeight.HasValue)
                 {
                     float width = newWidth.HasValue ? newWidth.Value : child.Bounds.Width;
                     float height = newHeight.HasValue ? newHeight.Value : child.Bounds.Height;
-                    child.Size = new DrawingSizeF(width, height);
+                    child.Size = new Size2F(width, height);
                 }
             }            
         }
@@ -355,8 +355,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         offset += _container.Padding.Top;
                     else
                         offset += (Items[i - 1].Size.Height + Items[i - 1].Margin.Bottom + Items[i].Margin.Top);
-                    Items[i].Position = new DrawingPointF(_container.Padding.Left, offset);
-                    Items[i].Size = new DrawingSizeF(_container.Size.Width - _container.Margin.Right, Items[i].Size.Height);
+                    Items[i].Position = new Vector2(_container.Padding.Left, offset);
+                    Items[i].Size = new Size2F(_container.Size.Width - _container.Margin.Right, Items[i].Size.Height);
                     //offset += Items[i].Size.Height;
                 }
             }
@@ -368,8 +368,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                         offset += _container.Padding.Left;
                     else                    
                         offset += (Items[i - 1].Size.Width + Items[i - 1].Margin.Right + Items[i].Margin.Left);
-                    Items[i].Position = new DrawingPointF(offset, _container.Padding.Top);
-                    Items[i].Size = new DrawingSizeF(Items[i].Size.Width, _container.Size.Height - _container.Margin.Bottom);
+                    Items[i].Position = new Vector2(offset, _container.Padding.Top);
+                    Items[i].Size = new Size2F(Items[i].Size.Width, _container.Size.Height - _container.Margin.Bottom);
                     //offset += Items[i].Size.Width;
                 }
             }

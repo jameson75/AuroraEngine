@@ -76,7 +76,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (Texture == null)
                 return RectangleF.Empty;
             else
-                return RectangleFExtension.CreateLTWH(0, 0, Texture.Description.Width, Texture.Description.Height);
+                return new RectangleF(0, 0, Texture.Description.Width, Texture.Description.Height);
         }
     }
 }

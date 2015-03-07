@@ -20,7 +20,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 {
     public abstract class UIControlTemplate
     {
-        public DrawingSizeF? Size { get; set; }
+        public Size2F? Size { get; set; }
         public VerticalAlignment? VerticalAlignment { get; set; }
         public HorizontalAlignment? HorizontalAlignment { get; set; }
         public abstract UIControl CreateControl(IUIRoot visualRoot);
@@ -147,13 +147,13 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             if (checkTexture != null)
             {
                 CheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = checkTexture } };
-                CheckContentTemplate.Size = new DrawingSizeF(checkTexture.Description.Width, checkTexture.Description.Height);
+                CheckContentTemplate.Size = new Size2F(checkTexture.Description.Width, checkTexture.Description.Height);
             }
 
             if (uncheckTexture != null)
             {
                 UncheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = uncheckTexture } };
-                UncheckContentTemplate.Size = new DrawingSizeF(uncheckTexture.Description.Width, uncheckTexture.Description.Height);
+                UncheckContentTemplate.Size = new Size2F(uncheckTexture.Description.Width, uncheckTexture.Description.Height);
             }
         }
 

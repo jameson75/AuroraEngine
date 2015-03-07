@@ -94,7 +94,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if (_button == null)
                 {
                     _button = new ButtonTemplate(null, ControlFont, ControlFontColor, ControlForegroundColor);
-                    _button.Size = new DrawingSizeF(30, 10);
+                    _button.Size = new Size2F(30, 10);
                 }
                 return _button;                
             }                
@@ -114,7 +114,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                         CaptionTemplate = this.Label,
                         CheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = DefaultCheckTexture } },
                         UncheckContentTemplate = new ContentControlTemplate() { ContentStyle = new ImageStyle() { Texture = DefaultUncheckTexture } },
-                        Size = new DrawingSizeF(30, 10)
+                        Size = new Size2F(30, 10)
                     };       
                 }
                 return _checkbox;
@@ -131,7 +131,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if (_contentControl == null)
                 {
                     _contentControl = new ContentControlTemplate();
-                    _contentControl.Size = new DrawingSizeF(20, 20);
+                    _contentControl.Size = new Size2F(20, 20);
                 }
                 return _contentControl;
             }
@@ -147,7 +147,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if (_imageControl == null)
                 {
                     _imageControl = new ImageControlTemplate(NoImageTexture);
-                    _imageControl.Size = new DrawingSizeF(20, 20);
+                    _imageControl.Size = new Size2F(20, 20);
                 }
                 return _imageControl;
             }
@@ -163,7 +163,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 if (_label == null)
                 {
                     _label = new LabelTemplate(null, ControlFont, ControlFontColor, null);
-                    _label.Size = new DrawingSizeF(30, 10);
+                    _label.Size = new Size2F(30, 10);
                 }
                 return _label;
             }
@@ -181,7 +181,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         //                TextBox = new TextBoxTemplate(null, EditorFont, EditorFontColor, EditorColor),
         //                ListControl = new ListControlTemplate(ControlColor)
         //            };
-        //            _dropList.Size = new DrawingSizeF(50, 20);
+        //            _dropList.Size = new Size2F(50, 20);
         //        }
         //        return _dropList;
         //    }
@@ -198,7 +198,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                 {
                     _textBox = new TextBoxTemplate(null, EditorFont, EditorFontColor, EditorColor)
                     {
-                       Size = new DrawingSizeF(40, 20)
+                       Size = new Size2F(40, 20)
                     };                    
                 }
                 return _textBox;
@@ -219,14 +219,14 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                         TrackContent = new ContentControlTemplate() 
                         { 
                             ContentStyle = new ColorStyle(Color.Gray),
-                            Size = new DrawingSizeF(50, 20)                                    
+                            Size = new Size2F(50, 20)                                    
                         },
                         HandleContent = new ContentControlTemplate()
                         { 
                             ContentStyle = new ColorStyle(Color.LightGray),
-                            Size = new DrawingSizeF(20, 20)
+                            Size = new Size2F(20, 20)
                         },
-                        Size = new DrawingSizeF(50, 20)
+                        Size = new Size2F(50, 20)
                     };
                     
                 }
@@ -249,7 +249,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                         ItemTemplate = new LabelTemplate(null, ControlFont, ControlFontColor, null),
                         SelectTemplate = new LabelTemplate(null, ControlFont, ControlFontSelectedColor, null)
                     };
-                    _listControlItem.Size = new DrawingSizeF(30, 20);
+                    _listControlItem.Size = new Size2F(30, 20);
                 }
                 return _listControlItem;
             }
@@ -267,7 +267,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     _listControl = new ListControlTemplate(ControlBackgroundColor)
                     {
                     };
-                    _listControl.Size = new DrawingSizeF(30, 20);
+                    _listControl.Size = new Size2F(30, 20);
                 }
                 return _listControl;
             }
@@ -285,7 +285,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     _menu = new MenuTemplate();                    
                     {
                     };
-                    _menu.Size = new DrawingSizeF(30, 20);
+                    _menu.Size = new Size2F(30, 20);
                 }
                 return _menu;
             }
@@ -303,7 +303,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
                     _menuItem = new MenuItemTemplate();
                     {
                     };
-                    _menuItem.Size = new DrawingSizeF(30, 20);
+                    _menuItem.Size = new Size2F(30, 20);
                 }
                 return _menuItem;
             }

@@ -273,7 +273,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
     {
         public static T NextOrFirst<T>(this IEnumerable<T> e, int i)
         {
-            return (i < e.Count() - 1) ? e.ElementAt(i) : e.FirstOrDefault();
+            return (i < e.Count() - 1) ? e.ElementAt(i+1) : e.FirstOrDefault();
         }
     }
 

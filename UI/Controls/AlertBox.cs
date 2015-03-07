@@ -100,10 +100,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             alertControl.Background = backgroundContent;
             //alertControl.Background.Opacity = .5f;
             RectangleF screenRect = new RectangleF(0, 0, ui.ScreenSize.Width, ui.ScreenSize.Height);
-            DrawingSizeF textMargin = new DrawingSizeF(5, 5);
-            DrawingSizeF minMessageFit = messageContent.Font.MeasureString(messageContent.Text).Add(textMargin);
-            DrawingSizeF minMessageBoxSize = new DrawingSizeF(100, 20);
-            DrawingSizeF messageBoxSize = new DrawingSizeF(Math.Max(minMessageFit.Width, minMessageBoxSize.Width),
+            Size2F textMargin = new Size2F(5, 5);
+            Size2F minMessageFit = messageContent.Font.MeasureString(messageContent.Text).Add(textMargin);
+            Size2F minMessageBoxSize = new Size2F(100, 20);
+            Size2F messageBoxSize = new Size2F(Math.Max(minMessageFit.Width, minMessageBoxSize.Width),
                                                            Math.Max(minMessageFit.Height, minMessageBoxSize.Height));
             RectangleF finalPanelRect = new RectangleF(0, 0, messageBoxSize.Width, messageBoxSize.Height);
             screenRect.AlignRectangle(ref finalPanelRect, RectangleAlignment.Centered);

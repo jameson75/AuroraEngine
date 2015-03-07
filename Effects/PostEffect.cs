@@ -49,7 +49,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         [Obsolete]
         public ShaderResourceView Depth { get; set; }
 
-        protected static Texture2DDescription CreateCommonTextureDesc(DrawingSize size)
+        protected static Texture2DDescription CreateCommonTextureDesc(Size2 size)
         {
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;

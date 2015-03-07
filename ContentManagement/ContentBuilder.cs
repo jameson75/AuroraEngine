@@ -111,7 +111,7 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion 
 
         #region Special Quad
-        public static Mesh BuildBillboardQuad(Device game, byte[] shaderByteCode, DrawingSizeF size)
+        public static Mesh BuildBillboardQuad(Device game, byte[] shaderByteCode, Size2F size)
         {
             BillboardVertex[] verts = new BillboardVertex[4];
             short[] indices = CreateQuadIndices();
@@ -125,7 +125,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<BillboardVertex>(game, shaderByteCode, verts, indices, BillboardVertex.InputElements, BillboardVertex.ElementSize, boundingBox); 
         }
 
-        public static Mesh BuildBillboardInstanceQuad(Device game, byte[] shaderByteCode, DrawingSizeF size, int maxInstances)
+        public static Mesh BuildBillboardInstanceQuad(Device game, byte[] shaderByteCode, Size2F size, int maxInstances)
         {
             BillboardInstanceVertex[] verts = new BillboardInstanceVertex[4];
             short[] indices = CreateQuadIndices();
@@ -142,7 +142,14 @@ namespace CipherPark.AngelJacket.Core.Content
 
         public static Mesh BuildBasicViewportQuad(Device game, byte[] shaderByteCode)
         {
-            Rectangle dimension = new Rectangle(-1, 1, 1, -1);
+            RectangleF r = new RectangleF(0, 0, 0, 0);
+
+            //NOTE: Viewport coords
+            //Left = -1
+            //Top = 1
+            //Right = 1
+            //Bottom = -1
+            Rectangle dimension = new Rectangle(-1, 1, 2, -2);
             Vector2[] textureCoords = { new Vector2( 0, 0 ), new Vector2( 1, 0 ), new Vector2( 1, 1 ), new Vector2( 0, 1 ) };
             ScreenVertex[] verts = new ScreenVertex[6];            
             verts[0] = new ScreenVertex(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
@@ -657,7 +664,7 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion
       
         #region ReferenceGrid
-        public static Mesh BuildReferenceGrid(Device game, byte[] shaderByteCode, DrawingSizeF gridSize, Vector2 gridSteps, Color gridColor)
+        public static Mesh BuildReferenceGrid(Device game, byte[] shaderByteCode, Size2F gridSize, Vector2 gridSteps, Color gridColor)
         {
             //Transform = Matrix.Identity;
 

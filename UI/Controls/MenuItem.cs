@@ -17,13 +17,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class MenuItem : ItemControl
     {
-        //public static readonly DrawingSizeF DefaultItemTextMargin = new DrawingSizeF(10f, 10f);
+        //public static readonly Size2F DefaultItemTextMargin = new Size2F(10f, 10f);
         private UIContent _itemContent = null;
         private UIContent _selectContent = null;
 
         public MenuItem(IUIRoot visualRoot) : base(visualRoot)
         {
-            this.Size = new DrawingSizeF(100, 20);
+            this.Size = new Size2F(100, 20);
         }
 
         public MenuItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 fontColor)
