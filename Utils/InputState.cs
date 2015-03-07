@@ -60,7 +60,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             //**********************************************************************************
             //NOTE: Since directx (apparently) doesn't support mouse wheel input, I've devised
             //my own. HwndMessageHook uses the game's window-handle to intercept 
-            //mouse messages.
+            //mouse messages and record the mouse wheel state.
             //**********************************************************************************
             if (_messageHook == null)
             {
@@ -632,19 +632,17 @@ namespace CipherPark.AngelJacket.Core.Utils
             private const int GWL_WNDPROC = -4;
 
             private delegate IntPtr WndProcDelegate(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
-            private WndProcDelegate _hookWndProcDelegate = null;
-            private Delegate _originalWndProcDelegate = null;
-            
+            private WndProcDelegate _hookWndProcDelegate = null;            
+            private IntPtr _originalWndProcFuncPtr = IntPtr.Zero;
+
             public void Initialize(IntPtr hWnd)
             {
-                //We hook into the running application's windows message pump.               
-                //-----------------------------------------------------------
+                //We hook into the running application's window's message pump (Subclass main window)
+                //-----------------------------------------------------------------------------------
                 _hookWndProcDelegate = new WndProcDelegate(WndProc);                
                 IntPtr hookWndProcFuncPtr = Marshal.GetFunctionPointerForDelegate(_hookWndProcDelegate);
-                IntPtr originalWndProcFuncPtr = UnsafeNativeMethods.GetWindowLong(hWnd, GWL_WNDPROC);
-                //UnsafeNativeMethods.SetWindowLong(hWnd, GWL_WNDPROC, hookWndProcFuncPtr);                
-                //if (originalWndProcFuncPtr != IntPtr.Zero)
-                //    _originalWndProcDelegate = Marshal.GetDelegateForFunctionPointer(originalWndProcFuncPtr, typeof(WndProcDelegate));                
+                _originalWndProcFuncPtr = UnsafeNativeMethods.GetWindowLong(hWnd, GWL_WNDPROC);                  
+                UnsafeNativeMethods.SetWindowLong(hWnd, GWL_WNDPROC, hookWndProcFuncPtr);                             
             }
 
             private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam)
@@ -655,15 +653,12 @@ namespace CipherPark.AngelJacket.Core.Utils
                     case WM_MOUSEWHEEL:
                         LastMouseWheelDelta = ((short)((int)wParam >> 16));                       
                         break;
-                }
-                return (IntPtr)_originalWndProcDelegate.DynamicInvoke(hWnd, msg, wParam, lParam);
+                }               
+                return UnsafeNativeMethods.CallWindowProc(_originalWndProcFuncPtr, hWnd, msg, wParam, lParam);                
             }
 
             private static class UnsafeNativeMethods
-            {
-               
-
-                [DllImport("user32.dll")]
+            {                [DllImport("user32.dll")]
                 public static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
 
                 [DllImport("user32.dll")]
@@ -671,6 +666,9 @@ namespace CipherPark.AngelJacket.Core.Utils
 
                 [DllImport("user32.dll")]
                 public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+                [DllImport("user32.dll")]
+                public static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
             }
 
             public int LastMouseWheelDelta { get; set; }
