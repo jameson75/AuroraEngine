@@ -194,7 +194,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         public bool Equals(BoundingQuadOA quad)
         {
             Vector3[] _corners = GetCorners();
-            Vector3[] quad_corners = GetCorners();
+            Vector3[] quad_corners = quad.GetCorners();
             for (int i = 0; i < _corners.Length; i++)
                 if (_corners[i] != quad_corners[i])
                     return false;
