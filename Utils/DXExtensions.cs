@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.DirectInput;
+using SharpDX.Direct3D11;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -584,6 +585,17 @@ namespace CipherPark.AngelJacket.Core.Utils
              point = point1;
              return RayRayIntersection.Intersect;
          } 
+    }
+
+    public static class ResourceViewExtension
+    {
+        public static Size2 GetTexture2DSize(this ResourceView view)
+        {
+            Texture2D texture = view.ResourceAs<Texture2D>();
+            if (texture == null)
+                throw new InvalidOperationException("Resource view was not of Texture2D");
+            return new Size2(texture.Description.Width, texture.Description.Height);
+        }
     }
 
     public enum RayRayIntersection

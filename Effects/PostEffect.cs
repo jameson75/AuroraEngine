@@ -49,7 +49,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         [Obsolete]
         public ShaderResourceView Depth { get; set; }
 
-        protected static Texture2DDescription CreateCommonTextureDesc(Size2 size)
+        public static Texture2DDescription CreateCommonTextureDesc(Size2 size)
         {
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
@@ -65,7 +65,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             return textureDesc;
         }
 
-        protected static ShaderResourceViewDescription CreateCommonShaderResourceViewDesc(Texture2DDescription textureDesc)
+        public static ShaderResourceViewDescription CreateCommonShaderResourceViewDesc(Texture2DDescription textureDesc)
         {
             ShaderResourceViewDescription resourceViewDesc = new ShaderResourceViewDescription();
             resourceViewDesc.Format = textureDesc.Format;
@@ -75,7 +75,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             return resourceViewDesc;
         }
 
-        protected static RenderTargetViewDescription CreateCommonRenderTargetViewDesc(Texture2DDescription textureDesc)
+        public static RenderTargetViewDescription CreateCommonRenderTargetViewDesc(Texture2DDescription textureDesc)
         {
             RenderTargetViewDescription renderTargetViewDesc = new RenderTargetViewDescription();
             renderTargetViewDesc.Format = textureDesc.Format;
@@ -84,7 +84,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             return renderTargetViewDesc;
         }
 
-        protected static SamplerStateDescription CreateCommonSamplerStateDesc()
+        public static SamplerStateDescription CreateCommonSamplerStateDesc()
         {
             SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
             samplerStateDesc.Filter = Filter.MinMagMipLinear;

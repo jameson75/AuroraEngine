@@ -43,7 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>..\packages\SharpDX.2.6.3\Bin\DirectX11-net40\SharpDX.dll</HintPath>
+      <HintPath>$(SharpDXPackageBinDir)\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -92,6 +92,7 @@
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\Common\Light.cs" />
+    <Compile Include="Effects\SpectrumAnalyzerProcEffect.cs" />
     <Compile Include="Effects\StreakEffect.cs" />
     <Compile Include="Effects\Obsolete\CookTorrenceEffect.cs" />
     <Compile Include="Effects\EffectPass.cs" />
@@ -283,9 +284,6 @@
   <ItemGroup>
     <Content Include="Properties\Docs\FocusManagerBehavior.txt" />
     <Content Include="Properties\Docs\HandlingControlInput.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
