@@ -43,7 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX">
-      <HintPath>$(SharpDXPackageBinDir)\SharpDX.dll</HintPath>
+      <HintPath>..\packages\SharpDX.2.6.3\Bin\DirectX11-net40\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

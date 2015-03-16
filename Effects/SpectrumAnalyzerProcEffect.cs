@@ -26,8 +26,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         private PixelShader _pixelShader = null;
         private SharpDX.Direct3D11.Buffer _constantsBuffer = null;
         private const int ConstantsBufferSize = 16; //float(4bytes) + float(4bytes) + float(4bytes) + float2(4bytes)
-        private DepthStencilView _output = null;
+        private RenderTargetView _output = null;
         private Mesh _offscreenQuad = null;
+        private Size2 _gameScreenSize = Size2.Zero;
 
         public SpectrumAnalyzerProcEffect(IGameApp game) : base(game)
         {         
@@ -58,7 +59,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);
         }
 
-        public void Apply()
+        public override void Apply()
         {
             //Capture current render targets
             RenderTargetView originalRenderTarget = null;
@@ -90,7 +91,15 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalDepthStencilView, originalRenderTarget);
         }
 
-        public Size2 GameScreenSize { get; set; }
+        public Size2 GameScreenSize
+        {
+            get { return _gameScreenSize; }
+            set
+            {
+                _gameScreenSize = value;
+                CreateOffscreenQuad();
+            }
+        }
 
         public uint BandCount { get; set; }
 
@@ -100,16 +109,26 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public float LevelMarginSize { get; set; }
 
-        public DepthStencilView Output
+        public RenderTargetView Output
         {
             get { return _output; }
             set
-            {                
+            {
+                _output = value;
+                CreateOffscreenQuad();                                                                                
+            }
+        }
+
+        private void CreateOffscreenQuad()
+        {
+            _offscreenQuad = null;
+            if (_output != null &&
+                GameScreenSize != Size2.Zero)
+            {
                 _offscreenQuad = Content.ContentBuilder.BuildBasicOffscreenQuad(Game.GraphicsDevice,
                                                                                 Output.GetTexture2DSize(),
                                                                                 GameScreenSize,
                                                                                 _vertexShaderByteCode);
-                                                                                
             }
         }
     }
