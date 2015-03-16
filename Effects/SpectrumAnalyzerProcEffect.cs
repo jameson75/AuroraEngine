@@ -25,13 +25,16 @@ namespace CipherPark.AngelJacket.Core.Effects
         private VertexShader _vertexShader = null;
         private PixelShader _pixelShader = null;
         private SharpDX.Direct3D11.Buffer _constantsBuffer = null;
-        private const int ConstantsBufferSize = 16; //float(4bytes) + float(4bytes) + float(4bytes) + float2(4bytes)
+        private const int ConstantsBufferSize = 400;
         private RenderTargetView _output = null;
         private Mesh _offscreenQuad = null;
         private Size2 _gameScreenSize = Size2.Zero;
+        private float[] _bandPower = null;
+        private const int MaxBands = 96;
 
         public SpectrumAnalyzerProcEffect(IGameApp game) : base(game)
-        {         
+        {
+            _bandPower = new float[MaxBands];
             CreateShaders();           
         }
 
@@ -56,6 +59,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             offset += sizeof(float);
             dataBuffer.Set(offset, MathUtil.Clamp(LevelMarginSize, 0, 1.0f));
             offset += sizeof(float);
+            dataBuffer.Set(offset, BandPower);
+            offset += (sizeof(float) * BandPower.Length);
             Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);
         }
 
@@ -117,6 +122,11 @@ namespace CipherPark.AngelJacket.Core.Effects
                 _output = value;
                 CreateOffscreenQuad();                                                                                
             }
+        }
+
+        public float[] BandPower
+        {
+            get { return _bandPower; }
         }
 
         private void CreateOffscreenQuad()
