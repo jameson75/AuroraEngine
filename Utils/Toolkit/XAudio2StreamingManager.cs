@@ -43,12 +43,28 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
             Dispose();
         }        
 
-        public SourceVoice SourceVoice { get { return _sourceVoice; } }       
-             
+        public SourceVoice SourceVoice { get { return _sourceVoice; } }
+
+        public void Start()
+        {
+            _sourceVoice.Start();
+        }
+
+        public void Stop()
+        {
+            _sourceVoice.Stop();
+        }
+
+        public void DestroyVoice()
+        {
+            _sourceVoice.DestroyVoice();
+        }
+
         public void Dispose()
         {
             UnsafeNativeMethods.Dispose(_nativePointer);
             _nativePointer = IntPtr.Zero;
+            _sourceVoice.Dispose();
         }
 
         private void SourceVoice_BufferEnd(IntPtr context)

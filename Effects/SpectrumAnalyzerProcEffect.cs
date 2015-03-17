@@ -25,16 +25,58 @@ namespace CipherPark.AngelJacket.Core.Effects
         private VertexShader _vertexShader = null;
         private PixelShader _pixelShader = null;
         private SharpDX.Direct3D11.Buffer _constantsBuffer = null;
-        private const int ConstantsBufferSize = 400;
+        private const int ConstantsBufferSize = 464;
         private RenderTargetView _output = null;
         private Mesh _offscreenQuad = null;
         private Size2 _gameScreenSize = Size2.Zero;
         private float[] _bandPower = null;
         private const int MaxBands = 96;
 
+        public Size2 GameScreenSize
+        {
+            get { return _gameScreenSize; }
+            set
+            {
+                _gameScreenSize = value;
+                CreateOffscreenQuad();
+            }
+        }
+
+        public uint BandCount { get; set; }
+
+        public uint LevelCount { get; set; }
+
+        public float BandMarginSize { get; set; }
+
+        public float LevelMarginSize { get; set; }
+
+        public Color LitLEDColor { get; set; }
+
+        public Color UnlitLEDColor { get; set; }
+
+        public Color BackColor { get; set; }
+
+        public float[] BandPower
+        {
+            get { return _bandPower; }
+        }
+
+        public RenderTargetView Output
+        {
+            get { return _output; }
+            set
+            {
+                _output = value;
+                CreateOffscreenQuad();
+            }
+        }
+
         public SpectrumAnalyzerProcEffect(IGameApp game) : base(game)
         {
             _bandPower = new float[MaxBands];
+            LitLEDColor = Color.Transparent;
+            BackColor = Color.Transparent;
+            UnlitLEDColor = Color.Transparent;
             CreateShaders();           
         }
 
@@ -58,7 +100,13 @@ namespace CipherPark.AngelJacket.Core.Effects
             dataBuffer.Set(offset, MathUtil.Clamp(BandMarginSize, 0, 1.0f));
             offset += sizeof(float);
             dataBuffer.Set(offset, MathUtil.Clamp(LevelMarginSize, 0, 1.0f));
-            offset += sizeof(float);
+            offset += sizeof(float);            
+            dataBuffer.Set(offset, LitLEDColor.ToVector4());
+            offset += Vector4.SizeInBytes;
+            dataBuffer.Set(offset, UnlitLEDColor.ToVector4());
+            offset += Vector4.SizeInBytes;
+            dataBuffer.Set(offset, BackColor.ToVector4());
+            offset += Vector4.SizeInBytes;
             dataBuffer.Set(offset, BandPower);
             offset += (sizeof(float) * BandPower.Length);
             Game.GraphicsDevice.ImmediateContext.UnmapSubresource(_constantsBuffer, 0);
@@ -95,40 +143,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Set graphics context back to captured state.
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalDepthStencilView, originalRenderTarget);
         }
-
-        public Size2 GameScreenSize
-        {
-            get { return _gameScreenSize; }
-            set
-            {
-                _gameScreenSize = value;
-                CreateOffscreenQuad();
-            }
-        }
-
-        public uint BandCount { get; set; }
-
-        public uint LevelCount { get; set; }
-
-        public float BandMarginSize { get; set; }
-
-        public float LevelMarginSize { get; set; }
-
-        public RenderTargetView Output
-        {
-            get { return _output; }
-            set
-            {
-                _output = value;
-                CreateOffscreenQuad();                                                                                
-            }
-        }
-
-        public float[] BandPower
-        {
-            get { return _bandPower; }
-        }
-
+       
         private void CreateOffscreenQuad()
         {
             _offscreenQuad = null;
