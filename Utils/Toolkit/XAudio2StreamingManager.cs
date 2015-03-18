@@ -26,24 +26,34 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         private SourceVoice _sourceVoice = null;
         private IntPtr _nativePointer = IntPtr.Zero;
 
+        #region constructor / finalizer
+
         public XAudio2StreamingManager(XAudio2 audioDevice, IntPtr nativePointer)
         {
             WaveFormatEx formatEx = new WaveFormatEx();           
             UnsafeNativeMethods.GetWaveFormat(nativePointer, ref formatEx);
             WaveFormat format = formatEx.ConvertToWaveFormat();
             _sourceVoice = new SharpDX.XAudio2.SourceVoice(audioDevice, format, true);
-            _sourceVoice.BufferEnd += SourceVoice_BufferEnd;
+            _sourceVoice.BufferEnd += SourceVoice_BufferEnd;            
             _nativePointer = nativePointer;
             SubmitNextBlock();
-            SubmitNextBlock();
-        }       
+            SubmitNextBlock();                       
+        }
         
         ~XAudio2StreamingManager()
         {
             Dispose();
-        }        
+        }
 
+        #endregion
+
+        #region properties
+        
         public SourceVoice SourceVoice { get { return _sourceVoice; } }
+        
+        #endregion   
+        
+        #region methods
 
         public void Start()
         {
@@ -62,23 +72,20 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         public void Dispose()
         {
-            UnsafeNativeMethods.Dispose(_nativePointer);
-            _nativePointer = IntPtr.Zero;
-            _sourceVoice.Dispose();
-        }
-
-        private void SourceVoice_BufferEnd(IntPtr context)
-        {
-            UnsafeNativeMethods.DestroyBlock(context);
-            bool isEOF = UnsafeNativeMethods.IsAtEndOfStream(_nativePointer);
-            if(!isEOF)
+            if (_nativePointer != IntPtr.Zero)
             {
-                SubmitNextBlock();
+                UnsafeNativeMethods.Dispose(_nativePointer);
+                _nativePointer = IntPtr.Zero;
+                if (!_sourceVoice.IsDisposed)
+                {
+                    _sourceVoice.DestroyVoice();
+                    _sourceVoice.Dispose();
+                }
             }
         }
 
         private void SubmitNextBlock()
-        {          
+        {
             int blockLength = 0;
             IntPtr blockPtr = UnsafeNativeMethods.GetNextBlock(_nativePointer, ref blockLength);
 
@@ -90,7 +97,23 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
                 buffer.Context = blockPtr;
                 _sourceVoice.SubmitSourceBuffer(buffer, null);
             }
-        }                
+        }   
+
+        #endregion       
+
+        #region handlers
+
+        private void SourceVoice_BufferEnd(IntPtr context)
+        {           
+            UnsafeNativeMethods.DestroyBlock(context);
+            bool isEOF = UnsafeNativeMethods.IsAtEndOfStream(_nativePointer);
+            if(!isEOF)
+            {
+                SubmitNextBlock();
+            }            
+        }       
+
+        #endregion             
 
         private static class UnsafeNativeMethods
         {
