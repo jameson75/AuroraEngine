@@ -20,6 +20,8 @@ namespace CipherPark.AngelJacket.Core.Utils
         FrequencyDistribution _distributionMethod = FrequencyDistribution.Linear;
         SourceVoice _voice = null;
         int _frequencyBucketCount = 0;
+        int _linearDistributionBucketSize = 0;
+        int[] _logarithmicDistributionBucketSizes = null;
 
         public AudioVisualization(IGameApp game)
         {
@@ -38,9 +40,15 @@ namespace CipherPark.AngelJacket.Core.Utils
             _distributionMethod = distriubtionMethod;
             _voice = voice;
             _voice.BufferStart += Voice_OnBufferStart;
+            _linearDistributionBucketSize = (HalfDataLength / _frequencyBucketCount) + (HalfDataLength % _frequencyBucketCount > 0 ? 1 : 0);
+            if (distriubtionMethod == FrequencyDistribution.Logarithmic)
+            {
+                _logarithmicDistributionBucketSizes = new int[frequencyBucketCount];
+                throw new NotImplementedException();
+            }
         }
 
-        public float[] GetVisualizationData()
+        public float[] GetSpectrum()
         {
             if (!IsInitialized)
                 throw new InvalidOperationException("Audio visualization not initialized.");                       
@@ -50,21 +58,20 @@ namespace CipherPark.AngelJacket.Core.Utils
             Complex[] data = new Complex[DataLength];
             Fourier.FFT(data, data.Length, FourierDirection.Forward);
             
-            float[] maxIntensities = new float[_frequencyBucketCount];            
+            float[] spectrum = new float[_frequencyBucketCount];            
             for (int i = 0; i < HalfDataLength; i++)
             {
-                float intensity = ComplexToRealNumber(data[i]);
+                float frequency = ComplexToRealNumber(data[i]);
                 int j = GetBucketIndex(i);
-                if (maxIntensities[j] < intensity)
-                    maxIntensities[j] = intensity;
+                if (spectrum[j] < frequency)
+                    spectrum[j] = frequency;
             }
-
-            return maxIntensities;
+            return spectrum;
         }
 
         private void _Uninitialize()
         {
-            _voice.ProcessingPassStart += Voice_OnBufferStart;
+            _voice.BufferStart -= Voice_OnBufferStart;
             _voice = null;
         }
 
@@ -75,15 +82,18 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         private int GetBucketIndex(int i)
         {
+            int index = -1;
             switch (_distributionMethod)
             {
-                case FrequencyDistribution.Linear:
+                case FrequencyDistribution.Linear:                   
+                    index = i / _linearDistributionBucketSize;
                     break;
                 case FrequencyDistribution.Logarithmic:
-                    break;
+                    throw new NotImplementedException();
                 default:
                     throw new InvalidOperationException("Unexpected distribution method encountered.");
             }
+            return index;
         }
 
         private bool IsInitialized { get { return _voice != null; } } 
