@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.XAudio2;
@@ -15,6 +16,12 @@ using Exocortex.DSP;
 
 namespace CipherPark.AngelJacket.Core.Utils
 {
+    //*********************************************************************************************
+    //Two separate examples were used as references to implement this class.
+    //1. The SpectrumAnalyzerXAPO C++ class at http://www.getcodesamples.com/src/5D67423E/31FD43A5
+    //2. The WPF Suound Visualization Library at http://wpfsvl.codeplex.com/
+    //*********************************************************************************************
+
     public class AudioVisualization : SharpDX.XAPO.AudioProcessorBase<AudioVisualizationParam>
     {
         const int DataLength = 2048;
@@ -24,6 +31,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         int _frequencyBucketCount = 0;
         int _linearDistributionBucketSize = 0;
         int[] _logarithmicDistributionBucketSizes = null;
+        float[] _fftInput = null;
+        int _fftInputBufferPos = 0;
+        private readonly object SamplesSyncRoot = new object();
 
         private AudioVisualization(IGameApp game)
         {
@@ -50,6 +60,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             
             av._frequencyBucketCount = frequencyBucketCount;
             av._distributionMethod = distriubtionMethod;
+            av._fftInput = new float[DataLength];
 
             switch (distriubtionMethod)
             {
@@ -69,11 +80,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             float[] spectrum = new float[_frequencyBucketCount];   
         
             Complex[] data = new Complex[DataLength];
-                
-            //**************************************************************
-            //TODO: thread-safe copy from sample aggregator to complex data
-            //**************************************************************
-
+            lock(SamplesSyncRoot)
+            {
+                for(int i = 0; i < DataLength; i++)
+                    data[i].Re = _fftInput[i];
+            }
             Fourier.FFT(data, data.Length, FourierDirection.Forward);                                    
             for (int i = 0; i < HalfDataLength; i++)
             {
@@ -84,6 +95,37 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
        
             return spectrum;
+        } 
+        
+        public override void Process(BufferParameters[] inputProcessParameters, BufferParameters[] outputProcessParameters, bool isEnabled)
+        {
+            int frameCount = inputProcessParameters[0].ValidFrameCount;
+            DataStream input = new DataStream(inputProcessParameters[0].Buffer, frameCount * InputFormatLocked.BlockAlign, true, true);
+            switch (inputProcessParameters[0].BufferFlags)
+            {
+                case SharpDX.XAPO.BufferFlags.Valid:
+                    for (int i = 0; i < frameCount; i++)
+                    {
+                        float left = input.Read<float>();
+                        float right = input.Read<float>();
+                        AggregateSamples(new float[] { left, right });
+                    }
+                    break;
+            }
+            outputProcessParameters[0].ValidFrameCount = inputProcessParameters[0].ValidFrameCount;
+            outputProcessParameters[0].BufferFlags = inputProcessParameters[0].BufferFlags;
+        }
+
+        private void AggregateSamples(float[] samplesForChannels)
+        {
+            float mid = samplesForChannels.Average();
+            lock (SamplesSyncRoot)
+            {
+                _fftInput[_fftInputBufferPos] = mid;
+                _fftInputBufferPos++;
+                if(_fftInputBufferPos >= _fftInput.Length)
+                    _fftInputBufferPos = 0;                
+            }
         }
 
         private int GetBucketIndex(int i)
@@ -106,31 +148,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         {
             //convert complex number, a + bi, to a real number... real_number = sqrt( a^2 + bi^2 )
             return (float)Math.Sqrt(data.Re * data.Re + data.Im * data.Im);
-        }
-
-        public override void Process(BufferParameters[] inputProcessParameters, BufferParameters[] outputProcessParameters, bool isEnabled)
-        {
-            int frameCount = inputProcessParameters[0].ValidFrameCount;
-            DataStream input = new DataStream(inputProcessParameters[0].Buffer, frameCount * InputFormatLocked.BlockAlign, true, true);
-
-            switch (inputProcessParameters[0].BufferFlags)
-            {
-                case SharpDX.XAPO.BufferFlags.Valid:
-                    for (int i = 0; i < frameCount; i++)
-                    {
-                        float left = input.Read<float>();
-                        float right = input.Read<float>();
-                        float intensity = (nextIntensity - lastIntensity) * (float)i / frameCount + lastIntensity;
-                        double vibrato = Math.Cos(2 * Math.PI * intensity * 400 * _counter / InputFormatLocked.SampleRate);
-                        output.Write((float)vibrato * left);
-                        output.Write((float)vibrato * right);
-                    }
-                    break;
-            }
-
-            outputProcessParameters[0].ValidFrameCount = inputProcessParameters[0].ValidFrameCount;
-            outputProcessParameters[0].BufferFlags = inputProcessParameters[0].BufferFlags;
-        }
+        }       
     }
 
     public enum FrequencyDistribution
