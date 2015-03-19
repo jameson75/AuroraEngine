@@ -33,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         int[] _logarithmicDistributionBucketSizes = null;
         float[] _fftInput = null;
         int _fftInputBufferPos = 0;
-        private readonly object SamplesSyncRoot = new object();
+        private readonly object InputSyncRoot = new object();
 
         private AudioVisualization(IGameApp game)
         {
@@ -80,10 +80,10 @@ namespace CipherPark.AngelJacket.Core.Utils
             float[] spectrum = new float[_frequencyBucketCount];   
         
             Complex[] data = new Complex[DataLength];
-            lock(SamplesSyncRoot)
+            lock(InputSyncRoot)
             {
                 for(int i = 0; i < DataLength; i++)
-                    data[i].Re = _fftInput[i];
+                    data[i].Re = _fftInput[i];               
             }
             Fourier.FFT(data, data.Length, FourierDirection.Forward);                                    
             for (int i = 0; i < HalfDataLength; i++)
@@ -92,11 +92,10 @@ namespace CipherPark.AngelJacket.Core.Utils
                 int j = GetBucketIndex(i);
                 if (spectrum[j] < frequency)
                     spectrum[j] = frequency;
-            }
-       
+            }       
             return spectrum;
-        } 
-        
+        }         
+       
         public override void Process(BufferParameters[] inputProcessParameters, BufferParameters[] outputProcessParameters, bool isEnabled)
         {
             int frameCount = inputProcessParameters[0].ValidFrameCount;
@@ -119,7 +118,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         private void AggregateSamples(float[] samplesForChannels)
         {
             float mid = samplesForChannels.Average();
-            lock (SamplesSyncRoot)
+            lock (InputSyncRoot)
             {
                 _fftInput[_fftInputBufferPos] = mid;
                 _fftInputBufferPos++;
