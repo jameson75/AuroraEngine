@@ -22,7 +22,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
     public static class WaveFormatExtension
     {
-        public static WaveFormat ConvertToWaveFormat(this WaveFormatEx wfex)
+        public static WaveFormat ConvertToSDXWaveFormat(this WaveFormatEx wfex)
         {
             WaveFormatEncoding tag = (WaveFormatEncoding)wfex.FormatTag;
             return WaveFormat.CreateCustomFormat(tag,

@@ -32,7 +32,7 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
         {
             WaveFormatEx formatEx = new WaveFormatEx();           
             UnsafeNativeMethods.GetWaveFormat(nativePointer, ref formatEx);
-            WaveFormat format = formatEx.ConvertToWaveFormat();
+            WaveFormat format = formatEx.ConvertToSDXWaveFormat();
             _sourceVoice = new SharpDX.XAudio2.SourceVoice(audioDevice, format, true);
             _sourceVoice.BufferEnd += SourceVoice_BufferEnd;            
             _nativePointer = nativePointer;
