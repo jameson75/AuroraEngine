@@ -16,11 +16,13 @@ using Exocortex.DSP;
 
 namespace CipherPark.AngelJacket.Core.Utils
 {
-    //*********************************************************************************************
-    //Two separate examples were used as references to implement this class.
+    //*********************************************************************************************************************************
+    //CREDITS:
+    //The following exmaples were used as references to understand how to implement this class.
     //1. The SpectrumAnalyzerXAPO C++ class at http://www.getcodesamples.com/src/5D67423E/31FD43A5
     //2. The WPF Suound Visualization Library at http://wpfsvl.codeplex.com/
-    //*********************************************************************************************
+    //3. Real-Time Spectrum Analysis by Gerry Beauregard https://gerrybeauregard.wordpress.com/2010/08/06/real-time-spectrum-analysis/
+    //***********************************************************************************************************************************
 
     public class AudioVisualization : SharpDX.XAPO.AudioProcessorBase<AudioVisualizationParam>
     {
@@ -30,9 +32,10 @@ namespace CipherPark.AngelJacket.Core.Utils
         FrequencyDistribution _distributionMethod = FrequencyDistribution.Linear;       
         int _frequencyBucketCount = 0;
         int _linearDistributionBucketSize = 0;
-        int[] _logarithmicDistributionBucketSizes = null;
+        int[] _logarithmicDistributionBucketRanges = null;
         float[] _fftInput = null;
-        int _fftInputBufferPos = 0;
+        float[] _window = null;
+        int _fftInputBufferWritePos = 0;
         private readonly object InputSyncRoot = new object();
 
         private AudioVisualization(IGameApp game)
@@ -61,14 +64,19 @@ namespace CipherPark.AngelJacket.Core.Utils
             av._frequencyBucketCount = frequencyBucketCount;
             av._distributionMethod = distriubtionMethod;
             av._fftInput = new float[DataLength];
+            av._window = new float[DataLength];
+
+            int linearBucketLength = (HalfDataLength / av._frequencyBucketCount) + (HalfDataLength % av._frequencyBucketCount > 0 ? 1 : 0);
+            for (int i = 0; i < DataLength; i++)
+                av._window[i] = (float)WindowFunction.Hann(i, DataLength);
 
             switch (distriubtionMethod)
             {
                 case FrequencyDistribution.Linear:
-                    av._linearDistributionBucketSize = (HalfDataLength / av._frequencyBucketCount) + (HalfDataLength % av._frequencyBucketCount > 0 ? 1 : 0);
+                    av._linearDistributionBucketSize = linearBucketLength;
                     break;
                 case FrequencyDistribution.Logarithmic:
-                    av._logarithmicDistributionBucketSizes = new int[frequencyBucketCount];
+                    av._logarithmicDistributionBucketRanges = new int[frequencyBucketCount];                    
                     throw new NotImplementedException();
             }
 
@@ -79,13 +87,28 @@ namespace CipherPark.AngelJacket.Core.Utils
         {   
             float[] spectrum = new float[_frequencyBucketCount];   
         
+            //Since we don't want to lock [circular] input buffer up while performing an
+            //FFT on it's data, we copy the data into an auxiliary buffer, first.
+            //We also take this opportunity to apply a window function to the input buffer, as well.
             Complex[] data = new Complex[DataLength];
             lock(InputSyncRoot)
             {
-                for(int i = 0; i < DataLength; i++)
-                    data[i].Re = _fftInput[i];               
+                int fftInputBufferReadPos = _fftInputBufferWritePos;
+                for (int i = 0; i < DataLength; i++)
+                {
+                    data[i].Re = _fftInput[fftInputBufferReadPos] * _window[i];
+                    fftInputBufferReadPos++;
+                    if (fftInputBufferReadPos >= _fftInput.Length)
+                        fftInputBufferReadPos = 0;
+                }
             }
+
+            //Perform [in-place] FFT on the input.
             Fourier.FFT(data, data.Length, FourierDirection.Forward);                                    
+
+            //FFT results are imaginary numbers. We convert these to real numbers and then 
+            //return them to caller.
+            //NOTE: The results of the FFT are symetrical, so we only concern ourselves the first half of the buffer.
             for (int i = 0; i < HalfDataLength; i++)
             {
                 float frequency = ComplexToRealNumber(data[i]);
@@ -93,6 +116,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 if (spectrum[j] < frequency)
                     spectrum[j] = frequency;
             }       
+
             return spectrum;
         }         
        
@@ -115,15 +139,19 @@ namespace CipherPark.AngelJacket.Core.Utils
             outputProcessParameters[0].BufferFlags = inputProcessParameters[0].BufferFlags;
         }
 
+        /// <summary>
+        /// Writes samples to a circular buffer to be processed by FFT
+        /// </summary>
+        /// <param name="samplesForChannels"></param>
         private void AggregateSamples(float[] samplesForChannels)
         {
             float mid = samplesForChannels.Average();
             lock (InputSyncRoot)
             {
-                _fftInput[_fftInputBufferPos] = mid;
-                _fftInputBufferPos++;
-                if(_fftInputBufferPos >= _fftInput.Length)
-                    _fftInputBufferPos = 0;                
+                _fftInput[_fftInputBufferWritePos] = mid;
+                _fftInputBufferWritePos++;
+                if(_fftInputBufferWritePos >= _fftInput.Length)
+                    _fftInputBufferWritePos = 0;                
             }
         }
 
@@ -147,18 +175,59 @@ namespace CipherPark.AngelJacket.Core.Utils
         {
             //convert complex number, a + bi, to a real number... real_number = sqrt( a^2 + bi^2 )
             return (float)Math.Sqrt(data.Re * data.Re + data.Im * data.Im);
-        }       
+        }          
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct AudioVisualizationParam
+    {   }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class WindowFunction
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="frameSize"></param>
+        /// <returns></returns>
+        public static double Hamming(int n, int frameSize) 
+        { 
+            return 0.54 - 0.46 * Math.Cos((2 * Math.PI * n) / (frameSize - 1)); 
+        } 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="frameSize"></param>
+        /// <returns></returns>
+        public static double Hann(int n, int frameSize)
+        { 
+            return 0.5 * (1 - Math.Cos((2 * Math.PI * n) / (frameSize - 1))); 
+        }   
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="frameSize"></param>
+        /// <returns></returns>
+        public static double BlackmannHarris(int n, int frameSize)
+        { 
+            return 0.35875 - (0.48829 * Math.Cos((2 * Math.PI * n) / (frameSize - 1))) + (0.14128 * Math.Cos((4 * Math.PI * n) / (frameSize - 1))) - (0.01168 * Math.Cos((4 * Math.PI * n) / (frameSize - 1))); 
+        } 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum FrequencyDistribution
     {
         Linear,
         Logarithmic
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct AudioVisualizationParam
-    {
-
-    }
+    }    
 }
