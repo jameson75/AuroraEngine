@@ -16,18 +16,18 @@ using Exocortex.DSP;
 
 namespace CipherPark.AngelJacket.Core.Utils
 {
-    //*********************************************************************************************************************************
-    //CREDITS:
-    //The following exmaples were used as references to understand how to implement this class.
-    //1. The SpectrumAnalyzerXAPO C++ class at http://www.getcodesamples.com/src/5D67423E/31FD43A5
-    //2. The WPF Suound Visualization Library at http://wpfsvl.codeplex.com/
-    //3. Real-Time Spectrum Analysis by Gerry Beauregard https://gerrybeauregard.wordpress.com/2010/08/06/real-time-spectrum-analysis/
-    //***********************************************************************************************************************************
+    //*******************************************************************************************************************************************  
+    //The following references were used as guide to understand how to implement this class.
+    //1. Spectral Analysis of Signals at http://www.dspguide.com/ch9/1.htm
+    //2. The sample SpectrumAnalyzerXAPO C++ class at http://www.getcodesamples.com/src/5D67423E/31FD43A5
+    //3. The opens source WPF Suound Visualization Library at http://wpfsvl.codeplex.com/
+    //4. The article and source code Real-Time Spectrum Analysis at https://gerrybeauregard.wordpress.com/2010/08/06/real-time-spectrum-analysis/    
+    //*******************************************************************************************************************************************
 
     public class AudioVisualization : SharpDX.XAPO.AudioProcessorBase<AudioVisualizationParam>
     {
-        const int DataLength = 2048;
-        const int HalfDataLength = 1024;
+        const int DataLength = 4096;
+        const int HalfDataLength = DataLength / 2;
         IGameApp _game = null;
         FrequencyDistribution _distributionMethod = FrequencyDistribution.Linear;       
         int _frequencyBucketCount = 0;
@@ -38,6 +38,10 @@ namespace CipherPark.AngelJacket.Core.Utils
         int _fftInputBufferWritePos = 0;
         private readonly object InputSyncRoot = new object();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="game"></param>
         private AudioVisualization(IGameApp game)
         {
             _game = game;
@@ -54,6 +58,13 @@ namespace CipherPark.AngelJacket.Core.Utils
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="frequencyBucketCount"></param>
+        /// <param name="distriubtionMethod"></param>
+        /// <returns></returns>
         public static AudioVisualization Create(IGameApp game, int frequencyBucketCount, FrequencyDistribution distriubtionMethod)
         {
             AudioVisualization av = new AudioVisualization(game);
@@ -68,7 +79,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
             int linearBucketLength = (HalfDataLength / av._frequencyBucketCount) + (HalfDataLength % av._frequencyBucketCount > 0 ? 1 : 0);
             for (int i = 0; i < DataLength; i++)
-                av._window[i] = (float)WindowFunction.Hann(i, DataLength);
+                av._window[i] = (float)WindowFunction.Hamming(i, DataLength);
 
             switch (distriubtionMethod)
             {
@@ -83,7 +94,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             return av;
         }
 
-        public float[] GetSpectrum()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pu"></param>
+        /// <returns></returns>
+        public float[] GetSpectrum(PowerUnit pu = PowerUnit.Linear)
         {   
             float[] spectrum = new float[_frequencyBucketCount];   
         
@@ -106,20 +122,36 @@ namespace CipherPark.AngelJacket.Core.Utils
             //Perform [in-place] FFT on the input.
             Fourier.FFT(data, data.Length, FourierDirection.Forward);                                    
 
-            //FFT results are imaginary numbers. We convert these to real numbers and then 
-            //return them to caller.
-            //NOTE: The results of the FFT are symetrical, so we only concern ourselves the first half of the buffer.
+            //FFT results are imaginary numbers. The result we want is the "size" of the complex number.
+            //return them to caller. Also, the results of the FFT are symetrical,
+            //so we only concern ourselves the first half of the buffer.
             for (int i = 0; i < HalfDataLength; i++)
             {
-                float frequency = ComplexToRealNumber(data[i]);
+                float frequency = ComplexNumberSize(data[i]);
                 int j = GetBucketIndex(i);
                 if (spectrum[j] < frequency)
-                    spectrum[j] = frequency;
+                {
+                    switch (pu)
+                    {
+                        case PowerUnit.Decibel:
+                            spectrum[j] = (float)Math.Log10(frequency + float.Epsilon) * 20.0f;
+                            break;
+                        default: //PowerUnit.Linear
+                            spectrum[j] = frequency;
+                            break;
+                    }
+                }
             }       
 
             return spectrum;
         }         
        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="inputProcessParameters"></param>
+        /// <param name="outputProcessParameters"></param>
+        /// <param name="isEnabled"></param>
         public override void Process(BufferParameters[] inputProcessParameters, BufferParameters[] outputProcessParameters, bool isEnabled)
         {
             int frameCount = inputProcessParameters[0].ValidFrameCount;
@@ -155,6 +187,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
         private int GetBucketIndex(int i)
         {
             int index = -1;
@@ -171,7 +208,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             return index;
         }    
 
-        private static float ComplexToRealNumber(Complex data)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static float ComplexNumberSize(Complex data)
         {
             //convert complex number, a + bi, to a real number... real_number = sqrt( a^2 + bi^2 )
             return (float)Math.Sqrt(data.Re * data.Re + data.Im * data.Im);
@@ -229,5 +271,11 @@ namespace CipherPark.AngelJacket.Core.Utils
     {
         Linear,
         Logarithmic
-    }    
+    }
+
+    public enum PowerUnit
+    {
+        Linear,
+        Decibel
+    }
 }
