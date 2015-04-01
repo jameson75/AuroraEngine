@@ -43,14 +43,14 @@ namespace CipherPark.AngelJacket.Core.World
             effect.EnableVertexColor = true;            
             return new StreakRenderer()
             {               
-                Width = 10.0f,
+                Radius = 5.0f,
                 StepSize = 10.0f,
                 Effect = effect,
                 _mesh = Content.ContentBuilder.BuildDynamicMesh<VertexPositionColor>(
                     game.GraphicsDevice,
                     effect.SelectShaderByteCode(),
                     null,
-                    1000,
+                    6000,
                     null,
                     0,
                     VertexPositionColor.InputElements,
@@ -59,7 +59,7 @@ namespace CipherPark.AngelJacket.Core.World
             };
         }
 
-        public float Width { get; set; }
+        public float Radius { get; set; }
 
         public float StepSize { get; set; }
 
@@ -73,10 +73,104 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Update(GameTime gameTime)
         {                     
-            const int VERTICES_PER_POINT = 2;   
-            float halfWidth = Width / 2.0f;                     
+            const int N_CYLINDER_SIDES = 4;                              
+            Vector3[] pathPoints = this.Path.ToPoints(StepSize);
+            Vector3[] meshGeometry = new Vector3[(pathPoints.Length) * N_CYLINDER_SIDES];                                         
+            for (int i = 0; i < pathPoints.Length; i++)
+            {
+                //Store the current point.
+                Vector3 p = pathPoints[i];
+                
+                //Get the direction vector from the current point to the next point.
+                Vector3 d = (i < pathPoints.Length - 1) ? pathPoints[i + 1] - pathPoints[i] : pathPoints[i] - pathPoints[i - 1];
+
+                //Get the normalized direction from the current point to the next point.
+                Vector3 n = Vector3.Normalize(d);
+                
+                //Get the distance from the current point to the next point.
+                float l = d.Length();
+                
+                //Transform point to world space.
+                Vector3 p_ws = ((PathParent != null) ? PathParent.ParentToWorldCoordinate(p) : p);
+
+                //Store camera location in world space.
+                Vector3 camPos_ws = p_ws - SceneCamera.Transform.Translation;
+
+                //get view normal in world space.
+                Vector3 camDirection_ws = Vector3.Normalize(SceneCamera.Camera.ViewMatrix.Column3.ToVector3());
+                
+                //Project point transformed point to camera z plane (defined in world space).                
+                //(See tmpearce's explanation at http://stackoverflow.com/questions/9605556/how-to-project-a-3d-point-to-a-3d-plane#comment12185786_9605695)
+                Vector3 projected_p_ws = p_ws - (Vector3.Dot(camPos_ws, camDirection_ws) * camDirection_ws);
+                
+                //Get direction to camera from projected point.
+                Vector3 projected_p_cam_ws = Vector3.Normalize(SceneCamera.Transform.Translation - projected_p_ws);
+                
+                //Transform direction to container space.               
+                Vector3 projected_p_cam = (PathParent != null) ? PathParent.WorldToParentNormal( projected_p_cam_ws) : projected_p_cam_ws;                                                
+                
+                //Draw tube segment in container space where the top of the tube has normal of "projected_p_cam".
+                //This way, each tube segment drawn has a "top" that always faces the view ray of the camera.
+                float step = 2.0f * (float)Math.PI / N_CYLINDER_SIDES;
+                Matrix nodeMatrix = new Transform(/*Quaternion.RotationLookAtLH(n, projected_p_cam),*/ p).ToMatrix();
+                for (int j = 0; j < N_CYLINDER_SIDES; j++)
+                {
+                    float angle = -step * j;
+                    Vector3 mp =  Vector3.TransformCoordinate(new Vector3()
+                    {
+                        X = Radius * (float)Math.Cos(angle),
+                        Y = Radius * (float)Math.Sin(angle)
+                    }, nodeMatrix);
+                    meshGeometry[i * N_CYLINDER_SIDES + j] = mp;
+                }
+            }
+
+            const int VERTS_PER_SIDE = 6;
+            const int INDICES_PER_SIDE = 4;
+            int nCylinders = pathPoints.Length - 1;
+           
+            VertexPositionColor[] meshVertices = new VertexPositionColor[nCylinders * N_CYLINDER_SIDES * VERTS_PER_SIDE];
+
+            Color[] colors = new Color[] { Color.Red, Color.Green, Color.Blue, Color.Yellow };
+            int colorIndex = 0;
+
+            for (int i = 0; i < nCylinders; i++)
+            {
+                for(int j = 0; j < N_CYLINDER_SIDES; j++)
+                {
+                    int[] qi = new int[INDICES_PER_SIDE];
+                    qi[0] = i * N_CYLINDER_SIDES + j;
+                    qi[1] = (i + 1) * N_CYLINDER_SIDES + j;
+                    if( j < N_CYLINDER_SIDES - 1)
+                    {
+                        qi[2] = qi[1] + 1;
+                        qi[3] = qi[0] + 1;
+                    }
+                    else 
+                    {
+                        qi[2] = (i + 1) * N_CYLINDER_SIDES;
+                        qi[3] = i * N_CYLINDER_SIDES;
+                    }
+
+                    int[] gi = new int[VERTS_PER_SIDE] { qi[0], qi[1], qi[2], qi[0], qi[2], qi[3] };
+                    for (int k = 0; k < gi.Length; k++)
+                    { 
+                        meshVertices[i * N_CYLINDER_SIDES + j * VERTS_PER_SIDE + k] = new VertexPositionColor(meshGeometry[gi[k]], Color.Blue.ToVector4());
+                    }
+                }               
+                colorIndex = (colorIndex == colors.Length - 1) ? 0 : colorIndex + 1;
+            }
+             
+            _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        
+        }
+
+        /*
+        public void Update(GameTime gameTime)
+        {
+            const int VERTICES_PER_POINT = 2;
+            float halfWidth = Width / 2.0f;
             Vector3[] points = this.Path.ToPoints(StepSize);
-            VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];                                         
+            VertexPositionColor[] vertices = new VertexPositionColor[(points.Length) * VERTICES_PER_POINT];
             for (int i = 0; i < points.Length; i++)
             {
                 //*****************************************************************************
@@ -90,7 +184,7 @@ namespace CipherPark.AngelJacket.Core.World
                 Vector3 vw = ((PathParent != null) ? PathParent.ParentToWorldCoordinate(p) : p);
                 Vector3 vw_camPos = vw - SceneCamera.Transform.Translation;
                 Vector3 camDir = Vector3.Normalize(SceneCamera.Camera.ViewMatrix.Column3.ToVector3());
-               //Project point transformed point to camera z plane.                
+                //Project point transformed point to camera z plane.                
                 //(See tmpearce's explanation at http://stackoverflow.com/questions/9605556/how-to-project-a-3d-point-to-a-3d-plane#comment12185786_9605695)
                 Vector3 vpcs = vw - (Vector3.Dot(vw_camPos, camDir) * camDir);
                 //Get direction to camera from projected point.
@@ -128,9 +222,10 @@ namespace CipherPark.AngelJacket.Core.World
                 meshVertices[j + 5].Color = colors[colorIndex].ToVector4();
                 colorIndex = (colorIndex == colors.Length - 1) ? 0 : colorIndex + 1;
             }
-             
-            _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        
+
+            _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);
         }
+        */
 
         public void Draw(GameTime gameTime)
         {
