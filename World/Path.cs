@@ -186,7 +186,7 @@ namespace CipherPark.AngelJacket.Core.World
             return pathNode;
         }
 
-        public Vector3[] ToPoints(float stepSize, PathNode firstNode = null, PathNode lastNode = null)
+        public Vector3[] GetEquidistantPoints(float stepSize, PathNode firstNode = null, PathNode lastNode = null)
         {
             return GetEquidistantNodes(stepSize, firstNode, lastNode).Select(n => n.Transform.Translation).ToArray();
         }

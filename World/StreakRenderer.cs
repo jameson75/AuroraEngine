@@ -73,16 +73,18 @@ namespace CipherPark.AngelJacket.Core.World
 
         public void Update(GameTime gameTime)
         {                     
-            const int N_CYLINDER_SIDES = 4;                              
-            Vector3[] pathPoints = this.Path.ToPoints(StepSize);
-            Vector3[] meshGeometry = new Vector3[(pathPoints.Length) * N_CYLINDER_SIDES];                                         
+            const int N_CYLINDER_SIDES = 8;                              
+            Vector3[] pathPoints = this.Path.GetEquidistantPoints(StepSize);
+            Vector3[] meshGeometry = new Vector3[(pathPoints.Length) * N_CYLINDER_SIDES];
+            Vector3 prev_up = Vector3.UnitY;                        
+            
             for (int i = 0; i < pathPoints.Length; i++)
             {
                 //Store the current point.
-                Vector3 p = pathPoints[i];
+                Vector3 p = pathPoints[i];              
                 
                 //Get the direction vector from the current point to the next point.
-                Vector3 d = (i < pathPoints.Length - 1) ? pathPoints[i + 1] - pathPoints[i] : pathPoints[i] - pathPoints[i - 1];
+                Vector3 d = (i < pathPoints.Length - 1) ? pathPoints[i + 1] - p : p - pathPoints[i - 1];
 
                 //Get the normalized direction from the current point to the next point.
                 Vector3 n = Vector3.Normalize(d);
@@ -112,9 +114,27 @@ namespace CipherPark.AngelJacket.Core.World
                 //Draw tube segment in container space where the top of the tube has normal of "projected_p_cam".
                 //This way, each tube segment drawn has a "top" that always faces the view ray of the camera.
                 float step = 2.0f * (float)Math.PI / N_CYLINDER_SIDES;
-                Matrix nodeMatrix = new Transform(/*Quaternion.RotationLookAtLH(n, projected_p_cam),*/ p).ToMatrix();
-                for (int j = 0; j < N_CYLINDER_SIDES; j++)
+
+                //To prevent the cylinder from twisting (and creating unwanted sharp edges) we preserve the relative
+                //direction of the up vector.
+                Vector3 up = prev_up;
+                if(i > 0)
                 {
+                    Vector3 prev_p = pathPoints[i - 1]; 
+                    Vector3 prev_d = p - prev_p;
+                    Vector3 prev_n = Vector3.Normalize(prev_d);
+                    //http://forums.cgsociety.org/archive/index.php/t-741227.html
+                    float angle = (float)Math.Acos(Vector3.Dot(prev_n, n));
+                    Vector3 rotationVector = Vector3.Normalize(Vector3.Cross(prev_n, n));
+                    if (rotationVector != Vector3.Zero)                    
+                        up = Vector3.TransformNormal(prev_up, Matrix.RotationAxis(rotationVector, angle));                                           
+                    OneTimeLoopDebug(i, pathPoints.Length, p, n, prev_n, angle, rotationVector, up, prev_up);
+                }
+                Matrix parentMatrix = PathParent != null ? PathParent.WorldTransform().ToMatrix() : Matrix.Identity;
+                Matrix nodeMatrix = Camera.ViewMatrixToTransform(Matrix.LookAtLH(p, p + n, up)).ToMatrix() * parentMatrix;
+              
+                for (int j = 0; j < N_CYLINDER_SIDES; j++)
+                {                  
                     float angle = -step * j;
                     Vector3 mp =  Vector3.TransformCoordinate(new Vector3()
                     {
@@ -123,6 +143,7 @@ namespace CipherPark.AngelJacket.Core.World
                     }, nodeMatrix);
                     meshGeometry[i * N_CYLINDER_SIDES + j] = mp;
                 }
+                prev_up = up;
             }
 
             const int VERTS_PER_SIDE = 6;
@@ -131,8 +152,10 @@ namespace CipherPark.AngelJacket.Core.World
            
             VertexPositionColor[] meshVertices = new VertexPositionColor[nCylinders * N_CYLINDER_SIDES * VERTS_PER_SIDE];
 
-            Color[] colors = new Color[] { Color.Red, Color.Green, Color.Blue, Color.Yellow };
-            int colorIndex = 0;
+            Color[] colors = new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet, Color.White,};
+            int sideColorMarkerIndex = 0;
+            int cylinderColorMarkerIndex = 0;
+            int vi = 0;
 
             for (int i = 0; i < nCylinders; i++)
             {
@@ -155,15 +178,40 @@ namespace CipherPark.AngelJacket.Core.World
                     int[] gi = new int[VERTS_PER_SIDE] { qi[0], qi[1], qi[2], qi[0], qi[2], qi[3] };
                     for (int k = 0; k < gi.Length; k++)
                     { 
-                        meshVertices[i * N_CYLINDER_SIDES + j * VERTS_PER_SIDE + k] = new VertexPositionColor(meshGeometry[gi[k]], Color.Blue.ToVector4());
+                        Color color = colors[sideColorMarkerIndex];
+                        meshVertices[vi] = new VertexPositionColor(meshGeometry[gi[k]], Color.Violet.ToVector4());
+                        vi++;                        
                     }
-                }               
-                colorIndex = (colorIndex == colors.Length - 1) ? 0 : colorIndex + 1;
+                    sideColorMarkerIndex = (sideColorMarkerIndex == colors.Length - 1) ? 0 : sideColorMarkerIndex + 1;
+                }
+                cylinderColorMarkerIndex = (cylinderColorMarkerIndex == colors.Length - 1) ? 0 : cylinderColorMarkerIndex + 1;
             }
              
             _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        
         }
 
+        private static bool debugComplete = false;
+        private static bool debugSpreadSheetFormat = true;
+        private static bool spreadSheetHeadersWritten = false;
+        private static void OneTimeLoopDebug(int i, int loopLimit, Vector3 p, Vector3 n, Vector3 prev_n, float angle, Vector3 rotationAxis, Vector3 up, Vector3 prev_up)
+        {
+            if (i == loopLimit - 1)
+                debugComplete = true;
+            if (!debugComplete)
+            {
+                if (debugSpreadSheetFormat)
+                {
+                    if (!spreadSheetHeadersWritten)
+                    {
+                        Console.WriteLine("i,p,n,prev_n,angle,rotationAxis,up,prev_up");
+                        spreadSheetHeadersWritten = true;
+                    }
+                    Console.WriteLine("{0},\"{1}\",\"{2}\",{3},\"{4}\",\"{5}\",\"{6}\",\"{7}\"", i, p, n, prev_n, angle, rotationAxis, up, prev_up);
+                }
+                else
+                    Console.WriteLine("i:{4}, p:{7}, n:{0}, prev_n:{1}, angle:{2}, rotationAxis:{3}, up:{5}, prev_up:{6}", n, prev_n, angle, rotationAxis, i, up, prev_up, p);
+            }
+        }
         /*
         public void Update(GameTime gameTime)
         {
