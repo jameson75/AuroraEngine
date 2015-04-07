@@ -26,7 +26,7 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
     {
         private long? _animationStartTime = null;
 
-        bool Loop { get; set; }
+        public bool Loop { get; set; }
 
         public KeyframeAnimationController()
             : base()

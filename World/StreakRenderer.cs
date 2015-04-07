@@ -42,7 +42,8 @@ namespace CipherPark.AngelJacket.Core.World
             BasicEffectEx effect = new BasicEffectEx(game);
             effect.EnableVertexColor = true;            
             return new StreakRenderer()
-            {               
+            {          
+                Color = Color.Transparent,
                 Radius = 5.0f,
                 StepSize = 10.0f,
                 Effect = effect,
@@ -67,7 +68,9 @@ namespace CipherPark.AngelJacket.Core.World
 
         public ITransformable PathParent { get; set; }
 
-        public SurfaceEffect Effect { get; set; }
+        public Color Color { get; set; }
+
+        public SurfaceEffect Effect { get; private set; }
 
         public Scene.CameraSceneNode SceneCamera { get; set; }
 
@@ -128,7 +131,7 @@ namespace CipherPark.AngelJacket.Core.World
                     Vector3 rotationVector = Vector3.Normalize(Vector3.Cross(prev_n, n));
                     if (rotationVector != Vector3.Zero)                    
                         up = Vector3.TransformNormal(prev_up, Matrix.RotationAxis(rotationVector, angle));                                           
-                    OneTimeLoopDebug(i, pathPoints.Length, p, n, prev_n, angle, rotationVector, up, prev_up);
+                    //OneTimeLoopDebug(i, pathPoints.Length, p, n, prev_n, angle, rotationVector, up, prev_up);
                 }
                 Matrix parentMatrix = PathParent != null ? PathParent.WorldTransform().ToMatrix() : Matrix.Identity;
                 Matrix nodeMatrix = Camera.ViewMatrixToTransform(Matrix.LookAtLH(p, p + n, up)).ToMatrix() * parentMatrix;
@@ -152,9 +155,9 @@ namespace CipherPark.AngelJacket.Core.World
            
             VertexPositionColor[] meshVertices = new VertexPositionColor[nCylinders * N_CYLINDER_SIDES * VERTS_PER_SIDE];
 
-            Color[] colors = new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet, Color.White,};
-            int sideColorMarkerIndex = 0;
-            int cylinderColorMarkerIndex = 0;
+            //Color[] colors = new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet, Color.White,};
+            //int sideColorMarkerIndex = 0;
+            //int cylinderColorMarkerIndex = 0;
             int vi = 0;
 
             for (int i = 0; i < nCylinders; i++)
@@ -178,18 +181,19 @@ namespace CipherPark.AngelJacket.Core.World
                     int[] gi = new int[VERTS_PER_SIDE] { qi[0], qi[1], qi[2], qi[0], qi[2], qi[3] };
                     for (int k = 0; k < gi.Length; k++)
                     { 
-                        Color color = colors[sideColorMarkerIndex];
-                        meshVertices[vi] = new VertexPositionColor(meshGeometry[gi[k]], Color.Violet.ToVector4());
+                        //Color color = colors[sideColorMarkerIndex];
+                        meshVertices[vi] = new VertexPositionColor(meshGeometry[gi[k]], Color.ToVector4());
                         vi++;                        
                     }
-                    sideColorMarkerIndex = (sideColorMarkerIndex == colors.Length - 1) ? 0 : sideColorMarkerIndex + 1;
+                    //sideColorMarkerIndex = (sideColorMarkerIndex == colors.Length - 1) ? 0 : sideColorMarkerIndex + 1;
                 }
-                cylinderColorMarkerIndex = (cylinderColorMarkerIndex == colors.Length - 1) ? 0 : cylinderColorMarkerIndex + 1;
+                //cylinderColorMarkerIndex = (cylinderColorMarkerIndex == colors.Length - 1) ? 0 : cylinderColorMarkerIndex + 1;
             }
              
             _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        
         }
 
+        /*
         private static bool debugComplete = false;
         private static bool debugSpreadSheetFormat = true;
         private static bool spreadSheetHeadersWritten = false;
@@ -212,6 +216,8 @@ namespace CipherPark.AngelJacket.Core.World
                     Console.WriteLine("i:{4}, p:{7}, n:{0}, prev_n:{1}, angle:{2}, rotationAxis:{3}, up:{5}, prev_up:{6}", n, prev_n, angle, rotationAxis, i, up, prev_up, p);
             }
         }
+        */
+
         /*
         public void Update(GameTime gameTime)
         {
@@ -311,19 +317,69 @@ namespace CipherPark.AngelJacket.Core.World
         }
     }
 
-    public class LightTrail
+    public class LightTrail : IRenderer
     {
-        private StreakRenderer _renderer = null;
+        private StreakRenderer _streakRenderer = null;
         private PathTracker _tracker = null;
+
+        private LightTrail()
+        { }
+
+        public static LightTrail Create(IGameApp game)
+        {
+            LightTrail trail = new LightTrail();
+            trail._streakRenderer = StreakRenderer.Create(game); 
+            trail.Color = Color.Transparent;          
+            return trail;
+        }
 
         public void Update(GameTime gameTime)
         {
+            if (_tracker != null)
+            {
+                _tracker.Update(gameTime);
+                _streakRenderer.Path = _tracker.Path;
+                _streakRenderer.Update(gameTime);
+            }
+        }
 
+        public ITransformable Anchor
+        {
+            get
+            {
+                if (_tracker != null)
+                    return _tracker.Target;
+                else
+                    return null;
+            }
+            set
+            {
+                if (value == null)
+                    _tracker = null;
+                else
+                    _tracker = new PathTracker()
+                    {
+                        Target = value
+                    };            
+            }
+        }
+
+        public Color Color
+        {
+            get { return _streakRenderer.Color; }
+            set { _streakRenderer.Color = value; }
         }
 
         public void Draw(GameTime gameTime)
         {
+            if (_streakRenderer.Path != null)
+                _streakRenderer.Draw(gameTime);
+        }
 
+        public SurfaceEffect Effect
+        {
+            get;
+            private set;
         }
     }
 

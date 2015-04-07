@@ -10,6 +10,7 @@ using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.AngelJacket.Core.Kinetics;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -30,6 +31,7 @@ namespace CipherPark.AngelJacket.Core.Utils
         private ObjectCollection _misc = new ObjectCollection();
         private SourceVoiceCollection _sounds = new SourceVoiceCollection();
         private AudioStreamCollection _music = new AudioStreamCollection();
+        private ParticleSystemCollection _systems = new ParticleSystemCollection();
 
         public GameAssets(IGameApp game)
         {
@@ -49,6 +51,8 @@ namespace CipherPark.AngelJacket.Core.Utils
         public SourceVoiceCollection Sounds { get { return _sounds; } }
 
         public AudioStreamCollection Music { get { return _music; } }
+
+        public ParticleSystemCollection Systems { get { return _systems; } } 
     }
 
     public class EffectsCollection : Dictionary<string, Effect> { }
@@ -62,4 +66,6 @@ namespace CipherPark.AngelJacket.Core.Utils
     public class SourceVoiceCollection : Dictionary<string, SourceVoice> { }
 
     public class AudioStreamCollection : Dictionary<string, XAudio2StreamingManager> { }
+
+    public class ParticleSystemCollection : Dictionary<string, ParticleSystem> { }
 }
