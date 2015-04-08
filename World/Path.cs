@@ -78,15 +78,15 @@ namespace CipherPark.AngelJacket.Core.World
         /// <param name="processEntirePath">Specifies whether to generate linear samples for the entire path or only for the portion of the path which hasn't been processed</param>
         /// <returns></returns>
         public void GenerateLinearApproximation(int nSamplesPerSegment = DefaultSamplesPerSegment, bool processEntirePath = true)
-        {
+        {           
             if (nSamplesPerSegment <= 0)
                 throw new ArgumentOutOfRangeException("nSamplesPerSegment must be a positive, non-zero integer");
 
             if (processEntirePath)
             {
                 _approximateSegmentLengths = new List<float>();
-                _lastProcessedIndex = 0;
-            }
+                _lastProcessedIndex = 0;              
+            }            
 
             //Determine the starting node index from which a linear approximation will be generated.
             int si = processEntirePath ? 1 : _lastProcessedIndex + 1; 
@@ -169,6 +169,10 @@ namespace CipherPark.AngelJacket.Core.World
                     Vector3 vTranslation;
                     if (SmoothingEnabled)
                     {
+                        //**************************************************************
+                        //NOTE: Important for future reference - the catmull algorithm
+                        //does not produce equidistant points.
+                        //**************************************************************
                         vTranslation = Vector3.CatmullRom(n0.Transform.Translation,
                                                           n1.Transform.Translation,
                                                           n2.Transform.Translation,
@@ -221,8 +225,11 @@ namespace CipherPark.AngelJacket.Core.World
                 throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
 
             //Remove the calculated segment lengths for the segments which were removed.
-            if(nRemovedHeadNodes > 0)
+            if (nRemovedHeadNodes > 0)
+            {
                 _approximateSegmentLengths.RemoveRange(0, nRemovedHeadNodes);
+                _lastProcessedIndex -= nRemovedHeadNodes;
+            }
 
             //Generate segment lengths only for the segments which were added since the last call to GenerateLinearApproximation(...).
             GenerateLinearApproximation(_samplesPerSegment, false);

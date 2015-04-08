@@ -44,10 +44,15 @@ namespace CipherPark.AngelJacket.Core.World
             {
                 Path.Nodes.Add(new PathNode() { Transform = Target.Transform });
                 Path.UpdateLinearApproximation(0);
-                if (Path.Nodes.Count > 50)
+                if (Path.Nodes.Count > 25)
                 {
                     Path.Nodes.RemoveAt(0);
                     Path.UpdateLinearApproximation(1);
+                }
+                if (lastNode != null)
+                {
+                    Console.WriteLine("------------------------------------");
+                    Console.WriteLine("Target Location {0}", Target.Transform.Translation);
                 }
             }            
         }       

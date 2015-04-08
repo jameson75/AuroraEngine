@@ -45,7 +45,7 @@ namespace CipherPark.AngelJacket.Core.World
             {          
                 Color = Color.Transparent,
                 Radius = 5.0f,
-                StepSize = 10.0f,
+                StepSize = 20.0f,
                 Effect = effect,
                 _mesh = Content.ContentBuilder.BuildDynamicMesh<VertexPositionColor>(
                     game.GraphicsDevice,
@@ -130,14 +130,17 @@ namespace CipherPark.AngelJacket.Core.World
                     Vector3 prev_n = Vector3.Normalize(prev_d);
                     //http://forums.cgsociety.org/archive/index.php/t-741227.html
                     float angle = (float)Math.Acos(Vector3.Dot(prev_n, n));
-                    Vector3 rotationVector = Vector3.Normalize(Vector3.Cross(prev_n, n));
-                    if (rotationVector != Vector3.Zero)                    
-                        up = Vector3.TransformNormal(prev_up, Matrix.RotationAxis(rotationVector, angle));                                           
-                    //OneTimeLoopDebug(i, pathPoints.Length, p, n, prev_n, angle, rotationVector, up, prev_up);
+                    if (angle > float.Epsilon)
+                    {
+                        Vector3 rotationVector = Vector3.Normalize(Vector3.Cross(prev_n, n));
+                        if (rotationVector != Vector3.Zero)
+                            up = Vector3.TransformNormal(prev_up, Matrix.RotationAxis(rotationVector, angle));
+                    }
+                    //OneTimeLoopDebug(i, pathPoints.Length, p, n, prev_n, angle, rotationVector, up, prev_up);                    
                 }
                 Matrix parentMatrix = PathParent != null ? PathParent.WorldTransform().ToMatrix() : Matrix.Identity;
                 Matrix nodeMatrix = Camera.ViewMatrixToTransform(Matrix.LookAtLH(p, p + n, up)).ToMatrix() * parentMatrix;
-              
+                
                 for (int j = 0; j < N_CYLINDER_SIDES; j++)
                 {                  
                     float angle = -step * j;
@@ -145,7 +148,7 @@ namespace CipherPark.AngelJacket.Core.World
                     {
                         X = Radius * (float)Math.Cos(angle),
                         Y = Radius * (float)Math.Sin(angle)
-                    }, nodeMatrix);
+                    }, nodeMatrix);                   
                     meshGeometry[i * N_CYLINDER_SIDES + j] = mp;
                 }
                 prev_up = up;
@@ -191,7 +194,7 @@ namespace CipherPark.AngelJacket.Core.World
                 }
                 //cylinderColorMarkerIndex = (cylinderColorMarkerIndex == colors.Length - 1) ? 0 : cylinderColorMarkerIndex + 1;
             }
-             
+            Console.WriteLine("Vertex Count {0}", meshVertices.Count());
             _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        
         }
 
@@ -364,7 +367,7 @@ namespace CipherPark.AngelJacket.Core.World
                 else
                     _tracker = new PathTracker()
                     {
-                        PathNodeMinDistance = 10.0f,
+                        PathNodeMinDistance = 20.0f,
                         Target = value
                     };            
             }
@@ -419,6 +422,14 @@ namespace CipherPark.AngelJacket.Core.World
             Position = new Vector4(position, 1.0f);
             TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, offset.X, offset.Y);
             TextureCoord2 = new Vector4(slopeDir, 1.0f);
+        }
+    }
+
+    public static class Vector3Extension2
+    {
+        public static bool IsAnyComponentNaN(this Vector3 v)
+        {
+            return float.IsNaN(v.X) || float.IsNaN(v.Y) || float.IsNaN(v.Z);
         }
     }
 }
