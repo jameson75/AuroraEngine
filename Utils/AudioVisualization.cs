@@ -127,7 +127,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             //so we only concern ourselves the first half of the buffer.
             for (int i = 0; i < HalfDataLength; i++)
             {
-                float frequency = ComplexNumberSize(data[i]);
+                float frequency = ConvertComplexNumber(data[i]);
                 int j = GetBucketIndex(i);
                 if (spectrum[j] < frequency)
                 {
@@ -213,9 +213,10 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private static float ComplexNumberSize(Complex data)
+        /// <remarks>We're not really "converting" a complex number - hence "Convert"ComplexNumber is a misnomer.</remarks>
+        private static float ConvertComplexNumber(Complex data)
         {
-            //convert complex number, a + bi, to a real number... real_number = sqrt( a^2 + bi^2 )
+            //for complex number a + bi, we return sqrt( a^2 + bi^2 )
             return (float)Math.Sqrt(data.Re * data.Re + data.Im * data.Im);
         }          
     }

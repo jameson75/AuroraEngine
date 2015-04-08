@@ -31,30 +31,25 @@ namespace CipherPark.AngelJacket.Core.World
 
         public PathTracker()
         {
-            _path = new Path();           
+            _path = new Path();
+            _path.GenerateLinearApproximation();
+            _path.SmoothingEnabled = true;
         }
 
         public void Update(GameTime gameTime)
         {
             PathNode lastNode = Path.Nodes.LastOrDefault();            
-            if (lastNode != null ||
+            if (lastNode == null ||
                 PathNodeMinDistance < Vector3.Distance(Target.Transform.Translation, lastNode.Transform.Translation) )
             {
                 Path.Nodes.Add(new PathNode() { Transform = Target.Transform });
-                Path.GenerateLinearApproximation(Path.DefaultSamplesPerSegment, false);
+                Path.UpdateLinearApproximation(0);
+                if (Path.Nodes.Count > 50)
+                {
+                    Path.Nodes.RemoveAt(0);
+                    Path.UpdateLinearApproximation(1);
+                }
             }            
-        }
-
-        public Transform Transform
-        {
-            get;
-            set;
-        }
-
-        public ITransformable TransformableParent
-        {
-            get;
-            set;
-        }
+        }       
     }
 }

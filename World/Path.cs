@@ -35,6 +35,8 @@ namespace CipherPark.AngelJacket.Core.World
 
         private int _lastProcessedIndex = 0;
 
+        private int _samplesPerSegment = 0;
+
         /// <summary>
         /// 
         /// </summary>
@@ -121,13 +123,16 @@ namespace CipherPark.AngelJacket.Core.World
             }
             else
             {
-                for (int i = 1; i < _nodes.Count; i++)
+                for (int i = si; i < _nodes.Count; i++)
                 {
                     _approximateSegmentLengths.Add(Vector3.Distance(_nodes[i - 1].Transform.Translation,
                                                                     _nodes[i].Transform.Translation));
+                    _lastProcessedIndex = i;
                 }
             }
-        }
+
+            _samplesPerSegment = nSamplesPerSegment;
+        }      
 
         /// <summary>
         /// Uses interpoation to evaluate a node at the specifed distance along this path and
@@ -146,13 +151,11 @@ namespace CipherPark.AngelJacket.Core.World
             //TODO: Handle looped path.
             //-------------------------
 
-            if (d < 0 || d > _approximateSegmentLengths.Sum())
+            if (d < 0 || d > Distance)
                 return null;
 
             float accumLength = 0;          
-            float pct = 0;
-
-            //TODO: Change code below NOT to use subtraction!!
+            float pct = 0;            
 
             for (int i = 0; i < _approximateSegmentLengths.Count; i++)
             {                  
@@ -186,12 +189,7 @@ namespace CipherPark.AngelJacket.Core.World
             return pathNode;
         }
 
-        public Vector3[] GetEquidistantPoints(float stepSize, PathNode firstNode = null, PathNode lastNode = null)
-        {
-            return GetEquidistantNodes(stepSize, firstNode, lastNode).Select(n => n.Transform.Translation).ToArray();
-        }
-
-        public PathNode[] GetEquidistantNodes(float stepSize, PathNode firstNode = null, PathNode lastNode = null)
+        public PathNode[] EvaluateEquidistantNodes(float stepSize, PathNode firstNode = null, PathNode lastNode = null)
         {
             List<PathNode> result = new List<PathNode>();
             float step = 0;
@@ -205,6 +203,30 @@ namespace CipherPark.AngelJacket.Core.World
             result.Add(EvaluateNodeAtDistance(Distance));
             return result.ToArray();
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nRemovedHeadNodes"></param>
+        public void UpdateLinearApproximation(int nRemovedHeadNodes)
+        {
+            //*************************************************************************
+            //TODO: Re-implement this stop-gap implementation.
+            //This method was coded quickly to quickly support dyanamically extending
+            //the path head and/or trimming the tail...
+            //It doesn't work for any other sort of modification to this path.
+            //*************************************************************************
+
+            if( _approximateSegmentLengths == null )
+                throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
+
+            //Remove the calculated segment lengths for the segments which were removed.
+            if(nRemovedHeadNodes > 0)
+                _approximateSegmentLengths.RemoveRange(0, nRemovedHeadNodes);
+
+            //Generate segment lengths only for the segments which were added since the last call to GenerateLinearApproximation(...).
+            GenerateLinearApproximation(_samplesPerSegment, false);
+        }
     }
     
     public class PathNode
@@ -215,5 +237,15 @@ namespace CipherPark.AngelJacket.Core.World
         }
 
         public Transform Transform { get; set; }       
+    }
+
+    public enum PathModificationType
+    {
+        //Indicates that a new node was added to the path.
+        NewTail,
+        //Indicates that the transform has changed for an existing node in the path.
+        Change,
+        //Indicates that a node was removed from the path.
+        Delete
     }
 }

@@ -72,12 +72,12 @@ namespace CipherPark.AngelJacket.Core.World
 
         public SurfaceEffect Effect { get; private set; }
 
-        public Scene.CameraSceneNode SceneCamera { get; set; }
+        //public Scene.CameraSceneNode SceneCamera { get; set; }
 
         public void Update(GameTime gameTime)
         {                     
-            const int N_CYLINDER_SIDES = 8;                              
-            Vector3[] pathPoints = this.Path.GetEquidistantPoints(StepSize);
+            const int N_CYLINDER_SIDES = 8;
+            Vector3[] pathPoints = this.Path.EvaluateEquidistantNodes(StepSize).Select(n => n.Transform.Translation).ToArray();
             Vector3[] meshGeometry = new Vector3[(pathPoints.Length) * N_CYLINDER_SIDES];
             Vector3 prev_up = Vector3.UnitY;                        
             
@@ -92,9 +92,10 @@ namespace CipherPark.AngelJacket.Core.World
                 //Get the normalized direction from the current point to the next point.
                 Vector3 n = Vector3.Normalize(d);
                 
+                /*
                 //Get the distance from the current point to the next point.
-                float l = d.Length();
-                
+                float l = d.Length();                
+               
                 //Transform point to world space.
                 Vector3 p_ws = ((PathParent != null) ? PathParent.ParentToWorldCoordinate(p) : p);
 
@@ -113,7 +114,8 @@ namespace CipherPark.AngelJacket.Core.World
                 
                 //Transform direction to container space.               
                 Vector3 projected_p_cam = (PathParent != null) ? PathParent.WorldToParentNormal( projected_p_cam_ws) : projected_p_cam_ws;                                                
-                
+                */
+
                 //Draw tube segment in container space where the top of the tube has normal of "projected_p_cam".
                 //This way, each tube segment drawn has a "top" that always faces the view ray of the camera.
                 float step = 2.0f * (float)Math.PI / N_CYLINDER_SIDES;
@@ -338,8 +340,11 @@ namespace CipherPark.AngelJacket.Core.World
             if (_tracker != null)
             {
                 _tracker.Update(gameTime);
-                _streakRenderer.Path = _tracker.Path;
-                _streakRenderer.Update(gameTime);
+                if (_tracker.Path.Nodes.Count > 1)
+                {
+                    _streakRenderer.Path = _tracker.Path;
+                    _streakRenderer.Update(gameTime);
+                }
             }
         }
 
@@ -359,6 +364,7 @@ namespace CipherPark.AngelJacket.Core.World
                 else
                     _tracker = new PathTracker()
                     {
+                        PathNodeMinDistance = 10.0f,
                         Target = value
                     };            
             }
@@ -378,8 +384,7 @@ namespace CipherPark.AngelJacket.Core.World
 
         public SurfaceEffect Effect
         {
-            get;
-            private set;
+            get { return _streakRenderer.Effect; }
         }
     }
 
