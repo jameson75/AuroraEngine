@@ -135,8 +135,7 @@ namespace CipherPark.AngelJacket.Core.World
                         Vector3 rotationVector = Vector3.Normalize(Vector3.Cross(prev_n, n));
                         if (rotationVector != Vector3.Zero)
                             up = Vector3.TransformNormal(prev_up, Matrix.RotationAxis(rotationVector, angle));
-                    }
-                    //OneTimeLoopDebug(i, pathPoints.Length, p, n, prev_n, angle, rotationVector, up, prev_up);                    
+                    }                                      
                 }
                 Matrix parentMatrix = PathParent != null ? PathParent.WorldTransform().ToMatrix() : Matrix.Identity;
                 Matrix nodeMatrix = Camera.ViewMatrixToTransform(Matrix.LookAtLH(p, p + n, up)).ToMatrix() * parentMatrix;
@@ -159,10 +158,7 @@ namespace CipherPark.AngelJacket.Core.World
             int nCylinders = pathPoints.Length - 1;
            
             VertexPositionColor[] meshVertices = new VertexPositionColor[nCylinders * N_CYLINDER_SIDES * VERTS_PER_SIDE];
-
-            //Color[] colors = new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Violet, Color.White,};
-            //int sideColorMarkerIndex = 0;
-            //int cylinderColorMarkerIndex = 0;
+       
             int vi = 0;
 
             for (int i = 0; i < nCylinders; i++)
@@ -185,45 +181,20 @@ namespace CipherPark.AngelJacket.Core.World
 
                     int[] gi = new int[VERTS_PER_SIDE] { qi[0], qi[1], qi[2], qi[0], qi[2], qi[3] };
                     for (int k = 0; k < gi.Length; k++)
-                    { 
-                        //Color color = colors[sideColorMarkerIndex];
+                    {                         
                         meshVertices[vi] = new VertexPositionColor(meshGeometry[gi[k]], Color.ToVector4());
                         vi++;                        
-                    }
-                    //sideColorMarkerIndex = (sideColorMarkerIndex == colors.Length - 1) ? 0 : sideColorMarkerIndex + 1;
-                }
-                //cylinderColorMarkerIndex = (cylinderColorMarkerIndex == colors.Length - 1) ? 0 : cylinderColorMarkerIndex + 1;
+                    }                   
+                }               
             }
             Console.WriteLine("Vertex Count {0}", meshVertices.Count());
             _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        
         }
 
-        /*
-        private static bool debugComplete = false;
-        private static bool debugSpreadSheetFormat = true;
-        private static bool spreadSheetHeadersWritten = false;
-        private static void OneTimeLoopDebug(int i, int loopLimit, Vector3 p, Vector3 n, Vector3 prev_n, float angle, Vector3 rotationAxis, Vector3 up, Vector3 prev_up)
-        {
-            if (i == loopLimit - 1)
-                debugComplete = true;
-            if (!debugComplete)
-            {
-                if (debugSpreadSheetFormat)
-                {
-                    if (!spreadSheetHeadersWritten)
-                    {
-                        Console.WriteLine("i,p,n,prev_n,angle,rotationAxis,up,prev_up");
-                        spreadSheetHeadersWritten = true;
-                    }
-                    Console.WriteLine("{0},\"{1}\",\"{2}\",{3},\"{4}\",\"{5}\",\"{6}\",\"{7}\"", i, p, n, prev_n, angle, rotationAxis, up, prev_up);
-                }
-                else
-                    Console.WriteLine("i:{4}, p:{7}, n:{0}, prev_n:{1}, angle:{2}, rotationAxis:{3}, up:{5}, prev_up:{6}", n, prev_n, angle, rotationAxis, i, up, prev_up, p);
-            }
-        }
-        */
-
-        /*
+        /*********************************************************************
+         * OBSOLETE
+         * *******************************************************************
+         
         public void Update(GameTime gameTime)
         {
             const int VERTICES_PER_POINT = 2;
