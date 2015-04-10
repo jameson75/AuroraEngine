@@ -31,8 +31,11 @@ namespace CipherPark.AngelJacket.Core.World
     }
 
     public class StreakRenderer : IRenderer
-    {       
+    {
+        private const int N_CYLINDER_SIDES = 8;
         private Mesh _mesh = null;
+        private Vector3[] _meshGeometry = null;
+        private Path _path = new Path();
                 
         private StreakRenderer()
         { }
@@ -64,7 +67,10 @@ namespace CipherPark.AngelJacket.Core.World
 
         public float StepSize { get; set; }
 
-        public Path Path { get; set; }
+        public void AddPath(Path path)
+        {
+            _path.Nodes.AddRange(path.Nodes);
+        }
 
         public ITransformable PathParent { get; set; }
 
@@ -74,13 +80,181 @@ namespace CipherPark.AngelJacket.Core.World
 
         //public Scene.CameraSceneNode SceneCamera { get; set; }
 
+        //public void Update(GameTime gameTime)
+        //{
+        //    const int N_CYLINDER_SIDES = 8;
+        //    Vector3[] pathPoints = this.Path.EvaluateEquidistantNodes(StepSize).Select(n => n.Transform.Translation).ToArray();
+        //    Vector3[] meshGeometry = new Vector3[(pathPoints.Length) * N_CYLINDER_SIDES];
+        //    Vector3 prev_up = Vector3.UnitY;
+
+        //    for (int i = 0; i < pathPoints.Length; i++)
+        //    {
+        //        //Store the current point.
+        //        Vector3 p = pathPoints[i];
+
+        //        //Get the direction vector from the current point to the next point.
+        //        Vector3 d = (i < pathPoints.Length - 1) ? pathPoints[i + 1] - p : p - pathPoints[i - 1];
+
+        //        //Get the normalized direction from the current point to the next point.
+        //        Vector3 n = Vector3.Normalize(d);
+
+        //        /*
+        //        //Get the distance from the current point to the next point.
+        //        float l = d.Length();                
+               
+        //        //Transform point to world space.
+        //        Vector3 p_ws = ((PathParent != null) ? PathParent.ParentToWorldCoordinate(p) : p);
+
+        //        //Store camera location in world space.
+        //        Vector3 camPos_ws = p_ws - SceneCamera.Transform.Translation;
+
+        //        //get view normal in world space.
+        //        Vector3 camDirection_ws = Vector3.Normalize(SceneCamera.Camera.ViewMatrix.Column3.ToVector3());
+                
+        //        //Project point transformed point to camera z plane (defined in world space).                
+        //        //(See tmpearce's explanation at http://stackoverflow.com/questions/9605556/how-to-project-a-3d-point-to-a-3d-plane#comment12185786_9605695)
+        //        Vector3 projected_p_ws = p_ws - (Vector3.Dot(camPos_ws, camDirection_ws) * camDirection_ws);
+                
+        //        //Get direction to camera from projected point.
+        //        Vector3 projected_p_cam_ws = Vector3.Normalize(SceneCamera.Transform.Translation - projected_p_ws);
+                
+        //        //Transform direction to container space.               
+        //        Vector3 projected_p_cam = (PathParent != null) ? PathParent.WorldToParentNormal( projected_p_cam_ws) : projected_p_cam_ws;                                                
+        //        */
+
+        //        //Draw tube segment in container space where the top of the tube has normal of "projected_p_cam".
+        //        //This way, each tube segment drawn has a "top" that always faces the view ray of the camera.
+        //        float step = 2.0f * (float)Math.PI / N_CYLINDER_SIDES;
+
+        //        //To prevent the cylinder from twisting (and creating unwanted sharp edges) we preserve the relative
+        //        //direction of the up vector.
+        //        Vector3 up = prev_up;
+        //        if (i > 0)
+        //        {
+        //            Vector3 prev_p = pathPoints[i - 1];
+        //            Vector3 prev_d = p - prev_p;
+        //            Vector3 prev_n = Vector3.Normalize(prev_d);
+        //            //http://forums.cgsociety.org/archive/index.php/t-741227.html
+        //            float angle = (float)Math.Acos(Vector3.Dot(prev_n, n));
+        //            if (angle > float.Epsilon)
+        //            {
+        //                Vector3 rotationVector = Vector3.Normalize(Vector3.Cross(prev_n, n));
+        //                if (rotationVector != Vector3.Zero)
+        //                    up = Vector3.TransformNormal(prev_up, Matrix.RotationAxis(rotationVector, angle));
+        //            }
+        //        }
+        //        Matrix parentMatrix = PathParent != null ? PathParent.WorldTransform().ToMatrix() : Matrix.Identity;
+        //        Matrix nodeMatrix = Camera.ViewMatrixToTransform(Matrix.LookAtLH(p, p + n, up)).ToMatrix() * parentMatrix;
+
+        //        for (int j = 0; j < N_CYLINDER_SIDES; j++)
+        //        {
+        //            float angle = -step * j;
+        //            Vector3 mp = Vector3.TransformCoordinate(new Vector3()
+        //            {
+        //                X = Radius * (float)Math.Cos(angle),
+        //                Y = Radius * (float)Math.Sin(angle)
+        //            }, nodeMatrix);
+        //            meshGeometry[i * N_CYLINDER_SIDES + j] = mp;
+        //        }
+        //        prev_up = up;
+        //    }
+
+        //    const int VERTS_PER_SIDE = 6;
+        //    const int INDICES_PER_SIDE = 4;
+        //    int nCylinders = pathPoints.Length - 1;
+
+        //    VertexPositionColor[] meshVertices = new VertexPositionColor[nCylinders * N_CYLINDER_SIDES * VERTS_PER_SIDE];
+
+        //    int vi = 0;
+
+        //    for (int i = 0; i < nCylinders; i++)
+        //    {
+        //        for (int j = 0; j < N_CYLINDER_SIDES; j++)
+        //        {
+        //            int[] qi = new int[INDICES_PER_SIDE];
+        //            qi[0] = i * N_CYLINDER_SIDES + j;
+        //            qi[1] = (i + 1) * N_CYLINDER_SIDES + j;
+        //            if (j < N_CYLINDER_SIDES - 1)
+        //            {
+        //                qi[2] = qi[1] + 1;
+        //                qi[3] = qi[0] + 1;
+        //            }
+        //            else
+        //            {
+        //                qi[2] = (i + 1) * N_CYLINDER_SIDES;
+        //                qi[3] = i * N_CYLINDER_SIDES;
+        //            }
+
+        //            int[] gi = new int[VERTS_PER_SIDE] { qi[0], qi[1], qi[2], qi[0], qi[2], qi[3] };
+        //            for (int k = 0; k < gi.Length; k++)
+        //            {
+        //                meshVertices[vi] = new VertexPositionColor(meshGeometry[gi[k]], Color.ToVector4());
+        //                vi++;
+        //            }
+        //        }
+        //    }
+        //    Console.WriteLine("Vertex Count {0}", meshVertices.Count());
+        //    _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);
+        //}
+        
         public void Update(GameTime gameTime)
-        {                     
-            const int N_CYLINDER_SIDES = 8;
-            Vector3[] pathPoints = this.Path.EvaluateEquidistantNodes(StepSize).Select(n => n.Transform.Translation).ToArray();
-            Vector3[] meshGeometry = new Vector3[(pathPoints.Length) * N_CYLINDER_SIDES];
-            Vector3 prev_up = Vector3.UnitY;                        
-            
+        {               
+            Vector3[] g = ConstructGeometryFromPath();
+            if (_meshGeometry != null)
+                _meshGeometry = AttachGeometry(g, _meshGeometry);
+            else 
+                _meshGeometry = g;
+
+            const int VERTS_PER_SIDE = 6;
+            const int INDICES_PER_SIDE = 4;
+            int nCylinders = (_meshGeometry.Length / N_CYLINDER_SIDES) - 1;
+
+            VertexPositionColor[] meshVertices = new VertexPositionColor[nCylinders * N_CYLINDER_SIDES * VERTS_PER_SIDE];
+
+            int vi = 0;
+
+            for (int i = 0; i < nCylinders; i++)
+            {
+                for (int j = 0; j < N_CYLINDER_SIDES; j++)
+                {
+                    int[] qi = new int[INDICES_PER_SIDE];
+                    qi[0] = i * N_CYLINDER_SIDES + j;
+                    qi[1] = (i + 1) * N_CYLINDER_SIDES + j;
+                    if (j < N_CYLINDER_SIDES - 1)
+                    {
+                        qi[2] = qi[1] + 1;
+                        qi[3] = qi[0] + 1;
+                    }
+                    else
+                    {
+                        qi[2] = (i + 1) * N_CYLINDER_SIDES;
+                        qi[3] = i * N_CYLINDER_SIDES;
+                    }
+
+                    int[] gi = new int[VERTS_PER_SIDE] { qi[0], qi[1], qi[2], qi[0], qi[2], qi[3] };
+                    for (int k = 0; k < gi.Length; k++)
+                    {
+                        meshVertices[vi] = new VertexPositionColor(_meshGeometry[gi[k]], Color.ToVector4());
+                        vi++;
+                    }
+                }
+            }
+            Console.WriteLine("Vertex Count {0}", meshVertices.Count());
+            _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);
+
+            _path.Reset();
+        }
+
+        private void AttachGeometry(Vector3[] g1, Vector3[] g2)
+        {
+
+        }
+
+        private Vector3[] ConstructGeometryFromPath()
+        {            
+            Vector3[] pathPoints = this._path.EvaluateEquidistantNodes(StepSize).Select(n => n.Transform.Translation).ToArray();
+            Vector3[] geometry = new Vector3[(pathPoints.Length) * N_CYLINDER_SIDES];
+            Vector3 prev_up = Vector3.UnitY;
             for (int i = 0; i < pathPoints.Length; i++)
             {
                 //Store the current point.
@@ -148,52 +322,16 @@ namespace CipherPark.AngelJacket.Core.World
                         X = Radius * (float)Math.Cos(angle),
                         Y = Radius * (float)Math.Sin(angle)
                     }, nodeMatrix);                   
-                    meshGeometry[i * N_CYLINDER_SIDES + j] = mp;
+                    geometry[i * N_CYLINDER_SIDES + j] = mp;
                 }
                 prev_up = up;
             }
-
-            const int VERTS_PER_SIDE = 6;
-            const int INDICES_PER_SIDE = 4;
-            int nCylinders = pathPoints.Length - 1;
-           
-            VertexPositionColor[] meshVertices = new VertexPositionColor[nCylinders * N_CYLINDER_SIDES * VERTS_PER_SIDE];
-       
-            int vi = 0;
-
-            for (int i = 0; i < nCylinders; i++)
-            {
-                for(int j = 0; j < N_CYLINDER_SIDES; j++)
-                {
-                    int[] qi = new int[INDICES_PER_SIDE];
-                    qi[0] = i * N_CYLINDER_SIDES + j;
-                    qi[1] = (i + 1) * N_CYLINDER_SIDES + j;
-                    if( j < N_CYLINDER_SIDES - 1)
-                    {
-                        qi[2] = qi[1] + 1;
-                        qi[3] = qi[0] + 1;
-                    }
-                    else 
-                    {
-                        qi[2] = (i + 1) * N_CYLINDER_SIDES;
-                        qi[3] = i * N_CYLINDER_SIDES;
-                    }
-
-                    int[] gi = new int[VERTS_PER_SIDE] { qi[0], qi[1], qi[2], qi[0], qi[2], qi[3] };
-                    for (int k = 0; k < gi.Length; k++)
-                    {                         
-                        meshVertices[vi] = new VertexPositionColor(meshGeometry[gi[k]], Color.ToVector4());
-                        vi++;                        
-                    }                   
-                }               
-            }
-            Console.WriteLine("Vertex Count {0}", meshVertices.Count());
-            _mesh.UpdateVertexStream<VertexPositionColor>(meshVertices);                        
+            return geometry;
         }
 
         /*********************************************************************
          * OBSOLETE
-         * *******************************************************************
+         *********************************************************************
          
         public void Update(GameTime gameTime)
         {

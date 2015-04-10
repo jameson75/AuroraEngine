@@ -204,7 +204,8 @@ namespace CipherPark.AngelJacket.Core.World
                 result.Add(EvaluateNodeAtDistance(step));
                 step += stepSize;
             }
-            result.Add(EvaluateNodeAtDistance(Distance));
+            if(Distance > 0)
+                result.Add(EvaluateNodeAtDistance(Distance));
             return result.ToArray();
         }
         
@@ -233,6 +234,16 @@ namespace CipherPark.AngelJacket.Core.World
 
             //Generate segment lengths only for the segments which were added since the last call to GenerateLinearApproximation(...).
             GenerateLinearApproximation(_samplesPerSegment, false);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Reset()
+        {
+            Nodes.Clear();
+            _approximateSegmentLengths.Clear();
+            _lastProcessedIndex = 0;
         }
     }
     
