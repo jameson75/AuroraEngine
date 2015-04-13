@@ -31,24 +31,19 @@ namespace CipherPark.AngelJacket.Core.World
 
         private List<PathNode> _nodes = new List<PathNode>();
 
-        private List<float> _approximateSegmentLengths = null;
+        private List<float> _approximateSegmentLengths = new List<float>();
 
-        private int _lastProcessedIndex = 0;
-
-        private int _samplesPerSegment = 0;
+        private int _lastCalculatedNodeIndex = 0;              
 
         /// <summary>
         /// 
         /// </summary>
         public Path()
         {
-
+            SamplesPerSegment = DefaultSamplesPerSegment;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<PathNode> Nodes { get { return _nodes; } }
+        public int SamplesPerSegment { get; set; }
 
         /// <summary>
         /// 
@@ -62,7 +57,7 @@ namespace CipherPark.AngelJacket.Core.World
         {
             get
             {
-                if (_approximateSegmentLengths == null)
+                if (this.RequiresApproximation)
                     throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
                 float d = 0.0f;
                 for (int i = 0; i < _approximateSegmentLengths.Count; i++)
@@ -72,28 +67,68 @@ namespace CipherPark.AngelJacket.Core.World
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public int NodeCount
+        {
+            get { return _nodes.Count(); }
+        }
+
+        /// <summary>
+        /// Returns a shallow copy of path nodes in the path in FIFO order.
+        /// </summary>
+        public List<PathNode> GetNodes() { return _nodes.ToList(); }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="index"></param>
+        public void RemoveNodes(int count, int index = 0)
+        {
+            _nodes.RemoveRange(index, count);
+            _approximateSegmentLengths.RemoveRange(index, count);
+            _lastCalculatedNodeIndex = Math.Max(0, _lastCalculatedNodeIndex - count);
+            OnPathChanged();
+        }      
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="node"></param>
+        public void AddNode(PathNode node, bool generateLinearApprox = false)
+        {
+            AddNodes(new[] { node }, generateLinearApprox);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nodes"></param>
+        public void AddNodes(IEnumerable<PathNode> nodes, bool generateLinearApprox = false)
+        {
+            _nodes.AddRange(nodes);
+            if (generateLinearApprox)
+                GenerateLinearApproximation();
+            OnPathChanged();  
+        }
+
+        /// <summary>
         /// Generates and stores the linear-approximate length of each curve segment.
         /// </summary>
-        /// <param name="nSamplesPerSegment">Number of samples taken between each node</param>
-        /// <param name="processEntirePath">Specifies whether to generate linear samples for the entire path or only for the portion of the path which hasn't been processed</param>
+        /// <param name="nSamplesPerSegment">Number of samples taken between each node</param>        
         /// <returns></returns>
-        public void GenerateLinearApproximation(int nSamplesPerSegment = DefaultSamplesPerSegment, bool processEntirePath = true)
+        public void GenerateLinearApproximation()
         {           
-            if (nSamplesPerSegment <= 0)
-                throw new ArgumentOutOfRangeException("nSamplesPerSegment must be a positive, non-zero integer");
-
-            if (processEntirePath)
-            {
-                _approximateSegmentLengths = new List<float>();
-                _lastProcessedIndex = 0;              
-            }            
+            if (SamplesPerSegment <= 0)
+                throw new ArgumentOutOfRangeException("The SamplesPerSegment property must be a positive, non-zero integer");          
 
             //Determine the starting node index from which a linear approximation will be generated.
-            int si = processEntirePath ? 1 : _lastProcessedIndex + 1; 
+            int si = _lastCalculatedNodeIndex + 1; 
 
             if (SmoothingEnabled)
             {
-                float stepSize = 1.0f / nSamplesPerSegment;
+                float stepSize = 1.0f / SamplesPerSegment;
                 for (int i = si; i < _nodes.Count; i++)
                 {
                     PathNode n1 = _nodes[i - 1];
@@ -103,7 +138,7 @@ namespace CipherPark.AngelJacket.Core.World
                     Vector3 p0 = n1.Transform.Translation;
                     float step = stepSize;
                     float totalLength = 0;
-                    for (int j = 0; j < nSamplesPerSegment; j++)
+                    for (int j = 0; j < SamplesPerSegment; j++)
                     {
                         //**************************************************************
                         //NOTE: Important for future reference - the catmull algorithm
@@ -118,7 +153,7 @@ namespace CipherPark.AngelJacket.Core.World
                         p0 = p;
                     }
                     _approximateSegmentLengths.Add(totalLength);
-                    _lastProcessedIndex = i;
+                    _lastCalculatedNodeIndex = i;
                 }
             }
             else
@@ -127,12 +162,18 @@ namespace CipherPark.AngelJacket.Core.World
                 {
                     _approximateSegmentLengths.Add(Vector3.Distance(_nodes[i - 1].Transform.Translation,
                                                                     _nodes[i].Transform.Translation));
-                    _lastProcessedIndex = i;
+                    _lastCalculatedNodeIndex = i;
                 }
-            }
+            }            
+        }
 
-            _samplesPerSegment = nSamplesPerSegment;
-        }      
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool RequiresApproximation
+        {
+            get { return _nodes.Count > 1 && _lastCalculatedNodeIndex != _nodes.Count() - 1; }
+        }
 
         /// <summary>
         /// Uses interpoation to evaluate a node at the specifed distance along this path and
@@ -145,8 +186,8 @@ namespace CipherPark.AngelJacket.Core.World
         {
             PathNode pathNode = null;
 
-            if (_approximateSegmentLengths == null)
-                throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
+            if (this.RequiresApproximation)
+                throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() after adding or removing nodes from the path.");
 
             //TODO: Handle looped path.
             //-------------------------
@@ -193,6 +234,13 @@ namespace CipherPark.AngelJacket.Core.World
             return pathNode;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stepSize"></param>
+        /// <param name="firstNode"></param>
+        /// <param name="lastNode"></param>
+        /// <returns></returns>
         public PathNode[] EvaluateEquidistantNodes(float stepSize, PathNode firstNode = null, PathNode lastNode = null)
         {
             List<PathNode> result = new List<PathNode>();
@@ -208,45 +256,47 @@ namespace CipherPark.AngelJacket.Core.World
                 result.Add(EvaluateNodeAtDistance(Distance));
             return result.ToArray();
         }
-        
+
         /// <summary>
-        /// 
+        /// Updates the internally managed linear approximation of the path.
         /// </summary>
-        /// <param name="nRemovedHeadNodes"></param>
-        public void UpdateLinearApproximation(int nRemovedHeadNodes)
+        /// <param name="node"></param>
+        /// <remarks>You would call this method when a path node changes it's transform property and want to obtain the new Distance of the entire path.</remarks>
+        public void NotifyNodeTransformChanged(PathNode node)
         {
-            //*************************************************************************
-            //TODO: Re-implement this stop-gap implementation.
-            //This method was coded quickly to quickly support dyanamically extending
-            //the path head and/or trimming the tail...
-            //It doesn't work for any other sort of modification to this path.
-            //*************************************************************************
-
-            if( _approximateSegmentLengths == null )
-                throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() at least once before calling this method");
-
-            //Remove the calculated segment lengths for the segments which were removed.
-            if (nRemovedHeadNodes > 0)
-            {
-                _approximateSegmentLengths.RemoveRange(0, nRemovedHeadNodes);
-                _lastProcessedIndex -= nRemovedHeadNodes;
-            }
-
-            //Generate segment lengths only for the segments which were added since the last call to GenerateLinearApproximation(...).
-            GenerateLinearApproximation(_samplesPerSegment, false);
-        }
+            
+        }   
 
         /// <summary>
         /// 
         /// </summary>
-        public void Reset()
+        public void ClearNodes()
         {
-            Nodes.Clear();
+            _nodes.Clear();
             _approximateSegmentLengths.Clear();
-            _lastProcessedIndex = 0;
-        }
+            _lastCalculatedNodeIndex = 0;
+            OnPathChanged();
+        }     
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected void OnPathChanged()
+        {
+            EventHandler handler = PathChanged;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }       
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler PathChanged;        
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
     public class PathNode
     {
         public PathNode()
@@ -257,6 +307,9 @@ namespace CipherPark.AngelJacket.Core.World
         public Transform Transform { get; set; }       
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum PathModificationType
     {
         //Indicates that a new node was added to the path.
