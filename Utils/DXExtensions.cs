@@ -305,7 +305,12 @@ namespace CipherPark.AngelJacket.Core.Utils
             float correctedAmount = amount;
             return Vector3.CatmullRom(value1, value2, value3, value4, correctedAmount);
         }
-    }
+        
+        public static bool IsAnyComponentNaN(this Vector3 v)
+        {
+            return float.IsNaN(v.X) || float.IsNaN(v.Y) || float.IsNaN(v.Z);
+        }
+    }   
 
     public static class Vector4Extension
     {

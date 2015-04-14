@@ -391,4 +391,39 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             get {return Matrix.SizeInBytes; }
         }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct FlexboardVertex
+    {
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+
+        public Vector4 Position;
+        public Vector4 TextureCoord;
+        public Vector4 TextureCoord2;
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+
+        static FlexboardVertex()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32B32A32_Float, 16, 0),
+                 new InputElement("TEXCOORD", 1, Format.R32G32B32A32_Float, 32, 0)
+             };
+            _elementSize = 48;
+        }
+
+        public FlexboardVertex(Vector3 position, Vector2 textureCoords, Vector2 offset, Vector3 slopeDir)
+        {
+            Position = new Vector4(position, 1.0f);
+            TextureCoord = new Vector4(textureCoords.X, textureCoords.Y, offset.X, offset.Y);
+            TextureCoord2 = new Vector4(slopeDir, 1.0f);
+        }
+    }
+
 }

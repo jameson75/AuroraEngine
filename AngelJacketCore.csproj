@@ -255,6 +255,7 @@
     <Compile Include="World\Kinetics\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
+    <Compile Include="World\LightTrail.cs" />
     <Compile Include="World\Path.cs" />
     <Compile Include="World\Geometry\RiggedModel.cs" />
     <Compile Include="World\Kinetics\ConcentricForm.cs" />

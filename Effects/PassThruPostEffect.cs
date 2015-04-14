@@ -58,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             BlendState oldBlendState = null;
             
             //Setup Shaders
-            //--------------
+            //-------------
             if (!EnableTexelFix)
                 Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderNoFix);
             else
@@ -67,20 +67,20 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, InputTexture);
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _samplerState);
             
-            //Setup states.
-            //-------------
+            //Setup states
+            //------------
             if (BlendState != null)
             {
                 oldBlendState = Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
                 Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = BlendState;
             }
 
-            //Render Screen quad.
-            //-------------------
+            //Render Screen quad
+            //------------------
             _quad.Draw(null);            
             
             //Clean Up Shader
-            //----------------
+            //---------------
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);            
 
