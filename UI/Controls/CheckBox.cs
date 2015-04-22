@@ -25,14 +25,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         bool _isChecked = false;
         ContentControl _checkedContentControl = null;
         ContentControl _uncheckedContentControl = null;
-        Label _label = null;
+        ContentControl _label = null;
 
         private CheckBox(IUIRoot visualRoot)
             : base(visualRoot)
         {
             _checkedContentControl = new ContentControl(visualRoot);
             _uncheckedContentControl = new ContentControl(visualRoot);
-            _label = new Label(visualRoot);
+            _label = new ContentControl(visualRoot);
             Children.Add(_checkedContentControl);
             Children.Add(_uncheckedContentControl);
             Children.Add(_label);
@@ -46,7 +46,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             UIContent uncheckedContent = new ColorContent(Color.Transparent);
             _checkedContentControl = new ContentControl(visualRoot, checkedContent);
             _uncheckedContentControl = new ContentControl(visualRoot, uncheckedContent);
-            _label = new Label(visualRoot, caption, font, fontColor);
+            _label = ContentControl.CreateLabelControl(visualRoot, caption, font, fontColor);
             Children.Add(_checkedContentControl);
             Children.Add(_uncheckedContentControl);
             Children.Add(_label);
@@ -102,10 +102,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public string Caption
         {
-            get { return _label.TextContent.Text; }
+            get { return ((TextContent)_label.Content).Text; }
             set
             {
-                _label.TextContent.Text = value;
+                ((TextContent)_label.Content).Text = value;
                 _label.SizeToContent();
             }
         }

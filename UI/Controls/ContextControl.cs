@@ -22,11 +22,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     {
         private T _subControl = null;
 
-        protected ContextControl(IUIRoot visualRoot, System.Func<IUIRoot,T> controlCreator)
+        protected ContextControl(IUIRoot visualRoot, System.Func<IUIRoot,T> subControlCreator)
             : base(visualRoot)
         {
             HandleCloseKey = true;
-            _subControl = controlCreator(visualRoot);
+            _subControl = subControlCreator(visualRoot);
             _subControl.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             _subControl.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             _subControl.SizeChanged += SubControl_SizeChanged;

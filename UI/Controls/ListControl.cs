@@ -161,8 +161,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }                    
         }
 
-        public LabelTemplate DefaultItemTemplate { get; set; }
-
         public ListControl(IUIRoot root)
             : base(root)
         {            
@@ -241,15 +239,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Items.Add(item);
         }
 
-        public void AddListItem(string text, string name = null, SpriteFont font = null, Color? fontColor = null, Color? bgColor = null, Color? selectColor = null)
-        {
-            LabelTemplate currentUILabelTemplate = this.DefaultItemTemplate != null ? this.DefaultItemTemplate : DefaultTheme.Instance.Label;
+        public void AddListItem(string text, string name, SpriteFont font, Color fontColor, Color? bgColor = null, Color? selectColor = null)
+        {            
             ListControlItem item = new ListControlItem(this.VisualRoot,
                                                        name,
                                                        text,
-                                                       font != null ? font : currentUILabelTemplate.CaptionStyle.Font,
-                                                       fontColor != null ? fontColor.Value : currentUILabelTemplate.CaptionStyle.FontColor.Value,
-                                                       bgColor != null ? bgColor.Value : currentUILabelTemplate.CaptionStyle.Color.Value,
+                                                       font,
+                                                       fontColor,
+                                                       bgColor,
                                                        selectColor);
             AddListItem(item);
         }
@@ -293,16 +290,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _wireUp.ChildControlCommand += CommandControlWireUp_ChildControlCommand;
         }
 
-        public ListControlItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 fontColor, Color4 backgroundColor, Color4? selectFontColor = null)
+        public ListControlItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color fontColor, Color? backgroundColor = null, Color? selectFontColor = null)
             : base(visualRoot)
         {
             Name = name;
             CommandName = name;
-            UIControlTemplate itemTemplate = new LabelTemplate(text, font, fontColor, backgroundColor);
+            UIControlTemplate itemTemplate = ContentControlTemplate.CreateLabelTemplate(text, font, fontColor, backgroundColor);
             UIControlTemplate selectTemplate = null;
             if (selectFontColor != null)
-                selectTemplate = new LabelTemplate(text, font, selectFontColor, backgroundColor);
-            Label childLabel = new Label(visualRoot);
+                selectTemplate = ContentControlTemplate.CreateLabelTemplate(text, font, selectFontColor.Value, backgroundColor);
+            ContentControl childLabel = new ContentControl(visualRoot);
             childLabel.Size = font.MeasureString(text).Add(DefaultItemTextMargin);
             SetContent(childLabel, itemTemplate, selectTemplate);
             _wireUp = new CommandControlWireUp(this);
@@ -335,9 +332,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnUnselected();
         }
      
-        public void SetContent(TextContent content, LabelTemplate itemTemplate = null, LabelTemplate selectTemplate = null)
+        public void SetContent(TextContent content, ContentControlTemplate itemTemplate = null, ContentControlTemplate selectTemplate = null)
         {
-            Label label = new Label(VisualRoot, content);
+            ContentControl label = ContentControl.CreateLabelControl(VisualRoot, content);
             SetContent(label, itemTemplate, selectTemplate);
         }           
 

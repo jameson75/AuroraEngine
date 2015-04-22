@@ -158,9 +158,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public bool AutoSize { get; set; }
-
-        public LabelTemplate DefaultItemTemplate { get; set; }
+        public bool AutoSize { get; set; }        
 
         public void OpenContextMenu(MenuItem item)
         {
@@ -197,15 +195,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Items.Add(item);
         }
 
-        public void AddMenuItem(string text, string name = null, SpriteFont font = null, Color? fontColor = null, Color? bgColor = null, Color? selectColor = null)
-        {
-            LabelTemplate itemTemplate = this.DefaultItemTemplate != null ? this.DefaultItemTemplate : DefaultTheme.Instance.Label;
-            MenuItem item = new MenuItem(this.VisualRoot,
-                                                       name,
-                                                       text,
-                                                       font != null ? font : itemTemplate.CaptionStyle.Font,
-                                                       fontColor != null ? fontColor.Value : itemTemplate.CaptionStyle.FontColor.Value,
-                                                       selectColor != null ? selectColor.Value : fontColor != null ? fontColor.Value : itemTemplate.CaptionStyle.FontColor.Value);
+        public void AddMenuItem(string text, string name, SpriteFont font, Color fontColor, Color? selectColor = null, string commandName = null, ContextMenu subMenu = null)
+        {        
+            MenuItem item = new MenuItem(this.VisualRoot, name, text, font, fontColor, selectColor, commandName, subMenu);
             AddMenuItem(item);
         }
 

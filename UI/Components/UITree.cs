@@ -208,7 +208,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
             //RegisterControlParser(new MultiScreenControlParser(), "MultiScreen");
             RegisterControlParser(new MenuControlParser(), "Menu");
-            RegisterControlParser(new ImageControlParser(), "Image");            
+            //RegisterControlParser(new ImageControlParser(), "Image");            
         }
 
         public void RegisterStyleParser(UIStyleParser parser, string elementName)

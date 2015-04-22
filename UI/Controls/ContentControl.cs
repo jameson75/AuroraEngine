@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SharpDX.Direct3D11;
+using SharpDX;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.AngelJacket.Core.Utils.Toolkit;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
 // Company: Cipher Park
@@ -19,21 +23,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private UIContent _content = null;
 
         public ContentControl(IUIRoot visualRoot) : base(visualRoot)
-        {           
-        }
+        { }
 
         public ContentControl(IUIRoot visualRoot, UIContent content)
             : base(visualRoot)
         {            
             Content = content;           
-        }
-
-        public static ContentControl FromTemplate(IUIRoot visualRoot, ContentControlTemplate template)
-        {
-            ContentControl contentControl = new ContentControl(visualRoot);
-            contentControl.ApplyTemplate(template);
-            return contentControl;
-        }
+        }     
 
         protected override void OnDraw(GameTime gameTime)
         {
@@ -72,6 +68,37 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (contentControlTemplate.ContentStyle != null)
                 Content = contentControlTemplate.ContentStyle.GenerateContent();
             base.ApplyTemplate(template);
+        }
+
+        public static ContentControl FromTemplate(IUIRoot visualRoot, ContentControlTemplate template)
+        {
+            ContentControl contentControl = new ContentControl(visualRoot);
+            contentControl.ApplyTemplate(template);
+            return contentControl;
+        }
+
+        public static ContentControl CreateImageControl(IUIRoot visualRoot, ImageContent image)
+        {
+            return new ContentControl(visualRoot, image);
+        }
+
+        public static ContentControl CreateImageControl(IUIRoot visualRoot, Texture2D image)
+        {
+            return new ContentControl(visualRoot, new ImageContent(image));
+        }
+
+        public static ContentControl CreateLabelControl(IUIRoot visualRoot, TextContent text, Color? backgroundColor = null)
+        {
+            Color backgroundColor_ = backgroundColor != null ? backgroundColor.Value : Color.Transparent;
+            return new ContentControl(visualRoot, new LayeredContent(new UIContent[] { new ColorContent(backgroundColor_), text}));
+        }
+
+        public static ContentControl CreateLabelControl(IUIRoot visualRoot, string text, SpriteFont font, Color fontColor, Color? backgroundColor = null)
+        {
+            Color backgroundColor_ = backgroundColor != null ? backgroundColor.Value : Color.Transparent;
+            return new ContentControl(visualRoot, new LayeredContent(new UIContent[] {  new ColorContent(backgroundColor_),
+                                                                                        new TextContent(text, font, fontColor)
+                                                                                         }));
         }
     }
 }

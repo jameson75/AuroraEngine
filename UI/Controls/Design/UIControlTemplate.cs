@@ -39,6 +39,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         }
     }
 
+    /*
     public class LabelTemplate : UIControlTemplate
     {
         public LabelTemplate()
@@ -67,6 +68,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             return Label.FromTemplate(visualRoot, this);
         }
     }
+    */
 
    // public abstract class UIContentTemplate
    // { }
@@ -105,10 +107,10 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         public ButtonTemplate()
         { }
 
-        public ButtonTemplate(string text, SpriteFont font, Color4? fontColor, Color4? bgColor)
+        public ButtonTemplate(string text, SpriteFont font, Color4 fontColor, Color4? bgColor)
         {
             if ( text != null || font != null || fontColor != null )
-                ForegroundStyle = new TextStyle() { Text = text, Font = font, FontColor = fontColor.HasValue ? Color.Transparent : fontColor };
+                ForegroundStyle = new TextStyle() { Text = text, Font = font, FontColor = fontColor };
 
             if (bgColor != null)
                 BackgroundStyle = new ColorStyle() { Color = bgColor.Value };
@@ -128,7 +130,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
     public class CheckBoxTemplate : UIControlTemplate
     {
-        public LabelTemplate CaptionTemplate { get; set; }
+        public ContentControlTemplate CaptionTemplate { get; set; }
         public ContentControlTemplate CheckContentTemplate { get; set; }
         public ContentControlTemplate UncheckContentTemplate { get; set; }
 
@@ -139,7 +141,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             if (caption != null || font != null || fontColor != null)
             {
-                CaptionTemplate = new LabelTemplate(caption, font, fontColor, null);
+                CaptionTemplate = ContentControlTemplate.CreateLabelTemplate(caption, font, fontColor.Value);
                 if (caption != null && font != null)
                     CaptionTemplate.Size = font.MeasureString(caption);
             }
@@ -166,12 +168,36 @@ namespace CipherPark.AngelJacket.Core.UI.Components
     public class ContentControlTemplate : UIControlTemplate
     {
         public UIStyle ContentStyle { get; set; }
+
+        public ContentControlTemplate()
+        { }
+
+        public ContentControlTemplate(UIStyle contentStyle)
+        {
+            ContentStyle = contentStyle;
+        }
+
         public override UIControl CreateControl(IUIRoot visualRoot)
         {
             return ContentControl.FromTemplate(visualRoot, this);
         }
+
+        public static ContentControlTemplate CreateLabelTemplate(string text, SpriteFont font, Color fontColor, Color? backgroundColor = null)
+        {
+            Color backgroundColor_ = backgroundColor != null ? backgroundColor.Value : Color.Transparent;
+            ContentControlTemplate template = new ContentControlTemplate
+            {
+                ContentStyle = new LayeredStyle(new UIStyle[]
+                {
+                    new ColorStyle(backgroundColor_),
+                    new TextStyle(text, font, fontColor)
+                })
+            };
+            return template;
+        }
     }
 
+    /*
     public class ImageControlTemplate : UIControlTemplate
     {
         public ImageStyle ImageStyle { get; set; }
@@ -187,7 +213,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             return ImageControl.FromTemplate(visualRoot, this);
         }
     }
-   
+   */
+
     public class SliderTemplate : UIControlTemplate
     {
         public ContentControlTemplate TrackContent { get; set; }
@@ -209,16 +236,19 @@ namespace CipherPark.AngelJacket.Core.UI.Components
     public class TextBoxTemplate : UIControlTemplate
     {
         public TextStyle TextStyle { get; set; }
+        public ColorStyle EditorStyle { get; set; }
 
-        public TextBoxTemplate(string text, SpriteFont font, Color? fontColor, Color? backgroundColor)
+        public TextBoxTemplate(string text, SpriteFont font, Color fontColor, Color? editorColor = null)
         {
             TextStyle = new Components.TextStyle() 
             { 
                 Text = text,
                 Font = font,
-                FontColor = fontColor,
-                Color = backgroundColor
+                FontColor = fontColor                
             };
+
+            if (editorColor != null)
+                EditorStyle = new ColorStyle(editorColor.Value);
         }
 
         public override UIControl CreateControl(IUIRoot visualRoot)

@@ -136,6 +136,8 @@
     <Compile Include="Effects\Obsolete\SHLightingEffect.cs" />
     <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Effects\SkysphereEffect.cs" />
+    <Compile Include="UI\Controls\Design\LayeredStyle.cs" />
+    <Compile Include="UI\Controls\LayeredContent.cs" />
     <Compile Include="Utils\AudioVisualization.cs" />
     <Compile Include="Utils\BoundingBoxOA.cs" />
     <Compile Include="Utils\BoundingQuadOA.cs" />
@@ -205,13 +207,10 @@
     <Compile Include="UI\Controls\ColorContent.cs" />
     <Compile Include="UI\Controls\ContainerControl.cs" />
     <Compile Include="UI\Controls\ContentControl.cs" />
-    <Compile Include="UI\Controls\DockPanel.cs" />
     <Compile Include="UI\Controls\ICommandControl.cs" />
     <Compile Include="UI\Controls\ImageContent.cs" />
-    <Compile Include="UI\Controls\ImageControl.cs" />
     <Compile Include="UI\Controls\ItemControl.cs" />
     <Compile Include="UI\Controls\ItemsControl.cs" />
-    <Compile Include="UI\Controls\Label.cs" />
     <Compile Include="UI\Controls\LayoutManager.cs" />
     <Compile Include="UI\Controls\ListControl.cs" />
     <Compile Include="UI\Controls\Menu.cs" />
@@ -226,10 +225,8 @@
     <Compile Include="UI\Controls\UIContent.cs" />
     <Compile Include="UI\Controls\UIControl.cs" />
     <Compile Include="UI\Serialization\ColorStyleParser.cs" />
-    <Compile Include="UI\Serialization\ImageControlParser.cs" />
     <Compile Include="UI\Serialization\ItemControlParser.cs" />
     <Compile Include="UI\Serialization\ItemsControlParser.cs" />
-    <Compile Include="UI\Serialization\LabelControlParser.cs" />
     <Compile Include="UI\Serialization\MenuControlParser.cs" />
     <Compile Include="UI\Serialization\MenuItemControlParser.cs" />
     <Compile Include="UI\Serialization\PathResourceParser.cs" />

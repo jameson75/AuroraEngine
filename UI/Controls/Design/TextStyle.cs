@@ -18,17 +18,27 @@ using SharpDX;
 
 namespace CipherPark.AngelJacket.Core.UI.Components
 {
-    public class TextStyle : ColorStyle
+    public class TextStyle : UIStyle
     {
+        public TextStyle()
+        { }
+
+        public TextStyle(string text, SpriteFont font, Color4 fontColor)
+        {
+            Text = text;
+            Font = font;
+            FontColor = fontColor;
+        }
+
         public string Text { get; set; }
 
         public SpriteFont Font { get; set; }
 
-        public Color4? FontColor { get; set; }
+        public Color4 FontColor { get; set; }
 
         public override UIContent GenerateContent()
         {
-            TextContent content = new TextContent(Text, Font, FontColor.HasValue ? FontColor.Value : SharpDX.Color.Transparent);
+            TextContent content = new TextContent(Text, Font, FontColor);
             return content;
         }
     }

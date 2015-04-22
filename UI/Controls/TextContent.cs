@@ -84,8 +84,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (textTemplate.Font != null)
                 this.Font = textTemplate.Font;
 
-            if (textTemplate.FontColor != null)
-                this.FontColor = textTemplate.FontColor.Value;
+            this.FontColor = textTemplate.FontColor;
 
             base.ApplyStyle(style);
         }

@@ -19,10 +19,10 @@ using SharpDX.DirectInput;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
-    public class Button : UIControl, ICommandControl
+    public class Button : ContentControl, ICommandControl
     {
-        UIContent _foregroundContent = null;
-        UIContent _backgroundContent = null;
+        //UIContent _foregroundContent = null;
+        //UIContent _backgroundContent = null;
 
         public Button(IUIRoot visualRoot)
             : base(visualRoot)
@@ -32,28 +32,33 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Button(IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 bgColor)
             : base(visualRoot)
         {
-            Content = new TextContent(text, font, fontColor);
-            BackgroundContent = new ColorContent(bgColor);
+            Content = new LayeredContent( new UIContent[] { 
+                                          new ColorContent(bgColor),
+                                          new TextContent(text, font, fontColor)
+                                          } );
         }
 
         public Button(IUIRoot visualRoot, TextContent text, ColorContent bgColor) : base(visualRoot)
         {
-            Content = text;
-            BackgroundContent = bgColor;
+            Content = new LayeredContent(new UIContent[] { 
+                                          bgColor,
+                                          text
+                                          });
         }
 
         public Button(IUIRoot visualRoot, Texture2D image)
             : base(visualRoot)
         {
-            BackgroundContent = new ImageContent(image);
+            Content = new ImageContent(image);
         }
 
         public Button(IUIRoot visualRoot, ImageContent image) 
             : base(visualRoot)
         {
-            BackgroundContent = image;
+            Content = image;
         }
 
+        /*
         public UIContent Content
         {
             get { return _foregroundContent; }
@@ -81,6 +86,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 OnBackgroundContentChanged();
             }
         }
+        */
 
         public string CommandName { get; set; }
 
@@ -97,6 +103,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             OnClick();
         }
 
+        /*
         protected override void OnDraw(GameTime gameTime)
         {
             if (BackgroundContent != null)
@@ -107,6 +114,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
             base.OnDraw(gameTime);
         }     
+        */
 
         protected override void OnUpdate(GameTime gameTime)
         {
@@ -150,6 +158,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 handler(this, new ControlCommandArgs(commandName));
         }
 
+        /*
         protected virtual void OnForegroundContentChanged()
         {
             EventHandler handler = ForegroundContentChanged;
@@ -166,6 +175,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public event EventHandler BackgroundContentChanged;
         public event EventHandler ForegroundContentChanged;
+        */
+
         public event EventHandler Click;
         public event ControlCommandHandler ControlCommand;
 

@@ -137,18 +137,18 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public class PropertyGridItem : ItemControl
     {
         private CommandControlWireUp _wireUp = null;      
-        private Label childLabel = null;
-        private Label selectedChildLabel = null;
+        private ContentControl childLabel = null;
+        private ContentControl selectedChildLabel = null;
 
         private PropertyGridItem(IUIRoot visualRoot, TextContent nameContent, TextContent selectNameContent)
             : base(visualRoot)
         {
-            childLabel = new Label(visualRoot, nameContent);    
+            childLabel = ContentControl.CreateLabelControl(visualRoot, nameContent);    
             childLabel.HorizontalAlignment = Controls.HorizontalAlignment.Left;
             childLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             childLabel.Size = new Size2F(100.0f, 1.0f);
             this.Children.Add(childLabel);
-            selectedChildLabel = new Label(visualRoot, selectNameContent);
+            selectedChildLabel = ContentControl.CreateLabelControl(visualRoot, selectNameContent);
             selectedChildLabel.HorizontalAlignment = Controls.HorizontalAlignment.Left;
             selectedChildLabel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             selectedChildLabel.Size = new Size2F(100.0f, 1.0f);

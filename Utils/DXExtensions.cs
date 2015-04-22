@@ -142,6 +142,11 @@ namespace CipherPark.AngelJacket.Core.Utils
             if (!alignment.HasFlag(RectangleAlignment.Top))
                 rectangle.Top = rectangle.Bottom - originalSize.Height;
         }
+
+        public static Rectangle ToRectangle(this RectangleF rf)
+        {
+            return new Rectangle((int)rf.X, (int)rf.Y, (int)rf.Width, (int)rf.Height);
+        }
     }
 
     /// <summary>

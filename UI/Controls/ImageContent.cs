@@ -40,6 +40,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _texture = value;
              }
         }
+
+        public bool ScaleImage { get; set; }
        
         public ImageContent()
         { }
@@ -59,12 +61,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 if (_textureView == null)
                     _textureView = new ShaderResourceView(Container.Game.GraphicsDevice, _texture);
                 this.BeginDraw();
-                //if (!HasDrawParameters)
-                //    Container.ControlSpriteBatch.Begin();
-                //else
-                //    Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);                                
-                Container.ControlSpriteBatch.Draw(_textureView, Container.PositionToSurface(Container.Position).ToVector2(), SharpDX.Color.White);              
-                // Container.ControlSpriteBatch.End();
+                if (!ScaleImage)
+                    Container.ControlSpriteBatch.Draw(_textureView, Container.PositionToSurface(Container.Position).ToVector2(), SharpDX.Color.White);
+                else
+                    Container.ControlSpriteBatch.Draw(_textureView, Container.BoundsToSurface(Container.Bounds).ToRectangle(), new Rectangle(0, 0, _textureView.GetTexture2DSize().Width, _textureView.GetTexture2DSize().Height), Color.White);
                 this.EndDraw();
             }
 

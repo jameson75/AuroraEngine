@@ -74,14 +74,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         { 
 
         }
-
-        //TODO: Deprecate this method.
-        [Obsolete]
-        public virtual void Load(string path)
-        {
-
-        }
-
+       
         public UIControl Container
         {
             get { return _container; }

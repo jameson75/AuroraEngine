@@ -247,17 +247,5 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             foreach (var d in data)
                 data.Remove(d);
         }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class ObservableCollectionExtension
-    {
-        public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> data)
-        {
-            foreach (T d in data)
-                collection.Add(d);
-        }
-    }
+    }    
 }

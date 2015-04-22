@@ -22,7 +22,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 {
     public class Spinner : UIControl
     {
-        private Label _textArea = null;        
+        private ContentControl _textArea = null;        
         private Button _upButton = null;
         private Button _downButton = null;        
         private SplitterPanel _mainPanel = null;
@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _rightSubPanel.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             _mainPanel.Children.Add(_rightSubPanel);
 
-            _textArea = new Label(visualRoot, string.Empty, font, fontColor, backgroundColor);
+            _textArea = ContentControl.CreateLabelControl(visualRoot, string.Empty, font, fontColor, backgroundColor);
             _textArea.HorizontalAlignment = Controls.HorizontalAlignment.Stretch;
             _textArea.VerticalAlignment = Controls.VerticalAlignment.Stretch;
             _mainPanel.Children.Add(_textArea);
@@ -110,14 +110,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             get
             {
                 double result = 0;
-                if (!double.TryParse(_textArea.TextContent.Text, out result))
+                if (!double.TryParse(((TextContent)_textArea.Content).Text, out result))
                     return 0;
                 else
                     return result;
             }
             set
             {
-                _textArea.TextContent.Text = value.ToString();
+                ((TextContent)_textArea.Content).Text = value.ToString();
                 OnValueChanged(Value);
             }                    
         }

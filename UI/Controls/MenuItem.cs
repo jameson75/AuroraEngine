@@ -26,40 +26,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             this.Size = new Size2F(100, 20);
         }
 
-        public MenuItem(IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 fontColor)
-            : base(visualRoot)
-        {
-            Name = name;
-            CommandName = name;
-            TextContent textContent = new TextContent(text, font, fontColor);
-            ItemContent = textContent;
-            //SelectContent = textContent;
-            Size = font.MeasureString(text); //.Add(DefaultItemTextMargin); 
-        }
-
-        public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 itemFontColor, Color4 selectFontColor, string commandName = null)
+        public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 itemFontColor, Color4? selectFontColor = null, string commandName = null, ContextMenu subMenu = null)
             : base(visualRoot)
         {
             Name = name;
             CommandName = (commandName != null) ? commandName : name;
-            TextContent itemContent = new TextContent(text, font, itemFontColor);
-            ItemContent = itemContent;
-            TextContent selectContent = new TextContent(text, font, selectFontColor);
-            SelectContent = selectContent;
+            SubMenu = subMenu;           
+            ItemContent = new TextContent(text, font, itemFontColor);            
+            if(selectFontColor.HasValue)
+                SelectContent = new TextContent(text, font, selectFontColor.Value);
             Size = font.MeasureString(text); //.Add(DefaultItemTextMargin);
-        }
-
-        public MenuItem(Components.IUIRoot visualRoot, string name, string text, SpriteFont font, Color4 itemFontColor, Color4 selectFontColor, string commandName, ContextMenu subMenu)
-            : base(visualRoot)
-        {
-            Name = name;
-            SubMenu = subMenu;
-            TextContent itemContent = new TextContent(text, font, itemFontColor);
-            ItemContent = itemContent;
-            TextContent selectContent = new TextContent(text, font, selectFontColor);
-            SelectContent = selectContent;
-            Size = font.MeasureString(text); //.Add(DefaultItemTextMargin);
-        }
+        }        
 
         public UIContent ItemContent
         {

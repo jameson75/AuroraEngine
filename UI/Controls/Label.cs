@@ -22,9 +22,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Label(Components.IUIRoot visualRoot)
             : base(visualRoot)
-        {
-           
-        }
+        { }
        
         public Label(Components.IUIRoot visualRoot, TextContent text, ColorContent background = null)
             : base(visualRoot)
@@ -43,8 +41,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 _backgroundContent = new ColorContent(backgroundColor.Value);
                 _backgroundContent.Container = this;
             }
-        }
-    
+        }    
 
         public static Label FromTemplate(IUIRoot visualRoot, LabelTemplate template)
         {
