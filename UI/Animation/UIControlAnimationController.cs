@@ -44,8 +44,15 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             OnUpdateTarget(timeT);
 
             if (timeT >= RunningTime)
-                this.OnAnimationComplete();           
+            {
+                if (Loop)
+                    _animationStartTime = null;
+                else
+                    this.OnAnimationComplete();
+            }
         }
+
+        public bool Loop { get; set; }
 
         protected virtual void OnUpdateTarget(ulong timeT)
         { }

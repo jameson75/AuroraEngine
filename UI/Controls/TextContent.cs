@@ -36,11 +36,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public HorizontalAlignment HAlignment { get; set; }
 
         public override void Draw(GameTime gameTime)
-        {
-            base.Draw(gameTime);            
+        {                       
             if (Container == null)
                 throw new InvalidOperationException("No container for this content was specified.");
             
+            base.Draw(gameTime); 
+           
             Vector2 contentSurfacePosition = Container.PositionToSurface(Container.Position);
             this.BeginDraw();
             //if (!HasDrawParameters)

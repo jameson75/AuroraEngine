@@ -31,12 +31,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public UIContent()
         {
-            Opacity = 1.0f;
             ClippingEnabled = true;
+            BlendFactor = Color.Zero;
             internalCallback = new Action(InternalShaderCallback);
         }
 
-        public Color4? BlendFactor { get; set; }
+        public Color4 BlendFactor { get; set; }
 
         public SpriteSortMode? SpriteSortMode { get; set; }
 
@@ -50,11 +50,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Action CustomShaderCallback { get; set; }
 
-        public Matrix? TransformationMatrix { get; set; }
-
-        public float Opacity { get; set; }
+        public Matrix? TransformationMatrix { get; set; }      
 
         public bool ClippingEnabled { get; set; }
+
+        public PredefinedBlend PredefinedBlend { get; set; }
 
         protected bool HasDrawParameters
         {
@@ -122,13 +122,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 }
             }
 
-            //Transparency
-            //------------
+            //Blending
+            //--------
             if (BlendState == null)
             {
-                float clampedOpacity = MathUtil.Clamp(Opacity, 0, 1);
-                if (clampedOpacity < 1.0f)
-                {
+                //https://msdn.microsoft.com/en-us/library/bb976070.aspx
+                if (PredefinedBlend == PredefinedBlend.Opacity)
+                {                  
                     //TODO: Currently, using "Non - Premultiplied" blend state - : Use Premultiplied state.
                     //NOTE: We're specifying the alpha channel (opacity) using the blend factor.
                     oldBlendState = game.GraphicsDeviceContext.OutputMerger.BlendState;
@@ -139,11 +139,25 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.BlendFactor;
                     blendDesc.RenderTarget[0].DestinationBlend = BlendOption.InverseBlendFactor;
                     blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseBlendFactor;
-                    this.BlendState = new BlendState(game.GraphicsDevice, blendDesc);
-                    this.BlendFactor = new Color4(clampedOpacity);
-                    _restoreBlendState = true;
+                    this.BlendState = new BlendState(game.GraphicsDevice, blendDesc);     
+                    _restoreBlendState = true;                                
                 }
-            }
+                else if(PredefinedBlend == PredefinedBlend.Brightness)
+                {                    
+                    oldBlendState = game.GraphicsDeviceContext.OutputMerger.BlendState;
+                    oldBlendFactor = game.GraphicsDeviceContext.OutputMerger.BlendFactor;
+                    BlendStateDescription blendDesc = BlendStateDescription.Default();
+                    blendDesc.RenderTarget[0].IsBlendEnabled = true;
+                    blendDesc.RenderTarget[0].SourceBlend =  BlendOption.BlendFactor;
+                    blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.BlendFactor;
+                    blendDesc.RenderTarget[0].DestinationBlend = BlendOption.One;
+                    blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.One;
+                    this.BlendState = new BlendState(game.GraphicsDevice, blendDesc);
+                    _restoreBlendState = true;
+                }               
+                
+                game.GraphicsDeviceContext.OutputMerger.BlendFactor = this.BlendFactor;
+            }           
 
             if (!HasDrawParameters)
                 Container.ControlSpriteBatch.Begin();
@@ -175,9 +189,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 this.Container.Game.GraphicsDeviceContext.OutputMerger.BlendState = oldBlendState;
                 this.Container.Game.GraphicsDeviceContext.OutputMerger.BlendFactor = oldBlendFactor;
                 oldBlendState = null;
-                oldBlendFactor = Color.Transparent;
-                this.BlendState = null;
-                this.BlendFactor = null;
+                oldBlendFactor = Color.Zero;
+                this.BlendState = null;               
                 _restoreBlendState = false;
             }      
 
@@ -186,11 +199,17 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private void InternalShaderCallback()
         {
-            if (this.BlendFactor != null)
-                this.Container.Game.GraphicsDeviceContext.OutputMerger.BlendFactor = BlendFactor.Value;
-
+            //Work around. SpriteBatch in directX tool kit overwrites BlendFactor so we set it here, during the shader callback.
+            this.Container.Game.GraphicsDeviceContext.OutputMerger.BlendFactor = BlendFactor;
             if (CustomShaderCallback != null)
                 CustomShaderCallback();
         }
+    }
+
+    public enum PredefinedBlend
+    {
+        None,
+        Opacity,
+        Brightness
     }
 }

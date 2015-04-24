@@ -88,7 +88,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnDraw(gameTime);
         }
        
-        public static void ShowAlert(IUIRoot ui, TextContent messageContent, ImageContent iconContent, ColorContent backgroundContent, ulong displayTime)
+        private static void ShowAlert(IUIRoot ui, TextContent messageContent, ImageContent iconContent, ColorContent backgroundContent, ulong displayTime)
         {
             if (ui == null || messageContent == null)
                 throw new ArgumentNullException();
@@ -96,8 +96,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             AlertBox alertControl = new AlertBox(ui);
             alertControl.Visible = true;
             alertControl.Text = messageContent;
+            alertControl.Text.PredefinedBlend = PredefinedBlend.Opacity;
             alertControl.Icon = iconContent;
             alertControl.Background = backgroundContent;
+            alertControl.Background.PredefinedBlend = PredefinedBlend.Opacity;
             //alertControl.Background.Opacity = .5f;
             RectangleF screenRect = new RectangleF(0, 0, ui.ScreenSize.Width, ui.ScreenSize.Height);
             Size2F textMargin = new Size2F(5, 5);

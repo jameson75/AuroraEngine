@@ -31,30 +31,29 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
 
         protected override void OnUpdateTarget(ulong timeT)
         {
-            if (TargetPropertyExists(UIContentPropertyNames.Opacity))
-                Target.Opacity = GetPropertyFloatValueAtT(UIContentPropertyNames.Opacity, timeT);
-
+            if (TargetPropertyExists(UIContentPropertyNames.BlendFactor))
+                Target.BlendFactor = GetPropertyColorValueAtT(UIContentPropertyNames.BlendFactor, timeT);
             base.OnUpdateTarget(timeT);
         }
         
-        public float GetOpacityAtT(ulong timeT)
+        public Color4 GetBlendFactorAtT(ulong timeT)
         {
-            if (TargetPropertyExists(UIContentPropertyNames.Opacity))
-                return GetPropertyFloatValueAtT(UIContentPropertyNames.Opacity, timeT);
+            if (TargetPropertyExists(UIContentPropertyNames.BlendFactor))
+                return GetPropertyColorValueAtT(UIContentPropertyNames.BlendFactor, timeT);
             else
-                return Target.Opacity;
+                return Target.BlendFactor;
         }
 
-        public void SetOpacityAtT(ulong timeT, float value)
+        public void SetBlendFactorAtT(ulong timeT, Color4 value)
         {
-            if (!TargetPropertyExists(UIContentPropertyNames.Opacity))
-                AddPropertyAnimation(UIContentPropertyNames.Opacity, new FloatAnimation());
-            SetPropertyKeyFrame(UIContentPropertyNames.Opacity, new AnimationKeyFrame(timeT, value));
+            if (!TargetPropertyExists(UIContentPropertyNames.BlendFactor))
+                AddPropertyAnimation(UIContentPropertyNames.BlendFactor, new Color4Animation());
+            SetPropertyKeyFrame(UIContentPropertyNames.BlendFactor, new AnimationKeyFrame(timeT, value));
         }
 
         private static class UIContentPropertyNames
         {
-            public const string Opacity = "Opacity";
+            public const string BlendFactor = "BlendFactor";
         }
     }
 
@@ -63,7 +62,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
         protected override void OnUpdateTarget(ulong timeT)
         {
             if (TargetPropertyExists(ColorContentPropertyNames.Color))
-                Target.Opacity = GetPropertyFloatValueAtT(ColorContentPropertyNames.Color, timeT);
+                Target.Color = GetPropertyColorValueAtT(ColorContentPropertyNames.Color, timeT);
 
             base.OnUpdateTarget(timeT);
         }

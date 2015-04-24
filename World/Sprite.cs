@@ -22,12 +22,13 @@ namespace CipherPark.AngelJacket.Core.World
             _graphicsDeviceContext = graphicsDeviceContext;
             _renderer = new SpriteBatch(graphicsDeviceContext);
             _sprites = new List<Sprite>();
+            BlendFactor = Color.Zero;
             internalCallback = new Action(this.InternalShaderCallback);
         }
 
         public List<Sprite> Sprites { get { return _sprites; } }
 
-        public Color4? BlendFactor { get; set; }
+        public Color4 BlendFactor { get; set; }
 
         public SpriteSortMode? SpriteSortMode { get; set; }
 
@@ -75,10 +76,13 @@ namespace CipherPark.AngelJacket.Core.World
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void InternalShaderCallback()
         {
-            if (this.BlendFactor != null)
-                this._graphicsDeviceContext.OutputMerger.BlendFactor = BlendFactor.Value;
+            //Work around. Shader overwrites BlendFactor so we set it here, during the shader callback.
+            this._graphicsDeviceContext.OutputMerger.BlendFactor = BlendFactor;
 
             if (CustomShaderCallback != null)
                 CustomShaderCallback();

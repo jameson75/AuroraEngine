@@ -37,12 +37,12 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             };
             ColorContentAnimationController backgroundContentController = new ColorContentAnimationController();
             backgroundContentController.Target = backgroundContent;
-            backgroundContentController.SetOpacityAtT(0, 0);
-            backgroundContentController.SetOpacityAtT(250, .5f);
+            backgroundContentController.SetBlendFactorAtT(0, new Color(0));
+            backgroundContentController.SetBlendFactorAtT(250, new Color(.5f));
             UIContentAnimationController<TextContent> messageContentController = new UIContentAnimationController<TextContent>();
             messageContentController.Target = messageContent;
-            messageContentController.SetOpacityAtT(0, 0);
-            messageContentController.SetOpacityAtT(250, 1);          
+            messageContentController.SetBlendFactorAtT(0, new Color(0));
+            messageContentController.SetBlendFactorAtT(250, new Color(1));          
             CompositeAnimationController alertBoxController = new CompositeAnimationController(new IAnimationController[] { controlController, backgroundContentController, messageContentController });
             return alertBoxController;
         }
@@ -76,6 +76,19 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             }            
             compositeController.Children.Add(menuController);
             return compositeController;
+        }
+
+        public static UIContentAnimationController<UIContent> CreateBlendFactorFlicker(UIContent backgroundImageContentLightMap)
+        {
+            UIContentAnimationController<UIContent> controller = new UIContentAnimationController<UIContent>()
+            {
+                Target = backgroundImageContentLightMap
+            };            
+            controller.SetBlendFactorAtT(0, new Color4(0));
+            controller.SetBlendFactorAtT(500, new Color4(1.0f));
+            controller.SetBlendFactorAtT(1000, new Color4(0));
+            controller.Loop = true;
+            return controller;
         }
     }
 }
