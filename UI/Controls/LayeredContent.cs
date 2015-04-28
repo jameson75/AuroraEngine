@@ -28,7 +28,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         /// <summary>
         /// 
         /// </summary>
-        public List<UIContent> ChildContent { get; set; }
+        public ObservableCollection<UIContent> ChildContents { get { return _childContent; } }
 
         /// <summary>
         /// 

@@ -78,8 +78,9 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             return compositeController;
         }
 
-        public static UIContentAnimationController<UIContent> CreateBlendFactorFlicker(UIContent backgroundImageContentLightMap)
+        public static IAnimationController CreateBlendFactorFlicker(UIContent uiContent)
         {
+            /*
             UIContentAnimationController<UIContent> controller = new UIContentAnimationController<UIContent>()
             {
                 Target = backgroundImageContentLightMap
@@ -89,6 +90,18 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             controller.SetBlendFactorAtT(1000, new Color4(0));
             controller.Loop = true;
             return controller;
+           */
+            Random _rand = new Random();
+            return new Core.Animation.Controllers.ActionAnimationController()
+            {
+                FireImmediately = true,
+                Frequency = 50,
+                Action = () =>
+                    {
+                        float r = (float)_rand.NextDouble(0.7, 1.0);
+                        uiContent.BlendFactor = new Color4(r);
+                    }
+            };
         }
     }
 }

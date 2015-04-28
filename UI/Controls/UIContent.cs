@@ -128,34 +128,57 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 //https://msdn.microsoft.com/en-us/library/bb976070.aspx
                 if (PredefinedBlend == PredefinedBlend.Opacity)
-                {                  
-                    //TODO: Currently, using "Non - Premultiplied" blend state - : Use Premultiplied state.
-                    //NOTE: We're specifying the alpha channel (opacity) using the blend factor.
+                {                   
                     oldBlendState = game.GraphicsDeviceContext.OutputMerger.BlendState;
                     oldBlendFactor = game.GraphicsDeviceContext.OutputMerger.BlendFactor;
                     BlendStateDescription blendDesc = BlendStateDescription.Default();
                     blendDesc.RenderTarget[0].IsBlendEnabled = true;
                     blendDesc.RenderTarget[0].SourceBlend = BlendOption.BlendFactor;
-                    blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.BlendFactor;
+                    blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
                     blendDesc.RenderTarget[0].DestinationBlend = BlendOption.InverseBlendFactor;
-                    blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseBlendFactor;
+                    blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
                     this.BlendState = new BlendState(game.GraphicsDevice, blendDesc);     
                     _restoreBlendState = true;                                
                 }
-                else if(PredefinedBlend == PredefinedBlend.Brightness)
+                else if(PredefinedBlend == PredefinedBlend.Additive)
                 {                    
                     oldBlendState = game.GraphicsDeviceContext.OutputMerger.BlendState;
                     oldBlendFactor = game.GraphicsDeviceContext.OutputMerger.BlendFactor;
                     BlendStateDescription blendDesc = BlendStateDescription.Default();
                     blendDesc.RenderTarget[0].IsBlendEnabled = true;
                     blendDesc.RenderTarget[0].SourceBlend =  BlendOption.BlendFactor;
-                    blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.BlendFactor;
+                    blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
                     blendDesc.RenderTarget[0].DestinationBlend = BlendOption.One;
-                    blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.One;
+                    blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
                     this.BlendState = new BlendState(game.GraphicsDevice, blendDesc);
                     _restoreBlendState = true;
-                }               
-                
+                }
+                else if(PredefinedBlend == PredefinedBlend.LightMap)
+                {
+                    oldBlendState = game.GraphicsDeviceContext.OutputMerger.BlendState;
+                    oldBlendFactor = game.GraphicsDeviceContext.OutputMerger.BlendFactor;
+                    BlendStateDescription blendDesc = BlendStateDescription.Default();
+                    blendDesc.RenderTarget[0].IsBlendEnabled = true;
+                    blendDesc.RenderTarget[0].SourceBlend = BlendOption.Zero;
+                    blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.Zero;
+                    blendDesc.RenderTarget[0].DestinationBlend = BlendOption.SourceColor;
+                    blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.One;                   
+                    this.BlendState = new BlendState(game.GraphicsDevice, blendDesc);
+                    _restoreBlendState = true;
+                }
+                else if (PredefinedBlend == PredefinedBlend.AlphaBlend)
+                {
+                    oldBlendState = game.GraphicsDeviceContext.OutputMerger.BlendState;
+                    oldBlendFactor = game.GraphicsDeviceContext.OutputMerger.BlendFactor;
+                    BlendStateDescription blendDesc = BlendStateDescription.Default();
+                    blendDesc.RenderTarget[0].IsBlendEnabled = true;
+                    blendDesc.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
+                    blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
+                    blendDesc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
+                    blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
+                    this.BlendState = new BlendState(game.GraphicsDevice, blendDesc);
+                    _restoreBlendState = true;
+                } 
                 game.GraphicsDeviceContext.OutputMerger.BlendFactor = this.BlendFactor;
             }           
 
@@ -206,10 +229,30 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
     }
 
+
+    public static class UIContentExtension
+    {
+        public static T As<T>(this UIContent content) where T : UIContent
+        {
+            if (typeof(T).IsAssignableFrom(content.GetType()))
+                return (T)content;
+            else if (content is LayeredContent)
+            {
+                LayeredContent layeredContent = (LayeredContent)content;
+                foreach (UIContent child in layeredContent.ChildContents)
+                    if (typeof(T).IsAssignableFrom(child.GetType()))
+                        return (T)child;
+            }
+
+            throw new InvalidOperationException("Cannot cast content to specified type");
+        }
+    }
+
     public enum PredefinedBlend
     {
         None,
         Opacity,
-        Brightness
-    }
-}
+        Additive,
+        LightMap,
+        AlphaBlend
+    }}

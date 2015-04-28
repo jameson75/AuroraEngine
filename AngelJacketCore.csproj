@@ -88,6 +88,7 @@
   <ItemGroup>
     <Compile Include="Animation\Controllers\CompositeAnimationController.cs" />
     <Compile Include="Animation\Controllers\KeyframeAnimationController.cs" />
+    <Compile Include="Animation\Controllers\ActionAnimationController.cs" />
     <Compile Include="Animation\Controllers\ParticleSystemController.cs" />
     <Compile Include="Animation\Controllers\RigidBodyAnimationController.cs" />
     <Compile Include="Animation\SpatialAnimation.cs" />
@@ -118,7 +119,7 @@
     <Compile Include="Animation\FloatAnimation.cs" />
     <Compile Include="Animation\IntAnimation.cs" />
     <Compile Include="Animation\ObjectAnimation.cs" />
-    <Compile Include="Animation\PropertiesAnimationController.cs" />
+    <Compile Include="Animation\Controllers\PropertiesAnimationController.cs" />
     <Compile Include="Animation\RectangleAnimation.cs" />
     <Compile Include="Animation\StringAnimation.cs" />
     <Compile Include="Animation\Transform.cs" />

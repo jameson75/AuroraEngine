@@ -108,16 +108,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public double Value
         {
             get
-            {
+            {                
                 double result = 0;
-                if (!double.TryParse(((TextContent)_textArea.Content).Text, out result))
+                if (!double.TryParse((_textArea.Content.As<TextContent>()).Text, out result))
                     return 0;
                 else
                     return result;
             }
             set
             {
-                ((TextContent)_textArea.Content).Text = value.ToString();
+                _textArea.Content.As<TextContent>().Text = value.ToString();
                 OnValueChanged(Value);
             }                    
         }

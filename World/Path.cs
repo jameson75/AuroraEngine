@@ -27,13 +27,14 @@ namespace CipherPark.AngelJacket.Core.World
     /// </summary>
     public class Path
     {
-        public const int DefaultSamplesPerSegment = 16;
-
         private List<PathNode> _nodes = new List<PathNode>();
-
         private List<float> _approximateSegmentLengths = new List<float>();
+        private int _lastCalculatedNodeIndex = 0;      
 
-        private int _lastCalculatedNodeIndex = 0;              
+        /// <summary>
+        /// 
+        /// </summary>
+        public const int DefaultSamplesPerSegment = 16;                
 
         /// <summary>
         /// 
@@ -43,6 +44,9 @@ namespace CipherPark.AngelJacket.Core.World
             SamplesPerSegment = DefaultSamplesPerSegment;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int SamplesPerSegment { get; set; }
 
         /// <summary>
@@ -255,17 +259,7 @@ namespace CipherPark.AngelJacket.Core.World
             if(Distance > 0)
                 result.Add(EvaluateNodeAtDistance(Distance));
             return result.ToArray();
-        }
-
-        /// <summary>
-        /// Updates the internally managed linear approximation of the path.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <remarks>You would call this method when a path node changes it's transform property and want to obtain the new Distance of the entire path.</remarks>
-        public void NotifyNodeTransformChanged(PathNode node)
-        {
-            
-        }   
+        }       
 
         /// <summary>
         /// 
@@ -305,18 +299,5 @@ namespace CipherPark.AngelJacket.Core.World
         }
 
         public Transform Transform { get; set; }       
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public enum PathModificationType
-    {
-        //Indicates that a new node was added to the path.
-        NewTail,
-        //Indicates that the transform has changed for an existing node in the path.
-        Change,
-        //Indicates that a node was removed from the path.
-        Delete
     }
 }
