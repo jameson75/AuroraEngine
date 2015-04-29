@@ -137,6 +137,7 @@
     <Compile Include="Effects\Obsolete\SHLightingEffect.cs" />
     <Compile Include="Effects\SkinnedEffectEx.cs" />
     <Compile Include="Effects\SkysphereEffect.cs" />
+    <Compile Include="UI\Controls\ChoiceControl.cs" />
     <Compile Include="UI\Controls\Design\LayeredStyle.cs" />
     <Compile Include="UI\Controls\LayeredContent.cs" />
     <Compile Include="Utils\AudioVisualization.cs" />

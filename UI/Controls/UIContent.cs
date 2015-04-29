@@ -127,6 +127,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (BlendState == null)
             {
                 //https://msdn.microsoft.com/en-us/library/bb976070.aspx
+
                 if (PredefinedBlend == PredefinedBlend.Opacity)
                 {                   
                     oldBlendState = game.GraphicsDeviceContext.OutputMerger.BlendState;

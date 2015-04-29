@@ -352,12 +352,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += _container.Padding.Top;
+                        offset += _container.Padding.Top + Items[0].Margin.Top;
                     else
                         offset += (Items[i - 1].Size.Height + Items[i - 1].Margin.Bottom + Items[i].Margin.Top);
                     Items[i].Position = new Vector2(_container.Padding.Left, offset);
-                    Items[i].Size = new Size2F(_container.Size.Width - _container.Margin.Right, Items[i].Size.Height);
-                    //offset += Items[i].Size.Height;
+                    Items[i].Size = new Size2F(_container.Size.Width - _container.Margin.Right, Items[i].Size.Height);                    
                 }
             }
             else
@@ -365,12 +364,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 for (int i = 0; i < Items.Count; i++)
                 {
                     if (i == 0)
-                        offset += _container.Padding.Left;
+                        offset += _container.Padding.Left + Items[0].Margin.Left;
                     else                    
                         offset += (Items[i - 1].Size.Width + Items[i - 1].Margin.Right + Items[i].Margin.Left);
                     Items[i].Position = new Vector2(offset, _container.Padding.Top);
-                    Items[i].Size = new Size2F(Items[i].Size.Width, _container.Size.Height - _container.Margin.Bottom);
-                    //offset += Items[i].Size.Width;
+                    Items[i].Size = new Size2F(Items[i].Size.Width, _container.Size.Height - _container.Margin.Bottom);                    
                 }
             }
         }

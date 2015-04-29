@@ -6,6 +6,7 @@ using SharpDX.DirectInput;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.UI.Components;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.AngelJacket.Core.UI.Controls.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,6 +18,9 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 
 namespace CipherPark.AngelJacket.Core.UI.Controls
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class SelectControl : ItemsControl
     {
         private int _selectedIndex = -1;
@@ -120,6 +124,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class Menu : SelectControl
     {
         //private MenuOrientation _orientation = MenuOrientation.Vertical;
@@ -208,6 +215,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.Initialize();
         }
 
+        /*
         public void SetItemsPadding(BoundaryF padding)
         {
             foreach (ItemControl item in this.Items)
@@ -221,6 +229,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 item.Margin = margin;
             UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
         }
+        */
 
         protected override void OnDraw(GameTime gameTime)
         {
@@ -282,60 +291,16 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (item is MenuItem == false)
                 throw new ArgumentException("item", "item must be of type or derivative of MenuItem");
             if (AutoSize)
-            {
-                //if (this.Items.Count == 1)
-                //    this.Size = item.Size;
-                //else
-                //    this.Size = (this.Orientation == MenuOrientation.Vertical) ? new Size2F(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new Size2F(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
-                this.Size = (this.Orientation == MenuOrientation.Vertical) ? new Size2F(this.Items.Max(x => x.Size.Width) , this.Items.Sum(x => x.Bounds.Height)) : new Size2F(this.Items.Sum(x => x.Bounds.Width), this.Items.Max(x => x.Size.Height));
-            }
+                //this.Size = (this.Orientation == MenuOrientation.Vertical) ? new Size2F(this.Items.Max(x => x.Size.Width) , this.Items.Sum(x => x.Bounds.Height)) : new Size2F(this.Items.Sum(x => x.Bounds.Width), this.Items.Max(x => x.Size.Height));            
+                this.Size = CalculateSizeFromItems(); 
             base.OnItemAdded(item);
         }
 
         protected override void OnItemRemoved(ItemControl item)
         {
-            base.OnItemRemoved(item);
-            //if (AutoSize)
-            //{
-            //    if (this.Items.Count == 0)
-            //        this.Size = Size2FExtension.Zero;
-            //    else
-            //        this.Size = (this.Orientation == MenuOrientation.Vertical) ? new Size2F(this.Size.Width, this.Items.Sum(x => x.Bounds.Height)) : new Size2F(this.Items.Sum(x => x.Bounds.Width), this.Size.Height);
-            //}
+            base.OnItemRemoved(item);            
             SelectedItemIndex = -1;
         }
-
-        //protected override void OnLayoutChanged()
-        //{
-        //    float offset = 0f;
-        //    if (Orientation == MenuOrientation.Vertical)
-        //    {
-        //        for (int i = 0; i < Items.Count; i++)
-        //        {
-        //            if (i == 0)
-        //                offset += this.Margin.Top;
-        //            else
-        //                offset += Items[i - 1].Padding.Bottom;
-        //            Items[i].Position = new Vector2(this.Margin.Left, offset);
-        //            Items[i].Size = new Size2F(this.Size.Width - this.Margin.Right, Items[i].Size.Height);
-        //            offset += Items[0].Size.Height;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        for (int i = 0; i < Items.Count; i++)
-        //        {
-        //            if (i == 0)
-        //                offset += this.Margin.Left;
-        //            else
-        //                offset += Items[i - 1].Padding.Right;
-        //            Items[i].Position = new Vector2(offset, this.Margin.Top);
-        //            Items[i].Size = new Size2F(Items[i].Size.Width, this.Size.Height - this.Margin.Bottom);
-        //            offset += Items[0].Size.Width;
-        //        }
-        //    }
-        //    base.OnLayoutChanged();
-        //}
 
         protected virtual void OnItemClicked(MenuItem item)
         {
@@ -361,14 +326,25 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             menu.ApplyTemplate(menuTemplate);
             return menu;
         }
+
+        private Size2F CalculateSizeFromItems()
+        {
+            return (this.Orientation == MenuOrientation.Vertical) ? new Size2F(this.Items.Max(x => x.Extents().Width), this.Items.Sum(x => x.Extents().Height)) : new Size2F(this.Items.Sum(x => x.Extents().Width), this.Items.Max(x => x.Extents().Height));
+        }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum MenuOrientation
     {
         Vertical,
         Horizontal
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ItemClickedEventArgs : EventArgs
     {
         private MenuItem _item = null;
@@ -381,128 +357,26 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public MenuItem Item { get { return _item; } }
     }
 
-    public delegate void ItemClickedEventHandler(object sender, ItemClickedEventArgs args);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
+    public delegate void ItemClickedEventHandler(object sender, ItemClickedEventArgs args); 
+}
 
-    public class ChoiceControl : ContentControl        
-    {        
-        ContextMenu _contextMenu = null;
-        
-        public ChoiceControl(IUIRoot visualRoot)
-            : base(visualRoot)
+namespace CipherPark.AngelJacket.Core.UI.Controls.Extensions
+{
+    public static class UIControlExtensions
+    {
+        public static RectangleF Extents(this UIControl control)
         {
-            _contextMenu = new ContextMenu(visualRoot);
-            _contextMenu.ContextClosed += ContextMenu_ContextClosed;
-            _contextMenu.DisplaySide = ContextMenuDisplaySide.Right;
-            _contextMenu.Visible = false;
-            visualRoot.Controls.Add(_contextMenu);
+            RectangleF r = control.Bounds;
+            r.Left -= control.Margin.Left;
+            r.Top -= control.Margin.Top;
+            r.Right += control.Margin.Right;
+            r.Bottom += control.Margin.Bottom;
+            return r;
         }
-
-        public UIItemControlCollection Items
-        {
-            get { return _contextMenu.SubControl.Items; }
-        }
-
-        public int SelectedItemIndex
-        {
-            get { return _contextMenu.SubControl.SelectedItemIndex; }
-            set 
-            { 
-                _contextMenu.SubControl.SelectedItemIndex = value;
-                UpdateContent();
-            }
-        }
-
-        public void OpenContextMenu()
-        {
-            if (_contextMenu.Owner != null && _contextMenu.Owner != this)
-                throw new InvalidOperationException("Context menu cannot be opened while owned by another control.");
-
-            _contextMenu.BeginContext(this);
-
-            Vector2 subMenuRelativePosition = Vector2Extension.Zero;
-
-            switch (_contextMenu.DisplaySide)
-            {
-                case ContextMenuDisplaySide.Left:
-                    subMenuRelativePosition = new Vector2(this.Position.X - _contextMenu.Bounds.Width, this.Position.Y);
-                    break;
-                case ContextMenuDisplaySide.Above:
-                    subMenuRelativePosition = new Vector2(this.Position.X, this.Position.Y - _contextMenu.Bounds.Height);
-                    break;
-                case ContextMenuDisplaySide.Right:
-                    subMenuRelativePosition = new Vector2(this.Bounds.Right, this.Position.Y);
-                    break;
-                case ContextMenuDisplaySide.Bottom:
-                    subMenuRelativePosition = new Vector2(this.Bounds.X, this.Bounds.Bottom);
-                    break;
-            }
-
-            _contextMenu.Position = _contextMenu.PositionToLocal(this.PositionToSurface(subMenuRelativePosition));
-        }
-
-        public override bool CanReceiveFocus
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        protected override void OnUpdate(GameTime gameTime)
-        {
-            Services.IInputService inputServices = (Services.IInputService)Game.Services.GetService(typeof(Services.IInputService));
-
-            if (inputServices == null)
-                throw new InvalidOperationException("Input services not available.");
-
-            if (this.HasFocus)
-            {
-                BufferedInputState bInputState = inputServices.GetBufferedInputState();
-                if (bInputState.IsKeyReleased(Key.Return))
-                    OpenContextMenu();
-            }
-
-            if (this.IsHit)
-            {
-                InputState inputState = inputServices.GetInputState();
-                if (inputState.IsMouseButtonDown(InputState.MouseButton.Left))
-                    OpenContextMenu();
-            }
-
-            base.OnUpdate(gameTime);
-        }
-
-        private void ContextMenu_ContextClosed(object sender, EventArgs e)
-        {
-            if(_contextMenu.Result == ContextControlResult.SelectOK)              
-                UpdateContent();
-        }
-
-        private void UpdateContent()
-        {
-            if (_contextMenu.SubControl.SelectedItem != null)
-            {
-                //TODO: Implement the ability to clone content.
-                //Right now, we relegate to copying text from text content.
-                TextContent t = ((MenuItem)_contextMenu.SubControl.SelectedItem).ItemContent as TextContent;
-                if (t != null)
-                    this.Content = new TextContent(t.Text, t.Font, t.FontColor);
-                else
-                    this.Content = null;
-            }
-            else
-                this.Content = null;
-
-            OnSelectedContentChanged();
-        }
-
-        protected virtual void OnSelectedContentChanged()
-        {
-            EventHandler handler = SelectedContentChanged;
-            if (handler != null)
-                handler(this, EventArgs.Empty);
-        }
-
-        public event EventHandler SelectedContentChanged;
     }
 }

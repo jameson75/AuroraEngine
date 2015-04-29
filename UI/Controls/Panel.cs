@@ -21,6 +21,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         { }           
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class SplitterPanel : Panel
     {
         private SplitterContainerLayoutManager _layoutManager = null;
@@ -48,6 +51,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public SplitterLayoutDivisions Splitters { get { return _layoutManager.LayoutDivisions; } }       
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class StackPanel : Panel
     {
         private StackLayoutManager _layoutManager = null;

@@ -79,18 +79,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
         }
 
         public static IAnimationController CreateBlendFactorFlicker(UIContent uiContent)
-        {
-            /*
-            UIContentAnimationController<UIContent> controller = new UIContentAnimationController<UIContent>()
-            {
-                Target = backgroundImageContentLightMap
-            };            
-            controller.SetBlendFactorAtT(0, new Color4(0));
-            controller.SetBlendFactorAtT(500, new Color4(1.0f));
-            controller.SetBlendFactorAtT(1000, new Color4(0));
-            controller.Loop = true;
-            return controller;
-           */
+        {           
             Random _rand = new Random();
             return new Core.Animation.Controllers.ActionAnimationController()
             {

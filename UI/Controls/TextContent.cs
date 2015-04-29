@@ -43,15 +43,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.Draw(gameTime); 
            
             Vector2 contentSurfacePosition = Container.PositionToSurface(Container.Position);
+
             this.BeginDraw();
-            //if (!HasDrawParameters)
-            //    Container.ControlSpriteBatch.Begin();
-            //else
-            //    Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, CustomShaderCallback, TransformationMatrix);
             string outputString = string.IsNullOrEmpty(Text) ? string.Empty : string.IsNullOrEmpty(Format) ? Text : string.Format(Format, Text);            
-            Container.ControlSpriteBatch.DrawString(Font, outputString, contentSurfacePosition.ToVector2(), FontColor);
-            
-            //Container.ControlSpriteBatch.End();     
+            Container.ControlSpriteBatch.DrawString(Font, outputString, contentSurfacePosition.ToVector2(), FontColor);               
             this.EndDraw();                   
         }
 
