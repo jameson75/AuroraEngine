@@ -45,5 +45,7 @@ namespace CipherPark.AngelJacket.Core
         DepthStencilView DepthStencil { get; }
 
         SwapChain SwapChain { get; }
+
+        bool IsWindowed { get; set; }
     }
 }
