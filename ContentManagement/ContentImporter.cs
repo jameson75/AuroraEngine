@@ -22,6 +22,7 @@ using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
+using CipherPark.AngelJacket.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -35,31 +36,30 @@ namespace CipherPark.AngelJacket.Core.Content
 {
     public static class ContentImporter
     {
-        public static SourceVoice LoadVoice(XAudio2 audioDevice, string resource, bool loop = false)
+        public static SourceVoiceEx LoadVoice(XAudio2 audioDevice, string resource, bool loop = false)
         {
-            SourceVoice sourceVoice = null;
-            AudioBuffer ab = new AudioBuffer();
+            SourceVoiceEx sourceVoiceEx = null;            
             string resourceFileExt = System.IO.Path.GetExtension(resource).ToLower();
             if (resourceFileExt == ".wav")
             {
                 VoiceData vd = LoadVoiceDataFromWav(resource);
                 WaveFormat sourceVoiceFormat = WaveFormat.CreateCustomFormat((WaveFormatEncoding)vd.Format.FormatTag, (int)vd.Format.SamplesPerSec, (int)vd.Format.Channels, (int)vd.Format.AvgBytesPerSec, (int)vd.Format.BlockAlign, (int)vd.Format.BitsPerSample);
-                sourceVoice = new SourceVoice(audioDevice, sourceVoiceFormat);
+                //SourceVoice sourceVoice = new SourceVoice(audioDevice, sourceVoiceFormat);
+                AudioBuffer ab = new AudioBuffer();
                 ab.AudioBytes = vd.AudioBytes;
                 ab.Flags = BufferFlags.EndOfStream;
                 ab.Stream = new DataStream(vd.AudioBytes, true, true);               
                 vd.AudioData.CopyTo(ab.Stream);
                 if (loop)
                     ab.LoopCount = AudioBuffer.LoopInfinite;
-                sourceVoice.SubmitSourceBuffer(ab, null);
+                //sourceVoice.SubmitSourceBuffer(ab, null);
+                sourceVoiceEx = new SourceVoiceEx(audioDevice, sourceVoiceFormat, ab);
             }
-            else if (resourceFileExt == ".wma")
-            {
-                return null;
-            }
+            else 
+                throw new NotSupportedException("Resource type is not supported by this method.");
 
-            return sourceVoice;
-        }
+            return sourceVoiceEx;
+        }        
 
         public static XAudio2StreamingManager LoadStreamingVoice(XAudio2 audioDevice, string resource)
         {            

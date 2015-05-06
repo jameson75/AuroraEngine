@@ -140,7 +140,7 @@ namespace CipherPark.AngelJacket.Core
             {
                 BufferCount = 1,
                 ModeDescription = new ModeDescription(form.ClientSize.Width, form.ClientSize.Height, new Rational(60, 1), Format.R8G8B8A8_UNorm),
-                IsWindowed = false,
+                IsWindowed = true,
                 OutputHandle = form.Handle,
                 SampleDescription = new SampleDescription(1, 0),
                 SwapEffect = SwapEffect.Discard,

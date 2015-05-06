@@ -144,6 +144,7 @@
     <Compile Include="Utils\BoundingBoxOA.cs" />
     <Compile Include="Utils\BoundingQuadOA.cs" />
     <Compile Include="Utils\NullableFloatExtension.cs" />
+    <Compile Include="Utils\SourceVoiceEx.cs" />
     <Compile Include="Utils\TransformBoundingElementExtensions.cs" />
     <Compile Include="World\ColliderRenderer.cs" />
     <Compile Include="World\Collision\BoxCollider.cs" />
