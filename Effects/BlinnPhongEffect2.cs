@@ -134,19 +134,6 @@ namespace CipherPark.AngelJacket.Core.Effects
             
             //Setup Vertex Shader.
             //-------------------
-            //if (EnableSkinning)
-            //{
-            //    GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderSkin);                
-            //}           
-            //else
-            //{
-            //    if (EnableAlphaMap)
-            //        GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderPNTA);
-            //    else if (EnableVertexColor)
-            //        GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderPNC);
-            //    else
-            //        GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderPNT);                        
-            //}           
             GraphicsDevice.ImmediateContext.VertexShader.Set(_shader.VertexShader);        
 
             //Setup Pixel Shader.
