@@ -25,11 +25,21 @@ namespace CipherPark.AngelJacket.Core.Effects
         private byte[] _vertexShaderByteCode = null;
         private SharpDX.Direct3D11.Buffer _vertexConstantBuffer = null;
         private SharpDX.Direct3D11.Buffer _pixelConstantBuffer = null;
+        private const int VertexConstantsBufferSize = SizeOfMatrix * 2;
+        private const int PixelConstantsBufferSize = SizeOfMatrix * 2;
 
         public StreakEffect(IGameApp game)
             : base(game)
         {
+            CreateShaders();
+        }
 
+        private void CreateShaders()
+        {
+            _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\streak_vs.cso", out _vertexShader);
+            LoadPixelShader("Content\\Shaders\\streak_ps.cso", out _pixelShader);
+            _vertexConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, VertexConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _pixelConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, PixelConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 
         public override void Apply()

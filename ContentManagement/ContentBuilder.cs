@@ -1064,6 +1064,28 @@ namespace CipherPark.AngelJacket.Core.Content
         }
         #endregion
 
+        #region Buildings
+        public static Mesh BuildLandStructureMesh(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType)
+        {
+            Vector3[] points = null;
+            switch (structureType)
+            {
+                case LandStructureType.BasicOne:
+                    points = CreateQuadPoints3DNI(bounds);
+                    break;
+                default:
+                    throw new ArgumentException("Unsupported building type specified.", "buildingType");
+            }           
+            VertexPositionColor[] verts = points.Select(p => new VertexPositionColor()
+            {
+                Color = Color.Red.ToVector4(), 
+                Position = new Vector4(p, 1.0f)
+            }).ToArray();
+            return ContentBuilder.BuildMesh(device, shaderByteCode, verts, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, bounds);
+        }
+
+        #endregion
+
         public static Vector3[] GenerateNormals(Vector3[] positions, short[] indices)
         {           
             Vector3[] normals = new Vector3[positions.Length];
@@ -1098,4 +1120,9 @@ namespace CipherPark.AngelJacket.Core.Content
                 throw new NotSupportedException();
         }
     }    
+}
+
+public enum LandStructureType
+{
+    BasicOne
 }

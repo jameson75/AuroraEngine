@@ -20,7 +20,11 @@ using CipherPark.AngelJacket.Core.Utils;
 namespace CipherPark.AngelJacket.Core.Effects
 {
     public abstract class Effect
-    {      
+    {   
+        protected const int SizeOfMatrix =     64;
+        protected const int SizeOfVector4 =    16;
+        protected const int SizeOfFloat =      4;
+        
         private IGameApp _game = null;
         private List<EffectPass> _passes = new List<EffectPass>();        
 
@@ -61,7 +65,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
             shader = new PixelShader(Game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
-        }     
+        }
+
+
     }
 
     public abstract class SurfaceEffect : Effect

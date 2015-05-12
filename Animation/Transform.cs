@@ -239,9 +239,9 @@ namespace CipherPark.AngelJacket.Core.Animation
             return new Transform(transformable.ParentToWorld(transformable.Transform.ToMatrix()));
         }
 
-        public static void Move(this ITransformable transformable, Vector3 location)
+        public static void Translate(this ITransformable transformable, Vector3 offset)
         {
-            transformable.Transform = new Transform(transformable.Transform.Rotation, location);
+            transformable.Transform = new Transform(transformable.Transform.Rotation, transformable.Transform.Translation + offset);
         }        
     }
 }
