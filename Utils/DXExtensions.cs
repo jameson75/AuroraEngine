@@ -327,6 +327,7 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public static class QuaternionExtension
     {
+        /*
         public static void GetYawPitchRoll(this Quaternion q, out float yaw, out float pitch, out float roll)
         {            
             yaw = (float)Math.Atan2(2.0 * (q.Y * q.Z + q.W * q.X), q.W * q.W - q.X * q.X - q.Y * q.Y + q.Z * q.Z);
@@ -391,8 +392,8 @@ namespace CipherPark.AngelJacket.Core.Utils
 
             return quaternion;
         }
-
-        public static void GetYawPitchRoll3(this Quaternion q, out float yaw, out float pitch, out float roll)
+        */
+        public static void GetYawPitchRoll(this Quaternion q, out float yaw, out float pitch, out float roll)
         {
             Vector3 v = Vector3.Zero;
 
