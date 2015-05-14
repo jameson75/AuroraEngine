@@ -159,10 +159,8 @@ namespace CipherPark.AngelJacket.Core.World.Collision
             foreach(var p in collisionEvent)
                 registeredHandlers.ForEach(h => h.OnCollision(p));
         }
-    }          
-  
+    } 
 }
-
 
 /// <summary>
 /// 
