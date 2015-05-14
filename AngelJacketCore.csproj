@@ -146,7 +146,7 @@
     <Compile Include="Utils\NullableFloatExtension.cs" />
     <Compile Include="Utils\SourceVoiceEx.cs" />
     <Compile Include="Utils\TransformBoundingElementExtensions.cs" />
-    <Compile Include="World\ColliderRenderer.cs" />
+    <Compile Include="World\Visualizers\ColliderRenderer.cs" />
     <Compile Include="World\Collision\BoxCollider.cs" />
     <Compile Include="World\Collision\Collider.cs" />
     <Compile Include="World\Collision\CollisionDetector.cs" />
@@ -154,8 +154,8 @@
     <Compile Include="World\Collision\ObservedWorldObject.cs" />
     <Compile Include="World\Collision\QuadCollider.cs" />
     <Compile Include="World\Collision\SphereCollider.cs" />
-    <Compile Include="World\Collision\WorldSpacePartitionNode.cs" />
-    <Compile Include="World\Collision\WorldSpacePartitionTree.cs" />
+    <Compile Include="World\Scene\SpatialPartitionNode.cs" />
+    <Compile Include="World\Scene\SpatialPartitionTree.cs" />
     <Compile Include="World\GameCharacter.cs" />
     <Compile Include="World\Kinetics\Force.cs" />
     <Compile Include="World\Collision\ICollisionResponseHandler.cs" />
@@ -255,7 +255,7 @@
     <Compile Include="World\Kinetics\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
-    <Compile Include="World\LightTrail.cs" />
+    <Compile Include="World\Visualizers\LightTrailRenderer.cs" />
     <Compile Include="World\Path.cs" />
     <Compile Include="World\Geometry\RiggedModel.cs" />
     <Compile Include="World\Kinetics\ConcentricForm.cs" />
@@ -263,9 +263,8 @@
     <Compile Include="World\Kinetics\Emitter.cs" />
     <Compile Include="World\Scene\WorldObjectSceneNode.cs" />
     <Compile Include="World\Scene\MountNode.cs" />
-    <Compile Include="World\Track.cs" />
     <Compile Include="World\ISprite.cs" />
-    <Compile Include="World\StreakRenderer.cs" />
+    <Compile Include="World\Visualizers\StreakRenderer.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
     <Compile Include="World\Scene\ModelSceneNode.cs" />
     <Compile Include="World\Geometry\ReferenceGrid.cs" />

@@ -26,14 +26,6 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
     public class OffsetNodeEffector : SceneNodeEffector
     {
-        //public OffsetCameraNodeEffector(IGameApp game)
-        //    : base(game)
-        //{ }
-
-        //public OffsetCameraNodeEffector(IGameApp game, string name)
-        //    : base(game, name)
-        //{ }
-
         public ITransformable TrackedObject { get; set; }
 
         public ITransformable CenterObject { get; set; }
@@ -66,8 +58,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 Vector3 newNodeLocation = pcsTrackedObjectDir * clampedOffsetPct * InnerRadius;
                 //Transform this offset node to the new location.
                 node.Transform = new Transform(Matrix.Translation(newNodeLocation));
-            }
-            //base.Update(gameTime);
+            }           
         }
     }
 

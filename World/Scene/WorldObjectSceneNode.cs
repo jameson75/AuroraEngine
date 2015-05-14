@@ -42,7 +42,6 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
-
         public override void Update(GameTime gameTime)
         {
             WorldObject.Update(gameTime);

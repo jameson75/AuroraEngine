@@ -19,20 +19,27 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Collision
+namespace CipherPark.AngelJacket.Core.World.Scene
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ObservedWorldObject
+    public class SpatialPartitionNode
     {
+        private List<WorldObject> _partitonedObjects = new List<WorldObject>();
+        private List<SpatialPartitionNode> _children = new List<SpatialPartitionNode>();
+
         /// <summary>
         /// 
         /// </summary>
-        public WorldObject ObservedObject { get; set; }
+        public BoundingBox BoundingBox { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public Transform PreviousTransform { get; set; }
-    }
+        public List<WorldObject> WorldObjects { get { return _partitonedObjects; } }
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<SpatialPartitionNode> Children { get { return _children; } }
+    }  
 }
