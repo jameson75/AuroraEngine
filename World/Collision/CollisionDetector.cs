@@ -124,10 +124,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                     foreach (ObservedWorldObject objectB in observedObjects)
                     {
                         if (objectA == objectB)
-                            continue;
-
-                        //TODO: Optimize by performing a lookup that disregards this test if these two objects
-                        //have already been tested (ie: when objectA was objectB and objectB was objectA).
+                            continue;                  
 
                         Vector3 vectorB = objectB.ObservedObject.ParentToWorldNormal(objectB.ObservedObject.Transform.Translation - objectB.PreviousTransform.Translation);
                         CollisionEvent collision = objectA.ObservedObject.Collider.DetectCollision(vectorA, objectB.ObservedObject.Collider, vectorB);
@@ -137,8 +134,10 @@ namespace CipherPark.AngelJacket.Core.World.Collision
                 }        
             }
 
-            SnapshotPositions(observedObjects);
+            //Take a snapshot of the current transforms of all observed objects.
+            SnapshotTransforms(observedObjects);
 
+            //Notify any listeners of collision events.
             NotifyHandlers(collisionEvents);
         }
 
@@ -146,7 +145,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
         /// Records the current position of each observed object as there respective previous position.
         /// </summary>
         /// <param name="observedObjects"></param>
-        private void SnapshotPositions(List<ObservedWorldObject> observedObjects)
+        private void SnapshotTransforms(List<ObservedWorldObject> observedObjects)
         {
             observedObjects.ForEach(o => o.PreviousTransform = o.ObservedObject.Transform);
         }
