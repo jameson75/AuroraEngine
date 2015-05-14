@@ -21,83 +21,48 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 {
     public class ModelSceneNode : SceneNode
     {
-        Transform _transform = Transform.Identity;       
-        //Model _model = null;
-        
+        private Transform _transform = Transform.Identity;
+
         public ModelSceneNode(IGameApp game)
             : base(game)
-        {            
-            
-        }
+        { }
 
         public ModelSceneNode(Model model, string name = null)
             : base(model.Game, name)
         {
-            Model = model;            
+            Model = model;
         }
 
-        public Model Model
-        {
-            /*
-            get 
-            { 
-                return _model; 
-            } 
-            set 
-            {
-                if (_model != null)
-                {
-                    ((ITransformable)_model).TransformableParent = null;
-                    if (value == null)
-                        _transform = _model.Transform;
-                }
+        public Model Model { get; set; }
 
-                _model = value;
-                
-                if (_model != null)               
-                    ((ITransformable)_model).TransformableParent = this;                                  
-            }*/
-
-            get;
-            set; 
-        }     
-
-        public override Transform Transform 
-        { 
-            get 
-            {
-                //if (Model != null)
-                //    return Model.Transform;
-                //else
-                    return _transform;
-            }
-            set 
-            {
-                //if (Model != null)
-                //    Model.Transform = value;
-                //else
-                    _transform = value;
-            }
-        }
-
-        //public override BoundingBox Bounds
-        //{
-        //    get
-        //    {
-        //        return Model.Mesh.BoundingBox;
-        //    }
-        //}
+        public bool EnableFustrumCulling { get; set; }
 
         public override void Draw(GameTime gameTime)
         {
             if (Model != null)
-            {             
+            {
                 Model.Effect.World = this.WorldTransform().ToMatrix();
                 Model.Effect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
-                Model.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;                
-                Model.Draw(gameTime);               
+                Model.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;
+                if (!EnableFustrumCulling || IsModelInFustrum(Model))
+                    Model.Draw(gameTime);
             }
             base.Draw(gameTime);
+        }
+
+        private static bool IsModelInFustrum(Model model)
+        {
+            Vector3[] bboaCorners = BoundingBoxOA.FromBox(model.BoundingBox)
+                                                 .Transform(model.Effect.World)
+                                                 .GetCorners();
+
+            BoundingFrustum fustrum = new BoundingFrustum(model.Effect.View * model.Effect.Projection);
+
+            for (int i = 0; i < bboaCorners.Length; i++)
+                if (fustrum.Contains(bboaCorners[i]) == ContainmentType.Contains)
+                    return true;
+
+            return false;
         }
     }
 }

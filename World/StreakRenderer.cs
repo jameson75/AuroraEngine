@@ -13,7 +13,6 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Effects;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
 // Company: Cipher Park
@@ -24,6 +23,9 @@ using CipherPark.AngelJacket.Core.Effects;
 
 namespace CipherPark.AngelJacket.Core.World
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IRenderer
     {
         SurfaceEffect Effect { get; }
@@ -31,6 +33,9 @@ namespace CipherPark.AngelJacket.Core.World
         void Draw(GameTime gameTime);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class StreakRenderer : IRenderer
     {
         const int N_CYLINDER_SIDES = 8;
@@ -272,6 +277,9 @@ namespace CipherPark.AngelJacket.Core.World
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class RendererSceneNode : Scene.SceneNode
     {
         public IRenderer Renderer { get; set; }
