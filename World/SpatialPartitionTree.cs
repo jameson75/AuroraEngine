@@ -19,10 +19,10 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Scene
+namespace CipherPark.AngelJacket.Core.World
 {
     /// <summary>
-    /// Represents a partition oct-tree in world space.
+    /// Represents an axis-aligned partition oct-tree in world space.
     /// </summary>
     public class SpatialPartitionTree
     {

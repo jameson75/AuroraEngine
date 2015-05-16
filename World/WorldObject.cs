@@ -59,13 +59,27 @@ namespace CipherPark.AngelJacket.Core.World
         }
     }
 
-    public abstract class BasicWorldObject : WorldObject, IRigidBody
-    {       
-
-        protected BasicWorldObject(IGameApp game) : base(game)
+    public class BasicWorldObject : WorldObject, IRigidBody
+    {
+        public BasicWorldObject(IGameApp game) : base(game)
         { }      
 
         public Model Model { get; set; }
+
+        public Vector3 CenterOfMass { get; set; }
+
+        public float Velocity { get; set; }
+        
+        public override BoundingBox BoundingBox
+        {
+            get
+            {
+                if (Model != null)
+                    return Model.BoundingBox;
+                else
+                    return BoundingBoxExtension.Empty;
+            }
+        }     
 
         public override void Update(GameTime gameTime)
         { }
@@ -85,21 +99,6 @@ namespace CipherPark.AngelJacket.Core.World
             Model.Effect.View = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
             Model.Effect.Projection = scene.CameraNode.Camera.ProjectionMatrix;
             Model.Draw(gameTime);
-        }
-
-        public Vector3 CenterOfMass { get; set; }
-
-        public float Velocity { get; set; }
-
-        public override BoundingBox BoundingBox
-        {
-            get
-            {
-                if (Model != null)
-                    return Model.BoundingBox;
-                else
-                    return BoundingBoxExtension.Empty;
-            }
-        }        
+        }         
     }
 }

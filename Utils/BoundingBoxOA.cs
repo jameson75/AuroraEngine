@@ -49,9 +49,9 @@ namespace CipherPark.AngelJacket.Core.Utils
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="points"></param>
+        /// <param name="corners"></param>
         /// <returns></returns>
-        public static BoundingBoxOA FromPoints(Vector3[] points)
+        public static BoundingBoxOA FromCorners(Vector3[] corners)
         {
             //******************************************************
             //NOTE:  
@@ -61,21 +61,21 @@ namespace CipherPark.AngelJacket.Core.Utils
             //front 4, 5, 6, 7 - starting from top left.
             //******************************************************
             BoundingBoxOA newBox = new BoundingBoxOA();
-            newBox.BackTopLeft = points[0];
-            newBox.BackTopRight = points[1];
-            newBox.BackBottomRight = points[2];
-            newBox.BackBottomLeft = points[3];
-            newBox.FrontTopLeft = points[4];
-            newBox.FrontTopRight = points[5];
-            newBox.FrontBottomRight = points[6];
-            newBox.FrontBottomLeft = points[7];
+            newBox.BackTopLeft = corners[0];
+            newBox.BackTopRight = corners[1];
+            newBox.BackBottomRight = corners[2];
+            newBox.BackBottomLeft = corners[3];
+            newBox.FrontTopLeft = corners[4];
+            newBox.FrontTopRight = corners[5];
+            newBox.FrontBottomRight = corners[6];
+            newBox.FrontBottomLeft = corners[7];
             return newBox;
         }
 
         public static BoundingBoxOA FromBox(BoundingBox box)
         {
             Vector3[] corners = box.GetCorners();
-            return Utils.BoundingBoxOA.FromPoints(corners);
+            return Utils.BoundingBoxOA.FromCorners(corners);
         }
 
         /// <summary>

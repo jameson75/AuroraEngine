@@ -33,9 +33,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             Model = model;
         }
 
-        public Model Model { get; set; }
-
-        public bool EnableFustrumCulling { get; set; }
+        public Model Model { get; set; }      
 
         public override void Draw(GameTime gameTime)
         {
@@ -44,25 +42,9 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 Model.Effect.World = this.WorldTransform().ToMatrix();
                 Model.Effect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
                 Model.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;
-                if (!EnableFustrumCulling || IsModelInFustrum(Model))
-                    Model.Draw(gameTime);
+                Model.Draw(gameTime);
             }
             base.Draw(gameTime);
-        }
-
-        private static bool IsModelInFustrum(Model model)
-        {
-            Vector3[] bboaCorners = BoundingBoxOA.FromBox(model.BoundingBox)
-                                                 .Transform(model.Effect.World)
-                                                 .GetCorners();
-
-            BoundingFrustum fustrum = new BoundingFrustum(model.Effect.View * model.Effect.Projection);
-
-            for (int i = 0; i < bboaCorners.Length; i++)
-                if (fustrum.Contains(bboaCorners[i]) == ContainmentType.Contains)
-                    return true;
-
-            return false;
-        }
+        }       
     }
 }

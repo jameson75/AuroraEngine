@@ -42,6 +42,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
+        public bool EnableFustrumCulling { get; set; }
+
         public override void Update(GameTime gameTime)
         {
             WorldObject.Update(gameTime);
@@ -49,9 +51,28 @@ namespace CipherPark.AngelJacket.Core.World.Scene
         }
 
         public override void Draw(GameTime gameTime)
-        {           
-            WorldObject.Draw(gameTime);                         
+        {
+            if (!EnableFustrumCulling || IsObjectInFustrum(WorldObject))
+                WorldObject.Draw(gameTime);                         
             base.Draw(gameTime);
+        }        
+
+        private bool IsObjectInFustrum(WorldObject worldObject)
+        {
+            IGameContextService contextService = (IGameContextService)Game.Services.GetService(typeof(IGameContextService));
+
+            if (contextService == null)
+                throw new InvalidOperationException("Context service not registered.");
+
+            if (contextService.Context == null)
+                throw new InvalidOperationException("No game context is associated with active game module");
+            
+            Scene scene = contextService.Context.Value.Scene;
+            Matrix viewMatrix = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
+            Matrix projMatrix = scene.CameraNode.Camera.ProjectionMatrix;
+            BoundingFrustum fustrum = new BoundingFrustum(viewMatrix * projMatrix);
+            BoundingBox box = worldObject.BoundingBox.Transform(worldObject.WorldTransform().ToMatrix());
+            return fustrum.Intersects(ref box);
         }
     }    
 }

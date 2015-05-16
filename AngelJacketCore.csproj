@@ -154,8 +154,8 @@
     <Compile Include="World\Collision\ObservedWorldObject.cs" />
     <Compile Include="World\Collision\QuadCollider.cs" />
     <Compile Include="World\Collision\SphereCollider.cs" />
-    <Compile Include="World\Scene\SpatialPartitionNode.cs" />
-    <Compile Include="World\Scene\SpatialPartitionTree.cs" />
+    <Compile Include="World\SpatialPartitionNode.cs" />
+    <Compile Include="World\SpatialPartitionTree.cs" />
     <Compile Include="World\GameCharacter.cs" />
     <Compile Include="World\Kinetics\Force.cs" />
     <Compile Include="World\Collision\ICollisionResponseHandler.cs" />
