@@ -146,6 +146,7 @@
     <Compile Include="Utils\NullableFloatExtension.cs" />
     <Compile Include="Utils\SourceVoiceEx.cs" />
     <Compile Include="Utils\TransformBoundingElementExtensions.cs" />
+    <Compile Include="World\Geometry\ObjectOutlineModel.cs" />
     <Compile Include="World\Visualizers\ColliderRenderer.cs" />
     <Compile Include="World\Collision\BoxCollider.cs" />
     <Compile Include="World\Collision\Collider.cs" />
