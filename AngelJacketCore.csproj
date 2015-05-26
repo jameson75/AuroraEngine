@@ -96,6 +96,7 @@
     <Compile Include="Effects\BlinnPhongEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\Common\Light.cs" />
+    <Compile Include="Effects\EdgeDraw.cs" />
     <Compile Include="Effects\SpectrumAnalyzerProcEffect.cs" />
     <Compile Include="Effects\StreakEffect.cs" />
     <Compile Include="Effects\Obsolete\CookTorrenceEffect.cs" />

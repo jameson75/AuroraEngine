@@ -67,7 +67,12 @@ namespace CipherPark.AngelJacket.Core.Effects
             return shaderByteCode;
         }
 
-
+        protected byte[] LoadGeometryShader(string fileName, out GeometryShader shader)
+        {
+            byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
+            shader = new GeometryShader(Game.GraphicsDevice, shaderByteCode);
+            return shaderByteCode;
+        }
     }
 
     public abstract class SurfaceEffect : Effect
