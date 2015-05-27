@@ -392,6 +392,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
     }
 
+    /*
     /// <summary>
     /// 
     /// </summary>
@@ -425,5 +426,35 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             TextureCoord2 = new Vector4(slopeDir, 1.0f);
         }
     }
+    */
 
+    /// <summary>
+    /// 
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct OutlineVertex
+    {
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+
+        public Vector4 Position;
+        public Vector3 Normal1;
+        public Vector3 Normal2;
+        public Vector3 Normal3;
+       
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+
+        static OutlineVertex()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32B32A32_Float, 16, 0),
+                 new InputElement("TEXCOORD", 1, Format.R32G32B32A32_Float, 28, 0),
+                 new InputElement("TEXCOORD", 2, Format.R32G32B32_Float, 40, 0)
+             };
+            _elementSize = 52;
+        }       
+    }
 }

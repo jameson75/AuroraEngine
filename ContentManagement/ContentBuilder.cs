@@ -256,6 +256,30 @@ namespace CipherPark.AngelJacket.Core.Content
             return mappedIndices.Select( (m) => corners[m]).ToArray();
         }
 
+        public static short[] CreateQuadOutlineIndices()
+        {
+            return new short[24] { 0, 1,
+                                   1, 2,
+                                   2, 3,
+                                   3, 0,
+                                   5, 4,
+                                   4, 7,
+                                   7, 6,
+                                   6, 5,
+                                   4, 0,
+                                   3, 7,
+                                   1, 5,
+                                   6, 2 
+            };
+        }
+
+        public static Vector3[] CreateQuadOutlinePoints3DNI(BoundingBox dimension)
+        {
+            Vector3[] positions = CreateQuadPoints3D(dimension);
+            short[] indices = CreateQuadOutlineIndices();
+            return indices.Select((i) => positions[i]).ToArray();
+        }
+
         public static short[] CreateQuadIndices3D()
         {
             return new short[36] { 0, 1, 2, 2, 3, 0, //TOP
@@ -866,12 +890,12 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion
 
         #region Mesh
-        public static Mesh BuildMesh<T>(Device device, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
+        public static Mesh BuildMesh<T>(Device device, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
         {
-            return BuildMesh<T>(device, shaderByteCode, verts, null, inputElements, vertexSize, boundingBox);
+            return BuildMesh<T>(device, shaderByteCode, verts, null, inputElements, vertexSize, boundingBox, topology);
         }
 
-        public static Mesh BuildMesh<T>(Device device, byte[] shaderByteCode, T[] verts, short[] indices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox) where T : struct
+        public static Mesh BuildMesh<T>(Device device, byte[] shaderByteCode, T[] verts, short[] indices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
         {            
             MeshDescription meshDesc = new MeshDescription();
 
@@ -904,7 +928,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 meshDesc.IndexBuffer = iBuffer;
             }
 
-            meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            meshDesc.Topology = topology; // SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             meshDesc.BoundingBox = boundingBox;
             
             return new Mesh(device, meshDesc);
@@ -1081,7 +1105,28 @@ namespace CipherPark.AngelJacket.Core.Content
                 Color = Color.Red.ToVector4(), 
                 Position = new Vector4(p, 1.0f)
             }).ToArray();
+
             return ContentBuilder.BuildMesh(device, shaderByteCode, verts, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, bounds);
+        }
+
+        public static Mesh BuildLandStructureOutline(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType)
+        {
+            Vector3[] points = null;
+            switch (structureType)
+            {
+                case LandStructureType.BasicOne:
+                    points = CreateQuadOutlinePoints3DNI(bounds);
+                    break;
+                default:
+                    throw new ArgumentException("Unsupported building type specified.", "buildingType");
+            }
+            VertexPositionColor[] verts = points.Select(p => new VertexPositionColor()
+            {
+                Color = Color.Blue.ToVector4(),
+                Position = new Vector4(p, 1.0f)
+            }).ToArray();
+
+            return ContentBuilder.BuildMesh(device, shaderByteCode, verts, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, bounds, PrimitiveTopology.LineList);
         }
 
         #endregion
