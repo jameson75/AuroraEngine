@@ -273,11 +273,25 @@ namespace CipherPark.AngelJacket.Core.Content
             };
         }
 
-        public static Vector3[] CreateQuadOutlinePoints3DNI(BoundingBox dimension)
+        public static OutlineVertex[] CreateQuadOutlineVertices(BoundingBox dimension)
         {
             Vector3[] positions = CreateQuadPoints3D(dimension);
             short[] indices = CreateQuadOutlineIndices();
-            return indices.Select((i) => positions[i]).ToArray();
+            System.Diagnostics.Debug.Assert(positions.Length == 8);
+            Vector3 nx = Vector3.UnitX;
+            Vector3 ny = Vector3.UnitY;
+            Vector3 nz = Vector3.UnitZ;
+            Vector3[] n1Vals = new Vector3[8] { -nx, nx, nx, -nx, -nx, nx, nx, -nx };
+            Vector3[] n2Vals = new Vector3[8] { ny, ny, ny, ny, -ny, -ny, -ny, -ny };
+            Vector3[] n3Vals = new Vector3[8] { nz, nz, -nz, -nz, nz, nz, -nz, -nz };
+            OutlineVertex[] verts = positions.Select((p,i) => new OutlineVertex()
+            {
+                Position = new Vector4(p, 1.0f),
+                Normal1 = n1Vals[i],
+                Normal2 = n1Vals[i],
+                Normal3 = n3Vals[i]
+            }).ToArray();          
+            return indices.Select((i) => verts[i]).ToArray();
         }
 
         public static short[] CreateQuadIndices3D()
@@ -1089,7 +1103,7 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion
 
         #region Buildings
-        public static Mesh BuildLandStructureMesh(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType)
+        public static Mesh BuildLandStructureMeshC(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType, Color color)
         {
             Vector3[] points = null;
             switch (structureType)
@@ -1102,7 +1116,7 @@ namespace CipherPark.AngelJacket.Core.Content
             }           
             VertexPositionColor[] verts = points.Select(p => new VertexPositionColor()
             {
-                Color = Color.Red.ToVector4(), 
+                Color = color.ToVector4(),
                 Position = new Vector4(p, 1.0f)
             }).ToArray();
 
@@ -1111,22 +1125,16 @@ namespace CipherPark.AngelJacket.Core.Content
 
         public static Mesh BuildLandStructureOutline(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType)
         {
-            Vector3[] points = null;
+            OutlineVertex[] verts = null;
             switch (structureType)
             {
                 case LandStructureType.BasicOne:
-                    points = CreateQuadOutlinePoints3DNI(bounds);
+                    verts = CreateQuadOutlineVertices(bounds);
                     break;
                 default:
                     throw new ArgumentException("Unsupported building type specified.", "buildingType");
-            }
-            VertexPositionColor[] verts = points.Select(p => new VertexPositionColor()
-            {
-                Color = Color.Blue.ToVector4(),
-                Position = new Vector4(p, 1.0f)
-            }).ToArray();
-
-            return ContentBuilder.BuildMesh(device, shaderByteCode, verts, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, bounds, PrimitiveTopology.LineList);
+            }   
+            return ContentBuilder.BuildMesh(device, shaderByteCode, verts, OutlineVertex.InputElements, OutlineVertex.ElementSize, bounds, PrimitiveTopology.LineList);
         }
 
         #endregion
