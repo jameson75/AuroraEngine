@@ -139,17 +139,18 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         {
             List<Frame> frameList = null;
                 if(FrameTree != null)
-                    frameList = FrameTree.FlattenToList();
-             
-            //TODO: Finish implementing this draw method my applying the frame transformation to the correct mesh.
-            //How??
+                    frameList = FrameTree.FlattenToList();     
 
             if (Effect != null)
             {                
                 OnApplyingEffect();
                 Effect.Apply();
                 foreach (Mesh mesh in Meshes)
+                {
+                    //TODO: This line of code is untested. TEST THIS.
+                    Effect.World = frameList.First(f => f.Name == mesh.Name).Transform.ToMatrix() * Effect.World;
                     mesh.Draw(gameTime);
+                }
                 Effect.Restore();
             }           
         }

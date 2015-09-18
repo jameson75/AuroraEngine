@@ -46,6 +46,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public SkinOffsets SkinOffsets { get { return _bones; } }
 
         #region IAnimatedModel
+        
         /// <summary>
         /// 
         /// </summary>
@@ -63,7 +64,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             ISkinEffect skinEffect = this.Effect as ISkinEffect;
             if (skinEffect != null)
             {
-                if (FrameTree != null)
+                if (SkinOffsets != null)
                 {                    
                     Matrix[] finalBoneMatrices = new Matrix[SkinOffsets.Count];
                     for (int i = 0; i < SkinOffsets.Count; i++ )
