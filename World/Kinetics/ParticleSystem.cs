@@ -132,6 +132,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 instanceEffect.World = this.WorldTransform().ToMatrix();
                 instanceEffect.Apply();
                 instanceMesh.Draw(gameTime);
+                instanceEffect.Restore();
             }
         }
        
@@ -145,6 +146,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                     p.Description.Effect.World = p.WorldTransform().ToMatrix();
                     p.Description.Effect.Apply();                   
                     p.Description.Mesh.Draw(gameTime);
+                    p.Description.Effect.Restore();
                 }             
             }
         }

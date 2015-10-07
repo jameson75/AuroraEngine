@@ -297,7 +297,8 @@ namespace CipherPark.AngelJacket.Core.World
                 Renderer.Effect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
                 Renderer.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;
                 Renderer.Effect.Apply();
-                Renderer.Draw(gameTime);     
+                Renderer.Draw(gameTime);
+                Renderer.Effect.Restore();
             }
         }
     }   

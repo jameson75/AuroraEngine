@@ -36,6 +36,10 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private Vector3[] _lampDirPosArray = new Vector3[MaxLights];
         private Color[] _lampColorArray = new Color[MaxLights];
+
+        private RasterizerState _oldRasterizerState = null;
+        private bool _isRestoreRequired = false;
+
         public BlinnPhongLampType[] _lampTypes = new BlinnPhongLampType[8];
         public SamplerState _textureSamplerState = null;
         public SamplerState _alphaSamplerState = null;
@@ -149,7 +153,27 @@ namespace CipherPark.AngelJacket.Core.Effects
             {
                 GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, _alphaSamplerState);
                 GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, AlphaMap);
-            }        
+            }  
+      
+            //Configure Rasterizer.
+            if (EnableBackFace)
+            {
+                _oldRasterizerState = GraphicsDevice.ImmediateContext.Rasterizer.State;
+                RasterizerStateDescription newRasterizerStateDesc = (_oldRasterizerState != null) ? _oldRasterizerState.Description : RasterizerStateDescription.Default();
+                newRasterizerStateDesc.CullMode = CullMode.None;
+                GraphicsDevice.ImmediateContext.Rasterizer.State = new RasterizerState(GraphicsDevice, newRasterizerStateDesc);
+                _isRestoreRequired = true;
+            }
+        }
+
+        public override void Restore()
+        {
+            if (_isRestoreRequired)
+            {
+                GraphicsDevice.ImmediateContext.Rasterizer.State = _oldRasterizerState;
+                _isRestoreRequired = false;
+            }
+            base.Restore();
         }
 
         public override byte[] SelectShaderByteCode()
@@ -323,6 +347,8 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             return offset;
         }
+
+        public bool EnableBackFace { get; set; }
     }
 
     public enum BlinnPhongLampType
