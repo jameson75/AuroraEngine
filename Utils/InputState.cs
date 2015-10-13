@@ -7,7 +7,6 @@ using SharpDX;
 using SharpDX.DirectInput;
 using SharpDX.XInput;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
 // Company: Cipher Park

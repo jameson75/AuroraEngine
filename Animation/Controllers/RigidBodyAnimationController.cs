@@ -24,19 +24,19 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
     public class RigidBodyAnimationController : AnimationController
     {
         private long? _animationStartTime = null;
+        private long? _lastUpdateTime = null;
 
         public IRigidBody Target { get; set; }
-
-        public Motion Delta { get; set; }
+        public Motion Motion { get; set; }
 
         public RigidBodyAnimationController()
         {
-            Delta = Motion.Identity;
+            
         }
 
-        public RigidBodyAnimationController(Motion delta, IRigidBody target)
+        public RigidBodyAnimationController(Motion motion, IRigidBody target)
         {
-            Delta = delta;
+            Motion = motion;
             Target = target;
         }
 
@@ -45,6 +45,7 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
         public override void Reset()
         {
             _animationStartTime = null;
+            _lastUpdateTime = null;
         }
 
         public override void UpdateAnimation(GameTime gameTime)
@@ -52,12 +53,13 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
             if (_animationStartTime == null)
                 _animationStartTime = gameTime.GetTotalSimtime();
 
-            ulong elapsedTime = (ulong)(gameTime.GetTotalSimtime() - _animationStartTime.Value);
+            if (_lastUpdateTime == null)
+                _lastUpdateTime = gameTime.GetTotalSimtime();
+
+            ulong windowT = (ulong)(gameTime.GetTotalSimtime() - _lastUpdateTime.Value);
 
             if (Target != null)
-                Target.Transform = new Transform(Delta.GetTransformationAtT((float)elapsedTime / 1000.0f));
-
-            //OnAnimationComplete();
+                Motion.TransformTarget(windowT, Target);           
         }
 
         #endregion

@@ -21,51 +21,40 @@ namespace CipherPark.AngelJacket.Core.Kinetics
     /// This application considers a "Motion" to be something which describes a body's
     /// linear and angular velocities over time.
     /// </summary>
-    public struct Motion
+    public class Motion
     {
-        private static Motion _identity = new Motion();
-
-        public float LinearVelocity { get; set; }
-        public Vector3[] LinearPath { get; set; }
-        //public float AngularVelocity { get; set; }
-        //public Vector3 AngularVector { get; set; }     
-        public static Motion Identity { get { return _identity; } }    
-    
         /// <summary>
-        /// 
+        /// Linear velocity in milliseconds.
+        /// </summary>
+        public float LinearVelocity { get; set; }
+        /// <summary>
+        /// Direction/Heading of linear motion (specified in world coordinates).
+        /// </summary>
+        public Vector3 Direction { get; set; }
+        /// <summary>
+        /// Angular velocity in milliseconds.
+        /// </summary>
+        public float AngularVelocity { get; set; }
+        /// <summary>
+        /// Rotation axis of angular motion (specified in world coordinates).
+        /// </summary>
+        public Vector3 AngularVector { get; set; }          
+        /// <summary>
+        /// Calculates the transformation matrix of an object in [this] motion for the specified time window.
         /// </summary>
         /// <param name="timeT">time in seconds</param>
         /// <returns></returns>
-        public Matrix GetTransformationAtT(float timeT)
-        {           
-            //TODO: Implement catmull for curved paths...
+        public void TransformTarget(ulong windowT, ITransformable target)
+        {          
             //TODO: Implement hermite for acceleration curves... 
-
-            Vector3 translation = Vector3.Zero;
-            float step = LinearVelocity * timeT;
-            if (LinearPath != null)
+            if (LinearVelocity >= 0)
             {
-                Vector3 pathOrigin = Vector3.Zero;
-                Vector3 pathDirection = Vector3.Zero;
-                float pathDistance = 0;
-                float accumLength = 0;
-                for (int i = 0; i < LinearPath.Length; i++)
-                {
-                    pathDistance = Vector3.Distance(LinearPath[i], pathOrigin);
-                    accumLength+= pathDistance;
-                    if (accumLength > step)
-                    {
-                        pathDirection = LinearPath[i] - pathOrigin;
-                        pathDirection.Normalize();
-                        break;
-                    }
-                    pathOrigin = LinearPath[i];
-                }
-                float pathStep = step - accumLength + pathDistance;
-                translation = pathOrigin + (pathDirection * pathStep);
-            }           
-
-            return Matrix.Translation(translation);
+                float displacementDistance = windowT / LinearVelocity;
+                Vector3 displacementVector = displacementDistance * Vector3.Normalize(Direction);
+                Matrix transformationMatrix = Matrix.Translation(displacementVector);
+                Matrix transform = target.Transform.ToMatrix() * transformationMatrix;
+                target.Transform = new Transform(transform);
+            }            
         }    
     }
 }

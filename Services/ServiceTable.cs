@@ -18,6 +18,11 @@ namespace CipherPark.AngelJacket.Core.Services
     {
         private List<object> _services = new List<object>();
 
+        public T GetService<T>()
+        {
+            return (T)GetService(typeof(T));
+        }
+
         public object GetService(Type tService)
         {
             foreach (object service in _services)
