@@ -59,10 +59,13 @@ namespace CipherPark.AngelJacket.Core.World
 
         public override void Fire()
         {
-            if (_isInitialized)
+            if (!_isInitialized)
                 throw new InvalidOperationException();
 
-            BasicWorldObject projectileWO = new BasicWorldObject(this.Game);
+            BasicWorldObject projectileWO = new BasicWorldObject(this.Game)
+            {
+                Model = Projectile
+            };
             WorldObjectSceneNode projectileNode = new WorldObjectSceneNode(projectileWO);
             
             //TODO: Find more elegant design than referencing the container scene node from inside this world object.                     

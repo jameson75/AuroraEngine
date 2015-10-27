@@ -94,11 +94,14 @@ namespace CipherPark.AngelJacket.Core.World
             if (contextService.Context == null)
                 throw new InvalidOperationException("No game context is associated with active game module");
 
-            Scene.Scene scene = contextService.Context.Value.Scene;
-            Model.Effect.World = this.WorldTransform().ToMatrix();
-            Model.Effect.View = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
-            Model.Effect.Projection = scene.CameraNode.Camera.ProjectionMatrix;
-            Model.Draw(gameTime);
+            if (Model != null)
+            {
+                Scene.Scene scene = contextService.Context.Value.Scene;
+                Model.Effect.World = this.WorldTransform().ToMatrix();
+                Model.Effect.View = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
+                Model.Effect.Projection = scene.CameraNode.Camera.ProjectionMatrix;
+                Model.Draw(gameTime);
+            }
         }         
     }
 }
