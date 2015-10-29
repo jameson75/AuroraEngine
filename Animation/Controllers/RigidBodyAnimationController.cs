@@ -54,12 +54,14 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
                 _animationStartTime = gameTime.GetTotalSimtime();
 
             if (_lastUpdateTime == null)
-                _lastUpdateTime = gameTime.GetTotalSimtime();
+                _lastUpdateTime = _animationStartTime;
 
             ulong windowT = (ulong)(gameTime.GetTotalSimtime() - _lastUpdateTime.Value);
 
             if (Target != null)
-                Motion.TransformTarget(windowT, Target);           
+                Motion.TransformTarget(windowT, Target);
+
+            _lastUpdateTime = gameTime.GetTotalSimtime();
         }
 
         #endregion

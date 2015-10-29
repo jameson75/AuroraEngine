@@ -70,6 +70,8 @@ namespace CipherPark.AngelJacket.Core.World
             
             //TODO: Find more elegant design than referencing the container scene node from inside this world object.                     
             //TODO: Use the following code to implemement ITransformable.LocalToLocal extension method.
+            //TODO: Add the projectiles to a static root node of the world (opposed the action root).
+            //TODO: Consider revising TODO #1 and making the the ContainerNode a property of a WorldObject (always being set in the the WorldObjectSceneNode's constructor).
 
             Vector3 actionFrameDischargeLocation = ActionNode.WorldToLocalCoordinate(ContainerNode.LocalToWorldCoordinate(DischargeLocation));
             ActionNode.Children.Add(projectileNode);
