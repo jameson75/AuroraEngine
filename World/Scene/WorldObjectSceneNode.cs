@@ -31,7 +31,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             : base(worldObject.Game, name)
         {
             _worldObject = worldObject;
-            worldObject.TransformableParent = this;
+            worldObject.TransformableParent = this;  
         }
 
         public WorldObject WorldObject

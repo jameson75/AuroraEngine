@@ -18,13 +18,16 @@ using CipherPark.AngelJacket.Core.Animation;
 namespace CipherPark.AngelJacket.Core.Kinetics
 {
     /// <summary>
-    /// This application considers a "Motion" to be something which describes a body's
-    /// linear and angular velocities over time.
+    /// Represents the state of a body's motion.
     /// </summary>
     public class Motion
     {
         /// <summary>
-        /// Linear velocity in milliseconds.
+        /// Time domain of velocity         
+        /// </summary>
+        public TimeDomainUnits TimeDomainUnits { get; set; }
+        /// <summary>
+        /// Linear velocity.
         /// </summary>
         public float LinearVelocity { get; set; }
         /// <summary>
@@ -32,7 +35,7 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         /// </summary>
         public Vector3 Direction { get; set; }
         /// <summary>
-        /// Angular velocity in milliseconds.
+        /// Angular velocity.
         /// </summary>
         public float AngularVelocity { get; set; }
         /// <summary>
@@ -40,21 +43,44 @@ namespace CipherPark.AngelJacket.Core.Kinetics
         /// </summary>
         public Vector3 AngularVector { get; set; }          
         /// <summary>
-        /// Calculates the transformation matrix of an object in [this] motion for the specified time window.
+        /// Displaces an object in motion for the specified time window.
         /// </summary>
-        /// <param name="timeT">time in seconds</param>
+        /// <param name="windowT">Length of the time window in milliseconds</param>
         /// <returns></returns>
         public void TransformTarget(ulong windowT, ITransformable target)
         {          
-            //TODO: Implement hermite for acceleration curves... 
+            //TODO: Implement angular transform.             
             if (LinearVelocity >= 0)
             {
-                float displacementDistance = windowT / LinearVelocity;
-                Vector3 displacementVector = displacementDistance * Vector3.Normalize(Direction);
-                Matrix transformationMatrix = Matrix.Translation(displacementVector);
-                Matrix transform = target.Transform.ToMatrix() * transformationMatrix;
-                target.Transform = new Transform(transform);
+                float cWindowT = 0;
+                switch(TimeDomainUnits)
+                {
+                    case Kinetics.TimeDomainUnits.Seconds:
+                        cWindowT = (float)windowT / 1000.0f;
+                        break;
+                    case Kinetics.TimeDomainUnits.Minutes:
+                        cWindowT = (float)windowT / 60000.0f;
+                        break;
+                    case Kinetics.TimeDomainUnits.Hours:
+                        cWindowT = (float)windowT / 3600000.0f;
+                        break;
+                    default:
+                        cWindowT = (float)windowT;
+                        break;
+                }
+                float displacementDistance = cWindowT * LinearVelocity;
+                Vector3 displacementVector = displacementDistance * Vector3.Normalize(target.WorldToParentNormal(Direction));              
+                Vector3 newTranslation = target.Transform.Translation + displacementVector;
+                target.Transform = new Transform(target.Transform.Rotation, newTranslation);
             }            
         }    
+    }
+
+    public enum TimeDomainUnits
+    {
+        Milliseconds,
+        Seconds,
+        Minutes,
+        Hours
     }
 }

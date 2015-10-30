@@ -6,6 +6,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.World.Collision;
+using CipherPark.AngelJacket.Core.World.Scene;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
@@ -44,6 +45,11 @@ namespace CipherPark.AngelJacket.Core.World
         public ITransformable TransformableParent { get; set; }    
 
         public abstract BoundingBox BoundingBox { get; }
+
+        public SceneNode ContainerNode
+        {
+            get { return this.TransformableParent as SceneNode; }
+        }    
 
         public Collider Collider
         {
