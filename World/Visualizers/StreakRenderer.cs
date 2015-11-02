@@ -13,7 +13,6 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Effects;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
 // Company: Cipher Park
