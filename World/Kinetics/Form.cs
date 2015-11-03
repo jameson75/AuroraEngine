@@ -17,8 +17,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     public abstract class Form : ParticleSystem 
     {      
         private Emitter _elementEmitter = null;
-        private ParticleDescription _elementDescription = null;
-        //private List<FormNode> _nodes = new List<FormNode>();
+        private ParticleDescription _elementDescription = null;        
 
         protected Form(IGameApp game)
             : base(game)
@@ -27,12 +26,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementDescription = new ParticleDescription();
             _elementEmitter.DefaultParticleDescription = _elementDescription;
             Emitters.Add(_elementEmitter);
-        }
-
-        /*
-        public ReadOnlyCollection<FormNode> Nodes 
-        { get { return _nodes.ToList().AsReadOnly(); } }
-        */
+        }     
 
         public Mesh ElementMesh
         {
@@ -89,39 +83,5 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         protected virtual void OnMeshChanged() { }
 
         protected virtual void OnEffectChanged() { }
-
-        /*
-        protected override void OnParticlesAdded(IEnumerable<Particle> particles)
-        {
-            foreach (Particle p in particles)
-            {
-                FormNode node = new FormNode();
-                node.TransformableParent = this;
-                _nodes.Add(node);
-                p.TransformableParent = node;
-            }
-        }
-
-        protected override void OnParticlesRemoved(IEnumerable<Particle> particles)
-        {  
-            foreach (Particle p in particles)
-            {                   
-                _nodes.RemoveAll(n => p.TransformableParent == n);
-                p.TransformableParent = null;
-            }
-        }
-
-        protected override void OnParticlesReset()
-        {            
-            _nodes.Clear();
-            base.OnParticlesReset();
-        }
-         */
-    }
-
-    public class FormNode : ITransformable
-    {
-        public Transform Transform { get; set; }
-        public ITransformable TransformableParent { get; set; }       
     }
 }

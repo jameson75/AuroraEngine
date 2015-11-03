@@ -23,14 +23,7 @@ using CipherPark.AngelJacket.Core.Effects;
 
 namespace CipherPark.AngelJacket.Core.World
 {
-    public interface IRenderer
-    {
-        SurfaceEffect Effect { get; }
-        void Update(GameTime gameTime);
-        void Draw(GameTime gameTime);
-    }
-
-    public class StreakRenderer : IRenderer
+       public class StreakRenderer : IRenderer
     {
         const int N_CYLINDER_SIDES = 8;
         const int VERTS_PER_SIDE = 6;
@@ -270,35 +263,5 @@ namespace CipherPark.AngelJacket.Core.World
             else
                 return p.EvaluateEquidistantNodes(stepSize_);
         }
-    }
-
-    public class RendererSceneNode : Scene.SceneNode
-    {
-        public IRenderer Renderer { get; set; }
-
-        public RendererSceneNode(IGameApp game)
-            : base(game)
-        { }
-
-        public override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
-            if (Renderer != null)
-            {         
-                Renderer.Update(gameTime);
-            }
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            if (Renderer != null)
-            {                
-                Renderer.Effect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
-                Renderer.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;
-                Renderer.Effect.Apply();
-                Renderer.Draw(gameTime);
-                Renderer.Effect.Restore();
-            }
-        }
-    }   
+    }    
 }

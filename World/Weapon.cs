@@ -47,8 +47,7 @@ namespace CipherPark.AngelJacket.Core.World
         private CompositeAnimationController _animationController = null;
         private GameContext? _gameContext = null;
         private long? _lastFireTime = null;
-        private ParticleSystem _emissionSystem = null;
-        
+           
         public BasicModel Projectile { get; set; }        
         public SceneNode ProjectileRootNode { get; set; }
         public Vector3 DischargeLocation { get; set; }
@@ -56,7 +55,7 @@ namespace CipherPark.AngelJacket.Core.World
         public long EmissionDelay { get; set; }
         public float ProjectileVelocity { get; set; }
 
-        public PlayerGun(IGameApp game  )
+        public PlayerGun( IGameApp game  )
             : base(game)
         { }       
 
@@ -75,8 +74,7 @@ namespace CipherPark.AngelJacket.Core.World
                 {
                     Model = Projectile,                   
                 };
-
-                /*
+                
                 WorldObjectSceneNode projectileNode = new WorldObjectSceneNode(projectileWO);
                 projectileNode.Transform = new Transform(Matrix.RotationX(MathUtil.DegreesToRadians(90f)));
 
@@ -85,16 +83,8 @@ namespace CipherPark.AngelJacket.Core.World
                 Vector3 actionFrameDischargeLocation = ProjectileRootNode.WorldToLocalCoordinate(ContainerNode.LocalToWorldCoordinate(DischargeLocation));
                 ProjectileRootNode.Children.Add(projectileNode);
                 projectileNode.Transform = new Transform(projectileNode.Transform.ToMatrix() * Matrix.Translation(actionFrameDischargeLocation));
-                */
+                
 
-                _emissionSystem.Emitters.Add(new Emitter()
-                {
-                    DefaultParticleDescription = new ParticleDescription()
-                    {
-                        Effect = Projectile.Effect,
-                        Mesh = Projectile.Mesh
-                    }
-                });
                 RigidBodyAnimationController animationController = new RigidBodyAnimationController();
                 animationController.Target = projectileWO;
                 animationController.Motion = new Motion()
@@ -116,7 +106,7 @@ namespace CipherPark.AngelJacket.Core.World
             IGameContextService service = Game.Services.GetService<IGameContextService>();
             _gameContext = service.Context;
             _gameContext.Value.Simulator.AnimationControllers.Add(_animationController);
-            _emissionSystem = new ParticleSystem(_gameContext.Value.Game);
+            
             _isInitialized = true;
         }
 
@@ -126,8 +116,7 @@ namespace CipherPark.AngelJacket.Core.World
         }
 
         public override void Draw(GameTime gameTime)
-        {
-            _emissionSystem.Draw(gameTime);
+        {           
             base.Draw(gameTime);
         }
     }   
