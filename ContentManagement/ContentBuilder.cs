@@ -48,14 +48,14 @@ namespace CipherPark.AngelJacket.Core.Content
 
         public static Mesh BuildParticleLitQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color, int maxInstances)
         {
-            ParticleVertexPositionNormalColor[] verts = new ParticleVertexPositionNormalColor[4];
+            InstanceVertexPositionNormalColor[] verts = new InstanceVertexPositionNormalColor[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(dimension);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new ParticleVertexPositionNormalColor(positions[i], Vector3.UnitY, color);            
+                verts[i] = new InstanceVertexPositionNormalColor(positions[i], Vector3.UnitY, color);            
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            ParticleInstanceVertexData[] instanceData = new ParticleInstanceVertexData[maxInstances];
-            return BuildDynamicInstancedMesh<ParticleVertexPositionNormalColor, ParticleInstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, ParticleVertexPositionNormalColor.InputElements, ParticleVertexPositionNormalColor.ElementSize, instanceData, instanceData.Length, ParticleInstanceVertexData.SizeInBytes, boundingBox);
+            InstanceVertexData[] instanceData = new InstanceVertexData[maxInstances];
+            return BuildDynamicInstancedMesh<InstanceVertexPositionNormalColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionNormalColor.InputElements, InstanceVertexPositionNormalColor.ElementSize, instanceData, instanceData.Length, InstanceVertexData.SizeInBytes, boundingBox);
         }
 
         public static Mesh BuildBasicTexturedQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
@@ -550,8 +550,8 @@ namespace CipherPark.AngelJacket.Core.Content
                         TextureCoord = textureCoords[i]
                     };
             
-            ParticleInstanceVertexData[] data = new ParticleInstanceVertexData[maxInstances * verts.Length];
-            return BuildInstancedMesh<ParticleVertexPostionNormalTexture, ParticleInstanceVertexData>(device, shaderByteCode, verts, indices, ParticleVertexPostionNormalTexture.InputElements, ParticleVertexPostionNormalTexture.ElementSize, data, ParticleInstanceVertexData.SizeInBytes);                
+            InstanceVertexData[] data = new InstanceVertexData[maxInstances * verts.Length];
+            return BuildInstancedMesh<ParticleVertexPostionNormalTexture, InstanceVertexData>(device, shaderByteCode, verts, indices, ParticleVertexPostionNormalTexture.InputElements, ParticleVertexPostionNormalTexture.ElementSize, data, InstanceVertexData.SizeInBytes);                
         }
 
         public static Vector2[] CreateHexagonTextureCoords()

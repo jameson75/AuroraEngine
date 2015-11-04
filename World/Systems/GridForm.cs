@@ -8,7 +8,7 @@ using SharpDX.Direct3D11;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Kinetics;
+using CipherPark.AngelJacket.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

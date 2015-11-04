@@ -342,7 +342,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct ParticleVertexPositionNormalColor
+    public struct InstanceVertexPositionNormalColor
     {
         public Vector4 Position;
         public Vector3 Normal;
@@ -355,7 +355,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static int ElementSize { get { return _elementSize; } }
         public static int InstanceSize { get { return _instanceSize; } }
 
-        static ParticleVertexPositionNormalColor()
+        static InstanceVertexPositionNormalColor()
         {
             _inputElements = new InputElement[]
              {
@@ -371,7 +371,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _instanceSize = 64;
         }
 
-        public ParticleVertexPositionNormalColor(Vector3 position, Vector3 normal, Color color)
+        public InstanceVertexPositionNormalColor(Vector3 position, Vector3 normal, Color color)
         {
             Position = new Vector4(position, 1.0f);
             Normal = normal;
@@ -382,7 +382,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct ParticleInstanceVertexData
+    public struct InstanceVertexData
     {
         public Matrix Matrix;
         public static int SizeInBytes

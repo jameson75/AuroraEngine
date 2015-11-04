@@ -21,7 +21,7 @@ using CipherPark.AngelJacket.Core.Effects;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Kinetics
+namespace CipherPark.AngelJacket.Core.Systems
 {
     /// <summary>
     /// 

@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Effects;
 //using CoreEffect = CipherPark.AngelJacket.Core.Effects.SurfaceEffect;
-using CipherPark.AngelJacket.Core.Kinetics;
+using CipherPark.AngelJacket.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -34,42 +34,46 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// 
     /// </summary>
-    public abstract class Model /*: ITransformable*/
+    public abstract class Model 
     {
         private IGameApp _game = null;
-        // private Mesh _mesh = null;        
-
+    
         public Model(IGameApp game)
         {
-            _game = game;
-            //Transform = Matrix.Identity;
+            _game = game;            
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Name { get; set; }
 
-        public IGameApp Game { get { return _game; } }
-          
-        /*
-        public Transform Transform { get; set; }
-
-        public ITransformable TransformableParent { get; set; }        
-        */
-
+        /// <summary>
+        /// 
+        /// </summary>
+        public IGameApp Game { get { return _game; } }     
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public SurfaceEffect Effect { get; set; }    
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public abstract BoundingBox BoundingBox { get; }    
 
-        public abstract void Draw(GameTime gameTime);      
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public abstract void Draw(GameTime gameTime);           
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected virtual void OnApplyingEffect()
-        { }
-
-        public abstract BoundingBox BoundingBox { get; }
-
-        /*
-        public void Move(Vector3 offset)
-        {
-            this.Transform = new Transform(this.Transform.Rotation, this.Transform.Translation + offset);
-        }
-        */
+        { }          
     }
 
     public class BasicModel : Model
@@ -104,62 +108,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         protected virtual void OnMeshChanged()
         { } 
     }   
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class ComplexModel : Model, IAnimatedModel
-    {
-        private List<Mesh> _meshes = new List<Mesh>();      
-
-        public List<Mesh> Meshes { get { return _meshes; } }        
-        
-        #region IAnimatedModel
-        public Frame FrameTree { get; set; }        
-        public List<KeyframeAnimationController> AnimationRig { get; set; }
-        #endregion        
-        
-        public List<MeshTextures> MeshTextures { get; set; }
-
-        public override BoundingBox BoundingBox
-        {
-            get 
-            {
-                Vector3 min = Meshes.Min(m => m.BoundingBox.Minimum);
-                Vector3 max = Meshes.Max(m => m.BoundingBox.Maximum);
-                return new BoundingBox(min, max);
-            }
-        }
-
-        public ComplexModel(IGameApp game)
-            : base(game)
-        { }
-        
-        public override void Draw(GameTime gameTime)
-        {
-            List<Frame> frameList = null;
-                if(FrameTree != null)
-                    frameList = FrameTree.FlattenToList();     
-
-            if (Effect != null)
-            {                
-                OnApplyingEffect();
-                Effect.Apply();
-                foreach (Mesh mesh in Meshes)
-                {
-                    //TODO: This line of code is untested. TEST THIS.
-                    Effect.World = frameList.First(f => f.Name == mesh.Name).Transform.ToMatrix() * Effect.World;
-                    mesh.Draw(gameTime);
-                }
-                Effect.Restore();
-            }           
-        }
-
-        protected override void OnApplyingEffect()
-        {
-            base.OnApplyingEffect();
-        }
-    }  
+   
     
     /// <summary>
     /// 
@@ -179,51 +128,5 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         Diffuse = 0,
         Normal,     
         Alpha
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public interface IAnimatedModel
-    {
-        Frame FrameTree { get; set; }
-        List<KeyframeAnimationController> AnimationRig { get; }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class AnimatedModelExtension
-    {
-       /// <summary>
-       /// 
-       /// </summary>
-       /// <param name="model"></param>
-       /// <param name="poseKeyTime"></param>
-       /// <param name="transitionTimeSpan"></param>
-       /// <returns></returns>
-        public static CompositeAnimationController CreatePoseAnimation(this IAnimatedModel model, ulong poseKeyTime, ulong transitionTimeSpan = 0)
-        {
-            List<KeyframeAnimationController> result = new List<KeyframeAnimationController>();
-            if (model.FrameTree != null)
-            {
-                List<Frame> frameList = model.FrameTree.FlattenToList();
-                foreach (Frame frame in frameList)
-                {
-                    TransformAnimation transitionAnimation = new TransformAnimation();
-                    if (transitionTimeSpan > 0)
-                    {
-                        AnimationKeyFrame startPoseKeyFrame = new AnimationKeyFrame(0, frame.Transform);
-                        transitionAnimation.SetKeyFrame(startPoseKeyFrame);
-                    }
-                    Transform endPoseTransform = (Transform)model.AnimationRig.Find(a => a.Target == frame).Animation.GetActiveKeyFrameAtT(poseKeyTime).Value;
-                    AnimationKeyFrame endPoseKeyFrame = new AnimationKeyFrame(transitionTimeSpan, endPoseTransform);
-                    transitionAnimation.SetKeyFrame(endPoseKeyFrame);
-                    KeyframeAnimationController frameController = new KeyframeAnimationController(transitionAnimation, frame);
-                    result.Add(frameController);
-                }
-            }
-            return new CompositeAnimationController(result);
-        }
-    }
+    }   
 }

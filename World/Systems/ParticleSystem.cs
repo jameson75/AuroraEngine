@@ -21,7 +21,7 @@ using CipherPark.AngelJacket.Core.Services;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Kinetics
+namespace CipherPark.AngelJacket.Core.Systems
 {
     public class ParticleSystem : ITransformable
     {
@@ -121,21 +121,25 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 throw new InvalidOperationException("Particle mesh is not both dynamic and instanced.");
 
             if (particles.Count() > 0)
-            {              
+            {            
+                //*************************************************************************************
+                //NOTE: It is expected that each particle being rendered is an immediate child of this 
+                //particle system.                                                                                 
+                //**************************************************************************************    
+                
                 //TODO: Ensure that the correct buffer size of instance data is being determined.                
-                IEnumerable<ParticleInstanceVertexData> instanceData = particles.Where(p => p.IsVisible)
-                                                                                .Select( p => new ParticleInstanceVertexData() 
-                                                                                {
+                IEnumerable<InstanceVertexData> instanceData = particles.Where(p => p.IsVisible)
+                                                                                .Select( p => new InstanceVertexData() 
+                                                                                {                                                                                    
                                                                                    Matrix = Matrix.Transpose(p.Transform.ToMatrix())                                                                                   
                                                                                 });
-                instanceMesh.UpdateVertexStream<ParticleInstanceVertexData>(instanceData.ToArray());
+                instanceMesh.UpdateVertexStream<InstanceVertexData>(instanceData.ToArray());
                 instanceEffect.World = this.WorldTransform().ToMatrix();
                 instanceEffect.Apply();
                 instanceMesh.Draw(gameTime);
                 instanceEffect.Restore();
             }
-        }
-       
+        }       
 
         private void DrawParticles(GameTime gameTime, IEnumerable<Particle> particles)
         {
@@ -151,89 +155,4 @@ namespace CipherPark.AngelJacket.Core.Kinetics
             }
         }
     }
-
-    /*
-    public class PlexSystem : ParticleSystem
-    {
-        public PlexSystem(IGameApp game)
-            : base(game)
-        { }
-
-        private List<ParticleLink> _links = new List<ParticleLink>();
-        
-        public ReadOnlyCollection<ParticleLink> Links { get { return _links.AsReadOnly(); } }    
-
-        public void Link(Particle particle1, Particle particle2)
-        {
-            if (!_links.Exists(e => (e.P1 == particle1 && e.P2 == particle2) || (e.P1 == particle2 && e.P2 == particle2)))
-                _links.Add(new ParticleLink(particle1, particle2));
-        }
-
-        public void Link(IEnumerable<Particle> particles)
-        {
-            Particle[] pArray = particles.ToArray();
-            for (int i = 0; i < pArray.Length; i += 2)
-                Link(pArray[i], pArray[i + 1]);
-        }
-
-        public void Unlink(Particle particle1, Particle particle2)
-        {
-            _links.RemoveAll(e => (e.P1 == particle1 && e.P2 == particle2) || (e.P1 == particle2 && e.P2 == particle2));
-        }
-
-        public void Unlink(Particle p)
-        {
-            _links.RemoveAll(e => e.P1 == p || e.P2 == p);
-        }
-
-        public void Unlink(IEnumerable<Particle> particles)
-        {
-            foreach (Particle p in particles)
-                Unlink(p);
-        }
-
-        protected override void OnParticlesRemoved(IEnumerable<Particle> particles)
-        {
-            Unlink(particles);
-            base.OnParticlesRemoved(particles);
-        }
-
-        protected override void OnParticlesReset()
-        {
-            _links.Clear();
-            base.OnParticlesReset();
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            //TODO: Implement wire frame rendering.
-            //-------------------------------------
-
-            //List<BasicVertexPositionColor> linkVertices = new List<BasicVertexPositionColor>();
-            //foreach (ParticleLink link in pLinks)
-            //{
-            //    BasicVertexPositionColor v1 = new BasicVertexPositionColor();
-            //    v1.Color = Color.White.ToVector4();
-            //    v1.Position = new Vector4((emitterTransform * link.P1.Transform.ToMatrix()).TranslationVector, 1.0f);
-            //    BasicVertexPositionColor v2 = new BasicVertexPositionColor();
-            //    v2.Color = Color.White.ToVector4();
-            //    v2.Position = new Vector4((emitterTransform * link.P2.Transform.ToMatrix()).TranslationVector, 1.0f);
-            //    linkVertices.Add(v1);
-            //    linkVertices.Add(v2);
-            //}
-
-            //if (linkVertices.Count > 0)
-            //{
-            //    linkEffect.World = Matrix.Identity;
-            //    linkEffect.View = view;
-            //    linkEffect.Projection = projection;
-            //    linkEffect.Apply();
-            //    _linkMesh.Update<BasicVertexPositionColor>(linkVertices.ToArray());
-            //    _linkMesh.Draw(gameTime);
-            //}
-
-            base.Draw(gameTime);
-        }
-    }
-    */
 }

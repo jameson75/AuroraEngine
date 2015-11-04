@@ -15,7 +15,7 @@ using CipherPark.AngelJacket.Core.Animation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Kinetics
+namespace CipherPark.AngelJacket.Core.Systems
 {
     /// <summary>
     /// Represents the state of a body's motion.
@@ -55,13 +55,13 @@ namespace CipherPark.AngelJacket.Core.Kinetics
                 float cWindowT = 0;
                 switch(TimeDomainUnits)
                 {
-                    case Kinetics.TimeDomainUnits.Seconds:
+                    case Systems.TimeDomainUnits.Seconds:
                         cWindowT = (float)windowT / 1000.0f;
                         break;
-                    case Kinetics.TimeDomainUnits.Minutes:
+                    case Systems.TimeDomainUnits.Minutes:
                         cWindowT = (float)windowT / 60000.0f;
                         break;
-                    case Kinetics.TimeDomainUnits.Hours:
+                    case Systems.TimeDomainUnits.Hours:
                         cWindowT = (float)windowT / 3600000.0f;
                         break;
                     default:

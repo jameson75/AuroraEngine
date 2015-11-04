@@ -11,7 +11,7 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
 
-namespace CipherPark.AngelJacket.Core.Kinetics
+namespace CipherPark.AngelJacket.Core.Systems
 {
     /// <summary>
     /// 

@@ -11,7 +11,7 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Effects;
-using CipherPark.AngelJacket.Core.Kinetics;
+using CipherPark.AngelJacket.Core.Systems;
 using CipherPark.AngelJacket.Core.Services;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -109,5 +109,32 @@ namespace CipherPark.AngelJacket.Core.World
                 Model.Draw(gameTime);
             }
         }         
+    }
+
+    public class InstancePlaceHolderWorldObject : WorldObject, IRigidBody
+    {
+        private string _instanceId = null;
+        private BoundingBox _bounds = BoundingBoxExtension.Empty;
+
+        public InstancePlaceHolderWorldObject(IGameApp game, BoundingBox bounds) : base(game)
+        {
+            _instanceId = Guid.NewGuid().ToString();
+            _bounds = bounds;
+        }
+
+        public string ReferenceObjectName 
+        {
+            get { return _instanceId; }
+        }       
+ 
+        public Vector3 CenterOfMass { get; set; }
+
+        public float Velocity { get; set; }
+
+        public override void Draw(GameTime gameTime) { }
+
+        public override void Update(GameTime gameTime) { }
+
+        public override BoundingBox BoundingBox { get { return _bounds; } }
     }
 }

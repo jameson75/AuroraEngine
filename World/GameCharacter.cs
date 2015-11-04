@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 using CipherPark.AngelJacket.Core.Sequencer;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Effects;
-using CipherPark.AngelJacket.Core.Kinetics;
+using CipherPark.AngelJacket.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

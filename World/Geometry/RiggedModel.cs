@@ -69,8 +69,8 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                     Matrix[] finalBoneMatrices = new Matrix[SkinOffsets.Count];
                     for (int i = 0; i < SkinOffsets.Count; i++ )
                     {
-                        Frame bone = SkinOffsets[i].BoneReference;                       
-                        finalBoneMatrices[i] = SkinOffsets[i].Transform.ToMatrix() * bone.ParentToWorld(bone.Transform.ToMatrix());
+                        Frame bone = SkinOffsets[i].BoneReference;
+                        finalBoneMatrices[i] = SkinOffsets[i].Transform.ToMatrix() * bone.WorldTransform().ToMatrix(); // /*REPLACED WITH SHORT CUT TO SAME BEHAVIOR* bone.ParentToWorld(bone.Transform.ToMatrix());
                     }
                     skinEffect.BoneTransforms = finalBoneMatrices;     
                 }
@@ -105,124 +105,4 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }      
     }   
-        
-    public class Frame : ITransformable
-    {
-        private Frames _children = null;
-        private Frame _parent = null;
-        private ITransformable _transformableParent = null;
-
-        public Frame()
-        {
-            _children = new Frames();
-            _children.CollectionChanged += this.Children_CollectionChanged;
-            Transform = Transform.Identity;
-        }
-
-        public string Name { get; set; }
-        
-        public Frame Parent
-        {
-            get { return _parent; }
-            set
-            {
-                if (_parent != null && _parent.Children.Contains(this))
-                    _parent.Children.Remove(this);
-                _parent = value;
-                if (_parent != null && !_parent.Children.Contains(this))
-                    _parent.Children.Add(this);
-                _transformableParent = value;
-            }
-        }
-
-        public Frames Children { get { return _children; } }
-        
-        #region ITransformable implementation
-        
-        public Transform Transform { get; set; }
-
-        public ITransformable TransformableParent
-        {
-            get { return this._transformableParent; }
-            set
-            {
-                if (value is Frame)
-                    this.Parent = (Frame)value;
-                else
-                {
-                    this.Parent = null;
-                    _transformableParent = value;
-                }
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Returns all the nodes in the frame tree as a list.
-        /// </summary>        
-        /// <returns></returns>
-        public List<Frame> FlattenToList()
-        {
-            List<Frame> results = new List<Frame>();
-            _BuildFlattenedTree(this, results);
-            return results;
-        }  
-
-        private static void _BuildFlattenedTree(Frame frame, List<Frame> results)
-        {
-            results.Add(frame);
-            foreach (Frame child in frame.Children)
-                _BuildFlattenedTree(child, results);
-        }
-
-        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
-        {
-            switch (args.Action)
-            {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    foreach (Frame child in args.NewItems)
-                        OnChildAdded(child);
-                    break;
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    foreach (Frame child in args.OldItems)
-                        OnChildRemoved(child);
-                    break;
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                    OnChildReset();
-                    break;
-            }
-        }
-
-        protected virtual void OnChildAdded(Frame child)
-        {
-            if (child.Parent != this)
-                child.Parent = this;
-        }
-
-        protected virtual void OnChildRemoved(Frame child)
-        {
-            if (child.Parent == this)
-                child.Parent = null;
-        }
-
-        protected virtual void OnChildReset()
-        {
-
-        }
-    }
-
-    public class Frames : ObservableCollection<Frame>
-    {
-        public Frame this[string name]
-        {
-            get
-            {
-                Frame result = this.FirstOrDefault(f => f.Name == name);
-                if (result != null)
-                    return result;
-                throw new IndexOutOfRangeException();
-            }
-        }     
-    }
 }

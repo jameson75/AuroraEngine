@@ -5,7 +5,7 @@ using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.AngelJacket.Core.Module;
-using CipherPark.AngelJacket.Core.Kinetics;
+using CipherPark.AngelJacket.Core.Systems;
 using CipherPark.AngelJacket.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
