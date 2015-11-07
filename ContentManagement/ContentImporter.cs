@@ -21,7 +21,6 @@ using CipherPark.AngelJacket.Core.Effects;
 using CipherPark.AngelJacket.Core.Animation;
 using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Utils.Toolkit;
-using CipherPark.AngelJacket.Core.Animation.Controllers;
 using CipherPark.AngelJacket.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -350,21 +349,14 @@ namespace CipherPark.AngelJacket.Core.Content
                     animationControllers = BuildAnimationRig(xAnimationSet, targetFrames);                   
                 }
                 
-                mesh = ContentBuilder.BuildMesh<VertexPositionNormalTextureSkin>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionNormalTextureSkin.InputElements, VertexPositionNormalTextureSkin.ElementSize, boundingBox);          
-            }
-            
-            //Create and return model
-            //-----------------------
-
-            if ((channels & XFileChannels.Skinning) != 0)
-            {               
+                mesh = ContentBuilder.BuildMesh<VertexPositionNormalTextureSkin>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionNormalTextureSkin.InputElements, VertexPositionNormalTextureSkin.ElementSize, boundingBox);                        
                 RiggedModel riggedModel = new RiggedModel(game);
                 riggedModel.Mesh = mesh;
                 riggedModel.SkinOffsets.AddRange(skinOffsets);
                 riggedModel.FrameTree = rootBoneFrame;
                 riggedModel.AnimationRig.AddRange(animationControllers);
                 result = riggedModel;
-            }
+            }      
 
             else if ((channels & XFileChannels.Animation) != 0)
             {

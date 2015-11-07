@@ -105,7 +105,7 @@ namespace CipherPark.AngelJacket.Core.World
                 projectileWO.Collider = new BoxCollider()
                 {
                     Box = BoundingBoxOA.FromBox(projectileWO.BoundingBox),
-                    Filter = IsObjectSubjectToCollisionTesting //Filter out the object's we want to collision test against.
+                    //Filter = IsObjectSubjectToCollisionTesting //Filter out the object's we want to collision test against.
                 };
                 _gameContext.Value.Simulator.CollisionDetector.AddObservedObject(projectileWO);
                 _lastFireTime = gameSimTime;

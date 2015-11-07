@@ -392,7 +392,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         }
     }
 
-    /*
+    /*FAILED EXPERIMENT
     /// <summary>
     /// 
     /// </summary>
@@ -428,6 +428,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     }
     */
 
+    /* FAILED EXPERIMENT
     /// <summary>
     /// 
     /// </summary>
@@ -457,4 +458,5 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementSize = 52;
         }       
     }
+    */
 }

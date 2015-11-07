@@ -273,6 +273,7 @@ namespace CipherPark.AngelJacket.Core.Content
             };
         }
 
+        /*
         public static OutlineVertex[] CreateQuadOutlineVertices(BoundingBox dimension)
         {
             Vector3[] positions = CreateQuadPoints3D(dimension);
@@ -293,6 +294,7 @@ namespace CipherPark.AngelJacket.Core.Content
             }).ToArray();          
             return indices.Select((i) => verts[i]).ToArray();
         }
+        */
 
         public static short[] CreateQuadIndices3D()
         {
@@ -1102,6 +1104,7 @@ namespace CipherPark.AngelJacket.Core.Content
         }
         #endregion
 
+        /*
         #region Buildings
         public static Mesh BuildLandStructureMeshC(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType, Color color)
         {
@@ -1122,6 +1125,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
             return ContentBuilder.BuildMesh(device, shaderByteCode, verts, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, bounds);
         }
+       
 
         public static Mesh BuildLandStructureOutline(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType)
         {
@@ -1138,6 +1142,7 @@ namespace CipherPark.AngelJacket.Core.Content
         }
 
         #endregion
+        */
 
         public static Vector3[] GenerateNormals(Vector3[] positions, short[] indices)
         {           

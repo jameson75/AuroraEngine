@@ -682,6 +682,21 @@ namespace CipherPark.AngelJacket.Core.Content
         public string Data { get; set; }
     }
 
+    #region Obsolete XFileTextDocument Implementation
+    
+    //**********************************************************************************
+    // THE CODE BELOW WAS MY FIRST ATTEMPT AT CREATING OF AN XFILE TEXT DOCUMENT READER.
+    // IT WORKED BUT WAS INCREDIBLY SLOW - THE REGULAR EXPRESSION TOOK WAY TOO LONG -
+    // EITHER BECAUSE OF THE WAY ITS IMPLEMENTED IN .NET OR BECAUSE I WAS SIMPLY
+    // LEVERAGING IT INCORRECTLY.
+    //
+    // EITHER CASE, I RE-WROTE THE CLASS (LOCATED ABOVE) USING A BUILT-IN FINITE 
+    // STATE MACHINE TO READ AND PARSE X-FILE DOCUMENT ELEMENTS. IT IS MANY MANY
+    // TIMES FASTER THAN THE REG-EX VERSION BELOW.
+    //
+    // I PRESERVED THE OLD CODE BELOW FOR FUTURE REFERENCE
+    //**********************************************************************************
+
     //public class XFileTextDocument : XFileDocument
     //{
     //    public void Load(string textFileContent)
@@ -1125,6 +1140,8 @@ namespace CipherPark.AngelJacket.Core.Content
     //        return header;
     //    }
     //}
+
+    #endregion
 
     public class XFileHeader
     {
