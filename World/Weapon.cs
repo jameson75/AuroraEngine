@@ -80,7 +80,8 @@ namespace CipherPark.AngelJacket.Core.World
                 //- Transform it to the world coordinates of the discharge location of this weapon.
                 //- Temporarily rotate the projectile to make my sample player-bullet work - We'll remove this code when the model is fixed and this
                 //  logic is fully tested.
-                Vector3 actionFrameDischargeLocation = ProjectileRootNode.WorldToLocalCoordinate(ContainerNode.LocalToWorldCoordinate(DischargeLocation));                
+                //Vector3 actionFrameDischargeLocation = ProjectileRootNode.WorldToLocalCoordinate(ContainerNode.LocalToWorldCoordinate(DischargeLocation));
+                Vector3 actionFrameDischargeLocation = ContainerNode.LocalToWorldCoordinate(DischargeLocation);
                 projectileWO.Transform = new Transform(Matrix.RotationX(MathUtil.DegreesToRadians(90f)) * Matrix.Translation(actionFrameDischargeLocation));                              
 
                 //Create and register animation for place holder
@@ -125,7 +126,7 @@ namespace CipherPark.AngelJacket.Core.World
             //------------------------------------------------------
             var renderer = InstanceWorldObjectRenderer.Create(ProjectileInstanceModel);
             _rendererNode = new RendererSceneNode(Game) { Renderer = renderer };
-            _gameContext.Value.Scene.Nodes.Add(_rendererNode);
+            ProjectileRootNode.Children.Add(_rendererNode);
 
             _isInitialized = true;
         }
@@ -183,13 +184,13 @@ namespace CipherPark.AngelJacket.Core.World
                                                                PlaceHolders.Where(p => p.ReferenceObjectName == referenceName)
                                                                            .Select(p => p.WorldTransform().ToMatrix())
                                                                            .ToArray());
-
             }
         }
 
         public void Draw(GameTime gameTime)
         {
-            _model.Draw(gameTime);
+            Effect.World = Matrix.Identity;            
+            _model.Draw(gameTime);                        
         }
     }
 
@@ -202,8 +203,9 @@ namespace CipherPark.AngelJacket.Core.World
 
             if (mesh.IsInstanced == false || mesh.IsDynamic == false)
                 throw new InvalidOperationException("Cannot set instance data to a mesh that is not both dynamic and instanced.");
-
-            mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
+            
+            if( data.Count() > 0)
+                mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
         }
 
         public static void UpdateInstanceData(this BasicModel model, IEnumerable<Matrix> data)
@@ -211,7 +213,8 @@ namespace CipherPark.AngelJacket.Core.World
             if (model.Mesh.IsInstanced == false || model.Mesh.IsDynamic == false)
                 throw new InvalidOperationException("Cannot set instance data to a mesh that is not both dynamic and instanced.");
 
-            model.Mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
+            if( data.Count() > 0)
+                model.Mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
         }
 
         public static void UpdateInstanceData(this RiggedModel model, IEnumerable<Matrix> orientationData, IEnumerable<SkinOffset> skinningData)

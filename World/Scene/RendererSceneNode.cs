@@ -37,10 +37,8 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             if (Renderer != null)
             {
                 Renderer.Effect.View = Camera.TransformToViewMatrix(Scene.CameraNode.ParentToWorld(Scene.CameraNode.Transform)); //ViewMatrix;
-                Renderer.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;
-                Renderer.Effect.Apply();
-                Renderer.Draw(gameTime);
-                Renderer.Effect.Restore();
+                Renderer.Effect.Projection = Scene.CameraNode.Camera.ProjectionMatrix;                
+                Renderer.Draw(gameTime);               
             }
         }
     }   

@@ -310,7 +310,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
     /// <summary>
     /// </summary>
     [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-    public struct ParticleVertexPostionNormalTexture
+    public struct InstanceVertexPostionNormalTexture
     {
         public Vector4 Position;
         public Vector3 Normal;
@@ -322,7 +322,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public static InputElement[] InputElements { get { return _inputElements; } }
         public static int ElementSize { get { return _elementSize; } }
         public static int InstanceSize { get { return _instanceSize; } }
-        static ParticleVertexPostionNormalTexture()
+        static InstanceVertexPostionNormalTexture()
         {
             _inputElements = new InputElement[]
              {
@@ -377,7 +377,97 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             Normal = normal;
             Color = color.ToVector4();
         }
-    }  
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct InstanceVertexPositionColor
+    {
+        public Vector4 Position;
+        public Vector4 Color;
+
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        private static int _instanceSize = 0;
+        
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+        public static int InstanceSize { get { return _instanceSize; } }
+
+        static InstanceVertexPositionColor()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 16, 0),
+                 new InputElement("MATRIX", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 1, Format.R32G32B32A32_Float, 16, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 2, Format.R32G32B32A32_Float, 32, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 3, Format.R32G32B32A32_Float, 48, 1, InputClassification.PerInstanceData, 1)
+             };
+            _elementSize = 32;
+            _instanceSize = 64;
+        }
+
+        public InstanceVertexPositionColor(Vector3 position)
+        {
+            Position = new Vector4(position, 1.0f);
+            Color = SharpDX.Color.Transparent.ToVector4();
+        }
+
+        public InstanceVertexPositionColor(Vector3 position, Vector4 color)
+        {
+            Position = new Vector4(position, 1.0f);
+            Color = color;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct InstanceVertexPositionTexture
+    {
+        public Vector4 Position;
+        public Vector2 TextureCoord;
+
+        private static InputElement[] _inputElements = null;
+        private static int _elementSize = 0;
+        private static int _instanceSize = 0;
+
+        public static InputElement[] InputElements { get { return _inputElements; } }
+        public static int ElementSize { get { return _elementSize; } }
+        public static int InstanceSize { get { return _instanceSize; } }
+
+        static InstanceVertexPositionTexture()
+        {
+            _inputElements = new InputElement[]
+             {
+                 new InputElement("SV_POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                 new InputElement("TEXCOORD", 0, Format.R32G32_Float, 16, 0),
+                 new InputElement("MATRIX", 0, Format.R32G32B32A32_Float, 0, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 1, Format.R32G32B32A32_Float, 16, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 2, Format.R32G32B32A32_Float, 32, 1, InputClassification.PerInstanceData, 1),
+                 new InputElement("MATRIX", 3, Format.R32G32B32A32_Float, 48, 1, InputClassification.PerInstanceData, 1)
+             };
+            _elementSize = 24;
+            _instanceSize = 64;
+        }
+
+        public InstanceVertexPositionTexture(Vector3 position)
+        {
+            Position = new Vector4(position, 1.0f);
+            TextureCoord = Vector2.Zero;
+        }
+        
+        public InstanceVertexPositionTexture(Vector3 position, Vector2 textureCoord)
+        {
+            Position = new Vector4(position, 1.0f);
+            TextureCoord = textureCoord;
+        }
+    }
     
     /// <summary>
     /// </summary>

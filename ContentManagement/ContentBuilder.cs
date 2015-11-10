@@ -544,16 +544,16 @@ namespace CipherPark.AngelJacket.Core.Content
             if (maxInstances <= 0)
                 throw new ArgumentException("Maxium instances is less than or equal to zero", "maxInstances");
         
-            ParticleVertexPostionNormalTexture[] verts = new ParticleVertexPostionNormalTexture[6];
+            InstanceVertexPostionNormalTexture[] verts = new InstanceVertexPostionNormalTexture[6];
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new ParticleVertexPostionNormalTexture()
+                verts[i] = new InstanceVertexPostionNormalTexture()
                     {
                         Position = new Vector4(positions[i], 1.0f),
                         TextureCoord = textureCoords[i]
                     };
             
             InstanceVertexData[] data = new InstanceVertexData[maxInstances * verts.Length];
-            return BuildInstancedMesh<ParticleVertexPostionNormalTexture, InstanceVertexData>(device, shaderByteCode, verts, indices, ParticleVertexPostionNormalTexture.InputElements, ParticleVertexPostionNormalTexture.ElementSize, data, InstanceVertexData.SizeInBytes);                
+            return BuildInstancedMesh<InstanceVertexPostionNormalTexture, InstanceVertexData>(device, shaderByteCode, verts, indices, InstanceVertexPostionNormalTexture.InputElements, InstanceVertexPostionNormalTexture.ElementSize, data, InstanceVertexData.SizeInBytes);                
         }
 
         public static Vector2[] CreateHexagonTextureCoords()
@@ -1092,8 +1092,8 @@ namespace CipherPark.AngelJacket.Core.Content
                 indexBufferDesc.SizeInBytes = maxIndices * sizeof(short);
                 indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
                 indexBufferDesc.Usage = ResourceUsage.Dynamic;
-                DXBuffer iBuffer = (indices != null) ? DXBuffer.Create<short>(device, indices, indexBufferDesc) : new DXBuffer(device, indexBufferDesc);
-                meshDesc.IndexCount = (indices != null) ? indices.Length : 0;
+                DXBuffer iBuffer = /*(indices != null) ?*/ DXBuffer.Create<short>(device, indices, indexBufferDesc) /*: new DXBuffer(device, indexBufferDesc)*/;
+                meshDesc.IndexCount = /*(indices != null) ?*/ indices.Length /*: 0*/;
                 meshDesc.IndexBuffer = iBuffer;
             }
 

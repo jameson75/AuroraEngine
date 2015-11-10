@@ -73,7 +73,9 @@ namespace CipherPark.AngelJacket.Core.World
             if (Effect != null && _mesh != null)
             {
                 Effect.World = Collider.WorldTransform().ToMatrix();
+                Effect.Apply();
                 _mesh.Draw(gameTime);
+                Effect.Restore();
             }
         }
         

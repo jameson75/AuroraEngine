@@ -157,7 +157,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return result;
         }   
 
-        public static Model ImportX(IGameApp game, string fileName, byte[] shaderByteCode, XFileChannels channels, XFileOptions options = XFileOptions.None, List<string> textureNames = null)
+        public static Model ImportX(IGameApp game, string fileName, byte[] shaderByteCode, XFileChannels channels, XFileImportOptions options = XFileImportOptions.None, List<string> textureNames = null)
         {
             Model result = null;
             Mesh mesh = null;
@@ -175,17 +175,22 @@ namespace CipherPark.AngelJacket.Core.Content
                 (channels & XFileChannels.MeshVertexColors) != 0)
                 throw new NotSupportedException("One or more of the specified channels is not supported.");
 
-            //Throw an error for conflicting channels.
-            //----------------------------------------
+            //Throw an error for conflicting channels and/or options
+            //Conflict 1: Both color and texture channel specified.
+            //Conflict 2: Instancing enabled for skinned mesh (we don't support this yet).
+            //-----------------------------------------------------------------------------
             if (((channels & XFileChannels.MeshVertexColors) != 0 ||
                 (channels & XFileChannels.DefaultMaterialColor) != 0 ||
                 (channels & XFileChannels.DeclColor) != 0) &&
                  ((channels & XFileChannels.MeshTextureCoords1) != 0 ||
-                 (channels & XFileChannels.MeshTextureCoords2) != 0))
+                 (channels & XFileChannels.MeshTextureCoords2) != 0) || 
+                 (channels.HasFlag(XFileChannels.Skinning) && options.HasFlag(XFileImportOptions.EnableInstancing)))
                 throw new NotSupportedException("Conflicting channels specified.");
 
-            //Read X-File Data
-            //----------------
+            
+
+            //Read X-File Data/DOM
+            //--------------------
             doc.Load(System.IO.File.Open(fileName, FileMode.Open, FileAccess.ReadWrite));
 
             //Access X-File's first mesh Data and it's frame
@@ -209,7 +214,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 texCoords = xMesh.DeclData.GetTextureCoords();
                 if (texCoords == null)
                 {
-                    if (!options.HasFlag(XFileOptions.IgnoreMissingTexCoords))
+                    if (!options.HasFlag(XFileImportOptions.IgnoreMissingTexCoords))
                         throw new InvalidOperationException("Expected texture coordinate data was not present.");
                     else
                         texCoords = xMesh.Vertices.Select(v => Vector2.Zero).ToArray();
@@ -231,7 +236,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 normals = xMesh.DeclData.GetNormals();
                 if (normals == null)
                 {
-                    if (!options.HasFlag(XFileOptions.IgnoreMissingNormals))
+                    if (!options.HasFlag(XFileImportOptions.IgnoreMissingNormals))
                         throw new InvalidOperationException("Expected normal data was not present.");
                     else
                         normals = xMesh.Vertices.Select(v=> Vector3.Zero).ToArray();
@@ -257,7 +262,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 }
                 if (colors == null)
                 {
-                    if (!options.HasFlag(XFileOptions.IgnoreMissingColors))
+                    if (!options.HasFlag(XFileImportOptions.IgnoreMissingColors))
                         throw new InvalidOperationException("Expected material color data was not present.");
                     else
                         colors = xMesh.Vertices.Select(v => Color.Transparent).ToArray();
@@ -360,7 +365,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
             else if ((channels & XFileChannels.Animation) != 0)
             {
-                mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox);
+                mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox, options.HasFlag(XFileImportOptions.EnableInstancing));
                 ComplexModel complexModel = new ComplexModel(game);
                 complexModel.Meshes.Add(mesh);
                 complexModel.FrameTree = rootBoneFrame;
@@ -370,7 +375,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
             else
             {
-                mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox);
+                mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox, options.HasFlag(XFileImportOptions.EnableInstancing));
                 BasicModel basicModel = new BasicModel(game);
                 basicModel.Mesh = mesh;
                 result = basicModel;
@@ -414,36 +419,66 @@ namespace CipherPark.AngelJacket.Core.Content
             return animationControllers;
         }
 
-        private static Mesh BuildMeshForChannels(XFileChannels channels, Device device, byte[] shaderByteCode, XFileVector[] vertices, short[] indices, Vector2[] texCoords, Vector3[] normals, Color[] colors, BoundingBox boundingBox)
+        private static Mesh BuildMeshForChannels(XFileChannels channels, Device device, byte[] shaderByteCode, XFileVector[] vertices, short[] indices, Vector2[] texCoords, Vector3[] normals, Color[] colors, BoundingBox boundingBox, bool enableInstancing = false)
         {
+            const int DefaultInstanceSize = 1000;
+
             if ((channels & XFileChannels.MeshVertexColors) != 0 ||
                 (channels & XFileChannels.DefaultMaterialColor) != 0)
             {
                 if ((channels & XFileChannels.MeshNormals) != 0 ||
                     (channels & XFileChannels.DeclNormals) != 0)
                 {
-                    //VERTEXPOSITIONNORMALCOLOR
-                    //-------------------------
-                    VertexPositionNormalColor[] _vertices = vertices.Select((v, i) => new VertexPositionNormalColor()
+                    if (!enableInstancing)
                     {
-                        Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
-                        Normal = normals[i],
-                        Color = colors[i].ToVector4()
-                    }).ToArray();
-
-                    return ContentBuilder.BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, _vertices, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
+                        //VERTEXPOSITIONNORMALCOLOR
+                        //-------------------------
+                        VertexPositionNormalColor[] _vertices = vertices.Select((v, i) => new VertexPositionNormalColor()
+                        {
+                            Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                            Normal = normals[i],
+                            Color = colors[i].ToVector4()
+                        }).ToArray();
+                        return ContentBuilder.BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, _vertices, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
+                    }
+                    else
+                    {
+                        //INSTANCEVERTEXPOSITIONNORMALCOLOR
+                        //---------------------------------
+                        InstanceVertexPositionNormalColor[] _vertices = vertices.Select((v, i) => new InstanceVertexPositionNormalColor()
+                        {
+                            Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                            Normal = normals[i],
+                            Color = colors[i].ToVector4()
+                        }).ToArray();
+                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionNormalColor, Matrix>(device, shaderByteCode, _vertices, indices, indices.Length, InstanceVertexPositionNormalColor.InputElements, InstanceVertexPositionNormalColor.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionNormalColor.InstanceSize, boundingBox);
+                    }
                 }
                 else
                 {
-                    //VERTEXPOSITIONCOLOR
-                    //-------------------
-                    VertexPositionColor[] _vertices = vertices.Select((v, i) => new VertexPositionColor()
+                    if (!enableInstancing)
                     {
-                        Position = new Vector4(v.X, v.Y, v.Z, 1.0f),                       
-                        Color = colors[i].ToVector4()
-                    }).ToArray();
+                        //VERTEXPOSITIONCOLOR
+                        //-------------------
+                        VertexPositionColor[] _vertices = vertices.Select((v, i) => new VertexPositionColor()
+                        {
+                            Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                            Color = colors[i].ToVector4()
+                        }).ToArray();
+                        return ContentBuilder.BuildMesh<VertexPositionColor>(device, shaderByteCode, _vertices, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
+                    }
+                    else
+                    {
+                        //INSTANCEVERTEXPOSITIONCOLOR
+                        //---------------------------
+                        InstanceVertexPositionColor[] _vertices = vertices.Select((v, i) => new InstanceVertexPositionColor()
+                        {
+                            Position = new Vector4(v.X, v.Y, v.Z, 1.0f),                           
+                            Color = colors[i].ToVector4()
+                        }).ToArray();
+                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionColor, Matrix>(device, shaderByteCode, _vertices, indices, indices.Length, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionColor.InstanceSize, boundingBox);
 
-                    return ContentBuilder.BuildMesh<VertexPositionColor>(device, shaderByteCode, _vertices, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
+                    }
                 }
             }
             else if((channels & XFileChannels.DeclTextureCoords1) != 0 ||
@@ -452,28 +487,55 @@ namespace CipherPark.AngelJacket.Core.Content
                 if ((channels & XFileChannels.DeclNormals) != 0 ||
                    (channels & XFileChannels.MeshNormals) != 0)
                 {
-                    //VERTEXPOSITIONNORMALTEXTURE
-                    //---------------------------
-                    VertexPositionNormalTexture[] _vertices = vertices.Select((v, i) => new VertexPositionNormalTexture()
+                    if (!enableInstancing)
                     {
-                        Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
-                        Normal = normals[i],
-                        TextureCoord = texCoords[i]
-                    }).ToArray();
-
-                    return ContentBuilder.BuildMesh<VertexPositionNormalTexture>(device, shaderByteCode, _vertices, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, boundingBox);
+                        //VERTEXPOSITIONNORMALTEXTURE
+                        //---------------------------
+                        VertexPositionNormalTexture[] _vertices = vertices.Select((v, i) => new VertexPositionNormalTexture()
+                        {
+                            Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                            Normal = normals[i],
+                            TextureCoord = texCoords[i]
+                        }).ToArray();
+                        return ContentBuilder.BuildMesh<VertexPositionNormalTexture>(device, shaderByteCode, _vertices, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, boundingBox);
+                    }
+                    else
+                    {
+                        //INSTANCEVERTEXPOSITIONNORMALTEXTURE
+                        //-----------------------------------    
+                        InstanceVertexPostionNormalTexture[] _vertices = vertices.Select((v, i) => new InstanceVertexPostionNormalTexture()
+                        {
+                            Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                            Normal = normals[i],
+                            TextureCoord = texCoords[i]
+                        }).ToArray();
+                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPostionNormalTexture, Matrix>(device, shaderByteCode, _vertices, indices, indices.Length, InstanceVertexPostionNormalTexture.InputElements, InstanceVertexPostionNormalTexture.ElementSize, null, DefaultInstanceSize, InstanceVertexPostionNormalTexture.InstanceSize, boundingBox);
+                    }
                 }
                 else
                 {
-                    //VERTEXPOSITIONTEXTURE
-                    //---------------------
-                    VertexPositionTexture[] _vertices = vertices.Select((v, i) => new VertexPositionTexture()
+                    if (!enableInstancing)
                     {
-                        Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
-                        TextureCoord = texCoords[i]
-                    }).ToArray();
-
-                    return ContentBuilder.BuildMesh<VertexPositionTexture>(device, shaderByteCode, _vertices, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+                        //VERTEXPOSITIONTEXTURE
+                        //---------------------
+                        VertexPositionTexture[] _vertices = vertices.Select((v, i) => new VertexPositionTexture()
+                        {
+                            Position = new Vector4(v.X, v.Y, v.Z, 1.0f),
+                            TextureCoord = texCoords[i]
+                        }).ToArray();
+                        return ContentBuilder.BuildMesh<VertexPositionTexture>(device, shaderByteCode, _vertices, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+                    }
+                    else
+                    {
+                        //INSTANCEVERTEXPOSITIONTEXTURE
+                        //-----------------------------------    
+                        InstanceVertexPositionTexture[] _vertices = vertices.Select((v, i) => new InstanceVertexPositionTexture()
+                        {
+                            Position = new Vector4(v.X, v.Y, v.Z, 1.0f),                            
+                            TextureCoord = texCoords[i]
+                        }).ToArray();
+                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionTexture, Matrix>(device, shaderByteCode, _vertices, indices, indices.Length, InstanceVertexPositionTexture.InputElements, InstanceVertexPositionTexture.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionTexture.InstanceSize, boundingBox);
+                    }
                 }
             }
             else 
@@ -574,12 +636,13 @@ namespace CipherPark.AngelJacket.Core.Content
     }
 
     [Flags]
-    public enum XFileOptions
+    public enum XFileImportOptions
     {
         None = 0,
         IgnoreMissingTexCoords =    0x0001,
         IgnoreMissingNormals =      0x0002,
-        IgnoreMissingColors =       0x0004
+        IgnoreMissingColors =       0x0004,
+        EnableInstancing =          0x0008
     }
 
     [StructLayout(LayoutKind.Sequential)]

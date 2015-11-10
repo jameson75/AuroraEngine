@@ -252,7 +252,9 @@ namespace CipherPark.AngelJacket.Core.World
         public void Draw(GameTime gameTime)
         {
             Effect.World = Matrix.Identity;
+            Effect.Apply();
             _mesh.Draw(gameTime);
+            Effect.Restore();
         }
 
         private IEnumerable<PathNode> EvaluatePathNodes(Path p)
