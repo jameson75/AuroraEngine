@@ -48,7 +48,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             set { _layoutManager.Orientation = value; }
         }
 
-        public SplitterLayoutDivisions Splitters { get { return _layoutManager.LayoutDivisions; } }       
+        public SplitterLayoutDivisions Splitters
+        {
+            get { return _layoutManager.LayoutDivisions; }
+        }       
     }
 
     /// <summary>

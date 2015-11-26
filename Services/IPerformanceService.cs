@@ -13,13 +13,13 @@ namespace CipherPark.AngelJacket.Core.Services
     public interface IPerformanceService
     {
         void Update(GameTime gameTime);
-        ReadOnlyCollection<Metric> GetAllMetrics();
-        Metric GetMetric(string name, string group = null);
+        ReadOnlyCollection<PerformanceMetric> GetAllMetrics();
+        PerformanceMetric GetMetric(string name, string group = null);
         void UpdateMetric(string name, string group, double value);
         void UpdateMetric(string name, double value);
     }
 
-    public class Metric
+    public class PerformanceMetric
     {
         private Queue<double> _samples = new Queue<double>();
         public string Group { get; set; }

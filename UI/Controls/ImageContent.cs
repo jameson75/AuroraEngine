@@ -33,7 +33,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
                 if (_texture != null)
                 {
-                    _texture.Dispose();
+                    //_texture.Dispose();
                     _texture = null;
                 }
 
