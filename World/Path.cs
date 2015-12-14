@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.Animation;
 // Copyright © 2010-2013
 // Angel Jacket by Cipher Park is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 namespace CipherPark.AngelJacket.Core.World
@@ -29,7 +29,8 @@ namespace CipherPark.AngelJacket.Core.World
     {
         private List<PathNode> _nodes = new List<PathNode>();
         private List<float> _approximateSegmentLengths = new List<float>();
-        private int _lastCalculatedNodeIndex = 0;      
+        private int _lastCalculatedNodeIndex = 0;             
+      
 
         /// <summary>
         /// 
@@ -190,74 +191,89 @@ namespace CipherPark.AngelJacket.Core.World
         {
             PathNode pathNode = null;
 
+            if (this.NodeCount < 2)
+                throw new InvalidOperationException("Path is undefined. A path requires at least two nodes to be defined");
+
             if (this.RequiresApproximation)
-                throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() after adding or removing nodes from the path.");
+                throw new InvalidOperationException("Length not approximated. Must call GenerateLinearApproximation() after adding or removing nodes from the path.");          
 
             //TODO: Handle looped path.
             //-------------------------
 
-            if (d < 0 || d > Distance)
-                return null;
+            if (d >= 0 && d <= Distance)
+            {
+                float accumLength = 0;
+                float pct = 0;
 
-            float accumLength = 0;          
-            float pct = 0;            
-
-            for (int i = 0; i < _approximateSegmentLengths.Count; i++)
-            {                  
-                if (d >= accumLength && d <= accumLength + _approximateSegmentLengths[i] || i == _approximateSegmentLengths.Count - 1)
+                for (int i = 0; i < _approximateSegmentLengths.Count; i++)
                 {
-                    pct = (d - accumLength) / _approximateSegmentLengths[i];
-                    PathNode n1 = _nodes[i];
-                    PathNode n2 = _nodes[i + 1];
-                    PathNode n0 = (n1 != _nodes.First()) ? _nodes[i - 1] : n1;
-                    PathNode n3 = (n2 != _nodes.Last()) ? _nodes[i + 2] : n2;
-                    Vector3 vTranslation;
-                    if (SmoothingEnabled)
+                    if (d >= accumLength && d <= accumLength + _approximateSegmentLengths[i] || i == _approximateSegmentLengths.Count - 1)
                     {
-                        //**************************************************************
-                        //NOTE: Important for future reference - the catmull algorithm
-                        //does not produce equidistant points.
-                        //**************************************************************
-                        vTranslation = Vector3.CatmullRom(n0.Transform.Translation,
-                                                          n1.Transform.Translation,
-                                                          n2.Transform.Translation,
-                                                          n3.Transform.Translation,
-                                                          pct);
+                        pct = (d - accumLength) / _approximateSegmentLengths[i];
+                        PathNode n1 = _nodes[i];
+                        PathNode n2 = _nodes[i + 1];
+                        PathNode n0 = (n1 != _nodes.First()) ? _nodes[i - 1] : n1;
+                        PathNode n3 = (n2 != _nodes.Last()) ? _nodes[i + 2] : n2;
+                        Vector3 vTranslation;
+                        if (SmoothingEnabled)
+                        {
+                            //**************************************************************
+                            //NOTE: Important for future reference - the catmull algorithm
+                            //does not produce equidistant points.
+                            //**************************************************************
+                            vTranslation = Vector3.CatmullRom(n0.Transform.Translation,
+                                                              n1.Transform.Translation,
+                                                              n2.Transform.Translation,
+                                                              n3.Transform.Translation,
+                                                              pct);
+                        }
+                        else
+                            vTranslation = Vector3.Lerp(n1.Transform.Translation,
+                                                        n2.Transform.Translation,
+                                                        pct);
+                        Quaternion qRotation = Quaternion.Lerp(n1.Transform.Rotation, n2.Transform.Rotation, pct);
+                        pathNode = new PathNode() { Transform = new Transform(qRotation, vTranslation) };
+                        break;
                     }
-                    else
-                        vTranslation = Vector3.Lerp(n1.Transform.Translation,
-                                                    n2.Transform.Translation,
-                                                    pct);
-                    Quaternion qRotation = Quaternion.Lerp(n1.Transform.Rotation, n2.Transform.Rotation, pct);
-                    pathNode = new PathNode() { Transform = new Transform(qRotation, vTranslation) };
-                    break;
+                    accumLength += _approximateSegmentLengths[i];
                 }
-                accumLength += _approximateSegmentLengths[i];
-            }
+            }            
+            else
+                throw new InvalidOperationException("Distance, d, is out of range.");
 
             return pathNode;
         }
 
         /// <summary>
-        /// 
+        /// Returns a list of path nodes that are approximately equidistant.
         /// </summary>
         /// <param name="stepSize"></param>
         /// <param name="firstNode"></param>
         /// <param name="lastNode"></param>
         /// <returns></returns>
+        /// <remarks>This distance between the nodes may actually be greater or less than the specified step size. 
+        /// The stepSize parameter is used as an approximation.
+        /// The SamplesPerSegment property determines the level of accuracy. The two are positively correlated.
+        /// </remarks>
         public PathNode[] EvaluateEquidistantNodes(float stepSize, PathNode firstNode = null, PathNode lastNode = null)
         {
             List<PathNode> result = new List<PathNode>();
             float step = 0;
+
+            //Ensure step size is rational number, greater than zero.
             if (stepSize <= 0)
                 throw new ArgumentException("stepSize is not greater than zero.");
+            
+            //
             while (step < Distance)
             {
                 result.Add(EvaluateNodeAtDistance(step));
                 step += stepSize;
             }
-            if(Distance > 0)
+
+            if (Distance > 0 && step < Distance)
                 result.Add(EvaluateNodeAtDistance(Distance));
+
             return result.ToArray();
         }       
 
