@@ -128,5 +128,33 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         Diffuse = 0,
         Normal,     
         Alpha
-    }   
+    }
+
+    public static class ModelExtension
+    {
+        public static void UpdateInstanceData(this ComplexModel model, string meshName, IEnumerable<Matrix> data)
+        {
+            Mesh mesh = model.Meshes.FirstOrDefault(m => m.Name == meshName);
+
+            if (mesh.IsInstanced == false || mesh.IsDynamic == false)
+                throw new InvalidOperationException("Cannot set instance data to a mesh that is not both dynamic and instanced.");
+
+            if (data.Count() > 0)
+                mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
+        }
+
+        public static void UpdateInstanceData(this BasicModel model, IEnumerable<Matrix> data)
+        {
+            if (model.Mesh.IsInstanced == false || model.Mesh.IsDynamic == false)
+                throw new InvalidOperationException("Cannot set instance data to a mesh that is not both dynamic and instanced.");
+
+            if (data.Count() > 0)
+                model.Mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
+        }
+
+        public static void UpdateInstanceData(this RiggedModel model, IEnumerable<Matrix> orientationData, IEnumerable<SkinOffset> skinningData)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

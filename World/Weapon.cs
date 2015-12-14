@@ -35,14 +35,13 @@ namespace CipherPark.AngelJacket.Core.World
     {
         public BasicWeapon(IGameApp game)
             : base(game)
-        { }
-
+        { }     
         public abstract void Fire();
         public abstract void Initialize();
         public abstract void Uninitialize();
     }
 
-    public class PlayerGun : BasicWeapon
+    public class PlayerGun : BasicWeapon 
     {
         private bool _isInitialized = false;
         private CompositeAnimationController _animationController = null;
@@ -71,8 +70,8 @@ namespace CipherPark.AngelJacket.Core.World
                 _lastFireTime == null ||
                 gameSimTime - _lastFireTime.Value >= DischargeLatency)
             {                
-                //Create place holder.
-                //--------------------
+                //Create place holder
+                //-------------------
                 InstancePlaceHolderWorldObject projectileWO = new InstancePlaceHolderWorldObject(this.Game, ProjectileInstanceModel.BoundingBox);                                               
                
                 //Initialize transform of the new projectile instance place holder
@@ -105,25 +104,37 @@ namespace CipherPark.AngelJacket.Core.World
                 //-----------------------------------------------------------------------------------------------
                 projectileWO.Collider = new BoxCollider()
                 {
-                    Box = BoundingBoxOA.FromBox(projectileWO.BoundingBox),
-                    //Filter = IsObjectSubjectToCollisionTesting //Filter out the object's we want to collision test against.
+                    Box = BoundingBoxOA.FromBox(projectileWO.BoundingBox),                    
+                    EnableFastMovingObjectDetection = true,
                 };
+
+                //Register the place holder object for collsiion detection
+                //--------------------------------------------------------
                 _gameContext.Value.Simulator.CollisionDetector.AddObservedObject(projectileWO);
+
+                //Create and register a resource collector for the moment the projectile is destroyed 
+                //(which can occur either by traveling a particular distance from the action node or by colliding with something)
+                //---------------------------------------------------------------------------------------------------------------
+                _gameContext.Value.Simulator.LifetimeManager.RegisterCollector(
+                    projectileWO, 
+                    new PlayerGunProjectileCollector(animationController, (InstanceWorldObjectRenderer)_rendererNode.Renderer
+                    ));
+
                 _lastFireTime = gameSimTime;
             }
         }
 
         public override void Initialize()
         {
-            //Register our animation controller.
-            //----------------------------------
+            //Register our animation controller
+            //---------------------------------
             _animationController = new CompositeAnimationController();
             IGameContextService service = Game.Services.GetService<IGameContextService>();
             _gameContext = service.Context;
             _gameContext.Value.Simulator.AnimationControllers.Add(_animationController);
 
-            //Create the projectile renderer and it to to the scene.
-            //------------------------------------------------------
+            //Create the projectile renderer and it to to the scene
+            //-----------------------------------------------------
             var renderer = InstanceWorldObjectRenderer.Create(ProjectileInstanceModel);
             _rendererNode = new RendererSceneNode(Game) { Renderer = renderer };
             ProjectileRootNode.Children.Add(_rendererNode);
@@ -141,85 +152,28 @@ namespace CipherPark.AngelJacket.Core.World
         {
             //Currently the player gun doesn't have a model associated with it.
             base.Draw(gameTime);
-        }
-    }
+        }     
+    }    
 
-    public class InstanceWorldObjectRenderer : IRenderer
+    public class PlayerGunProjectileCollector : IWorldCollector
     {
-        private IGameApp _game = null;
-        private Model _model = null;
-        private List<InstancePlaceHolderWorldObject> _placeHolders = new List<InstancePlaceHolderWorldObject>();
+        public RigidBodyAnimationController ProjectileController { get; private set; }
+        public InstanceWorldObjectRenderer ProjectileRenderer { get; private set; }
 
-        public List<InstancePlaceHolderWorldObject> PlaceHolders { get { return _placeHolders; } }
-
-        protected InstanceWorldObjectRenderer(Model model)
+        public PlayerGunProjectileCollector(RigidBodyAnimationController projectileController,                                           
+                                            InstanceWorldObjectRenderer projectileRenderer)
         {
-            _model = model;
-            _game = model.Game;
+            ProjectileController = projectileController;           
+            ProjectileRenderer = projectileRenderer;
         }
 
-        public static InstanceWorldObjectRenderer Create(Model model)
+        public void CollectObject(WorldObject worldObject)
         {
-            return new InstanceWorldObjectRenderer(model);
-        }
-
-        public SurfaceEffect Effect
-        {
-            get 
-            {
-                return _model.Effect;
-            }
-        }
-
-        public void Update(GameTime gameTime)
-        {
-            if (_model is BasicModel)
-                ((BasicModel)_model).UpdateInstanceData(PlaceHolders.Select(p => p.WorldTransform().ToMatrix()).ToArray());
-            
-            else if (_model is ComplexModel)
-            {
-                var referenceNames = _placeHolders.Select(p => p.ReferenceObjectName).Distinct();
-                foreach (string referenceName in referenceNames)
-                    ((ComplexModel)_model).UpdateInstanceData(referenceName,
-                                                               PlaceHolders.Where(p => p.ReferenceObjectName == referenceName)
-                                                                           .Select(p => p.WorldTransform().ToMatrix())
-                                                                           .ToArray());
-            }
-        }
-
-        public void Draw(GameTime gameTime)
-        {
-            Effect.World = Matrix.Identity;            
-            _model.Draw(gameTime);                        
-        }
-    }
-
-
-    public static class ModelExtension
-    {
-        public static void UpdateInstanceData(this ComplexModel model, string meshName, IEnumerable<Matrix> data)
-        {
-            Mesh mesh = model.Meshes.FirstOrDefault(m => m.Name == meshName);
-
-            if (mesh.IsInstanced == false || mesh.IsDynamic == false)
-                throw new InvalidOperationException("Cannot set instance data to a mesh that is not both dynamic and instanced.");
-            
-            if( data.Count() > 0)
-                mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
-        }
-
-        public static void UpdateInstanceData(this BasicModel model, IEnumerable<Matrix> data)
-        {
-            if (model.Mesh.IsInstanced == false || model.Mesh.IsDynamic == false)
-                throw new InvalidOperationException("Cannot set instance data to a mesh that is not both dynamic and instanced.");
-
-            if( data.Count() > 0)
-                model.Mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
-        }
-
-        public static void UpdateInstanceData(this RiggedModel model, IEnumerable<Matrix> orientationData, IEnumerable<SkinOffset> skinningData)
-        {
-            throw new NotImplementedException();
+            IGameContextService service = (IGameContextService)worldObject.Game.Services.GetService(typeof(IGameContextService));
+            GameContext gameContext = service.Context.Value;
+            gameContext.Simulator.AnimationControllers.Remove(ProjectileController);
+            ProjectileRenderer.PlaceHolders.Remove((InstancePlaceHolderWorldObject)worldObject);
+            gameContext.Simulator.CollisionDetector.RemoveObservedObject(worldObject);    
         }
     }
 }

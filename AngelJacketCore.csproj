@@ -151,6 +151,7 @@
     <Compile Include="World\Geometry\AnimatedModel.cs" />
     <Compile Include="World\Geometry\ComplexModel.cs" />
     <Compile Include="World\Geometry\ObjectOutlineModel.cs" />
+    <Compile Include="World\EntityManager.cs" />
     <Compile Include="World\Scene\RendererSceneNode.cs" />
     <Compile Include="World\Visualizers\ColliderRenderer.cs" />
     <Compile Include="World\Collision\BoxCollider.cs" />
@@ -261,6 +262,7 @@
     <Compile Include="World\Systems\GridForm.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
+    <Compile Include="World\Visualizers\InstanceWorldObjectRenderer.cs" />
     <Compile Include="World\Visualizers\IRenderer.cs" />
     <Compile Include="World\Visualizers\LightTrailRenderer.cs" />
     <Compile Include="World\Path.cs" />

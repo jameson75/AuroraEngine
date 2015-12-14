@@ -24,22 +24,24 @@ namespace CipherPark.AngelJacket.Core.World
         private IGameApp _game = null;
         private List<IAnimationController> _animationControllers = new List<IAnimationController>();
         private CollisionDetector _collisionDetector = null;
+        private LifetimeManager _lifetimeManager = null;
 
         public IGameApp Game { get { return _game; } }    
         public List<IAnimationController> AnimationControllers { get { return _animationControllers; } }
         public CollisionDetector CollisionDetector { get { return _collisionDetector; } } 
+        public LifetimeManager LifetimeManager { get { return _lifetimeManager; } }
 
         public WorldSimulator(IGameApp game)
         {
             _game = game;
             _collisionDetector = new CollisionDetector(game);
+            _lifetimeManager = new LifetimeManager();
         }
 
         public void Update(GameTime gameTime)
         {
-            //I. Update animation controllers.
-            //--------------------------------
-
+            //I. Update animation controllers
+            //-------------------------------
             //**********************************************************************************
             //NOTE: We use an auxilary controller collection to enumerate through, in 
             //the event that an updated controller alters this Simulator's Animation Controllers
@@ -53,9 +55,13 @@ namespace CipherPark.AngelJacket.Core.World
                     _animationControllers.Remove(controller);
             }
 
-            //II. Update collision detection.
-            //-------------------------------
+            //II. Update collision detection
+            //------------------------------
             CollisionDetector.Update(gameTime);
+
+            //III. Remove entities (discarded by either animation controller or collision detector)
+            //-------------------------------------------------------------------------------------
+            LifetimeManager.Collect();
         }       
     }  
 }
