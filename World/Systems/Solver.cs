@@ -21,5 +21,6 @@ namespace CipherPark.AngelJacket.Core.Systems
     {
         public abstract void Step(GameTime time, ParticleSystem system);
         public abstract void Reset();
+        public bool IsComplete { get; protected set; }
     }
 }

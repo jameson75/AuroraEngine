@@ -37,6 +37,8 @@ namespace CipherPark.AngelJacket.Core.Systems
         {
             foreach (KeyframeAnimationController c in _controllers)
                 c.UpdateAnimation(time);
+
+            IsComplete = _controllers.All(c => c.IsAnimationComplete);
         }
     } 
 }

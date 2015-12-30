@@ -51,8 +51,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         public virtual BoundingBox BoundingBox
         {            
             get { return BoundingBoxExtension.Empty; }
-        }
+        }      
 
+      
         protected void ClearElements() 
         { KillAll(); }
 

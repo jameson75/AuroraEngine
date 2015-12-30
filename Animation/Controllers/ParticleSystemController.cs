@@ -70,7 +70,7 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
                     System.Emit(i);       
                 }
 
-                if( Solver != null )
+                if( Solver != null && !Solver.IsComplete )
                     Solver.Step(gameTime, System); 
             }              
         }
