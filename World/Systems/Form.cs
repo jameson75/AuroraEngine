@@ -13,20 +13,20 @@ using CipherPark.AngelJacket.Core.Utils;
 using CipherPark.AngelJacket.Core.Animation;
 
 namespace CipherPark.AngelJacket.Core.World.Geometry
-{    
-    public abstract class Form : ParticleSystem 
-    {      
+{
+    public class Form : ParticleSystem
+    {
         private Emitter _elementEmitter = null;
-        private ParticleDescription _elementDescription = null;        
+        private ParticleDescription _elementDescription = null;
 
-        protected Form(IGameApp game)
+        public Form(IGameApp game)
             : base(game)
         {
             _elementEmitter = new Emitter();
             _elementDescription = new ParticleDescription();
             _elementEmitter.DefaultParticleDescription = _elementDescription;
             Emitters.Add(_elementEmitter);
-        }     
+        }
 
         public Mesh ElementMesh
         {
@@ -46,43 +46,54 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 _elementDescription.Effect = value;
                 OnEffectChanged();
             }
-        }      
-
-        public virtual BoundingBox BoundingBox
-        {            
-            get { return BoundingBoxExtension.Empty; }
-        }      
-
-      
-        protected void ClearElements() 
-        { KillAll(); }
-
-        protected List<Particle> EmitElements(int count) 
-        {           
-            return Emit(0, null, count);       
         }
 
-        protected List<Particle> SpawnElements(int count)
+        public virtual BoundingBox BoundingBox
+        {
+            get { return BoundingBoxExtension.Empty; }
+        }
+
+        public void ClearElements()
+        { KillAll(); }
+
+        public List<Particle> EmitElements(int count)
+        {
+            return Emit(0, null, count);
+        }
+
+        public List<Particle> SpawnElements(int count)
         {
             return Spawn(0, null, count);
         }
 
-        protected void AddElements(IEnumerable<Particle> elements, int? index = null)
+        public void AddElements(IEnumerable<Particle> elements, int? index = null)
         {
             Add(elements, index);
         }
 
-        protected void KillElements(IEnumerable<Particle> elements)
+        public void KillElements(IEnumerable<Particle> elements)
         {
             Kill(elements);
         }
 
-        protected int ElementCount { get { return Particles.Count; } }
+        public int ElementCount { get { return Particles.Count; } }
 
-        protected virtual void OnLayoutChanged() { }
+        public event EventHandler LayoutChanged;
 
-        protected virtual void OnMeshChanged() { }
+        public event EventHandler MeshChanged;
 
-        protected virtual void OnEffectChanged() { }
+        public event EventHandler EffectChanged;
+
+        protected virtual void OnLayoutChanged() { FireHandler(LayoutChanged); }
+
+        protected virtual void OnMeshChanged() { FireHandler(MeshChanged); }
+
+        protected virtual void OnEffectChanged() { FireHandler(EffectChanged); }
+
+        private void FireHandler(EventHandler handler)
+        {            
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
     }
 }

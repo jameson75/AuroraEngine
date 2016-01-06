@@ -169,7 +169,7 @@
     <Compile Include="World\Systems\Particle.cs" />
     <Compile Include="World\Systems\ParticleKeyframeSolver.cs" />
     <Compile Include="World\Systems\ParticleSystem.cs" />
-    <Compile Include="World\Systems\Solver.cs" />
+    <Compile Include="World\Systems\Animation\Solver.cs" />
     <Compile Include="Sequencer\CodeBlockSequenceEvent.cs" />
     <Compile Include="Sequencer\ScriptSequenceEvent.cs" />
     <Compile Include="Services\IPerformanceService.cs" />
@@ -256,10 +256,9 @@
     <Compile Include="Utils\Range.cs" />
     <Compile Include="Utils\DXExtensions.cs" />
     <Compile Include="Animation\Animation.cs" />
-    <Compile Include="World\Systems\StackGridDeformer.cs" />
+    <Compile Include="World\Systems\Animation\StackGridDeformer.cs" />
     <Compile Include="World\Systems\Form.cs" />
-    <Compile Include="World\Systems\PathGridDeformer.cs" />
-    <Compile Include="World\Systems\GridForm.cs" />
+    <Compile Include="World\Systems\GridFormPattern.cs" />
     <Compile Include="World\Geometry\Model.cs" />
     <Compile Include="Sequencer\Sequencer.cs" />
     <Compile Include="World\Visualizers\InstanceWorldObjectRenderer.cs" />
@@ -267,7 +266,7 @@
     <Compile Include="World\Visualizers\LightTrailRenderer.cs" />
     <Compile Include="World\Path.cs" />
     <Compile Include="World\Geometry\RiggedModel.cs" />
-    <Compile Include="World\Systems\ConcentricForm.cs" />
+    <Compile Include="World\Systems\ConcentricFormPattern.cs" />
     <Compile Include="World\Systems\IRigidBody.cs" />
     <Compile Include="World\Systems\Emitter.cs" />
     <Compile Include="World\Scene\WorldObjectSceneNode.cs" />

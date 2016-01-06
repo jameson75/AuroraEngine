@@ -47,7 +47,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry.Modifiers
 
         public override void Step(GameTime time, ParticleSystem system)
         {            
-            GridForm gridForm = (GridForm)system;
+            GridFormPattern gridForm = (GridFormPattern)system;
             Vector3 renderedGridSize = gridForm.CalculateRenderedSize();
             Vector3 gridDimension = gridForm.Dimensions;
             //ReadOnlyCollection<FormNode> elements = gridForm.Nodes;
