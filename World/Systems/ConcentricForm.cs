@@ -14,59 +14,37 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public class ConcentricForm : Form
     {
-        float _radius = 0;
-        int _steps = 0;
-
-        public ConcentricForm(IGameApp game)
-            : base(game)
-        { }
+        ConcentricFormPattern _pattern = null;
 
         public ConcentricForm(IGameApp game, float radius, int steps) 
             : base(game)
         {
-            _radius = radius;
-            _steps = steps;
-            GenerateElements();
+            _pattern = new ConcentricFormPattern(radius, steps);
+            _pattern.Initialize(this);
+        }
+
+        public override FormPattern Pattern
+        {
+            get
+            {
+                return _pattern;
+            }
         }
 
         public float Radius
         {
-            get { return _radius; }
-            set {
-                _radius = value;
-                OnLayoutChanged();
-            }
+            get { return _pattern.Radius; }
         }
 
         public int Steps
         {
-            get { return _steps; }
-            set {
-                _steps = value;
-                GenerateElements();
-            }
+           get { return _pattern.Steps; }
         }
 
-        protected override void OnLayoutChanged()
-        {            
-            float step = ElementCount != 0 ? MathUtil.TwoPi / ElementCount : 0;
-            float angle = MathUtil.PiOverTwo;
-            //foreach (Particle element in Particles)
-            foreach(Particle element in Particles)
-            {
-                Matrix rotation = Matrix.RotationY(angle);
-                Matrix translation = Matrix.Translation(new Vector3(0, 0, _radius));
-                element.Transform = new Animation.Transform(translation * rotation);
-                angle += step;
-            }
-        }
-
-        private void GenerateElements()
-        {        
-            ClearElements();          
-            //AddElements(CreateElements(_steps));
-            EmitElements(_steps);
-            OnLayoutChanged();
+        protected override void OnMeshChanged()
+        {
+            _pattern.Update(this);
+            base.OnMeshChanged();
         }
     }
 }

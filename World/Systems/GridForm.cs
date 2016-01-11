@@ -22,39 +22,20 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 {
     public class GridForm : Form
     {
-        private Vector3 _dimensions = Vector3.Zero;
-        private Vector3 _cellPadding = Vector3.Zero;
-        private Range? _rowClipRange = null;
+        private GridFormPattern _pattern = null;
 
-        public GridForm(IGameApp game)
-            : base(game)
-        { }
-
-        public GridForm(IGameApp game, Vector3 dimensions, Vector3 cellSpacing)
-            : base(game)
+        public GridForm(IGameApp game, Vector3 dimensions, Vector3 cellPadding) : base(game)
         {
-            _dimensions = dimensions;
-            _cellPadding = cellSpacing;
-            GenerateElements();
+            GridFormPattern pattern = new GridFormPattern(dimensions, cellPadding);
+            pattern.Initialize(this);
+            _pattern = pattern;
         }
 
-        public Vector3 Dimensions
+        public override FormPattern Pattern
         {
-            get { return _dimensions; }
-            set
+            get
             {
-                _dimensions = value;
-                GenerateElements();
-            }
-        }
-
-        public Vector3 CellPadding
-        {
-            get { return _cellPadding; }
-            set
-            {
-                _cellPadding = value;
-                OnLayoutChanged();
+                return _pattern;
             }
         }
 
@@ -67,125 +48,42 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 Vector3 max = new Vector3(renderedSize.X, renderedSize.Y, renderedSize.Z);
                 return new BoundingBox(min, max);
             }
+        }       
+
+        public Vector3 Dimensions
+        {
+            get { return _pattern.Dimensions; }
         }
 
-        protected override void OnLayoutChanged()
+        public Vector3 Cellpadding
         {
-            //**************************************************************************
-            //NOTES: 
-            //The first element is the {left-most, top-most, front-most} element.
-            //The last element is the {righ-most, bottom-most, back-most} element.
-            //So... First Row is the front/near side, Last Row is the back/far side.
-            //**************************************************************************
-            int i = 0;
-            //foreach (Particle element in Particles)
-            foreach(Particle element in Particles)
-            {
-                if (ElementMesh != null)
-                {
-                    int xIndex = i % (int)Dimensions.X;
-                    int zIndex = i / (int)Dimensions.X;
-                    int yIndex = 0; // i / ((int)Dimensions.X * (int)Dimensions.Z);
-                    Vector3 elementOrigin = new Vector3();
-                    elementOrigin.X = (xIndex * ((CellPadding.X * 2) + ElementMesh.BoundingBox.GetLengthX())) + (CellPadding.X + (ElementMesh.BoundingBox.GetLengthX() * 0.5f));
-                    elementOrigin.Y = (yIndex * ((CellPadding.Y * 2) + ElementMesh.BoundingBox.GetLengthY())) + (CellPadding.Y + (ElementMesh.BoundingBox.GetLengthY() * 0.5f));
-                    elementOrigin.Z = (zIndex * ((CellPadding.Z * 2) + ElementMesh.BoundingBox.GetLengthZ())) + (CellPadding.Z + (ElementMesh.BoundingBox.GetLengthZ() * 0.5f));
-                    element.Transform = new Animation.Transform(Matrix.Translation(elementOrigin));
-                }
-                else
-                    element.Transform = Animation.Transform.Identity;
-                i++;
-            }
+            get { return _pattern.CellPadding; }
         }
 
         protected override void OnMeshChanged()
         {
-            OnLayoutChanged();
+            _pattern.Update(this);
             base.OnMeshChanged();
-        }
-
-        private void GenerateElements()
-        {          
-            //Remove existing elements
-            ClearElements();
-            
-            //Emit elements (particles) into the particle system.           
-            int elementCount = (int)(Dimensions.X * Dimensions.Y * Dimensions.Z);           
-            EmitElements(elementCount);
-            
-            //Layout particles into rows.                
-            OnLayoutChanged();
-        }
+        }   
 
         public Vector3 CalculateRenderedSize()
         {
-            if (ElementMesh == null)
-                return Vector3.Zero;
-            else
-            {
-                return new Vector3((ElementMesh.BoundingBox.GetLengthX() + CellPadding.X * 2) * Dimensions.X,
-                                   (ElementMesh.BoundingBox.GetLengthY() + CellPadding.Y * 2)/* * Dimensions.Y*/,
-                                   (ElementMesh.BoundingBox.GetLengthZ() + CellPadding.Z * 2) * Dimensions.Z);
-            }
+            return _pattern.CalculateRenderedSize(this);
         }
 
         public Vector3 CalculateRenderedCellSize()
         {
-            if (ElementMesh == null)
-                return Vector3.Zero;
-            else
-            {
-                return new Vector3((ElementMesh.BoundingBox.GetLengthX() + CellPadding.X * 2),
-                                   (ElementMesh.BoundingBox.GetLengthY() + CellPadding.Y * 2),
-                                   (ElementMesh.BoundingBox.GetLengthZ() + CellPadding.Z * 2));
-            }
+            return _pattern.CalculateRenderedCellSize(this);
         }        
 
-        public List<Particle> GetRowParticles(int index)
-        {           
-            return Particles.Skip(index * (int)Dimensions.X).Take((int)Dimensions.X).ToList();
+        public void Deform(Path path)
+        {
+            _pattern.Deform(this, path);
         }
 
-        /*
-        public List<FormNode> GetRowNodes(int index)
+        public List<Particle> GetRowElements(int index)
         {
-            return Nodes.Skip(index * (int)Dimensions.X).Take((int)Dimensions.X).ToList();
-        }
-        */
-
-        public void HideRow(int index)
-        {
-            GetRowParticles(index).ForEach(p => p.IsVisible = false);        
-        }
-
-        public void ShowRow(int index)
-        {
-            GetRowParticles(index).ForEach(p => p.IsVisible = false);
-        }
-
-        public Range? RowClipRange
-        {
-            get { return _rowClipRange; }
-            set
-            {
-                _rowClipRange = value;
-                OnRowClipRangeChanged();
-            }
-        }
-
-        protected void OnRowClipRangeChanged()
-        {
-            int i = 0;
-            foreach (Particle element in Particles)
-            {                              
-                int zIndex = i / (int)Dimensions.X;
-                if ( _rowClipRange == null ||
-                    (_rowClipRange.Value.Min <= zIndex && _rowClipRange.Value.Max >= zIndex))
-                    element.IsVisible = true;
-                else
-                    element.IsVisible = false;
-                i++;
-            }
-        }
+            return _pattern.GetRowElements(this, index);
+        }              
     }
 }

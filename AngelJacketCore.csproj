@@ -153,6 +153,8 @@
     <Compile Include="World\Geometry\ObjectOutlineModel.cs" />
     <Compile Include="World\EntityManager.cs" />
     <Compile Include="World\Scene\RendererSceneNode.cs" />
+    <Compile Include="World\Systems\ConcentricForm.cs" />
+    <Compile Include="World\Systems\GridForm.cs" />
     <Compile Include="World\Visualizers\ColliderRenderer.cs" />
     <Compile Include="World\Collision\BoxCollider.cs" />
     <Compile Include="World\Collision\Collider.cs" />

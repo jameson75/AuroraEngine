@@ -26,7 +26,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _elementDescription = new ParticleDescription();
             _elementEmitter.DefaultParticleDescription = _elementDescription;
             Emitters.Add(_elementEmitter);
-        }
+        }      
+
+        public virtual FormPattern Pattern { get { return null; } }
 
         public Mesh ElementMesh
         {
@@ -78,13 +80,9 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
 
         public int ElementCount { get { return Particles.Count; } }
 
-        public event EventHandler LayoutChanged;
-
         public event EventHandler MeshChanged;
 
-        public event EventHandler EffectChanged;
-
-        protected virtual void OnLayoutChanged() { FireHandler(LayoutChanged); }
+        public event EventHandler EffectChanged;       
 
         protected virtual void OnMeshChanged() { FireHandler(MeshChanged); }
 
