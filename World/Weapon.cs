@@ -117,7 +117,7 @@ namespace CipherPark.AngelJacket.Core.World
                 //---------------------------------------------------------------------------------------------------------------
                 _gameContext.Value.Simulator.LifetimeManager.RegisterCollector(
                     projectileWO, 
-                    new PlayerGunProjectileCollector(animationController, (InstanceWorldObjectRenderer)_rendererNode.Renderer
+                    new ProjectileWorldCollector(animationController, (InstanceWorldObjectRenderer)_rendererNode.Renderer
                     ));
 
                 _lastFireTime = gameSimTime;
@@ -155,12 +155,12 @@ namespace CipherPark.AngelJacket.Core.World
         }     
     }    
 
-    public class PlayerGunProjectileCollector : IWorldCollector
+    public class ProjectileWorldCollector : IWorldCollector
     {
         public RigidBodyAnimationController ProjectileController { get; private set; }
         public InstanceWorldObjectRenderer ProjectileRenderer { get; private set; }
 
-        public PlayerGunProjectileCollector(RigidBodyAnimationController projectileController,                                           
+        public ProjectileWorldCollector(RigidBodyAnimationController projectileController,                                           
                                             InstanceWorldObjectRenderer projectileRenderer)
         {
             ProjectileController = projectileController;           
