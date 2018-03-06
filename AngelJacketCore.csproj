@@ -47,7 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Exocortex.DSP.v1">
-      <HintPath>..\..\Libraries\Exocortex\Exocortex.DSP.v1.dll</HintPath>
+      <HintPath>..\_Common\Exocortex\Exocortex.DSP.v1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
       <HintPath>..\packages\SharpDX.2.6.3\Bin\DirectX11-net40\SharpDX.dll</HintPath>
@@ -302,6 +302,9 @@
   <ItemGroup>
     <Content Include="Properties\Docs\FocusManagerBehavior.txt" />
     <Content Include="Properties\Docs\HandlingControlInput.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
