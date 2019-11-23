@@ -17,7 +17,7 @@ using System.Windows.Forms;
 // Developer: Eugene Adams
 // Company: Cipher Park
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// JaMoolah Chart by Cipher Park is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
