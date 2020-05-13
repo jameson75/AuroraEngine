@@ -1,0 +1,54 @@
+﻿I. Updating control state from Key/Gamepad/Mouse Input
+------------------------------------------------------
+
+Input events are NOT routed to controls like in win32/Winforms/WPF,etc. 
+The idea was not to stray too far away from the natural flow of a game
+loop, where device states are, typically, polled.
+
+The state of input devices are polled. The GameApp does this at the begining of the
+game loop. The real-time-input-state (ImputState) and buffered-input-state
+(BufferedInputSate - where the scan rate of keys being held down is throttled)
+represent the state of input devices for each iteration of the game loop.
+These states can be retreived using the InputService service.
+
+Typcially, as an optimization, a control will only attempt to update
+its state if it has focus (UIControl.HasFocus). 
+
+II. Best practice for Rerouting commands from child controls
+------------------------------------------------------------
+
+As mentioned, input events aren't routed to controls but, when a control
+finishes invoking some command (typicall as a result of an input event)
+the control fires an OnCommand event. Controls which do, 
+implement the ICommandControl interface.
+
+In a situation where a control contains children which fire oncommand events,
+we want the parent control to also fire this event. In other words, we want
+the command to be "wired up". Parent controls that want the command events of
+their children auto-magically wired up can do so by implementing the ICommandDispatcher
+inteface and then instanciating the CommandControlWireUp class, passing itself to the
+constructor.
+
+III. Best practice for input and focus management for composite controls
+------------------------------------------------------------------------
+
+Composite controls (container controls which use their children to look and behave as
+an single, atomic control) sometimes want to override the way their children are
+traversed or selected by mouse. To override how the ui system's focus manager interacts
+with a control, a control can be assigned an implementation of ICustomFocusManager. 
+The custom focus manager is called to when the focus manager wants to know 
+one of the following 3 things...
+
+1. The next control in tab order.
+2. The previous control in tab order.
+3. The inner-most control to be set in focus as a result of a mouse click.
+
+Some controls already have a custom focus manager assigned by default.
+For example, Menu, ListControl and PropertyGrid don't allow users to tab through 
+their items/descedants. Also, the ListControl and PropertyGrid don't allow
+descendants of their items to be selected by mouse. Each of these controls
+are associated with a CustomFocusManager to override the default behavior.
+See <link href="FocusManagerBehavior.txt">Focus Manager Behavior</link>.
+
+
+
