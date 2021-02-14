@@ -1,0 +1,90 @@
+﻿I. Focus selection by mouse.
+----------------------------
+As a pre-process, the children of all nodes, as well as all root-level nodes,
+are z-ordered before traversal.
+
+Hit-testing is an In-order tree traversal process which begins at first sibling
+at the root level of the UI control tree. The inner-most control which satisfies
+the conditions of the hit test is placed in focus.
+
+To satisfy the conditions of a successful hit test, the following conditions must be met...
+1. the mouse-click coords must exist within the uicontrol's bounds.
+2. all ancestors of the control must be visible and enabled.
+
+After a successful hit test is performed, the inner-most control is returned.
+
+Therefore, it is not possible to set a control (nor any of it's children) with 
+focus, via mouse, if the control does not satisfy all of these conditions.
+
+Even if a control which satifies these conditions is found, a focus-change event
+will only occur if the located control is not currently with focus.
+
+II. Focus selection by TAB key.
+-------------------------------
+
+[Forward Tabbing]
+
+As a pre-process, the children of all nodes, as well as all root-level nodes, are
+tab-ordered before traversal.
+
+Searching is a tree traversal process which can begin at any node in the 
+UI control tree. If no control is currently in focus, the search for the next eligible
+control to receive focus simply begins at the first sibling at the root level
+of the tree. If there is a control currently with focus, it becomes the starting reference
+point. The traversal process is recursive. With each visited node becoming the new reference point,
+traversal takes place in the following order...
+1. The reference node's first child, if it exists.
+2. The reference node's next sibling, if it exists.
+3. The reference node's parent's next sibling, if it exists.
+(if the parent has no sibling, we search up the tree until we find an ancestor with a next sibling
+ and start the process at that next sibling).
+
+Eligibility is tested the first time each node is visited in the traversal (Pre-order).
+
+To satisfy the eligiblity of receiving focus...
+1. the control must be visible, enabled, can-receive-focus and have focusing enabled. 
+2. all ancestors of the control must be visible and enabled.
+
+Therefore, it is not possible to set a control with focus, via TAB key, if the 
+control does not satisfy these conditions.
+
+[Backward Tabbing]
+Not implemented as of (11.21.2013)
+
+III. Focus selection by code.
+-----------------------------
+Currently, there are no rules for setting the focus control programatically.
+
+IV. Focus management override.
+------------------------------
+[Tabbing]
+When tabbing, if the current control with focus has is associated with a CustomFocusManager, that CustomFocusManager is invoked
+to return the next control in tab order.
+
+[Mouse Clicking]
+When searching for the innermost control hit by the mouse, if a control is found with a CustomFocusManager, that CustomFocusManager is
+invoked to return the hit control.
+
+V. Current flaws and short commings.
+------------------------------------
+1. Having no rules when setting focus programatically may result 
+   in a control recieving focus which is not visible nor enabled nor can-receive focus 
+   nor has focusing enabled.
+   - Could be solved by having an external version of Set/Leave Focus
+     which checks for eligibility. Right now, manually setting focus needs
+	 to be done judiciously (the control ought to be known to have focus).	 
+
+2. If the focus control's visible, enabled, focusenabled properties change, the control
+   is no longer eligible for focus but it still remains in focus.
+   - Could be solved by listening to the respective properties of a control once it goes into
+     focus. We'd stop listening when it leaves focus.
+   * FIXED (11.22.2013), using the above solution. Needs testing. This text will be updated
+     after successful test.
+
+VI. New Ideas
+--------------
+To simply focus management...
+1. Implement protected Control.HandleInput() which is called from a control's Update() method
+when it has focus or from a parent control from which it's managed.
+2. Create rule where a control can only override tabbing for it's immediate children.
+3. Implment EnableChildFocus so that focus management can know whether to search/pick a contro's children.
