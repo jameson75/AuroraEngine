@@ -177,6 +177,17 @@ namespace CipherPark.KillScript.Core.Utils
             float halfHeight = quadHeight / 2.0f;
             return new RectangleF(-halfWidth, halfHeight, quadWidth, -quadHeight);
         }
+
+        public static RectangleF FromPoint(Vector2 origin, float quadWidth, float quadHeight)
+        {
+            if (origin.X > quadWidth)
+                throw new ArgumentException("origin x component cannot be greater than width");
+
+            if (origin.Y > quadHeight)
+                throw new ArgumentException("origin y component cannot be greater than height");
+            
+            return new RectangleF(-origin.X, origin.Y, quadWidth, -quadHeight);
+        }
     }
 
     /// <summary>
