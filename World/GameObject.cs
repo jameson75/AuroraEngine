@@ -64,7 +64,7 @@ namespace CipherPark.KillScript.Core.World
         {
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
-            var type = typeof(T);
+            var type = content.GetType();
             if (_contextualContent.ContainsKey(type))
                 throw new InvalidOperationException("Content type already exists.");
             _contextualContent.Add(type, content);
