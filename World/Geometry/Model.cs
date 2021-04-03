@@ -91,7 +91,7 @@ namespace CipherPark.KillScript.Core.World.Geometry
         { }
     }
 
-    public class BasicModel : Model
+    public class SingleMeshModel : Model
     {
         public Mesh Mesh { get; set; }
 
@@ -103,7 +103,7 @@ namespace CipherPark.KillScript.Core.World.Geometry
             }
         }
 
-        public BasicModel(IGameApp game) : base(game)
+        public SingleMeshModel(IGameApp game) : base(game)
         {
            
         }   

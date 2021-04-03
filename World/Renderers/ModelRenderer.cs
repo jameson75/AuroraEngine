@@ -47,12 +47,8 @@ namespace CipherPark.KillScript.Core.World
                                   .Scene
                                   .CameraNode
                                   .Camera;
-                /*
-                if (Model.IsDynamicAndInstanced())                                   
-                    Model.Effect.World = Matrix.Identity;                
-                else
-                */
-                Model.Effect.World = container.WorldTransform().ToMatrix();
+               
+                Model.Effect.World = container?.WorldTransform().ToMatrix() ?? Matrix.Identity;
                 Model.Effect.View = camera.ViewMatrix;
                 Model.Effect.Projection = camera.ProjectionMatrix;
                 Model.Draw();

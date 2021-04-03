@@ -186,7 +186,7 @@ namespace CipherPark.KillScript.Core.Utils
             if (origin.Y > quadHeight)
                 throw new ArgumentException("origin y component cannot be greater than height");
             
-            return new RectangleF(-origin.X, origin.Y, quadWidth, -quadHeight);
+            return new RectangleF(-origin.X, quadHeight - origin.Y, quadWidth, -quadHeight);
         }
     }
 

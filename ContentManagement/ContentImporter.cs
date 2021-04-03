@@ -129,7 +129,7 @@ namespace CipherPark.KillScript.Core.Content
         [Obsolete]
         public static Model ImportFBX(IGameApp game, string fileName, byte[] shaderByteCode, FBXFileChannels channels = FBXFileChannels.Default)
         {
-            BasicModel result = null;
+            SingleMeshModel result = null;
             FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();            
             fbxMeshThunk.m = new float[16];
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
@@ -151,7 +151,7 @@ namespace CipherPark.KillScript.Core.Content
                 case FBXFileChannels.PositionColor:
                     VertexPositionColor[] _vertices = vertices.Select(e => new VertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.Red.ToVector4() }).ToArray();
                     mesh = ContentBuilder.BuildMesh<VertexPositionColor>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
-                    result = new BasicModel(game);
+                    result = new SingleMeshModel(game);
                     result.Mesh = mesh;
                     break;
                 default:
@@ -358,7 +358,7 @@ namespace CipherPark.KillScript.Core.Content
                 }
                 
                 mesh = ContentBuilder.BuildMesh<VertexPositionNormalTextureSkin>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionNormalTextureSkin.InputElements, VertexPositionNormalTextureSkin.ElementSize, boundingBox);                        
-                RiggedModel riggedModel = new RiggedModel(game);
+                SkinnedMeshModel riggedModel = new SkinnedMeshModel(game);
                 riggedModel.Mesh = mesh;
                 riggedModel.SkinOffsets.AddRange(skinOffsets);
                 riggedModel.FrameTree = rootBoneFrame;
@@ -369,7 +369,7 @@ namespace CipherPark.KillScript.Core.Content
             else if ((channels & XFileChannels.Animation) != 0)
             {
                 mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox, options.HasFlag(XFileImportOptions.EnableInstancing));
-                ComplexModel complexModel = new ComplexModel(game);
+                MultiMeshModel complexModel = new MultiMeshModel(game);
                 complexModel.Meshes.Add(mesh);
                 complexModel.FrameTree = rootBoneFrame;
                 complexModel.AnimationRig.AddRange(animationControllers);
@@ -379,7 +379,7 @@ namespace CipherPark.KillScript.Core.Content
             else
             {
                 mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox, options.HasFlag(XFileImportOptions.EnableInstancing));
-                BasicModel basicModel = new BasicModel(game);
+                SingleMeshModel basicModel = new SingleMeshModel(game);
                 basicModel.Mesh = mesh;
                 result = basicModel;
             }

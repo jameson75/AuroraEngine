@@ -159,8 +159,8 @@
     <Compile Include="Utils\SourceVoiceEx.cs" />
     <Compile Include="Utils\TransformBoundingElementExtensions.cs" />
     <Compile Include="World\GameObject.cs" />
-    <Compile Include="World\Geometry\AnimatedModel.cs" />
-    <Compile Include="World\Geometry\ComplexModel.cs" />
+    <Compile Include="World\Geometry\IAnimatedModel.cs" />
+    <Compile Include="World\Geometry\MultiMeshModel.cs" />
     <Compile Include="World\Geometry\ObjectOutlineModel.cs" />
     <Compile Include="World\Renderers\InstanceRenderer.cs" />
     <Compile Include="World\Renderers\ModelRenderer.cs" />
@@ -266,7 +266,7 @@
     <Compile Include="World\Renderers\IRenderer.cs" />
     <Compile Include="World\Renderers\LightTrailRenderer.cs" />
     <Compile Include="World\Geometry\Path.cs" />
-    <Compile Include="World\Geometry\RiggedModel.cs" />
+    <Compile Include="World\Geometry\SkinnedMeshModel.cs" />
     <Compile Include="World\Systems\ConcentricFormPattern.cs" />
     <Compile Include="World\Systems\IRigidBody.cs" />
     <Compile Include="World\Systems\Emitter.cs" />
