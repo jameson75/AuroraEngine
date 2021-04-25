@@ -135,7 +135,10 @@ namespace CipherPark.KillScript.Core.World.Scene
             }
         }
 
-        public bool Visible { get; set; }
+        public bool Visible 
+        { 
+            get; set; 
+        }
 
         public void Dispose()
         {
