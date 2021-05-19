@@ -531,7 +531,7 @@ namespace CipherPark.KillScript.Core.Content
                     else
                     {
                         //INSTANCEVERTEXPOSITIONTEXTURE
-                        //-----------------------------------    
+                        //-----------------------------
                         InstanceVertexPositionTexture[] _vertices = vertices.Select((v, i) => new InstanceVertexPositionTexture()
                         {
                             Position = new Vector4(v.X, v.Y, v.Z, 1.0f),                            

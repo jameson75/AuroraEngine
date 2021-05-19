@@ -99,7 +99,7 @@ namespace CipherPark.KillScript.Core.World.Geometry
             int dataStride = (!IsInstanced) ? _vertexStride : _instanceStride;
             DataBox box = _device.ImmediateContext.MapSubresource(dynamicBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(box.DataPointer, data.Length * dataStride);
-            dataBuffer.Set<T>(offset * dataStride, data);            
+            dataBuffer.Set<T>(offset * dataStride, data);                
             _device.ImmediateContext.UnmapSubresource(dynamicBuffer, 0);
             if(!IsInstanced)
                _vertexCount = data.Length;

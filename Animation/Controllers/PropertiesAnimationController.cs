@@ -128,12 +128,7 @@ namespace CipherPark.KillScript.Core.Animation
         protected RectangleF GetPropertyRectangleValueAtT(string propertyName, ulong t)
         {
             return ((RectangleAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
-        }
-
-        protected string GetPropertyStringValueAtT(string propertyName, ulong t)
-        {
-            return ((StringAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
-        }
+        }      
 
         protected Color4 GetPropertyColorValueAtT(string propertyName, ulong t)
         {
@@ -143,12 +138,7 @@ namespace CipherPark.KillScript.Core.Animation
         protected Vector3 GetPropertyVector3AtT(string propertyName, ulong t)
         {
             return ((Vector3Animation)AnimatedProperties[propertyName]).GetValueAtT(t);
-        }
-
-        protected object GetPropertyValueAtT(string propertyName, ulong t)
-        {
-            return ((ObjectAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
-        }
+        }       
 
         protected bool TargetPropertyExists(string propertyName)
         {
