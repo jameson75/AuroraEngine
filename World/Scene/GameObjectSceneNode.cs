@@ -35,7 +35,7 @@
                     */
                 }
             }
-        }
+        }        
 
         public GameObjectSceneNode(IGameApp game, string name = null) : base(game, name)
         { }

@@ -171,12 +171,7 @@ namespace CipherPark.KillScript.Core.World.Scene
         public event EventHandler EndDraw;
         public event EventHandler BeginUpdate;
         public event EventHandler EndUpdate;
-
-        public void Emplace(SceneNode sourceNode, SpatialReference sourceNodeSpatialReference, SceneNode targetNode, SpatialReference targetSpatialReference)
-        {
-            //Transform sourceWorldBounds = sourceNode.LocalToWorld(sourceNode.Bounds);
-            //Transform targetWorldBounds = targetNode.LocalToWorld(targetNode.Bounds);            
-        }
+       
     }
 
     public enum SpatialReference
