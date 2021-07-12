@@ -96,12 +96,11 @@ namespace CipherPark.KillScript.Core.World
                                                                                     Matrix = Matrix.Transpose(p.Transform.ToMatrix())
                                                                                 });
                 instanceMesh.UpdateVertexStream<InstanceVertexData>(instanceData.ToArray());
-                var camera = _game.GetActiveModuleContext()
+                var cameraNode = _game.GetActiveModuleContext()
                                   .Scene
-                                  .CameraNode
-                                  .Camera;
-                instanceEffect.View = camera.ViewMatrix;
-                instanceEffect.Projection = camera.ProjectionMatrix;
+                                  .CameraNode;
+                instanceEffect.View = cameraNode.RiggedViewMatrix;
+                instanceEffect.Projection = cameraNode.ProjectionMatrix;
                 instanceEffect.World = container == null ? Matrix.Identity : container.WorldTransform().ToMatrix();
                 instanceEffect.Apply();
                 instanceMesh.Draw();

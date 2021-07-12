@@ -21,39 +21,49 @@ namespace CipherPark.KillScript.Core.World.Scene
 {
     public class CameraSceneNode : SceneNode
     {
-        private Transform _nodeTransform = Transform.Identity;
-
-        public CameraSceneNode(IGameApp game, string name = null)
-            : base(game, name)
-        { }       
-
         public CameraSceneNode(Camera camera, string name = null)
             : base(camera.Game, name)
         {
             Camera = camera;
         }
+        
+        public Camera Camera { get; }
 
         public ITransformable LockInTarget { get; set; }
 
-        public Vector3? LockUp { get; set; }      
+        public Vector3? LockUp { get; set; }        
 
-        public Camera Camera { get; set; }
+        public Matrix RiggedViewMatrix
+        {
+            get
+            {
+                return Camera.TransformToViewMatrix(this.WorldTransform());
+            }
+        }
 
-        /* These methods have been replaced by the alternate methods below
-         * These methods manipulate the camera's view matrix such that the view
-         * matrix represents the local transform the of camera node.
-         * which makes it impractical to utilize the camera's view matrix directly.
-         * The methods below make this practicle by manipulating the camera's view matrix
-         * such that camera's view matrix always represents the world transform of the camer node.
-         * /         
+        public Matrix ProjectionMatrix
+        {
+            get
+            {
+                return Camera.ProjectionMatrix;
+            }
+        }
+
+        public Matrix ViewMatrix
+        {
+            get
+            {
+                return Camera.ViewMatrix;
+            }
+        }
+
         public override Transform Transform
         {                        
             get
             {
-                if (Camera != null)
-                    return Camera.ViewMatrixToTransform(Camera.ViewMatrix);
-                else
-                    return Transform.Identity;
+                return Camera != null ?
+                    Camera.ViewMatrixToTransform(Camera.ViewMatrix) :
+                    Transform.Identity;
             }
             set
             {
@@ -65,14 +75,14 @@ namespace CipherPark.KillScript.Core.World.Scene
                     //Transform exactly as specified.
                     else
                         Camera.ViewMatrix = Camera.TransformToViewMatrix(value);
-                }                
+                }
             }
         }     
 
         public override void Update(GameTime gameTime)
         {
             //Update, but track the lock-in-target, if one was specified.
-            if (Camera != null && LockInTarget != null)
+            if (LockInTarget != null)
                 Camera.ViewMatrix = TransformToLockInViewMatrix(Transform);            
                         
             base.Update(gameTime);
@@ -98,9 +108,9 @@ namespace CipherPark.KillScript.Core.World.Scene
             Vector3 target = this.WorldToParent(LockInTarget.ParentToWorld(LockInTarget.Transform)).Translation;
             Vector3 eye = t.Translation;
             return Matrix.LookAtLH(eye, target, up);           
-        }
-        */
+        }       
 
+        /*
         public override Transform Transform
         {
             get
@@ -151,6 +161,7 @@ namespace CipherPark.KillScript.Core.World.Scene
             Vector3 eye = t.Translation;
             return Matrix.LookAtLH(eye, target, up);
         }
+        */
     }
 
     public class CameraLookAtAnimationController : SimulatorController

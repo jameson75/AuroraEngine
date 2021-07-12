@@ -43,14 +43,13 @@ namespace CipherPark.KillScript.Core.World
         {
             if (Model != null)
             {
-                var camera = _game.GetActiveModuleContext()
+                var cameraNode = _game.GetActiveModuleContext()
                                   .Scene
-                                  .CameraNode
-                                  .Camera;
+                                  .CameraNode;
                
                 Model.Effect.World = container?.WorldTransform().ToMatrix() ?? Matrix.Identity;
-                Model.Effect.View = camera.ViewMatrix;
-                Model.Effect.Projection = camera.ProjectionMatrix;
+                Model.Effect.View = cameraNode.RiggedViewMatrix;
+                Model.Effect.Projection = cameraNode.ProjectionMatrix;
                 Model.Draw();
             }
         }

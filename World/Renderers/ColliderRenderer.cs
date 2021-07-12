@@ -69,16 +69,15 @@ namespace CipherPark.KillScript.Core.World
         {
             if (Effect != null && _mesh != null)
             {
-                var camera = _app.GetActiveModuleContext()
+                var cameraNode = _app.GetActiveModuleContext()
                                  .Scene
-                                 .CameraNode
-                                 .Camera;                
+                                 .CameraNode;            
                 //NOTE: When calculating the world transform of the collider, we use the container as the collider's parent
                 //space if one is specified, otherwise, we use the explicit parent space of the collider.
                 Effect.World = container != null ? container.WorldTransform().ToMatrix() * Collider.Transform.ToMatrix() :
                                                    Collider.WorldTransform().ToMatrix();
-                Effect.View = camera.ViewMatrix;
-                Effect.Projection = camera.ProjectionMatrix;
+                Effect.View = cameraNode.RiggedViewMatrix;
+                Effect.Projection = cameraNode.ProjectionMatrix;
                 Effect.Apply();
                 _mesh.Draw();
                 Effect.Restore();

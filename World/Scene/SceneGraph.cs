@@ -73,7 +73,7 @@ namespace CipherPark.KillScript.Core.World.Scene
         {
             if (SkyModel != null)
             {               
-                SkyModel.Effect.View = CameraNode.Camera.ViewMatrix;
+                SkyModel.Effect.View = CameraNode.RiggedViewMatrix;
                 SkyModel.Effect.Projection = CameraNode.Camera.ProjectionMatrix;
                 SkyModel.Draw();
             }

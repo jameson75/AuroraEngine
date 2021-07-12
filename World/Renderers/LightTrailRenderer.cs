@@ -32,13 +32,13 @@ namespace CipherPark.KillScript.Core.World
             {
                 if (LightTrail.Effect == null)
                     throw new InvalidOperationException("Effect not set for light trail.");
-                var camera = _game.GetActiveModuleContext()
+                var cameraNode = _game.GetActiveModuleContext()
                                       .Scene
-                                      .CameraNode
-                                      .Camera;
+                                      .CameraNode;
+
                 LightTrail.Effect.World = Matrix.Identity; //TODO: Verifty whether I should be using the world transform here.
-                LightTrail.Effect.View = camera.ViewMatrix;
-                LightTrail.Effect.Projection = camera.ProjectionMatrix;                
+                LightTrail.Effect.View = cameraNode.RiggedViewMatrix;
+                LightTrail.Effect.Projection = cameraNode.ProjectionMatrix;                
                 LightTrail.Draw();
             }
         }
@@ -77,13 +77,12 @@ namespace CipherPark.KillScript.Core.World
             {
                 if (Streak.Effect == null)
                     throw new InvalidOperationException("Effect not set for light trail.");
-                var camera = _game.GetActiveModuleContext()
+                var cameraNode = _game.GetActiveModuleContext()
                                       .Scene
-                                      .CameraNode
-                                      .Camera;
+                                      .CameraNode;
                 Streak.Effect.World = Matrix.Identity; //TODO: Verifty whether I should be using the world transform here.
-                Streak.Effect.View = camera.ViewMatrix;
-                Streak.Effect.Projection = camera.ProjectionMatrix;
+                Streak.Effect.View = cameraNode.RiggedViewMatrix;
+                Streak.Effect.Projection = cameraNode.ProjectionMatrix;
                 Streak.Draw();
             }
         }

@@ -52,10 +52,15 @@ namespace CipherPark.KillScript.Core.UI.Controls
 
         public SceneNode SelectedNode { get { return _selectedNode; } }
 
+        public CameraSceneNode CurrentCameraNode
+        {
+            get { return Scene.CameraNode; }
+        }       
+
         public Camera CurrentCamera
         {
             get { return Scene.CameraNode.Camera; }
-        }       
+        }
 
         protected override void OnSizeChanged()
         {
@@ -105,8 +110,8 @@ namespace CipherPark.KillScript.Core.UI.Controls
                         ViewportF vp = Game.GraphicsDeviceContext.Rasterizer.GetViewports<ViewportF>()[0];
                         //Vector3 mousePointNear = vp.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
                         //Vector3 mousePointFar = vp.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
-                        Vector3 mousePointNear = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
-                        Vector3 mousePointFar = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
+                        Vector3 mousePointNear = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCameraNode.RiggedViewMatrix * CurrentCameraNode.ProjectionMatrix);
+                        Vector3 mousePointFar = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCameraNode.RiggedViewMatrix * CurrentCameraNode.ProjectionMatrix);
                         Vector3 mouseRay = mousePointFar - mousePointNear;
                         mouseRay.Normalize();
                         System.Diagnostics.Trace.WriteLine(mousePointNear);
