@@ -21,7 +21,7 @@ namespace CipherPark.KillScript.Core.World.Scene
 {
     public class SceneNodeAnimationController : SimulatorController
     {
-        public SceneNode Node { get; set; }
+        public SceneNode CameraOffsetNode { get; set; }
         
         public ITransformable TrackedObject { get; set; }
 
@@ -54,7 +54,7 @@ namespace CipherPark.KillScript.Core.World.Scene
                 //Calculate the new location, multplying the direction by the portion of the radius to be covered.
                 Vector3 newNodeLocation = pcsTrackedObjectDir * clampedOffsetPct * InnerRadius;
                 //Transform this offset node to the new location.
-                Node.Transform = new Transform(Matrix.Translation(newNodeLocation));
+                CameraOffsetNode.Transform = new Transform(Matrix.Translation(newNodeLocation));
             }           
         }
 
