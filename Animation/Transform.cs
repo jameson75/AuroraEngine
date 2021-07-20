@@ -237,16 +237,21 @@ namespace CipherPark.KillScript.Core.Animation
         public static Transform WorldTransform(this ITransformable transformable)
         {
             return new Transform(transformable.ParentToWorld(transformable.Transform.ToMatrix()));
-        }
-
-        public static void Translate(this ITransformable transformable, Vector3 offset)
-        {
-            transformable.Transform = new Transform(transformable.Transform.Rotation, transformable.Transform.Translation + offset);
-        }
+        }      
 
         public static Vector3 WorldPosition (this ITransformable transformable)
         {
             return transformable.WorldTransform().Translation;
+        }
+
+        public static void Translate(this ITransformable transformable, Vector3 delta)
+        {
+            transformable.Transform = new Transform(transformable.Transform.Rotation, transformable.Transform.Translation + delta);
+        }
+
+        public static void Rotate(this ITransformable transformable, Quaternion delta)
+        {
+            transformable.Transform = new Transform(delta * transformable.Transform.Rotation, transformable.Transform.Translation);
         }
     }
 }

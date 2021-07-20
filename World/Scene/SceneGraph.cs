@@ -38,6 +38,8 @@ namespace CipherPark.KillScript.Core.World.Scene
 
         public List<SpriteBatchContext> SpriteBatchContexts { get { return _spriteBatchContexts; } }
 
+        public List<CameraSceneNode> Cameras { get; } = new List<CameraSceneNode>();
+
         public void Update(GameTime gameTime)
         {
             OnBeginUpdate();
