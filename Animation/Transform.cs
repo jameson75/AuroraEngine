@@ -72,6 +72,36 @@ namespace CipherPark.KillScript.Core.Animation
             return new Transform(Quaternion.Lerp(t1.Rotation, t2.Rotation, step),
                                  Vector3.Lerp(t1.Translation, t2.Translation, step));
         }
+
+        public static Transform operator * (Transform t, Matrix m)
+        {
+            return new Transform(t.ToMatrix() * m);
+        }
+
+        public static Transform operator * (Matrix m, Transform t)
+        {
+            return new Transform(m * t.ToMatrix());
+        }
+
+        public static Transform operator + (Transform t, Vector3 v)
+        {
+            return new Transform(t.Rotation, t.Translation + v);
+        }
+
+        public static Transform operator + (Vector3 v, Transform t)
+        {
+            return new Transform(t.Rotation, v + t.Translation);
+        }
+
+        public static Transform operator - (Transform t, Vector3 v)
+        {
+            return new Transform(t.Rotation, t.Translation - v);
+        }
+
+        public static Transform operator - (Vector3 v, Transform t)
+        {
+            return new Transform(t.Rotation, v - t.Translation);
+        }
     }
 
     /// <summary>

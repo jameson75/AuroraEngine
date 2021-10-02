@@ -187,7 +187,7 @@ namespace CipherPark.KillScript.Core.World.Scene
             if(LockInTarget != null && LookAtTarget != null)
                 throw new InvalidOperationException("A transformable target and end-look-at vector were both specified");
 
-            //Exactly one must be specified.
+            //At least one must be specified.
             if(LockInTarget == null && LookAtTarget == null)
                 throw new InvalidOperationException("Niether transformable target nor end-look-at vector was specified.");
 
