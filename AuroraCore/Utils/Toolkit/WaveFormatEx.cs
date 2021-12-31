@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX.Multimedia;
 
-namespace CipherPark.AngelJacket.Core.Utils.Toolkit
+namespace CipherPark.KillScript.Core.Utils.Toolkit
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct WaveFormatEx

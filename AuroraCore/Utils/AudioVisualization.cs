@@ -14,7 +14,7 @@ using Exocortex.DSP;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.KillScript.Core.Utils
 {
     //*******************************************************************************************************************************************  
     //The following references were used as guide to understand how to implement this class.

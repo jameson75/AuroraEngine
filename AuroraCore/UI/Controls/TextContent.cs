@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 using SharpDX;
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
-    public class TextContent : UIContent
+    public class TextContent : ColorContent
     {
         public TextContent()
         {
@@ -14,13 +14,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             HAlignment = HorizontalAlignment.Left;
         }
 
-        public TextContent(string text, SpriteFont font, Color4 fontColor)
+        public TextContent(string text, SpriteFont font, Color4 fontColor, Color4? color = null)
         {
             Text = text;
             Font = font;
             FontColor = fontColor;
             VAlignment = VerticalAlignment.Top;
             HAlignment = HorizontalAlignment.Left;
+            Color = color.GetValueOrDefault();
         }
 
         public string Text { get; set; }
@@ -35,12 +36,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public HorizontalAlignment HAlignment { get; set; }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw()
         {                       
             if (Container == null)
                 throw new InvalidOperationException("No container for this content was specified.");
             
-            base.Draw(gameTime); 
+            base.Draw(); 
            
             Vector2 contentSurfacePosition = Container.PositionToSurface(Container.Position);
 
@@ -69,18 +70,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public override void ApplyStyle(Components.UIStyle style)
         {
-            Components.TextStyle textTemplate = style as Components.TextStyle;
+            Components.TextStyle textStyle = style as Components.TextStyle;
             
-            if (textTemplate == null)
-                throw new ArgumentException("Template is not of type TextContentTemplate", "textTemplate");
+            if (textStyle == null)
+                throw new ArgumentException("Style is not of type TextStyle", "textStyle");           
 
-            if (textTemplate.Text != null)
-                this.Text = textTemplate.Text;
+            if (textStyle.Font != null)
+                this.Font = textStyle.Font;
 
-            if (textTemplate.Font != null)
-                this.Font = textTemplate.Font;
+            if (textStyle.FontColor != null)
+                this.FontColor = textStyle.FontColor.Value;
 
-            this.FontColor = textTemplate.FontColor;
+            if (textStyle.Color != null)
+                this.Color = textStyle.Color.Value;
 
             base.ApplyStyle(style);
         }

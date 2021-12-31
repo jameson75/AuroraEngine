@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Components;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -13,7 +13,7 @@ using CipherPark.AngelJacket.Core.UI.Components;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Design
+namespace CipherPark.KillScript.Core.UI.Design
 {
     public class PathResourceParser : UIResourceParser
     {

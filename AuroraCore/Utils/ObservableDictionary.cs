@@ -16,7 +16,7 @@ using System.Xml.Serialization;
 // Anyway... Credits to the author... who ever you are.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.KillScript.Core.Utils
 {
     [XmlRoot("dictionary")]
     public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IXmlSerializable

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
 
-namespace CipherPark.AngelJacket.Core.Utils.Toolkit
+namespace CipherPark.KillScript.Core.Utils.Toolkit
 {
     static class MarshalHelper
     {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DirectInput;
@@ -18,7 +18,7 @@ using SharpDX.DirectInput;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class CheckBox : UIControl, ICommandControl
     {
@@ -46,7 +46,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             UIContent uncheckedContent = new ColorContent(Color.Transparent);
             _checkedContentControl = new ContentControl(visualRoot, checkedContent);
             _uncheckedContentControl = new ContentControl(visualRoot, uncheckedContent);
-            _label = ContentControl.CreateLabelControl(visualRoot, caption, font, fontColor);
+            _label = new ContentControl(visualRoot, new TextContent(caption, font, fontColor));
             Children.Add(_checkedContentControl);
             Children.Add(_uncheckedContentControl);
             Children.Add(_label);
@@ -63,13 +63,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
             if (IsChecked)
-                _checkedContentControl.Draw(gameTime);
+                _checkedContentControl.Draw();
             else
-                _uncheckedContentControl.Draw(gameTime);
-            base.OnDraw(gameTime);
+                _uncheckedContentControl.Draw();
+            base.OnDraw();
         }
 
         protected override void OnLayoutChanged()

@@ -8,7 +8,7 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.KillScript.Core.World.Geometry
 {
     public class Mesh : IDisposable
     {
@@ -99,7 +99,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             int dataStride = (!IsInstanced) ? _vertexStride : _instanceStride;
             DataBox box = _device.ImmediateContext.MapSubresource(dynamicBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None);
             DataBuffer dataBuffer = new DataBuffer(box.DataPointer, data.Length * dataStride);
-            dataBuffer.Set<T>(offset * dataStride, data);            
+            dataBuffer.Set<T>(offset * dataStride, data);                
             _device.ImmediateContext.UnmapSubresource(dynamicBuffer, 0);
             if(!IsInstanced)
                _vertexCount = data.Length;
@@ -107,7 +107,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                _instanceCount = data.Length;
         }     
 
-        public void Draw(GameTime gameTime)
+        public void Draw()
         {
             Format indexBufferFormat = Format.R16_UInt;
 
@@ -160,7 +160,7 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
                 _indexCount = 0;
             }
 
-            if (_instanceBuffer == null)
+            if (_instanceBuffer != null)
             {
                 _instanceBuffer.Dispose();
                 _instanceCount = 0;

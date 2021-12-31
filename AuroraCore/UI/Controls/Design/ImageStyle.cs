@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.UI.Controls;
+using CipherPark.KillScript.Core.UI.Controls;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -15,13 +15,21 @@ using CipherPark.AngelJacket.Core.UI.Controls;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Components
+namespace CipherPark.KillScript.Core.UI.Components
 {
     public class ImageStyle : UIStyle
     {
         public Texture2D Texture { get; set; }
 
-        public override Controls.UIContent GenerateContent()
+        public ImageStyle()
+        { }
+
+        public ImageStyle(Texture2D texture)
+        {
+            Texture = texture;
+        }
+
+        public override UIContent GenerateContent()
         {
             ImageContent content = new ImageContent(Texture);
             return content;

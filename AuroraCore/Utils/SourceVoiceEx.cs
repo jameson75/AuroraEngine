@@ -7,7 +7,7 @@ using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.KillScript.Core.Utils
 {
     public class SourceVoiceEx
     {

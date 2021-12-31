@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Module;
-using CipherPark.AngelJacket.Core.Systems;
-using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.KillScript.Core.Module;
+using CipherPark.KillScript.Core.Systems;
+using CipherPark.KillScript.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,13 +16,12 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-
-namespace CipherPark.AngelJacket.Core.Animation.Controllers
+namespace CipherPark.KillScript.Core.Animation.Controllers
 {
     /// <summary>
     /// 
     /// </summary>
-    public class KeyframeAnimationController : AnimationController
+    public class KeyframeAnimationController : SimulatorController
     {
         private long? _animationStartTime = null;
 
@@ -38,12 +37,12 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
             Animation = animation;
         }
 
-        public override void Reset()
+        protected override void OnSimulationReset()
         {
             _animationStartTime = null;
         }
 
-        public override void UpdateAnimation(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime.GetTotalSimtime();
@@ -54,14 +53,14 @@ namespace CipherPark.AngelJacket.Core.Animation.Controllers
             {
                 Target.Transform = Animation.GetValueAtT(elapsedTime);
                 //check whether we've updated the target with the last key frame.
-                if (elapsedTime >= Animation.RunningTime && !IsAnimationComplete)
+                if (elapsedTime >= Animation.RunningTime && !IsSimulationFinal)
                 {
                     //if Loop is specified, we start the animation over by resetting the animationStartTime.
                     if (Loop)
                         _animationStartTime = null;
                     //otherwise, we signal this animation as complete                    
                     else
-                        OnAnimationComplete();
+                        OnSimulationComplete();
                 }
             }
             else

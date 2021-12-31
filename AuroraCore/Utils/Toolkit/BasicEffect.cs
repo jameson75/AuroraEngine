@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.KillScript.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils.Toolkit
+namespace CipherPark.KillScript.Core.Utils.Toolkit
 {
     public class BasicEffect
     {
@@ -185,85 +185,85 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_New")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_New")]
             public static extern IntPtr New(IntPtr deviceContext);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_Delete")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_Delete")]
             public static extern void Delete(IntPtr basicEffect);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SelectShaderByteCode")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SelectShaderByteCode")]
             public static extern IntPtr SelectShaderByteCode(IntPtr basicEffect, out uint bufferSize);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_Apply")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_Apply")]
             public static extern void Apply(IntPtr basicEffect, IntPtr deviceContext);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetWorld")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetWorld")]
              public static extern void SetWorld(IntPtr basicEffect, float[] m);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetView")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetView")]
              public static extern void SetView(IntPtr basicEffect, float[] m);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetProjection")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetProjection")]
              public static extern void SetProjection(IntPtr basicEffect, float[] m);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetDiffuseColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetDiffuseColor")]
              public static extern void SetDiffuseColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetEmissiveColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetEmissiveColor")]
              public static extern void SetEmissiveColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetSpecularColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetSpecularColor")]
              public static extern void SetSpecularColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetSpecularPower")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetSpecularPower")]
              public static extern void SetSpecularPower(IntPtr basicEffect, float value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetAlpha")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetAlpha")]
              public static extern void SetAlpha(IntPtr basicEffect, float value);      
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetLightingEnabled")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightingEnabled")]
              public static extern void SetLightingEnabled(IntPtr basicEffect, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetPerPixelLighting")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetPerPixelLighting")]
              public static extern void SetPerPixelLighting(IntPtr basicEffect, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetAmbientLightColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetAmbientLightColor")]
              public static extern void SetAmbientLightColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetLightEnabled")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightEnabled")]
              public static extern void SetLightEnabled(IntPtr basicEffect, int whichLight, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetLightDirection")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightDirection")]
              public static extern void SetLightDirection(IntPtr basicEffect, int whichLight, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetLightDiffuseColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightDiffuseColor")]
              public static extern void SetLightDiffuseColor(IntPtr basicEffect, int whichLight, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetLightSpecularColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightSpecularColor")]
              public static extern void SetLightSpecularColor(IntPtr basicEffect, int whichLight, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_EnableDefaultLighting")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_EnableDefaultLighting")]
              public static extern void EnableDefaultLighting(IntPtr basicEffect);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetFogEnabled")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetFogEnabled")]
              public static extern void SetFogEnabled(IntPtr basicEffect, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetFogStart")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetFogStart")]
              public static extern void SetFogStart(IntPtr basicEffect, float value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetFogEnd")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetFogEnd")]
              public static extern void SetFogEnd(IntPtr basicEffect, float value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetFogColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetFogColor")]
              public static extern void SetFogColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetVertexColorEnabled")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetVertexColorEnabled")]
              public static extern void SetVertexColorEnabled(IntPtr basicEffect, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetTextureEnabled")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetTextureEnabled")]
              public static extern void SetTextureEnabled(IntPtr basicEffect, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint="BasicEffect_SetTexture")]
+            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetTexture")]
              public static extern void SetTexture(IntPtr basicEffect, IntPtr value);
         }
     }      

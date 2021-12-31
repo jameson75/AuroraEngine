@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core;
-using CipherPark.AngelJacket.Core.World;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.World.Scene;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Effects;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
-using CipherPark.AngelJacket.Core.Systems;
+using CipherPark.KillScript.Core;
+using CipherPark.KillScript.Core.World;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.World.Scene;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Effects;
+using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -20,7 +20,7 @@ using CipherPark.AngelJacket.Core.Systems;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.KillScript.Core.Utils
 {
     public class GameAssets
     {

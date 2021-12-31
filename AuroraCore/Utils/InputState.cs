@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using SharpDX;
 using SharpDX.DirectInput;
 using SharpDX.XInput;
@@ -15,14 +14,14 @@ using SharpDX.XInput;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.KillScript.Core.Utils
 {
     public class InputState
     {
         ControllerStateWindow[] controllerStateWindows = null;
         KeyboardStateWindow keyboardStateWindow = null;
         MouseStateWindow mouseStateWindow = null;
-        Key[] _releasedKeys = null;
+        Key[] _releasedKeys = null;        
         MouseButton[] _mouseButtonsReleased = null;
         MouseButton[] _mouseButtonsDown = null;
         MouseButton[] _mouseButtonsPressed = null;
@@ -45,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             _releasedKeys = null;
             _mouseButtonsDown = null;
             _mouseButtonsReleased = null;
-            _mouseButtonsPressed = null;
+            _mouseButtonsPressed = null;            
         }
           
         public void UpdateState()
@@ -54,7 +53,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             _releasedKeys = null;
             _mouseButtonsDown = null;
             _mouseButtonsReleased = null;
-            _mouseButtonsPressed = null;
+            _mouseButtonsPressed = null;            
 
             //**********************************************************************************
             //NOTE: Since directx (apparently) doesn't support mouse wheel input, I've devised
@@ -380,6 +379,21 @@ namespace CipherPark.AngelJacket.Core.Utils
                 return false;
             else
                 return keyboardStateWindow.OldState.IsKeyUp(key) && keyboardStateWindow.NewState.IsKeyDown(key);
+        }     
+
+        public void DiscardKey(Key key)
+        {           
+            if(keyboardStateWindow != null)
+            {
+                if (keyboardStateWindow.NewState.IsPressed(key))
+                    keyboardStateWindow.NewState.PressedKeys.Remove(key);                
+
+                if (keyboardStateWindow.OldState.IsPressed(key))
+                    keyboardStateWindow.OldState.PressedKeys.Remove(key);                
+
+                if (keyboardStateWindow.PressTime.ContainsKey(key))
+                    keyboardStateWindow.PressTime.Remove(key);
+            }
         }
 
         public Key[] GetKeysDown()
@@ -449,8 +463,12 @@ namespace CipherPark.AngelJacket.Core.Utils
 
         public bool IsMouseButtonReleased(MouseButton button)
         {
-            return (_GetMouseButtonsInState(mouseStateWindow.OldState, ButtonState.Pressed).Contains(button) &&
-                    _GetMouseButtonsInState(mouseStateWindow.NewState, ButtonState.Released).Contains(button));
+            return GetMouseButtonsReleased().Contains(button);
+        }      
+
+        public bool IsMouseButtonPressed(MouseButton button)
+        {
+            return GetMouseButtonsPressed().Contains(button);
         }
 
         public MouseButton[] GetMouseButtonsReleased()
@@ -462,7 +480,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 if (_mouseButtonsReleased == null)
                 {
                     List<MouseButton> _mouseButtonsReleasedList = new List<MouseButton>();
-                    foreach (MouseButton oldPressedMouseButton in InputState._GetMouseButtonsInState(mouseStateWindow.OldState, ButtonState.Pressed))
+                    foreach (MouseButton oldPressedMouseButton in InputState._GetMouseButtonsInState(mouseStateWindow.OldState, ButtonState.Down))
                         if (this.IsMouseButtonUp(oldPressedMouseButton))
                             _mouseButtonsReleasedList.Add(oldPressedMouseButton);
                     _mouseButtonsReleased = _mouseButtonsReleasedList.ToArray();
@@ -478,7 +496,7 @@ namespace CipherPark.AngelJacket.Core.Utils
             else
             {
                 if (_mouseButtonsDown == null)
-                    _mouseButtonsDown = InputState._GetMouseButtonsInState(mouseStateWindow.NewState, ButtonState.Pressed);
+                    _mouseButtonsDown = InputState._GetMouseButtonsInState(mouseStateWindow.NewState, ButtonState.Down);
                 return _mouseButtonsDown;
             }
         }
@@ -492,7 +510,7 @@ namespace CipherPark.AngelJacket.Core.Utils
                 if (_mouseButtonsPressed == null)
                 {
                     List<MouseButton> _mouseButtonsPressedList = new List<MouseButton>();
-                    MouseButton[] oldMouseButtonsUp = InputState._GetMouseButtonsInState(mouseStateWindow.OldState, ButtonState.Released);
+                    MouseButton[] oldMouseButtonsUp = InputState._GetMouseButtonsInState(mouseStateWindow.OldState, ButtonState.Up);
                     for (int i = 0; i < oldMouseButtonsUp.Length; i++ )
                         if (IsMouseButtonDown(oldMouseButtonsUp[i]))
                             _mouseButtonsPressedList.Add(oldMouseButtonsUp[i]);
@@ -657,7 +675,8 @@ namespace CipherPark.AngelJacket.Core.Utils
             }
 
             private static class UnsafeNativeMethods
-            {                [DllImport("user32.dll")]
+            {                
+               [DllImport("user32.dll")]
                 public static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
 
                 [DllImport("user32.dll")]
@@ -676,8 +695,8 @@ namespace CipherPark.AngelJacket.Core.Utils
 
     public enum ButtonState
     {
-        Pressed,
-        Released,
+        Down,
+        Up,
     }
 
     /*

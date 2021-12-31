@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.Utils;
 using System.Collections.ObjectModel;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,8 +16,9 @@ using System.Collections.ObjectModel;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
+    /*
     /// <summary>
     /// Renders child content, first to last.
     /// </summary>
@@ -61,11 +62,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
-        public override void Draw(GameTime gameTime)
+        public override void Draw()
         {
             for (int i = 0; i < _childContent.Count(); i++)
-                _childContent[i].Draw(gameTime);
-            base.Draw(gameTime);
+                _childContent[i].Draw();
+            base.Draw();
         }
 
         /// <summary>
@@ -78,6 +79,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 content.Container = this.Container;
         }
     }
+    */
 
     public static class ObservableCollectionExtension
     {

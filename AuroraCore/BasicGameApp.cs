@@ -10,18 +10,20 @@ using SharpDX.Direct3D;
 using SharpDX.DXGI;
 using SharpDX.XAudio2;
 using SharpDX.DirectInput;
-using CipherPark.AngelJacket.Core.Services;
+using CipherPark.KillScript.Core.Services;
 using System.Windows.Forms;
+using SharpDX.Mathematics.Interop;
+using SharpDX.Mathematics;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
 // Company: Cipher Park
 // Copyright © 2010-2013
-// JaMoolah Chart by Cipher Park is licensed under 
+// Angel Jacket by Cipher Park is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core
+namespace CipherPark.KillScript.Core
 {
     public class BasicGameApp : IGameApp
     {
@@ -58,14 +60,14 @@ namespace CipherPark.AngelJacket.Core
         {
             _services = new ServiceTable();
             _gameTime = new GameTime();
-        }
+        }        
 
         protected GameTime GameTime { get { return _gameTime; } } 
 
         public void Run(Form form)
         {
             _form = form;
-
+            
             form.FormClosing += form_FormClosing;
             form.SizeChanged += form_SizeChanged;
             
@@ -82,7 +84,18 @@ namespace CipherPark.AngelJacket.Core
                 if (_closeFormOnUpdate)
                     form.Close();                  
             });                    
-        }       
+        }
+
+        public void ToggleFullScreen()
+        {
+            SwapChain.IsFullScreen = !SwapChain.IsFullScreen;                  
+        }
+
+        public event Action BuffersResizing;
+
+        public event Action BuffersResized;
+
+        public event Action ViewportSizeChanged;
 
         protected virtual void Update()
         { }
@@ -100,29 +113,8 @@ namespace CipherPark.AngelJacket.Core
         { }
 
         protected virtual void Uninitialize()
-        {   
-            //Dispose of graphic resources
-            //----------------------------
-            _renderTargetView.Dispose();
-            _renderTargetShaderResource.Dispose();
-            _renderTargetBuffer.Dispose();
-            _swapChain.Dispose();
-            _depthStencilBuffer.Dispose();
-            _depthStencilView.Dispose();
-            _graphicsDevice.Dispose();
-            _graphicsDeviceContext.Dispose();
-           
-            //Dispose of audio resources
-            //--------------------------
-            _masteringVoice.DestroyVoice();
-            _masteringVoice.Dispose();
-            _xaudio2Device.Dispose();
-
-            //Dispose of input resources
-            //--------------------------            
-            _keyboard.Dispose();
-            _mouse.Dispose();
-            _directInput.Dispose();
+        {
+            UninitializeDirectXResources();
         }
 
         protected void Exit()
@@ -130,9 +122,25 @@ namespace CipherPark.AngelJacket.Core
             _closeFormOnUpdate = true;
         }
 
+        protected void ReinitializeDevice()
+        {
+            UninitializeDirectXResources();
+            InitializeDirectXResources(_form);
+        }
+
+        protected virtual void OnBuffersResizing()
+        {
+            BuffersResizing?.Invoke();
+        }
+
+        protected virtual void OnBuffersResized()
+        {
+            BuffersResized?.Invoke();
+        }
+
         private void InitializeDirectXResources(Form form)
         {           
-            _deviceHwnd = form.Handle;            
+            _deviceHwnd = form.Handle;
 
             //Initialize Direct3D11 Resources.
             //--------------------------------
@@ -144,39 +152,17 @@ namespace CipherPark.AngelJacket.Core
                 OutputHandle = form.Handle,
                 SampleDescription = new SampleDescription(1, 0),
                 SwapEffect = SwapEffect.Discard,
-                Usage = Usage.RenderTargetOutput | Usage.ShaderInput
+                Usage = Usage.RenderTargetOutput | Usage.ShaderInput,                
             };
+
             SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.Debug, chainDesc, out _graphicsDevice, out _swapChain);
             _graphicsDeviceContext = _graphicsDevice.ImmediateContext;
-            _renderTargetBuffer = Texture2D.FromSwapChain<Texture2D>(_swapChain, 0);
-            _renderTargetView = new RenderTargetView(_graphicsDevice, _renderTargetBuffer);
-            _renderTargetShaderResource = new ShaderResourceView(_graphicsDevice, _renderTargetBuffer);
 
-            Texture2DDescription renderStencilDesc = new Texture2DDescription()
-            {
-                Format = BestSupportedDepthStencilFormat(_graphicsDevice, false, true),
-                ArraySize = 1,
-                MipLevels = 1,
-                Width = form.ClientSize.Width,
-                Height = form.ClientSize.Height,
-                SampleDescription = new SampleDescription(1,0),
-                Usage = ResourceUsage.Default,
-                BindFlags = BindFlags.DepthStencil | BindFlags.ShaderResource,
-                CpuAccessFlags = CpuAccessFlags.None,                
-                OptionFlags = ResourceOptionFlags.None               
-            };            
-            _depthStencilBuffer = new Texture2D(_graphicsDevice, renderStencilDesc);
-            DepthStencilViewDescription dsvd = new DepthStencilViewDescription();
-            dsvd.Dimension = DepthStencilViewDimension.Texture2D;
-            dsvd.Flags = DepthStencilViewFlags.None;
-            dsvd.Format = BestSupportedDepthStencilFormat(_graphicsDevice, false);
-            _depthStencilView = new DepthStencilView(_graphicsDevice, _depthStencilBuffer, dsvd);
-            _graphicsDeviceContext.Rasterizer.SetViewports(new [] { new ViewportF(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f) });
-            _graphicsDeviceContext.OutputMerger.SetTargets(DepthStencil, RenderTarget);
-            
-            DepthStencilStateDescription depthStencilStateDesc = DepthStencilStateDescription.Default();
-            DepthStencilState dsState = new DepthStencilState(_graphicsDevice, depthStencilStateDesc);
-            _graphicsDeviceContext.OutputMerger.DepthStencilState = dsState;    
+            // Ignore all windows events
+            var factory = _swapChain.GetParent<Factory>();
+            factory.MakeWindowAssociation(form.Handle, WindowAssociationFlags.IgnoreAll);
+
+            CreateResourcesFromSwapChain(form);            
 
             //Initialize XAudio2 Resources.
             //-----------------------------
@@ -192,11 +178,81 @@ namespace CipherPark.AngelJacket.Core
             _mouse.Acquire();
         }
 
+        private void UninitializeDirectXResources()
+        {
+            _swapChain.IsFullScreen = false;
+
+            //Dispose of graphic resources
+            //----------------------------
+            _renderTargetView.Dispose();
+            _renderTargetShaderResource.Dispose();
+            _renderTargetBuffer.Dispose();
+            _swapChain.Dispose();
+            _depthStencilBuffer.Dispose();
+            _depthStencilView.Dispose();
+            _graphicsDevice.Dispose();
+            _graphicsDeviceContext.Dispose();
+
+            //Dispose of audio resources
+            //--------------------------
+            _masteringVoice.DestroyVoice();
+            _masteringVoice.Dispose();
+            _xaudio2Device.Dispose();
+
+            //Dispose of input resources
+            //--------------------------            
+            _keyboard.Dispose();
+            _mouse.Dispose();
+            _directInput.Dispose();
+        }
+
+        private void CreateResourcesFromSwapChain(Form form)
+        {
+            _renderTargetBuffer = Texture2D.FromSwapChain<Texture2D>(_swapChain, 0);
+            _renderTargetView = new RenderTargetView(_graphicsDevice, _renderTargetBuffer);
+            _renderTargetShaderResource = new ShaderResourceView(_graphicsDevice, _renderTargetBuffer);
+
+            Texture2DDescription renderStencilDesc = new Texture2DDescription()
+            {
+                Format = BestSupportedDepthStencilFormat(_graphicsDevice, false, true),
+                ArraySize = 1,
+                MipLevels = 1,
+                Width = form.ClientSize.Width,
+                Height = form.ClientSize.Height,
+                SampleDescription = new SampleDescription(1, 0),
+                Usage = ResourceUsage.Default,
+                BindFlags = BindFlags.DepthStencil | BindFlags.ShaderResource,
+                CpuAccessFlags = CpuAccessFlags.None,
+                OptionFlags = ResourceOptionFlags.None
+            };
+            _depthStencilBuffer = new Texture2D(_graphicsDevice, renderStencilDesc);
+            DepthStencilViewDescription dsvd = new DepthStencilViewDescription();
+            dsvd.Dimension = DepthStencilViewDimension.Texture2D;
+            dsvd.Flags = DepthStencilViewFlags.None;
+            dsvd.Format = BestSupportedDepthStencilFormat(_graphicsDevice, false);
+            _depthStencilView = new DepthStencilView(_graphicsDevice, _depthStencilBuffer, dsvd);
+            _graphicsDeviceContext.Rasterizer.SetViewports(new[] { (RawViewportF) new ViewportF(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f) });
+            _graphicsDeviceContext.OutputMerger.SetTargets(DepthStencil, RenderTargetView);
+
+            DepthStencilStateDescription depthStencilStateDesc = DepthStencilStateDescription.Default();
+            DepthStencilState dsState = new DepthStencilState(_graphicsDevice, depthStencilStateDesc);
+            _graphicsDeviceContext.OutputMerger.DepthStencilState = dsState;
+        }
+
         private void ResizeGraphicsBuffers()
         {
             if (_swapChain != null)
             {
-                _swapChain.ResizeBuffers(1, _form.ClientSize.Width, _form.ClientSize.Height, Format.R8G8B8A8_UNorm, SwapChainFlags.None);
+                _renderTargetBuffer.Dispose();
+                _renderTargetView.Dispose();
+                _renderTargetShaderResource.Dispose();
+                _depthStencilBuffer.Dispose();
+                _depthStencilView.Dispose();                                
+                //_graphicsDeviceContext.ClearState();
+                OnBuffersResizing();
+                _swapChain.ResizeBuffers(0, _form.ClientSize.Width, _form.ClientSize.Height, Format.Unknown, SwapChainFlags.None);                
+                CreateResourcesFromSwapChain(_form);
+                OnBuffersResized();
             }
         }
 
@@ -208,8 +264,10 @@ namespace CipherPark.AngelJacket.Core
 
         private void form_SizeChanged(object sender, EventArgs e)
         {
-            ResizeGraphicsBuffers();
-        }
+           
+            if(_form.ClientSize.Width != 0 && _form.ClientSize.Height != 0)
+                ResizeGraphicsBuffers();
+        }       
 
         #region IGameApp Members
 
@@ -253,7 +311,7 @@ namespace CipherPark.AngelJacket.Core
             get { return _deviceHwnd; }
         }
 
-        public RenderTargetView RenderTarget
+        public RenderTargetView RenderTargetView
         {
             get { return _renderTargetView; }
         }
@@ -277,10 +335,10 @@ namespace CipherPark.AngelJacket.Core
         {
             get
             {
-                Bool isWindowed = false;
+                RawBool isWindowed = false;
                 Output output = null;
                 _swapChain.GetFullscreenState(out isWindowed, out output);
-                return bool.Parse(isWindowed.ToString());
+                return isWindowed;
             }
             set
             {
@@ -288,7 +346,7 @@ namespace CipherPark.AngelJacket.Core
                 {
                     //NOTE: This call is expected to fail for Windows store Apps.
                     //https://msdn.microsoft.com/en-us/library/windows/desktop/bb174579(v=vs.85).aspx
-                    _swapChain.SetFullscreenState(new Bool(value), null);
+                    _swapChain.SetFullscreenState(value, null);
                 }
                 catch { }
             }

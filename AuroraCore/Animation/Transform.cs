@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Module;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.Module;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -15,7 +15,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Animation
+namespace CipherPark.KillScript.Core.Animation
 {
     /// <summary>
     /// 
@@ -71,6 +71,36 @@ namespace CipherPark.AngelJacket.Core.Animation
         {
             return new Transform(Quaternion.Lerp(t1.Rotation, t2.Rotation, step),
                                  Vector3.Lerp(t1.Translation, t2.Translation, step));
+        }
+
+        public static Transform operator * (Transform t, Matrix m)
+        {
+            return new Transform(t.ToMatrix() * m);
+        }
+
+        public static Transform operator * (Matrix m, Transform t)
+        {
+            return new Transform(m * t.ToMatrix());
+        }
+
+        public static Transform operator + (Transform t, Vector3 v)
+        {
+            return new Transform(t.Rotation, t.Translation + v);
+        }
+
+        public static Transform operator + (Vector3 v, Transform t)
+        {
+            return new Transform(t.Rotation, v + t.Translation);
+        }
+
+        public static Transform operator - (Transform t, Vector3 v)
+        {
+            return new Transform(t.Rotation, t.Translation - v);
+        }
+
+        public static Transform operator - (Vector3 v, Transform t)
+        {
+            return new Transform(t.Rotation, v - t.Translation);
         }
     }
 
@@ -237,11 +267,21 @@ namespace CipherPark.AngelJacket.Core.Animation
         public static Transform WorldTransform(this ITransformable transformable)
         {
             return new Transform(transformable.ParentToWorld(transformable.Transform.ToMatrix()));
+        }      
+
+        public static Vector3 WorldPosition (this ITransformable transformable)
+        {
+            return transformable.WorldTransform().Translation;
         }
 
-        public static void Translate(this ITransformable transformable, Vector3 offset)
+        public static void Translate(this ITransformable transformable, Vector3 delta)
         {
-            transformable.Transform = new Transform(transformable.Transform.Rotation, transformable.Transform.Translation + offset);
-        }        
+            transformable.Transform = new Transform(transformable.Transform.Rotation, transformable.Transform.Translation + delta);
+        }
+
+        public static void Rotate(this ITransformable transformable, Quaternion delta)
+        {
+            transformable.Transform = new Transform(delta * transformable.Transform.Rotation, transformable.Transform.Translation);
+        }
     }
 }

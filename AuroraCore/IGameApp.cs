@@ -8,7 +8,7 @@ using SharpDX.Direct3D11;
 using SharpDX.XAudio2;
 using SharpDX.DirectInput;
 using SharpDX.DXGI;
-using CipherPark.AngelJacket.Core.Services;
+using CipherPark.KillScript.Core.Services;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -18,10 +18,10 @@ using CipherPark.AngelJacket.Core.Services;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core
+namespace CipherPark.KillScript.Core
 {
     public interface IGameApp
-    {
+    {       
         ServiceTable Services { get; }
 
         DeviceContext GraphicsDeviceContext { get; }
@@ -30,7 +30,13 @@ namespace CipherPark.AngelJacket.Core
 
         MasteringVoice MasteringVoice { get; }
 
-        XAudio2 AudioDevice { get; }
+        XAudio2 AudioDevice { get; }      
+
+        RenderTargetView RenderTargetView { get; }
+
+        ShaderResourceView RenderTargetShaderResource { get; }
+
+        DepthStencilView DepthStencil { get; }       
 
         Keyboard Keyboard { get; }
 
@@ -38,14 +44,10 @@ namespace CipherPark.AngelJacket.Core
 
         IntPtr DeviceHwnd { get; }
 
-        RenderTargetView RenderTarget { get; }
+        event Action BuffersResizing;
 
-        ShaderResourceView RenderTargetShaderResource { get; }
+        event Action BuffersResized;
 
-        DepthStencilView DepthStencil { get; }
-
-        SwapChain SwapChain { get; }
-
-        bool IsWindowed { get; set; }
+        event Action ViewportSizeChanged;
     }
 }

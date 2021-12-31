@@ -54,15 +54,15 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateShaderTargets()
         {             
-            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
 
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
             textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
             textureDesc.CpuAccessFlags = CpuAccessFlags.None;
             textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            textureDesc.Height = Game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
-            textureDesc.Width = Game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
+            textureDesc.Height = Game.RenderTargetView.GetTextureDescription().Height;
+            textureDesc.Width = Game.RenderTargetView.GetTextureDescription().Width;
             textureDesc.MipLevels = 1;
             textureDesc.OptionFlags = ResourceOptionFlags.None;
             textureDesc.Usage = ResourceUsage.Default;
@@ -123,7 +123,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(3, _randomTextureSampler);
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);            
             Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
-            _quad.Draw(null);           
+            _quad.Draw();           
 
             //////////////
             //Clean up
@@ -142,6 +142,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(3, null);
             //Reset render targets.  
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousDepthStencil, previousRenderTarget);
+            //COM Release swap chain resource.
+            previousRenderTarget.Dispose();
+            previousDepthStencil.Dispose(); ;
 
             base.Apply();
         }

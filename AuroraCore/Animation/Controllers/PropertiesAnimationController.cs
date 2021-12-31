@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Module;
+using CipherPark.KillScript.Core.Module;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -14,9 +14,9 @@ using CipherPark.AngelJacket.Core.Module;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Animation
+namespace CipherPark.KillScript.Core.Animation
 {
-    public abstract class PropertiesAnimationController : AnimationController
+    public abstract class PropertiesAnimationController : SimulatorController
     {
         private PropertyAnimations _animatedProperties = new PropertyAnimations();
         private PropertyAnimations AnimatedProperties { get { return _animatedProperties; } }
@@ -128,12 +128,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         protected RectangleF GetPropertyRectangleValueAtT(string propertyName, ulong t)
         {
             return ((RectangleAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
-        }
-
-        protected string GetPropertyStringValueAtT(string propertyName, ulong t)
-        {
-            return ((StringAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
-        }
+        }      
 
         protected Color4 GetPropertyColorValueAtT(string propertyName, ulong t)
         {
@@ -143,12 +138,7 @@ namespace CipherPark.AngelJacket.Core.Animation
         protected Vector3 GetPropertyVector3AtT(string propertyName, ulong t)
         {
             return ((Vector3Animation)AnimatedProperties[propertyName]).GetValueAtT(t);
-        }
-
-        protected object GetPropertyValueAtT(string propertyName, ulong t)
-        {
-            return ((ObjectAnimation)AnimatedProperties[propertyName]).GetValueAtT(t);
-        }
+        }       
 
         protected bool TargetPropertyExists(string propertyName)
         {

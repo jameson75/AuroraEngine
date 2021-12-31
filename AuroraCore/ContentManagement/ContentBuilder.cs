@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.KillScript.Core.World.Geometry;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -19,12 +16,12 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Content
+namespace CipherPark.KillScript.Core.Content
 {
     public static class ContentBuilder
     {
         #region Quad
-        public static Mesh BuildBasicQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
+        public static Mesh BuildColoredQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
         {   
             VertexPositionColor[] verts = new VertexPositionColor[4];
             short[] indices = CreateQuadIndices();
@@ -35,7 +32,19 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildBasicLitQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
+        public static Mesh BuildInstancedLitQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color, int maxInstances)
+        {
+            InstanceVertexPositionNormalColor[] verts = new InstanceVertexPositionNormalColor[4];
+            short[] indices = CreateQuadIndices();
+            Vector3[] positions = CreateQuadPoints(dimension);
+            for (int i = 0; i < positions.Length; i++)
+                verts[i] = new InstanceVertexPositionNormalColor(positions[i], Vector3.UnitY, color);
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            //InstanceVertexData[] instanceData = null; //new InstanceVertexData[maxInstances];
+            return BuildDynamicInstancedMesh<InstanceVertexPositionNormalColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionNormalColor.InputElements, InstanceVertexPositionNormalColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox);
+        }
+
+        public static Mesh BuildLitQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[4];
             short[] indices = CreateQuadIndices();
@@ -46,41 +55,122 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildParticleLitQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color, int maxInstances)
+        public static Mesh BuildInstancedColoredQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color, int maxInstances)
         {
-            InstanceVertexPositionNormalColor[] verts = new InstanceVertexPositionNormalColor[4];
+            InstanceVertexPositionColor[] verts = new InstanceVertexPositionColor[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(dimension);
             for (int i = 0; i < positions.Length; i++)
-                verts[i] = new InstanceVertexPositionNormalColor(positions[i], Vector3.UnitY, color);            
-            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            InstanceVertexData[] instanceData = new InstanceVertexData[maxInstances];
-            return BuildDynamicInstancedMesh<InstanceVertexPositionNormalColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionNormalColor.InputElements, InstanceVertexPositionNormalColor.ElementSize, instanceData, instanceData.Length, InstanceVertexData.SizeInBytes, boundingBox);
+                verts[i] = new InstanceVertexPositionColor(positions[i], color.ToVector4());            
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);           
+            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox);
         }
 
-        public static Mesh BuildBasicTexturedQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
+        public static Mesh BuildTexturedQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             VertexPositionTexture[] verts = new VertexPositionTexture[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(dimension);
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : CreateQuadTextureCoords();
             for(int i = 0; i < positions.Length; i++)
-                verts[0] = new VertexPositionTexture(positions[i], _textureCoords[i]);                            
+                verts[i] = new VertexPositionTexture(positions[i], _textureCoords[i]);                            
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);         
             return BuildMesh<VertexPositionTexture>(device, shaderByteCode, verts, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildBasicLitTexturedQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
+        public static Mesh BuildInstancedTexturedQuad(Device device, byte[] shaderByteCode, RectangleF dimension, int maxInstances, Vector2[] textureCoords = null)
+        {
+            InstanceVertexPositionTexture[] verts = new InstanceVertexPositionTexture[4];
+            short[] indices = CreateQuadIndices();
+            Vector3[] positions = CreateQuadPoints(dimension);
+            Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : CreateQuadTextureCoords();
+            for (int i = 0; i < positions.Length; i++)
+                verts[i] = new InstanceVertexPositionTexture(positions[i], _textureCoords[i]);
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);            
+            return BuildDynamicInstancedMesh<InstanceVertexPositionTexture, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionTexture.InputElements, InstanceVertexPositionTexture.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox);
+        }
+
+        public static Mesh BuildLitTexturedQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[4];
             short[] indices = CreateQuadIndices();
             Vector3[] positions = CreateQuadPoints(dimension);
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : CreateQuadTextureCoords();
             for(int i = 0; i < positions.Length; i++)
-                verts[0] = new VertexPositionNormalTexture(positions[i], Vector3.UnitY, _textureCoords[i]);          
+                verts[i] = new VertexPositionNormalTexture(positions[i], Vector3.UnitY, _textureCoords[i]);          
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             return BuildMesh<VertexPositionNormalTexture>(device, shaderByteCode, verts, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, boundingBox);
         }
+
+        public static Mesh BuildWireQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
+        {
+            VertexPositionColor[] verts = new VertexPositionColor[4];
+            short[] indices = CreateQuadWireIndices();
+            Vector3[] positions = CreateQuadPoints(dimension);
+            for (int i = 0; i < positions.Length; i++)
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox, PrimitiveTopology.LineStrip);
+        }
+
+        public static Mesh BuildInstancedWireQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color, int maxInstances)
+        {
+            InstanceVertexPositionColor[] verts = new InstanceVertexPositionColor[4];
+            short[] indices = CreateQuadWireIndices();
+            Vector3[] positions = CreateQuadPoints(dimension);
+            for (int i = 0; i < positions.Length; i++)
+                verts[i] = new InstanceVertexPositionColor(positions[i], color.ToVector4());
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox, PrimitiveTopology.LineStrip);
+        }
+        
+        /*
+        public static Mesh BuildTexturedTiledMesh(Device device, byte[] shaderByteCode, Size2 dimension, Size2 imageSize, Size2 imageDimension, int imageSpacing, int[] imageTileMap, Size2F meshTileSize, bool isLit = true)
+        {
+            Size2F halfSize = new Size2F(meshTileSize.Width / 2.0f, meshTileSize.Height / 2.0f);           
+            int nVerticleTiles = dimension.Height;
+            int nHorizontalTiles = dimension.Width;
+            short[] quadIndicies = CreateQuadIndices();
+            Vector3[] quadPoints = CreateQuadPoints(new RectangleF(0 - halfSize.Width, 0 + halfSize.Height, meshTileSize.Width, -meshTileSize.Height));           
+            VertexPositionTexture[] meshVerts = new VertexPositionTexture[quadPoints.Length]; // * nHorizontalTiles * nVerticleTiles];
+            short[] meshIndices = new short[quadIndicies.Length]; // * nHorizontalTiles * nVerticleTiles];
+            Size2 imageTileSize = new Size2( (imageSize.Width - ((imageDimension.Width - 1) * imageSpacing)) / imageDimension.Width, 
+                                             (imageSize.Height - ((imageDimension.Height - 1) * imageSpacing)) / imageDimension.Height);
+
+            for (int i = 0; i < nVerticleTiles; i++)
+            {
+                for (int j = 0; j < nHorizontalTiles; j++)
+                {
+                    int k = i * nHorizontalTiles + j;
+                    Vector3[] tilePoints = quadPoints
+                                            .Select(x => new Vector3(x.X + (j * meshTileSize.Width),
+                                                                     x.Y,
+                                                                     x.Z + (i * -meshTileSize.Height)))
+                                            .ToArray();
+                    int indexOffset = (k) * quadPoints.Length;
+                    short[] tileIndices = quadIndicies
+                                            .Select(x => (short)(x + indexOffset))
+                                            .ToArray();
+                    Point imageTileCoord = new Point((imageTileMap[k] - 1) % imageDimension.Width, (imageTileMap[k] - 1) / imageDimension.Width);
+                    
+                    float tx0 = ((imageTileCoord.X * imageTileSize.Width) + (imageSpacing * imageTileCoord.X)) / (float)imageSize.Width;
+                    float ty0 = ((imageTileCoord.Y * imageTileSize.Height) + (imageSpacing * imageTileCoord.Y)) / (float)imageSize.Height;
+                    float tx1 = (((imageTileCoord.X + 1) * imageTileSize.Width) + (imageSpacing * imageTileCoord.X)) / (float)imageSize.Width;
+                    float ty1 = (((imageTileCoord.Y + 1) * imageTileSize.Height) + (imageSpacing * imageTileCoord.Y)) / (float)imageSize.Height;
+                    Vector2[] tileTextureCoords = new Vector2[] { new Vector2(tx0, ty0), new Vector2(tx1, ty0), new Vector2(tx1, ty1), new Vector2(tx0, ty1) };
+
+                    for (int n = 0; n < tilePoints.Length; n++)
+                        meshVerts[n] = new VertexPositionTexture(tilePoints[n], tileTextureCoords[n]);
+
+                    Array.Copy(tileIndices, 0, meshIndices, k * tileIndices.Length, tileIndices.Length);                 
+                }             
+            }
+           
+            BoundingBox boundingBox = BoundingBox.FromPoints(meshVerts.Select(x => x.Position.ToVector3()).ToArray());
+
+            return BuildMesh<VertexPositionTexture>(device, shaderByteCode, meshVerts, meshIndices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
+        }
+        */
 
         public static Vector3[] CreateQuadPoints(RectangleF dimension, bool includeCenterPoint = false)
         {
@@ -106,7 +196,13 @@ namespace CipherPark.AngelJacket.Core.Content
         public static short[] CreateQuadIndices()
         {
             return new short[6] { 0, 1, 2, 2, 3, 0 };
+        }    
+        
+        public static short[] CreateQuadWireIndices()
+        {
+            return new short[8] { 0, 1, 1, 2, 2, 3, 3, 0 };
         }
+
         #endregion 
 
         #region Special Quad
@@ -140,28 +236,32 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildInstancedMesh<BillboardInstanceVertex, Matrix>(device, shaderByteCode, verts, indices, BillboardInstanceVertex.InputElements, BillboardInstanceVertex.ElementSize, instanceData, BillboardInstanceVertex.InstanceSize ); 
         }
 
-        public static Mesh BuildBasicViewportQuad(Device device, byte[] shaderByteCode)
+        public static Mesh BuildViewportQuad(Device device, byte[] shaderByteCode)
         {
-            //NOTE: Viewport coords
+            //NOTE: Screen coords
             //Left = -1
             //Top = 1
             //Right = 1
             //Bottom = -1
-            RectangleF dimension = new RectangleF(-1, 1, 2, -2);
-            Vector2[] textureCoords = { new Vector2( 0, 0 ), new Vector2( 1, 0 ), new Vector2( 1, 1 ), new Vector2( 0, 1 ) };
+            RectangleF screenCoords = new RectangleF(-1, 1, 2, -2);   
+            Vector2[] textureCoords = { new Vector2( 0, 0 ),
+                                        new Vector2( 1, 0 ),
+                                        new Vector2( 1, 1 ),
+                                        new Vector2( 0, 1 )
+                                       };
             ScreenVertex[] verts = new ScreenVertex[6];            
-            verts[0] = new ScreenVertex(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
-            verts[1] = new ScreenVertex(new Vector2(dimension.Right, dimension.Top), textureCoords[1]);
-            verts[2] = new ScreenVertex(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
-            verts[3] = new ScreenVertex(new Vector2(dimension.Right, dimension.Bottom), textureCoords[2]);
-            verts[4] = new ScreenVertex(new Vector2(dimension.Left, dimension.Bottom), textureCoords[3]);
-            verts[5] = new ScreenVertex(new Vector2(dimension.Left, dimension.Top), textureCoords[0]);
+            verts[0] = new ScreenVertex(new Vector2(screenCoords.Left, screenCoords.Top), textureCoords[0]);
+            verts[1] = new ScreenVertex(new Vector2(screenCoords.Right, screenCoords.Top), textureCoords[1]);
+            verts[2] = new ScreenVertex(new Vector2(screenCoords.Right, screenCoords.Bottom), textureCoords[2]);
+            verts[3] = new ScreenVertex(new Vector2(screenCoords.Right, screenCoords.Bottom), textureCoords[2]);
+            verts[4] = new ScreenVertex(new Vector2(screenCoords.Left, screenCoords.Bottom), textureCoords[3]);
+            verts[5] = new ScreenVertex(new Vector2(screenCoords.Left, screenCoords.Top), textureCoords[0]);
             Vector3[] positions = (from v in verts select new Vector3(v.Position.X, v.Position.Y, 0)).ToArray();
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);         
             return BuildMesh<ScreenVertex>(device, shaderByteCode, verts, ScreenVertex.InputElements, ScreenVertex.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildBasicOffscreenQuad(Device device, Size2 offscreenTextureSize, Size2 gameScreenSize, byte[] shaderByteCode)
+        public static Mesh BuildOffscreenQuad(Device device, Size2 offscreenTextureSize, Size2 gameScreenSize, byte[] shaderByteCode)
         {
             float width = (2.0f * offscreenTextureSize.Width / gameScreenSize.Width);
             float height = -(2.0f * offscreenTextureSize.Height / gameScreenSize.Height);
@@ -181,7 +281,7 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion
 
         #region Quad3D
-        public static Mesh BuildBasicBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildColoredBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             VertexPositionColor[] verts = new VertexPositionColor[8];
             short[] indices = CreateBoxIndices();
@@ -191,7 +291,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildLitBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[8];
             short[] indices = CreateBoxIndices();
@@ -202,7 +302,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitBoxNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildLitBoxNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[36];           
             Vector3[] positions = CreateBoxPointsNI(dimension);
@@ -212,7 +312,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicTexturedBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
+        public static Mesh BuildTexturedBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             VertexPositionTexture[] verts = new VertexPositionTexture[36];
             Vector3[] positions = CreateBoxPoints(dimension);
@@ -222,7 +322,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionTexture>(device, shaderByteCode, verts, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitTexturedBoxNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
+        public static Mesh BuildLitTexturedBoxNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[36];
             Vector3[] positions = CreateBoxPointsNI(dimension);
@@ -321,7 +421,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
         #region Triangle
         //Constructs an equilateral triangle.
-        public static Mesh BuildBasicTriangle(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
+        public static Mesh BuildColoredTriangle(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
             VertexPositionColor[] verts = new VertexPositionColor[3];
             Vector3[] positions = CreateTrianglePoints(dimension);
@@ -333,7 +433,7 @@ namespace CipherPark.AngelJacket.Core.Content
         }
 
         //Constructs an equilateral triangle.
-        public static Mesh BuildBasicLitTriangle(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
+        public static Mesh BuildLitTriangle(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[3];
             Vector3[] positions = CreateTrianglePoints(dimension);
@@ -344,7 +444,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
         }     
 
-        public static Mesh BuildBasicTexturedTriangle(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
+        public static Mesh BuildTexturedTriangle(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             VertexPositionTexture[] verts = new VertexPositionTexture[3];
             Vector3[] positions = CreateTrianglePoints(dimension);
@@ -357,7 +457,7 @@ namespace CipherPark.AngelJacket.Core.Content
         }
 
         //Constructs an equilateral triangle.
-        public static Mesh BuildBasicLitTexturedTriangle(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
+        public static Mesh BuildLitTexturedTriangle(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             Vector2[] _textureCoords = (textureCoords != null) ? textureCoords : new Vector2[] { new Vector2(0.5f, 0), new Vector2(1, 1), new Vector2(0, 1)};
             VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[3];
@@ -382,7 +482,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
         #region Triangle3D
 
-        public static Mesh BuildBasicPrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildColoredPrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             VertexPositionColor[] verts = new VertexPositionColor[6];
             short[] indices = CreatePrismIndices();
@@ -392,7 +492,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitPrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildLitPrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[6];
             short[] indices = CreatePrismIndices();
@@ -403,7 +503,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitPrismNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildLitPrismNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[24];            
             Vector3[] positions = CreatePrismPointsNI(dimension);
@@ -413,7 +513,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicTexturedPrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
+        public static Mesh BuildTexturedPrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             VertexPositionTexture[] verts = new VertexPositionTexture[6];
             short[] indices = CreatePrismIndices();
@@ -424,7 +524,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionTexture>(device, shaderByteCode, verts, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitTexturedPrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
+        public static Mesh BuildLitTexturedPrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[6];
             short[] indices = CreatePrismIndices();
@@ -436,7 +536,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalTexture>(device, shaderByteCode, verts, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitTexturedTrianglePrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
+        public static Mesh BuildLitTexturedTrianglePrism(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[24];            
             Vector3[] positions = CreatePrismPoints(dimension);
@@ -487,7 +587,7 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion
 
         #region Hexagon
-        public static Mesh BuildBasicHexagon(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
+        public static Mesh BuildColoredHexagon(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
             short[] indices = CreateHexagonIndices();
             VertexPositionColor[] verts = new VertexPositionColor[6];
@@ -498,7 +598,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildBasicLitHexagon(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
+        public static Mesh BuildLitHexagon(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
         {
             short[] indices = CreateHexagonIndices();
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[6];
@@ -509,7 +609,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildBasicTexturedHexagon(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
+        public static Mesh BuildTexturedHexagon(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             short[] indices = CreateHexagonIndices();
             VertexPositionTexture[] verts = new VertexPositionTexture[6];
@@ -521,7 +621,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionTexture>(device, shaderByteCode, verts, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, boundingBox);
         }
 
-        public static Mesh BuildBasicLitTexturedHexagon(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
+        public static Mesh BuildLitTexturedHexagon(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
         {
             short[] indices = CreateHexagonIndices();
             VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[6];
@@ -605,7 +705,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
         #region Hexagon3D
 
-        public static Mesh BuildBasicHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildColoredHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             short[] indices = CreateHexagonIndices3D();
             VertexPositionColor[] verts = new VertexPositionColor[12];
@@ -615,7 +715,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildLitHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             short[] indices = CreateHexagonIndices3D();
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[12];
@@ -626,7 +726,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitHexagon3DNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        public static Mesh BuildLitHexagon3DNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {            
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[60];
             Vector3[] positions = CreateHexagonPoints3DNI(dimension);
@@ -636,7 +736,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicTexturedHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
+        public static Mesh BuildTexturedHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             short[] indices = CreateHexagonIndices3D();
             VertexPositionTexture[] verts = new VertexPositionTexture[12];
@@ -647,7 +747,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionTexture>(device, shaderByteCode, verts, indices, VertexPositionTexture.InputElements, VertexPositionTexture.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitTexturedHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
+        public static Mesh BuildLitTexturedHexagon3D(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {
             short[] indices = CreateHexagonIndices3D();
             VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[12];
@@ -659,7 +759,7 @@ namespace CipherPark.AngelJacket.Core.Content
             return BuildMesh<VertexPositionNormalTexture>(device, shaderByteCode, verts, indices, VertexPositionNormalTexture.InputElements, VertexPositionNormalTexture.ElementSize, dimension);
         }
 
-        public static Mesh BuildBasicLitTexturedHexagon3DNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
+        public static Mesh BuildLitTexturedHexagon3DNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Vector2[] texCoords = null)
         {    
             VertexPositionNormalTexture[] verts = new VertexPositionNormalTexture[60];
             Vector3[] positions = CreateHexagonPoints3DNI(dimension);
@@ -781,7 +881,7 @@ namespace CipherPark.AngelJacket.Core.Content
         #endregion
 
         #region Skybox
-        public static Mesh[] CreateSkyBox(Device device, byte[] shaderByteCode, float distanceFromViewPoint)
+        public static Mesh[] BuildSkyBox(Device device, byte[] shaderByteCode, float distanceFromViewPoint)
         {
             VertexPositionTexture[] front = new VertexPositionTexture[4];
             VertexPositionTexture[] back = new VertexPositionTexture[4];
@@ -838,10 +938,62 @@ namespace CipherPark.AngelJacket.Core.Content
 
             return new Mesh[] { frontQuad, backQuad, leftQuad, rightQuad, topQuad, bottomQuad };
         }
-        #endregion        
+        #endregion
+
+        #region Disc
+
+        public static Mesh BuildColoredDisc(Device device, byte[] shaderByteCode, float radius, int segments, Color color)
+        {
+            Vector3[] positions = CreateDiscPoints(radius, segments);
+            short[] indices = CreateDiscIndices(segments);
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            VertexPositionColor[] verts = positions.Select( p => new VertexPositionColor(p, color.ToVector4())).ToArray();
+            return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
+        }
+
+        public static Mesh BuildInstancedColoredDisc(Device device, byte[] shaderByteCode, float radius, int segments, Color color, int maxInstances)
+        {           
+            Vector3[] positions = CreateDiscPoints(radius, segments);
+            short[] indices = CreateDiscIndices(segments);            
+            InstanceVertexPositionColor[] verts = positions.Select(p => new InstanceVertexPositionColor(p, color.ToVector4())).ToArray();
+            BoundingBox boundingBox = BoundingBox.FromPoints(positions);
+            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox);
+        }
+
+        private static Vector3[] CreateDiscPoints(float radius, int segments)
+        {
+            const int MinSegmentsAllowed = 3;
+            if (segments < MinSegmentsAllowed)
+                throw new ArgumentException("Segments less than minimum allowed", "segments");
+
+            float angle = MathUtil.Pi / 2.0f;
+            float angle_stepsize = MathUtil.TwoPi / (float)segments;          
+            Vector3[] points = new Vector3[segments + 1];
+            for (int i = 0; i < segments; i++)
+            {                
+                points[i] = new Vector3(radius * (float)Math.Cos(-angle), 0, radius * (float)Math.Sin(-angle));               
+                angle -= angle_stepsize;
+            }
+            return points;
+        }
+
+        private static short[] CreateDiscIndices(int segments)
+        {
+            short[] indices = new short[segments * 3];
+            short middlePointIndex = (short)segments; //It's expected that the point in the middle of the disc is the last index.
+            for (int i = 0; i < segments; i++)
+            {
+                var k = i * 3;
+                indices[k + 1] = (short)i;
+                indices[k] = (short)( (i + 1 != segments) ? (i + 1) : 0);
+                indices[k + 2] = middlePointIndex;
+            }
+            return indices;
+        }
+        #endregion
 
         #region Ring
-        public static Mesh BuildBasicRing(Device device, byte[] shaderByteCode, Color color, float radius, float width, int segments, bool isDynamic = false)
+        public static Mesh BuildColoredRing(Device device, byte[] shaderByteCode, Color color, float radius, float width, int segments, bool isDynamic = false)
         {          
             Vector3[] positions = CreateRingPoints(radius, width, segments);
             short[] indices = CreateRingIndices(segments);
@@ -995,7 +1147,7 @@ namespace CipherPark.AngelJacket.Core.Content
 
         public static Mesh BuildInstancedMesh<Tv, Ti>(Device device, byte[] shaderByteCode, Tv[] verts, short[] indices, 
             InputElement[] vertexInputElements, int vertexSize, Ti[] instances,  
-            int instanceSize) where Ti : struct where Tv : struct
+            int instanceSize, PrimitiveTopology topology = PrimitiveTopology.TriangleList) where Ti : struct where Tv : struct
         {
             MeshDescription meshDesc = new MeshDescription();
             
@@ -1038,13 +1190,13 @@ namespace CipherPark.AngelJacket.Core.Content
                 meshDesc.IndexBuffer = iBuffer;
             }
             
-            meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            meshDesc.Topology = topology;
             return new Mesh(device, meshDesc);
         }
 
         public static Mesh BuildDynamicInstancedMesh<Tv, Ti>(Device device, byte[] shaderByteCode, Tv[] verts, short[] indices,
             int maxIndices, InputElement[] vertexInputElements, int vertexSize, Ti[] instances, int maxInstances,
-            int instanceSize, BoundingBox boundingBox)
+            int instanceSize, BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
             where Ti : struct
             where Tv : struct
         {
@@ -1097,7 +1249,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 meshDesc.IndexBuffer = iBuffer;
             }
 
-            meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            meshDesc.Topology = topology;
             meshDesc.BoundingBox = boundingBox;
 
             return new Mesh(device, meshDesc);
@@ -1178,9 +1330,4 @@ namespace CipherPark.AngelJacket.Core.Content
                 throw new NotSupportedException();
         }
     }    
-}
-
-public enum LandStructureType
-{
-    BasicOne
 }

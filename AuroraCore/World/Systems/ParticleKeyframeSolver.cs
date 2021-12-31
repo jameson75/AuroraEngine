@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Animation.Controllers;
-using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Animation.Controllers;
+using CipherPark.KillScript.Core.Effects;
 
-namespace CipherPark.AngelJacket.Core.Systems
+namespace CipherPark.KillScript.Core.Systems
 {
     /// <summary>
     /// 
@@ -36,9 +36,9 @@ namespace CipherPark.AngelJacket.Core.Systems
         public override void Step(GameTime time, ParticleSystem system)
         {
             foreach (KeyframeAnimationController c in _controllers)
-                c.UpdateAnimation(time);
+                c.Update(time);
 
-            IsComplete = _controllers.All(c => c.IsAnimationComplete);
+            IsComplete = _controllers.All(c => c.IsSimulationFinal);
         }
     } 
 }

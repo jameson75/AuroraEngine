@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DirectInput;
@@ -17,7 +17,7 @@ using SharpDX.DirectInput;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class Button : ContentControl, ICommandControl
     {
@@ -27,36 +27,22 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public Button(IUIRoot visualRoot)
             : base(visualRoot)
         {
+            visualRoot?.Theme.Apply(this);
         }
 
-        public Button(IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4 bgColor)
+        public Button(IUIRoot visualRoot, string text, SpriteFont font, Color4 fontColor, Color4? bgColor = null)
             : base(visualRoot)
         {
-            Content = new LayeredContent( new UIContent[] { 
-                                          new ColorContent(bgColor),
-                                          new TextContent(text, font, fontColor)
-                                          } );
-        }
-
-        public Button(IUIRoot visualRoot, TextContent text, ColorContent bgColor) : base(visualRoot)
-        {
-            Content = new LayeredContent(new UIContent[] { 
-                                          bgColor,
-                                          text
-                                          });
-        }
+            Content = new TextContent(text, font, fontColor, bgColor.GetValueOrDefault());
+            visualRoot?.Theme.Apply(this);
+        }      
 
         public Button(IUIRoot visualRoot, Texture2D image)
             : base(visualRoot)
         {
             Content = new ImageContent(image);
-        }
-
-        public Button(IUIRoot visualRoot, ImageContent image) 
-            : base(visualRoot)
-        {
-            Content = image;
-        }
+            visualRoot?.Theme.Apply(this);
+        }       
 
         /*
         public UIContent Content
@@ -133,7 +119,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if( this.IsHit )
             {
                 InputState inputState = inputServices.GetInputState();
-                if( inputState.IsMouseButtonDown(InputState.MouseButton.Left) )            
+                if( inputState.IsMouseButtonPressed(InputState.MouseButton.Left) )            
                     OnClick();
             }
             

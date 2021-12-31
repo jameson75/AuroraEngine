@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SharpDX;
-using CipherPark.AngelJacket.Core.Module;
-using CipherPark.AngelJacket.Core.World;
-using CipherPark.AngelJacket.Core.World.Scene;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.Module;
+using CipherPark.KillScript.Core.World;
+using CipherPark.KillScript.Core.World.Scene;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.UI.Components;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.UI.Components;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Sequencer
+namespace CipherPark.KillScript.Core.Sequencer
 {
     public class Sequencer
     {
@@ -29,17 +29,17 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         public IGameApp Game { get { return _game; } }
 
         public Sequence Sequence { get { return _sequence; } }
- 
+
         public Sequencer(IGameApp game)
         {
             _game = game;
         }
 
-        public void Update(GameTime gameTime, GameContext context)
+        public void Update(GameTime gameTime, ModuleContext context)
         {
             if (!_isStarted)
                 Start(gameTime);
-            
+
             long elapsedSequencerTime = CalculateElapsedSequencerTime(gameTime);
             //**************************************************************************
             //NOTE: We use an auxilary sequence to enumerate through, in the event that
@@ -47,14 +47,14 @@ namespace CipherPark.AngelJacket.Core.Sequencer
             //**************************************************************************
             Sequence auxSequence = new Sequence();
             auxSequence.AddRange(this.Sequence);
-            foreach ( SequenceEvent sequenceEvent in auxSequence )
+            foreach (SequenceEvent sequenceEvent in auxSequence)
             {
                 if (sequenceEvent.Time <= elapsedSequencerTime)
                 {
                     sequenceEvent.Execute(gameTime, context);
-                    Sequence.Remove(sequenceEvent);                   
+                    Sequence.Remove(sequenceEvent);
                 }
-            }          
+            }
         }
 
         private void Start(GameTime gameTime)
@@ -64,41 +64,15 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         }
 
         private long CalculateElapsedSequencerTime(GameTime gameTime)
-        { return  gameTime.GetTotalSimtime() - _startTime; }
+        { return gameTime.GetTotalSimtime() - _startTime; }
     }
 
     public class Sequence : List<SequenceEvent>
     { }
 
-    public abstract class SequenceEvent 
-    { 
-        public long Time { get; set; }
-        public abstract void Execute(GameTime gameTime, GameContext context);
-    }      
-}
-
-namespace CipherPark.AngelJacket.Core
-{
-    public struct GameContext
+    public abstract class SequenceEvent
     {
-        public GameContext(GameAssets assets, Scene scene, WorldSimulator simulator, IUIRoot ui, BoundingBox actionBounds)
-            : this()
-        {
-            Assets = assets;
-            Scene = scene;
-            Simulator = simulator;
-            UI = ui;
-            Game = scene.Game;
-            ActionBounds = actionBounds;
-        }
-        public GameAssets Assets { get; private set; }
-        public Scene Scene { get; private set; }
-        public WorldSimulator Simulator { get; private set; }
-        public IUIRoot UI { get; private set; }
-        public IGameApp Game { get; private set; }
-        public BoundingBox ActionBounds { get; private set; }
-
-        private static GameContext _empty = new GameContext();
-        public static GameContext Empty { get { return _empty; } }
+        public long Time { get; set; }
+        public abstract void Execute(GameTime gameTime, ModuleContext context);
     }
 }

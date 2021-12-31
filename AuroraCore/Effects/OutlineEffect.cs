@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,24 +17,23 @@ using CipherPark.AngelJacket.Core.Animation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class OutlineEffect : SurfaceEffect
     {
-        private BasicEffectEx basicEffect = null;
+        private FlatEffect basicEffect = null;
         private bool _isRestoreRequired = false;
         private RasterizerState oldRasterizerState = null;
 
         public OutlineEffect(IGameApp game)
             : base(game)
         {
-            basicEffect = new BasicEffectEx(game);           
-            basicEffect.EnableVertexColor = true;
+            basicEffect = new FlatEffect(game, SurfaceVertexType.PositionColor);                     
         }
 
-        public override byte[] SelectShaderByteCode()
+        public override byte[] GetVertexShaderByteCode()
         {
-            return basicEffect.SelectShaderByteCode();
+            return basicEffect.GetVertexShaderByteCode();
         }
 
         public override void Apply()

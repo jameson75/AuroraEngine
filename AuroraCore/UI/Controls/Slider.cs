@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.UI.Components;
 using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -12,7 +12,7 @@ using SharpDX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class Slider : UIControl
     {
@@ -91,10 +91,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
-            trackContentControl.Draw(gameTime);
-            handleContentControl.Draw(gameTime);
+            trackContentControl.Draw();
+            handleContentControl.Draw();
         }
     }
 }

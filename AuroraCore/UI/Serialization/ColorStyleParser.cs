@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Components;
 using System.Xml.Linq;
-using CipherPark.AngelJacket.Core.Module;
+using CipherPark.KillScript.Core.Module;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -12,7 +12,7 @@ using CipherPark.AngelJacket.Core.Module;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Design
+namespace CipherPark.KillScript.Core.UI.Design
 {
     public class ColorStyleParser : UIStyleParser
     {

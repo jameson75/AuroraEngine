@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CipherPark.AngelJacket.Core.Module;
+using CipherPark.KillScript.Core.Module;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -12,7 +12,7 @@ using CipherPark.AngelJacket.Core.Module;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Services
+namespace CipherPark.KillScript.Core.Services
 {  
     public interface IModuleService
     {

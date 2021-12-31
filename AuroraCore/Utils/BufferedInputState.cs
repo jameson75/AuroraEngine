@@ -12,12 +12,12 @@ using SharpDX.DirectInput;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.KillScript.Core.Utils
 {
     public class BufferedInputState
     {
         public const long DelayTimeAfterPress = 300;
-        public const long DelayTimeAfterHold = 80;
+        public const long DelayTimeAfterHold = 40;
         private InputState _inputState = null;
         private List<Key> _delayedScannedKeysDown = new List<Key>();        
         private Dictionary<Key, long> _inputDelayExpirationTimes = new Dictionary<Key, long>();
@@ -53,6 +53,11 @@ namespace CipherPark.AngelJacket.Core.Utils
         public bool IsKeyReleased(Key key)
         {
             return _inputState.IsKeyReleased(key);
+        }
+
+        public void DiscardKey(Key key)
+        {
+            _inputState.DiscardKey(key);
         }
 
         public Key[] GetKeysDown(bool scanRealTime = false)

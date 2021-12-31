@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 
-namespace CipherPark.AngelJacket.Core.Services
+namespace CipherPark.KillScript.Core.Services
 {
     /// <summary>
     /// 

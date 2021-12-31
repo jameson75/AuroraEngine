@@ -5,11 +5,11 @@ using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Direct3D11;
 using SharpDX.DirectInput;
-using CipherPark.AngelJacket.Core;
-using CipherPark.AngelJacket.Core.World.Scene;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Services;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core;
+using CipherPark.KillScript.Core.World.Scene;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Services;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -19,17 +19,17 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Collision
+namespace CipherPark.KillScript.Core.World.Collision
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ObservedWorldObject
+    public class ObservedCollidableObject
     {
         /// <summary>
         /// 
         /// </summary>
-        public WorldObject ObservedObject { get; set; }
+        public ICollidable ObservedObject { get; set; }
         /// <summary>
         /// 
         /// </summary>

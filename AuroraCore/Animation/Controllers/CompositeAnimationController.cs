@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Module;
-using CipherPark.AngelJacket.Core.Systems;
-using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.KillScript.Core.Module;
+using CipherPark.KillScript.Core.Systems;
+using CipherPark.KillScript.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,47 +16,45 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Animation.Controllers
+namespace CipherPark.KillScript.Core.Animation.Controllers
 {
     /// <summary>
     /// 
     /// </summary>
-    public class CompositeAnimationController : AnimationController
+    public class CompositeAnimationController : SimulatorController
     {
-        List<IAnimationController> _children = new List<IAnimationController>();
+        List<ISimulatorController> _children = new List<ISimulatorController>();       
 
         public CompositeAnimationController()
         { }
 
-        public CompositeAnimationController(IEnumerable<IAnimationController> children)
-        {
+        public CompositeAnimationController(IEnumerable<ISimulatorController> children)
+        {            
             _children.AddRange(children);
         }
 
-        public override void Reset() 
-        {
+        protected override void OnSimulationReset() 
+        {           
             _children.ForEach(c => c.Reset());
         }
 
-        public override void UpdateAnimation(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
-            //**********************************************************************************
-            //NOTE: We use an auxilary controller collection to enumerate through, in 
-            //the event that an updated controller alters this Simulator's Animation Controllers
-            //collection.
-            //**********************************************************************************
-            List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_children);
-            foreach (IAnimationController controller in auxAnimationControllers)
+            foreach (ISimulatorController controller in _children)
             {
-                controller.UpdateAnimation(gameTime);
-                if (controller.IsAnimationComplete)
-                    _children.Remove(controller);
+                if(!controller.IsSimulationFinal && !controller.IsSimulationSuspended)
+                    controller.Update(gameTime);               
             }
 
-            if (_children.Count == 0 && !IsAnimationComplete)
-                OnAnimationComplete();
+            if (_children.All(c => c.IsSimulationFinal) && !IsSimulationFinal)
+            {
+                if (_children.Any(c => c.WasSimulationAborted))
+                    OnSimulationAbort();
+                else
+                    OnSimulationComplete();
+            }
         }
 
-        public List<IAnimationController> Children { get { return _children; } }
+        public List<ISimulatorController> Children { get { return _children; } }
     }
 }

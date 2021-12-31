@@ -8,10 +8,10 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.KillScript.Core.World.Geometry
 {
     public class ReferenceGrid
     {
@@ -76,13 +76,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _mesh = new Mesh(device, meshDesc);
         }
 
-        public void Draw(GameTime gameTime)
+        public void Draw()
         {
             _effect.SetWorld(Transform);
             _effect.SetView(Camera.ViewMatrix);
             _effect.SetProjection(Camera.ProjectionMatrix);
             _effect.Apply();
-            _mesh.Draw(gameTime);
+            _mesh.Draw();
         }
 
         public Camera Camera { get; set; }

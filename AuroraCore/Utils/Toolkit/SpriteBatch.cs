@@ -15,7 +15,7 @@ using SharpDX.Direct3D11;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils.Toolkit
+namespace CipherPark.KillScript.Core.Utils.Toolkit
 {
     public class SpriteBatch
     {
@@ -122,25 +122,25 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("AngelJacketNative.dll", EntryPoint="SpriteBatch_New")]
+            [DllImport("KillScriptNative.dll", EntryPoint="SpriteBatch_New")]
             public static extern IntPtr New(IntPtr deviceContext);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Begin")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Begin")]
             public static extern void Begin(IntPtr nativeSpriteBatch, SpriteSortMode sortMode, IntPtr blendState, IntPtr samplerState, IntPtr depthStencilState, IntPtr rasterizerState, IntPtr customShaderFunction, [MarshalAs(UnmanagedType.LPArray, SizeConst=16)] float[] transformationMatrix);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Begin_2")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Begin_2")]
             public static extern void Begin(IntPtr nativeSpriteBatch);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Draw")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Draw")]
             public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, XMFLOAT2 position, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, XMFLOAT2 origin, XMFLOAT2 scale, SpriteEffects effects, float layerDepth);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Draw_2")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Draw_2")]
             public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, WIN32_RECT destinationRectangle, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, XMFLOAT2 origin, SpriteEffects effects, float layerDepth); 
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_End")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_End")]
             public static extern void End(IntPtr nativeSpriteBatch);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteBatch_Delete")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Delete")]
             public static extern void Delete(IntPtr nativeSpriteBatch);
         }
     }

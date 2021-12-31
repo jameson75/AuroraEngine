@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,7 +16,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class FlexboardEffect : SurfaceEffect
     {
@@ -56,7 +56,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
         }
 
-        public override byte[] SelectShaderByteCode()
+        public override byte[] GetVertexShaderByteCode()
         {
             return _vertexShaderByteCode;
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CipherPark.AngelJacket.Core.Sequencer
+namespace CipherPark.KillScript.Core.Sequencer
 {
     ///////////////////////////////////////////////////////////////////////////////
     // Developer: Eugene Adams
@@ -16,7 +16,7 @@ namespace CipherPark.AngelJacket.Core.Sequencer
 
     public class CodeBlockSequenceEvent : SequenceEvent
     {
-        public override void Execute(GameTime gameTime, GameContext context)
+        public override void Execute(GameTime gameTime, ModuleContext context)
         {
             if (CodeBlock != null)
                 CodeBlock(gameTime, context);
@@ -25,5 +25,5 @@ namespace CipherPark.AngelJacket.Core.Sequencer
         public ExecuteSequenceDelegate CodeBlock { get; set; }
     }
 
-    public delegate void ExecuteSequenceDelegate(GameTime gameTime, GameContext context);
+    public delegate void ExecuteSequenceDelegate(GameTime gameTime, ModuleContext context);
 }

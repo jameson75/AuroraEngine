@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Animation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Animation
+namespace CipherPark.KillScript.Core.UI.Animation
 {
     public class UIContentAnimationController<T> : UIAnimationControllerBase where T : UIContent
     { 

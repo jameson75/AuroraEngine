@@ -15,13 +15,13 @@ using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using SharpDX.MediaFoundation;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CoreTransform = CipherPark.AngelJacket.Core.Animation.Transform;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Effects;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Animation.Controllers;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
-using CipherPark.AngelJacket.Core.Utils;
+using CoreTransform = CipherPark.KillScript.Core.Animation.Transform;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Effects;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Animation.Controllers;
+using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -31,7 +31,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Content
+namespace CipherPark.KillScript.Core.Content
 {
     public static class ContentImporter
     {
@@ -76,6 +76,8 @@ namespace CipherPark.AngelJacket.Core.Content
         public static Texture2D LoadTexture(DeviceContext deviceContext, string fileName)
         {
             IntPtr _nativeTextureResource = UnsafeNativeMethods.CreateTextureFromFile(deviceContext.NativePointer, fileName);
+            if (_nativeTextureResource == IntPtr.Zero)
+                throw new InvalidOperationException("Failed loading texture.");
             return new Texture2D(_nativeTextureResource);
         }
 
@@ -113,8 +115,9 @@ namespace CipherPark.AngelJacket.Core.Content
             for (int i = 0; i < _textures.Length; i++)
                 deviceContext.UnmapSubresource(_stagingTextures[i], 0);
             return cubeTexture;
-        }    
+        }
       
+
         /// <summary>
         /// 
         /// </summary>
@@ -126,7 +129,7 @@ namespace CipherPark.AngelJacket.Core.Content
         [Obsolete]
         public static Model ImportFBX(IGameApp game, string fileName, byte[] shaderByteCode, FBXFileChannels channels = FBXFileChannels.Default)
         {
-            BasicModel result = null;
+            SingleMeshModel result = null;
             FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();            
             fbxMeshThunk.m = new float[16];
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
@@ -148,7 +151,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 case FBXFileChannels.PositionColor:
                     VertexPositionColor[] _vertices = vertices.Select(e => new VertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.Red.ToVector4() }).ToArray();
                     mesh = ContentBuilder.BuildMesh<VertexPositionColor>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
-                    result = new BasicModel(game);
+                    result = new SingleMeshModel(game);
                     result.Mesh = mesh;
                     break;
                 default:
@@ -355,7 +358,7 @@ namespace CipherPark.AngelJacket.Core.Content
                 }
                 
                 mesh = ContentBuilder.BuildMesh<VertexPositionNormalTextureSkin>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionNormalTextureSkin.InputElements, VertexPositionNormalTextureSkin.ElementSize, boundingBox);                        
-                RiggedModel riggedModel = new RiggedModel(game);
+                SkinnedMeshModel riggedModel = new SkinnedMeshModel(game);
                 riggedModel.Mesh = mesh;
                 riggedModel.SkinOffsets.AddRange(skinOffsets);
                 riggedModel.FrameTree = rootBoneFrame;
@@ -366,7 +369,7 @@ namespace CipherPark.AngelJacket.Core.Content
             else if ((channels & XFileChannels.Animation) != 0)
             {
                 mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox, options.HasFlag(XFileImportOptions.EnableInstancing));
-                ComplexModel complexModel = new ComplexModel(game);
+                MultiMeshModel complexModel = new MultiMeshModel(game);
                 complexModel.Meshes.Add(mesh);
                 complexModel.FrameTree = rootBoneFrame;
                 complexModel.AnimationRig.AddRange(animationControllers);
@@ -376,7 +379,7 @@ namespace CipherPark.AngelJacket.Core.Content
             else
             {
                 mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox, options.HasFlag(XFileImportOptions.EnableInstancing));
-                BasicModel basicModel = new BasicModel(game);
+                SingleMeshModel basicModel = new SingleMeshModel(game);
                 basicModel.Mesh = mesh;
                 result = basicModel;
             }
@@ -528,7 +531,7 @@ namespace CipherPark.AngelJacket.Core.Content
                     else
                     {
                         //INSTANCEVERTEXPOSITIONTEXTURE
-                        //-----------------------------------    
+                        //-----------------------------
                         InstanceVertexPositionTexture[] _vertices = vertices.Select((v, i) => new InstanceVertexPositionTexture()
                         {
                             Position = new Vector4(v.X, v.Y, v.Z, 1.0f),                            
@@ -571,16 +574,16 @@ namespace CipherPark.AngelJacket.Core.Content
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadVoiceDataFromWav")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "ContentImporter_LoadVoiceDataFromWav")]
             public static extern int LoadVoiceDataFromWav([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref VoiceDataThunk voiceData);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
             public static extern IntPtr CreateTextureFromFile(IntPtr deviceContext, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
             public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
             
-            [DllImport("AngelJacketNative.dll", EntryPoint = "ContentImporter_LoadStreamingAudio")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "ContentImporter_LoadStreamingAudio")]
             public static extern IntPtr LoadStreamingAudio([MarshalAs(UnmanagedType.LPWStr)] string fileName);
         }       
     }

@@ -1,11 +1,11 @@
 ﻿using System;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 using SharpDX;
 using SharpDX.DirectInput;
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class TextBox : UIControl
     {
@@ -59,9 +59,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             get { return _backgroundContent; }
         }
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
             VisualRoot.FocusManager.ControlLostFocus += FocusManager_ControlLostFocus;
+            base.OnInitialize();
         }
 
         protected override void OnUpdate(GameTime gameTime)
@@ -90,7 +91,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                                 if (this._textContent.Text.Length > 0)
                                     this._textContent.Text = this._textContent.Text.Substring(0, this._textContent.Text.Length - 1);
                         }
-                    UpdateCaretPosition();
+                    AdvanceCaretPosition();
                     _textEdited = true;
                 }
             }            
@@ -102,7 +103,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
             if (this.Size == Size2FExtension.Zero)
                 return;
@@ -124,15 +125,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             */
 
             if (_backgroundContent != null)
-                _backgroundContent.Draw(gameTime);
+                _backgroundContent.Draw();
 
             if(_textContent != null)
-                _textContent.Draw(gameTime);
+                _textContent.Draw();
            
             if( this.HasFocus && _caret.Visible )
-                _caret.Draw(gameTime);
+                _caret.Draw();
            
-            base.OnDraw(gameTime);
+            base.OnDraw();
+        }
+
+
+        public override bool CanReceiveFocus
+        {
+            get
+            {
+                return true;
+            }
         }
 
         public event EventHandler EnterKeyEvent;
@@ -175,14 +185,14 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             _caret.Visible = false;
         }
 
-        private void UpdateCaretPosition()
+        private void AdvanceCaretPosition()
         {
             if(_textContent.Text != null )
                 _caret.Position = new Vector2(_textContent.GetTextLength(0, _textContent.Text.Length), _caret.Position.Y);
         }
 
         protected virtual void OnEnterKey()
-        {
+        {         
             EventHandler handler = EnterKeyEvent;
             if (handler != null)
                 handler(this, EventArgs.Empty);

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class SpectrumAnalyzerProcEffect : Effect
     {
@@ -131,7 +131,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(Output);
             
             //Render spectrum analyzer to offscreen texture.
-            _offscreenQuad.Draw(null);            
+            _offscreenQuad.Draw();            
             
             //Clear.
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
@@ -142,6 +142,10 @@ namespace CipherPark.AngelJacket.Core.Effects
             
             //Set graphics context back to captured state.
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalDepthStencilView, originalRenderTarget);
+
+            //COM Release() swap chain resource.
+            originalRenderTarget.Dispose();
+            originalDepthStencilView.Dispose();
         }
        
         private void CreateOffscreenQuad()
@@ -150,7 +154,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             if (_output != null &&
                 GameScreenSize != Size2.Zero)
             {
-                _offscreenQuad = Content.ContentBuilder.BuildBasicOffscreenQuad(Game.GraphicsDevice,
+                _offscreenQuad = Content.ContentBuilder.BuildOffscreenQuad(Game.GraphicsDevice,
                                                                                 Output.GetTexture2DSize(),
                                                                                 GameScreenSize,
                                                                                 _vertexShaderByteCode);

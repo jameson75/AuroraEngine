@@ -6,10 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Animation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Animation
+namespace CipherPark.KillScript.Core.UI.Animation
 {
     public abstract class UIAnimationControllerBase : PropertiesAnimationController
     { 
@@ -29,12 +29,12 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
              get { return _animationStartTime; }
         }
 
-        public override void Reset()
+        protected override void OnSimulationReset()
         {
             _animationStartTime = null;            
         }
 
-        public override void UpdateAnimation(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             if (_animationStartTime == null)
                 _animationStartTime = gameTime.GetTotalSimtime();
@@ -48,7 +48,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
                 if (Loop)
                     _animationStartTime = null;
                 else
-                    this.OnAnimationComplete();
+                    this.OnSimulationComplete();
             }
         }
 

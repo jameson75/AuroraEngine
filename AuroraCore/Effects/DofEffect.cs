@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Content;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Content;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.Content;
 // Angel Jacket by Cipher Park is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class DofEffect : PostEffect
     {
@@ -73,7 +73,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateShaderTargets()
         {
-            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
             
             SamplerStateDescription samplerDesc = SamplerStateDescription.Default();
             samplerDesc.Filter = Filter.MinMagMipLinear;
@@ -87,8 +87,8 @@ namespace CipherPark.AngelJacket.Core.Effects
             textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
             textureDesc.CpuAccessFlags = CpuAccessFlags.None;
             textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            textureDesc.Height = Game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
-            textureDesc.Width = Game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
+            textureDesc.Height = Game.RenderTargetView.GetTextureDescription().Height;
+            textureDesc.Width = Game.RenderTargetView.GetTextureDescription().Width;
             textureDesc.MipLevels = 1;
             textureDesc.OptionFlags = ResourceOptionFlags.None;
             textureDesc.Usage = ResourceUsage.Default;
@@ -176,7 +176,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_lowResTarget);
             Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_downSampleVertexShader);
             Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_downSamplePixelShader);
-            _quad.Draw(null);
+            _quad.Draw();
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
@@ -193,7 +193,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_tempTarget);
             Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_gaussianVertexShader);
             Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_gaussianPixelShader);
-            _quad.Draw(null);
+            _quad.Draw();
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
@@ -212,7 +212,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             //NOTE: We are reusing the Guassian vertex shader from previous pass.
             //*******************************************************************************
             Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_gaussianPixelShader2);
-            _quad.Draw(null);
+            _quad.Draw();
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
@@ -235,7 +235,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalRenderTarget);
             Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_depthFinal1VertexShader);
             Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_depthFinal1PixelShader);            
-            _quad.Draw(null);
+            _quad.Draw();
             //**********************************************************************************
             //NOTE: No need for clean-up, We'll be reusing the same resources in the next pass.
             //**********************************************************************************
@@ -266,7 +266,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
             BlendState oldBlendState = Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
             Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = new BlendState(Game.GraphicsDevice, blendDesc);
-            _quad.Draw(null);
+            _quad.Draw();
             Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, null);
@@ -276,6 +276,8 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalDepthStencilView, originalRenderTarget);
+            originalRenderTarget.Dispose();
+            originalDepthStencilView.Dispose();
         }
     }
 

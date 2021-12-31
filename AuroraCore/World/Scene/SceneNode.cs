@@ -2,14 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
 using SharpDX;
-using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -19,7 +14,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Scene
+namespace CipherPark.KillScript.Core.World.Scene
 {
     [Obsolete]
     public interface ISceneObject
@@ -27,13 +22,14 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
     }
 
-    public abstract class SceneNode : ITransformable
+    public abstract class SceneNode : ITransformable, IDisposable
     {       
         private SceneNode _parent = null;
         private SceneNodes _children = null;
-        private Scene _scene = null;
+        private SceneGraph _scene = null;
         private ITransformable _transformableParent = null;
-        private IGameApp _game = null;
+        private SceneNodeBehaviour _behaviour = null;
+        private IGameApp _game = null;      
 
         public SceneNode(IGameApp game)
         {
@@ -54,7 +50,7 @@ namespace CipherPark.AngelJacket.Core.World.Scene
 
         public virtual string Name { get; set; }
 
-        public Scene Scene 
+        public SceneGraph Scene 
         { 
             get { return _scene; } 
             set { _scene = value; OnSceneChanged(); } 
@@ -73,18 +69,56 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 _transformableParent = value;
             }
         }
-
-        public SceneNodes Children { get { return _children; } }
         
+        public SceneNodes Children { get { return _children; } }
+
+        public SceneNodeBehaviour Behaviour
+        {
+            get { return _behaviour; }
+            set
+            {
+                if (value == null)
+                {
+                    var b = _behaviour;
+                    _behaviour = null;
+                    if (b.ContainerNode == this)
+                        b.ContainerNode = null;                 
+                }
+                else
+                {
+                    _behaviour = value;
+                    if (_behaviour.ContainerNode != this)
+                        _behaviour.ContainerNode = this;
+                }
+            }
+        }
+
+        public ulong Flags { get; set; }
+
         public virtual Transform Transform { get; set; }        
 
-        public virtual void Draw(GameTime gameTime) { }
+        public virtual void Draw() { }
 
-        public virtual void Update(GameTime gameTime) 
+        public virtual void Update(GameTime gameTime)
         {
-            if (NodeEffector != null)
-                NodeEffector.Update(gameTime, this);
-        }     
+            Behaviour?.Update(this);
+        }   
+
+        /*
+        public virtual BoundingBox CalcBoundingBox()
+        {
+            return BoundingBoxExtension.Empty;
+        }
+
+        public virtual BoundingBox  CalcWorldBoundingBox()
+        {
+            var localBoundingBox = CalcBoundingBox();
+            if (localBoundingBox == BoundingBoxExtension.Empty)
+                return BoundingBoxExtension.Empty;
+            else
+                return this.LocalToWorldBoundingBox(localBoundingBox);
+        }
+        */
 
         public virtual ITransformable TransformableParent
         {
@@ -101,7 +135,15 @@ namespace CipherPark.AngelJacket.Core.World.Scene
             }
         }
 
-        public bool Visible { get; set; }
+        public bool Visible 
+        { 
+            get; set; 
+        }
+
+        public void Dispose()
+        {
+            OnDispose();
+        }
 
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
         {
@@ -156,8 +198,10 @@ namespace CipherPark.AngelJacket.Core.World.Scene
                 child.Scene = this._scene;
         }
 
-        public SceneNodeEffector NodeEffector
-        { get; set; }
+        protected virtual void OnDispose()
+        {
+
+        }        
     }
      
     public class SceneNodes :  ObservableCollection<SceneNode>

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using SharpDX;
 using SharpDX.Direct3D;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Design
+namespace CipherPark.KillScript.Core.UI.Design
 {
     public static class UIControlPropertyParser
     {

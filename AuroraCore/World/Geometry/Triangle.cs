@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 using SharpDX;
 using SharpDX.Direct3D11;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.KillScript.Core.World.Geometry
 {
     public class Triangle
     {
@@ -51,13 +51,13 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             _mesh = new Mesh(device, meshDesc); 
         }
 
-        public void Draw(GameTime gameTime)
+        public void Draw()
         {
             _effect.SetWorld(Transform);
             _effect.SetView(Camera.ViewMatrix);
             _effect.SetProjection(Camera.ProjectionMatrix);
             _effect.Apply();            
-            _mesh.Draw(gameTime);
+            _mesh.Draw();
         }
     }
 }

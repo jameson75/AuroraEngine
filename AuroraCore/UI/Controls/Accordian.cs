@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Components;
 using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,7 +13,7 @@ using SharpDX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class Accordian : ItemsControl
     {
@@ -23,11 +23,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             : base(visualRoot)
         { }
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
             foreach (ToolMenuItem panel in Items)
-                panel.Draw(gameTime);
-            base.OnDraw(gameTime);
+                panel.Draw();
+            base.OnDraw();
         }
         
         protected override void OnLayoutChanged()
@@ -89,12 +89,12 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         public Button Button { get { return itemButton; } }
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
-            itemButton.Draw(gameTime);
+            itemButton.Draw();
             if (this.Expanded)            
-                itemPanel.Draw(gameTime);          
-            base.OnDraw(gameTime);
+                itemPanel.Draw();          
+            base.OnDraw();
         }
 
         public bool Expanded

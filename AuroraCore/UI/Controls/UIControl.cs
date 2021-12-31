@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.UI.Animation;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
-using CipherPark.AngelJacket.Core.Module;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Animation;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Module;
 using System.Linq;
 using SharpDX;
+using CipherPark.KillScript.Core.World.Scene;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,7 +17,7 @@ using SharpDX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public abstract class UIControl 
     {
@@ -32,6 +33,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private bool _visible = false;
         private bool _enabled = false;
         private bool _enableFocus = false;
+        private bool _initialized = false;
         #endregion
 
         #region Constructors
@@ -352,33 +354,44 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         //TODO: Implement mouse capture in control tree.
         public bool Capture { get; set; }
         public bool SuspendLayout { get; set; }
+        public UIControlBehavior Behavior { get; set; }
+
         #endregion
 
         #region Methods       
 
-        public virtual void Initialize() { }
+        public void Initialize() 
+        {
+            Behavior?.Initialize(this);
+            OnInitialize();
+            _initialized = true;
+        }
+
+        protected virtual void OnInitialize() { }
 
         public void Update(GameTime gameTime)
         {
+            if (!_initialized)
+                Initialize();
+            Behavior?.Update(this);
             OnUpdate(gameTime);
         }
 
         protected virtual void OnUpdate(GameTime gameTime) { }
 
-        public void Draw(GameTime gameTime)
+        public void Draw()
         {
             if(Visible)
-                OnDraw(gameTime);
+                OnDraw();
         }
 
-        protected virtual void OnDraw(GameTime gameTime) { }
+        protected virtual void OnDraw() { }
 
         public virtual void ApplyTemplate(UIControlTemplate template)
         {
             if (template.Size != null)
-                this.Size = template.Size.Value;
-            OnStyleChanged();
-        }
+                this.Size = template.Size.Value;          
+        }      
 
         public RectangleF BoundsToSurface(RectangleF bounds)
         {
@@ -535,14 +548,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         protected virtual void OnLoad()
-        {}
-
-        protected virtual void OnStyleChanged()
-        {
-            EventHandler handler = EffectChanged;
-            if (handler != null)
-                handler(this, EventArgs.Empty);
-        }     
+        {}       
 
         protected virtual void OnParentChanged()
         {
@@ -604,7 +610,6 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         public event EventHandler PositionChanged;
         public event EventHandler PaddingChanged;
         public event EventHandler MarginChanged;
-        public event EventHandler EffectChanged;
         public event EventHandler ParentChanged;
         public event EventHandler VisibleChanged;
         public event EventHandler EnabledChanged;

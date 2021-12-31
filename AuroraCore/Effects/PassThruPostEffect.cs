@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Content;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Content;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -18,7 +18,7 @@ using CipherPark.AngelJacket.Core.Content;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class PassThruPostEffect : PostEffect
     {
@@ -36,9 +36,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         public PassThruPostEffect(IGameApp game)
             : base(game)
         {
-            string psFileName = "Content\\Shaders\\postpassthru-ps.cso";
-            string vsFileName = "Content\\Shaders\\postpassthru-vs.cso";
-            string vsFixFileName = "Content\\Shaders\\postpassthru-fix-vs.cso";
+            string psFileName = "Resources\\Shaders\\postpassthru-ps.cso";
+            string vsFileName = "Resources\\Shaders\\postpassthru-vs.cso";
+            string vsFixFileName = "Resources\\Shaders\\postpassthru-fix-vs.cso";
             
             //Load Shaders
             //------------
@@ -50,7 +50,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             
             //Create Scree Quad
             //------------------
-            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
         }
 
         public override void Apply()
@@ -77,7 +77,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Render Screen quad
             //------------------
-            _quad.Draw(null);            
+            _quad.Draw();            
             
             //Clean Up Shader
             //---------------
@@ -88,6 +88,22 @@ namespace CipherPark.AngelJacket.Core.Effects
             //--------------
             if (BlendState != null)            
                 Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;            
+        }
+
+        public void Dispose()
+        {            
+            _samplerState.Dispose();
+            _vertexShaderNoFix.Dispose();
+            _pixelShader.Dispose();
+            _vertexShaderWithFix.Dispose();
+            _quad.Dispose();
+
+            _vertexShaderByteCode = null;
+            _samplerState = null;
+            _vertexShaderNoFix = null;
+            _pixelShader = null;
+            _vertexShaderWithFix = null;            
+            _quad = null;
         }
     }
 

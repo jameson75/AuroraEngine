@@ -6,11 +6,11 @@ using System.IO;
 using System.Xml.Linq;
 using SharpDX.Direct3D11;
 using SharpDX;
-using CipherPark.AngelJacket.Core.UI.Design;
-using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Module;
-using CipherPark.AngelJacket.Core.UI.Animation;
-using CipherPark.AngelJacket.Core.Animation;
+//using CipherPark.KillScript.Core.UI.Design;
+using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.KillScript.Core.Module;
+using CipherPark.KillScript.Core.UI.Animation;
+using CipherPark.KillScript.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -20,7 +20,7 @@ using CipherPark.AngelJacket.Core.Animation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Components
+namespace CipherPark.KillScript.Core.UI.Components
 {
     public class UITree : IUIRoot
     {
@@ -30,13 +30,12 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         private UIStyleCollection styles = null;
         private UIResourceCollection resources = null;
         private FocusManager focusManager = null;
-        private List<IAnimationController> _animationControllers = null;
-        //private IUITheme theme = null;       
-
+        private List<ISimulatorController> _animationControllers = null;    
+        /*
         private Dictionary<string, UIControlParser> _controlParsers = new Dictionary<string, UIControlParser>();
         private Dictionary<string, UIStyleParser> _styleParsers = new Dictionary<string, UIStyleParser>();
         private Dictionary<string, UIResourceParser> _resourceParsers = new Dictionary<string, UIResourceParser>();
-        
+        */
         public UITree(IGameApp game)
         {
             _game = game;
@@ -44,8 +43,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             styles = new UIStyleCollection();
             resources = new UIResourceCollection();
             focusManager = new FocusManager(this);
-            _animationControllers = new List<IAnimationController>();
-            //theme = new DefaultTheme();    
+            _animationControllers = new List<ISimulatorController>();            
         }     
 
         public IGameApp Game { get { return _game; } }
@@ -58,20 +56,20 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         public FocusManager FocusManager { get { return focusManager; } }
 
-        public List<IAnimationController> Animations { get { return _animationControllers; } }
+        public List<ISimulatorController> Animations { get { return _animationControllers; } }
 
-        //public IUITheme Theme { get { return theme; } }
+        public IUITheme Theme { get; set; }
 
         public Size2F ScreenSize
         {
             get
             {
-                return new Size2F(_game.RenderTarget.ResourceAs<Texture2D>().Description.Width,
-                                        _game.RenderTarget.ResourceAs<Texture2D>().Description.Height);                                                       
-
+                return new Size2F(_game.RenderTargetView.GetTextureDescription().Width,
+                                  _game.RenderTargetView.GetTextureDescription().Height);                                                       
             }
         }
 
+        /*
         public void Initialize(string markupFileName)
         {
             _markUpFileName = markupFileName;
@@ -146,6 +144,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             else
                 return _resourceParsers[elementName];
         }
+        */
 
         public void Update(GameTime gameTime)
         {
@@ -159,7 +158,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             focusManager.PostUpdate();
         }
 
-        public void Draw(GameTime gameTime)
+        public void Draw()
         {
             //******************************************************************************
             // NOTE: When using the SpriteBatch, the DepthStencilState and RasterizerState
@@ -169,18 +168,16 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             RasterizerState oldRasterizerState = Game.GraphicsDeviceContext.Rasterizer.State;
             
             foreach (UIControl control in this.controls)
-                control.Draw(gameTime);
+                control.Draw();
             
             Game.GraphicsDeviceContext.OutputMerger.DepthStencilState = oldState;
             Game.GraphicsDeviceContext.Rasterizer.State = oldRasterizerState;
         }        
-
+        
         public void OnLoadComplete()
         {
-            EventHandler handler = LoadComplete;
-            if (handler != null)
-                handler(this, EventArgs.Empty);
-        }
+            LoadComplete?.Invoke(this, EventArgs.Empty);
+        }        
 
         private void UpdateAnimations(GameTime gameTime)
         {
@@ -190,15 +187,16 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             //the event that an updated controller alters this Simulator's Animation Controllers
             //collection.
             //**********************************************************************************
-            List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_animationControllers);
-            foreach (IAnimationController controller in auxAnimationControllers)
+            List<ISimulatorController> auxAnimationControllers = new List<ISimulatorController>(_animationControllers);
+            foreach (ISimulatorController controller in auxAnimationControllers)
             {
-                controller.UpdateAnimation(gameTime);
-                if (controller.IsAnimationComplete)
+                controller.Update(gameTime);
+                if (controller.IsSimulationFinal)
                     _animationControllers.Remove(controller);
             }
         }
         
+        /*
         private void RegisterStandardParsers()
         {
             RegisterStyleParser(new TextStyleParser(), "TextStyle");
@@ -225,8 +223,9 @@ namespace CipherPark.AngelJacket.Core.UI.Components
         {
             _controlParsers.Add(elementName, parser);
         }
+        */
 
-        public event EventHandler LoadComplete;
+        public event EventHandler LoadComplete;        
     }   
    
 }

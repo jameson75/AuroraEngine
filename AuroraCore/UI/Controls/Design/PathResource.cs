@@ -12,7 +12,7 @@ using System.IO;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Components
+namespace CipherPark.KillScript.Core.UI.Components
 {
     public class PathResource : UIResource
     {

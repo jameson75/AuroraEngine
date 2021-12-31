@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Content;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Content;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,7 +16,7 @@ using CipherPark.AngelJacket.Core.Content;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class BloomPostEffect : PostEffect
     {
@@ -107,7 +107,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Create descriptions for textures and samplers
             //---------------------------------------------
-            Size2 gameScreenSize = new Size2(_game.RenderTarget.ResourceAs<Texture2D>().Description.Width, _game.RenderTarget.ResourceAs<Texture2D>().Description.Height);
+            Size2 gameScreenSize = new Size2(_game.RenderTargetView.GetTextureDescription().Width, _game.RenderTargetView.GetTextureDescription().Height);
             Texture2DDescription textureDesc = CreateCommonTextureDesc(gameScreenSize);
             ShaderResourceViewDescription shaderResourceViewDesc = CreateCommonShaderResourceViewDesc(textureDesc);
             RenderTargetViewDescription renderTargetViewDesc = CreateCommonRenderTargetViewDesc(textureDesc);
@@ -143,7 +143,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //Create Screen Quad
             //------------------
-            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
 
             PostEffectPass[] passes = new PostEffectPass[4];
 
@@ -214,8 +214,8 @@ namespace CipherPark.AngelJacket.Core.Effects
         private void WriteShaderConstants()
         {
             DataBox dataBox;
-            int inputTextureWidth = InputTexture.ResourceAs<Texture2D>().Description.Width;
-            int inputTextureHeight = InputTexture.ResourceAs<Texture2D>().Description.Height;
+            int inputTextureWidth = InputTexture.GetTextureDescription().Width;
+            int inputTextureHeight = InputTexture.GetTextureDescription().Height;
 
             //Write to BloomExtract Buffer
             dataBox = GraphicsDevice.ImmediateContext.MapSubresource(_bloomExtractConstantBuffer, 0, MapMode.WriteDiscard, MapFlags.None);

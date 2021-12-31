@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket;
-using CipherPark.AngelJacket.Core.Services;
+using CipherPark.KillScript;
+using CipherPark.KillScript.Core.Services;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -11,7 +11,7 @@ using CipherPark.AngelJacket.Core.Services;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Module
+namespace CipherPark.KillScript.Core.Module
 {
     public abstract class GameModule
     {
@@ -19,30 +19,65 @@ namespace CipherPark.AngelJacket.Core.Module
 
         public IGameApp Game { get { return _game; } }
 
-        public GameModule(IGameApp game) { this._game = game; }
+        public GameModule() { }
 
         public string Name { get; set; }
 
-        public abstract void Initialize();       
+        public void Initialize(IGameApp gameApp)
+        {
+            _game = gameApp;
+            OnInitialize();
+            IsInitialized = true;
+        }
 
-        public abstract void LoadContent();
+        public void LoadContent()
+        {
+            OnLoadContent();
+            IsLoaded = true;
+        }
 
-        public abstract void Update(GameTime gameTime);
-        
-        public abstract void Draw(GameTime gameTime);      
+        public void Update(GameTime gameTime)
+        {
+            OnUpdate(gameTime);
+        }
 
-        public abstract void UnloadContent();
-        
-        public abstract void Uninitialize();     
+        public void Draw()
+        {
+            OnDraw();
+        }
 
-        public abstract bool IsLoaded { get; }
+        public void UnloadContent()
+        {
+            OnUnloadContent();
+            IsLoaded = false;
+        }
 
-        public abstract bool IsInitialized { get; }
+        public void Uninitialize()
+        {
+            OnUninitialize();
+            IsInitialized = false;
+        }
 
-        //public event EventHandler Exit;
+        #region Handlers
 
-        //public event ModuleSwitchEventHandler Switch;
+        protected abstract void OnInitialize();
 
+        protected abstract void OnLoadContent();
+
+        protected abstract void OnUpdate(GameTime gameTime);
+
+        protected abstract void OnDraw();
+
+        protected abstract void OnUnloadContent();
+
+        protected abstract void OnUninitialize();
+
+        #endregion
+
+        public bool IsLoaded { get; private set; }
+
+        public bool IsInitialized { get; private set; }
+      
         protected void SignalExitModule()
         {
             IModuleService moduleService = (IModuleService)Game.Services.GetService(typeof(IModuleService));

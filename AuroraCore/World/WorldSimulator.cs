@@ -4,10 +4,10 @@ using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Direct3D11;
 using SharpDX.DirectInput;
-using CipherPark.AngelJacket.Core;
-using CipherPark.AngelJacket.Core.World.Scene;
-using CipherPark.AngelJacket.Core.World.Collision;
-using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.KillScript.Core;
+using CipherPark.KillScript.Core.World.Scene;
+using CipherPark.KillScript.Core.World.Collision;
+using CipherPark.KillScript.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,51 +17,43 @@ using CipherPark.AngelJacket.Core.Animation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World
+namespace CipherPark.KillScript.Core.World
 {
     public class WorldSimulator
     {
         private IGameApp _game = null;
-        private List<IAnimationController> _animationControllers = new List<IAnimationController>();
-        private CollisionDetector _collisionDetector = null;
-        private LifetimeManager _lifetimeManager = null;
+        private List<ISimulatorController> _animationControllers = new List<ISimulatorController>();
+        private CollisionDetector _collisionDetector = null;       
 
         public IGameApp Game { get { return _game; } }    
-        public List<IAnimationController> AnimationControllers { get { return _animationControllers; } }
+        public List<ISimulatorController> Controllers { get { return _animationControllers; } }
         public CollisionDetector CollisionDetector { get { return _collisionDetector; } } 
-        public LifetimeManager LifetimeManager { get { return _lifetimeManager; } }
+       
 
         public WorldSimulator(IGameApp game)
         {
             _game = game;
-            _collisionDetector = new CollisionDetector(game);
-            _lifetimeManager = new LifetimeManager();
+            _collisionDetector = new CollisionDetector(game);           
         }
 
         public void Update(GameTime gameTime)
         {
             //I. Update animation controllers
-            //-------------------------------
-            //**********************************************************************************
-            //NOTE: We use an auxilary controller collection to enumerate through, in 
-            //the event that an updated controller alters this Simulator's Animation Controllers
-            //collection.
-            //**********************************************************************************
-            List<IAnimationController> auxAnimationControllers = new List<IAnimationController>(_animationControllers);
-            foreach (IAnimationController controller in auxAnimationControllers)
+            //-------------------------------           
+            List<ISimulatorController> auxAnimationControllers = new List<ISimulatorController>(_animationControllers);
+            foreach (ISimulatorController controller in auxAnimationControllers)
             {
-                controller.UpdateAnimation(gameTime);
-                if (controller.IsAnimationComplete)
-                    _animationControllers.Remove(controller);
+                if (!controller.IsSimulationSuspended)
+                {
+                    controller.Update(gameTime);
+                    if (controller.IsSimulationFinal)
+                        _animationControllers.Remove(controller);
+                }
             }
 
             //II. Update collision detection
             //------------------------------
-            CollisionDetector.Update(gameTime);
-
-            //III. Remove entities (discarded by either animation controller or collision detector)
-            //-------------------------------------------------------------------------------------
-            LifetimeManager.Collect();
+            CollisionDetector.Update(gameTime);           
         }       
     }  
 }

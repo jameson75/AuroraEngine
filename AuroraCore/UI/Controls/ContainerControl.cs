@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Components;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -12,7 +12,7 @@ using CipherPark.AngelJacket.Core.UI.Components;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public abstract class ContainerControl : UIControl
     {
@@ -32,11 +32,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
             foreach (UIControl control in Children)
-                control.Draw(gameTime);
-            base.OnDraw(gameTime);    
+                control.Draw();
+            base.OnDraw();    
         }      
 
         protected override void OnUpdate(GameTime gameTime)
@@ -46,11 +46,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnUpdate(gameTime);
         }
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
             foreach (UIControl child in this.Children)
                 child.Initialize();
-            base.Initialize();
+            base.OnInitialize();
         }
 
         public override void ApplyTemplate(UIControlTemplate template)

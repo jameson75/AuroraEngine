@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
 using SharpDX.DirectInput;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -15,7 +15,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public abstract class ContextControl<T> : ContainerControl, ICustomFocusContainer
         where T : UIControl

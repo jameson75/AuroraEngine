@@ -8,10 +8,10 @@ using System.Collections.ObjectModel;
 using SharpDX;
 using SharpDX.Direct3D11;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Effects;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -21,7 +21,7 @@ using CipherPark.AngelJacket.Core.Effects;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Systems
+namespace CipherPark.KillScript.Core.Systems
 {
     /// <summary>
     /// 
@@ -75,17 +75,20 @@ namespace CipherPark.AngelJacket.Core.Systems
             Random randomGen = new Random();
             List<Particle> pList = new List<Particle>();            
             int birthCount = (count != 0) ? count : (this.BirthRateRandomness == 0) ? this.BirthRate : 
-                this.BirthRate + randomGen.Next(this.BirthRateRandomness);                
+                this.BirthRate + randomGen.Next(this.BirthRateRandomness);
             for (int i = 0; i < birthCount; i++)
             {
                 ulong randomLife = (this.LifeRandomness == 0) ? this.Life :
                     this.Life + (ulong)randomGen.Next(this.LifeRandomness);
                 float randomVelocity = (this.InitialVelocityRandomness == 0) ? this.InitialVelocity :
-                    this.InitialVelocity + (float)randomGen.Next(this.InitialVelocityRandomness);               
+                    this.InitialVelocity + (float)randomGen.Next(this.InitialVelocityRandomness);
                 Particle p = new Particle();
                 p.Life = randomLife;
-                p.Birth = gameTime.GetTotalSimtime();                
-                p.Velocity = randomVelocity;
+                p.Birth = gameTime.GetTotalSimtime();
+                p.BodyMotion = new BodyMotion()
+                {
+                    LinearVelocity = randomVelocity
+                };                
                 p.Transform = this.Transform;
                 p.Description = particleDesc;                
                 pList.Add(p);

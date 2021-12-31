@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SharpDX;
-using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.UI.Animation;
+using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.UI.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -15,7 +15,7 @@ using CipherPark.AngelJacket.Core.UI.Animation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Components
+namespace CipherPark.KillScript.Core.UI.Components
 {
     public interface IUIRoot
     {
@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         void Update(GameTime gameTime);
 
-        void Draw(GameTime gameTime);
+        void Draw();
 
         event EventHandler LoadComplete;
 
@@ -37,8 +37,8 @@ namespace CipherPark.AngelJacket.Core.UI.Components
 
         Size2F ScreenSize { get; }
 
-        List<IAnimationController> Animations { get; }
+        List<ISimulatorController> Animations { get; }
 
-        //IUITheme Theme { get; }     
+        IUITheme Theme { get; }     
     }
 }

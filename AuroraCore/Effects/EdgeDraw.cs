@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
 
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class EdgeDraw : SurfaceEffect
     {
@@ -49,7 +49,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShader);
         }
 
-        public override byte[] SelectShaderByteCode()
+        public override byte[] GetVertexShaderByteCode()
         {
             return _shaderByteCode;
         }

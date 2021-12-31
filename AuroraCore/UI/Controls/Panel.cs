@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -12,13 +15,34 @@ using CipherPark.AngelJacket.Core.UI.Components;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class Panel : ContainerControl
     {       
         public Panel(IUIRoot visualRoot)
             : base(visualRoot)
-        { }           
+        { }
+
+        public bool IsFullSize { get; set; }
+
+        protected override void OnInitialize()
+        {
+            Game.BuffersResized += Game_BuffersResized;
+            UpdateSize();
+            base.OnInitialize();            
+        }
+
+        private void Game_BuffersResized()
+        {
+            UpdateSize();
+        }
+
+        private void UpdateSize()
+        {
+            if (IsFullSize)
+                this.Size = Parent != null ? Parent.Size :
+                                              Game.RenderTargetView.GetTexture2DSize().ToSize2F();
+        }
     }
 
     /// <summary>

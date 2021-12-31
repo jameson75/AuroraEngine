@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.KillScript.Core.World.Geometry
 {
     
 }

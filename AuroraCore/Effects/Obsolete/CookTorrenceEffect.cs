@@ -47,7 +47,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetConstantBuffer(0, null);        
         }
 
-        public override byte[] SelectShaderByteCode()
+        public override byte[] GetVertexShaderByteCode()
         { 
             return _vertexShaderByteCode;
         }

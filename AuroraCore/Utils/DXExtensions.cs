@@ -14,7 +14,27 @@ using SharpDX.Direct3D11;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.KillScript.Core
+{
+    public static class ResourceViewExtension
+    {
+        public static Texture2DDescription GetTextureDescription(this ResourceView view)
+        {
+            using (var resource = view.ResourceAs<Texture2D>())
+                return resource.Description;
+        }
+    }
+
+    public static class Texture2DExtension
+    {
+        public static ShaderResourceView ToShaderResourceView(this Texture2D texture, SharpDX.Direct3D11.Device device)
+        {
+            return new ShaderResourceView(device, texture);
+        }
+    }
+}
+
+namespace CipherPark.KillScript.Core.Utils
 {
     /// <summary>
     /// 
@@ -45,17 +65,17 @@ namespace CipherPark.AngelJacket.Core.Utils
     {
         public static ButtonState LeftButton(this MouseState ms)
         {
-            return ms.Buttons[0] ? ButtonState.Pressed : ButtonState.Released;
+            return ms.Buttons[0] ? ButtonState.Down : ButtonState.Up;
         }
 
         public static ButtonState RightButton(this MouseState ms)
         {
-            return ms.Buttons[1] ? ButtonState.Pressed : ButtonState.Released;
+            return ms.Buttons[1] ? ButtonState.Down : ButtonState.Up;
         }
 
         public static ButtonState MiddleButton(this MouseState ms)
         {
-            return ms.Buttons[2] ? ButtonState.Pressed : ButtonState.Released;
+            return ms.Buttons[2] ? ButtonState.Down : ButtonState.Up;
         }
     }
 
@@ -146,6 +166,27 @@ namespace CipherPark.AngelJacket.Core.Utils
         public static Rectangle ToRectangle(this RectangleF rf)
         {
             return new Rectangle((int)rf.X, (int)rf.Y, (int)rf.Width, (int)rf.Height);
+        }        
+    }
+
+    public static class RectangleDimensions
+    {
+        public static RectangleF FromCenter(float quadWidth, float quadHeight)
+        {
+            float halfWidth = quadWidth / 2.0f;
+            float halfHeight = quadHeight / 2.0f;
+            return new RectangleF(-halfWidth, halfHeight, quadWidth, -quadHeight);
+        }
+
+        public static RectangleF FromPoint(Vector2 origin, float quadWidth, float quadHeight)
+        {
+            if (origin.X > quadWidth)
+                throw new ArgumentException("origin x component cannot be greater than width");
+
+            if (origin.Y > quadHeight)
+                throw new ArgumentException("origin y component cannot be greater than height");
+            
+            return new RectangleF(-origin.X, quadHeight - origin.Y, quadWidth, -quadHeight);
         }
     }
 
@@ -601,11 +642,8 @@ namespace CipherPark.AngelJacket.Core.Utils
     public static class ResourceViewExtension
     {
         public static Size2 GetTexture2DSize(this ResourceView view)
-        {
-            Texture2D texture = view.ResourceAs<Texture2D>();
-            if (texture == null)
-                throw new InvalidOperationException("Resource view was not of Texture2D");
-            return new Size2(texture.Description.Width, texture.Description.Height);
+        {          
+            return new Size2(view.GetTextureDescription().Width, view.GetTextureDescription().Height);
         }
     }
 
@@ -615,4 +653,6 @@ namespace CipherPark.AngelJacket.Core.Utils
         Intersect,
         Overlap
     }
+
+
 }

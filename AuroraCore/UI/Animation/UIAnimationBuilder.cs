@@ -5,14 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Animation.Controllers;
-using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Animation.Controllers;
+using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 
-namespace CipherPark.AngelJacket.Core.UI.Animation
+namespace CipherPark.KillScript.Core.UI.Animation
 {
     public class UIAnimationBuilder
     {
@@ -30,7 +30,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             controlController.SetVisibleAtT(0, true);
             controlController.SetVisibleAtT(displayTime, true);
             ui.Controls.Add(alertControl);
-            controlController.AnimationComplete += (object sender, EventArgs args) =>
+            controlController.SimulationComplete += (object sender, EventArgs args) =>
             {
                 ui.Controls.Remove(alertControl);
             };
@@ -42,7 +42,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             messageContentController.Target = messageContent;
             messageContentController.SetBlendFactorAtT(0, new Color(0));
             messageContentController.SetBlendFactorAtT(250, new Color(1));          
-            CompositeAnimationController alertBoxController = new CompositeAnimationController(new IAnimationController[] { controlController, backgroundContentController, messageContentController });
+            CompositeAnimationController alertBoxController = new CompositeAnimationController(new ISimulatorController[] { controlController, backgroundContentController, messageContentController });
             return alertBoxController;
         }
 
@@ -58,7 +58,7 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             menuController.SetPositionAndSizeAtT(0, initialPanelRect);
             menuController.SetPositionAndSizeAtT(animationTime, finalMenuRect);
             menuController.Target = menu;
-            menuController.AnimationComplete+= (object sender, EventArgs args) =>
+            menuController.SimulationComplete+= (object sender, EventArgs args) =>
                 {
                     menu.SuspendLayout = false;
                 };            
@@ -77,14 +77,14 @@ namespace CipherPark.AngelJacket.Core.UI.Animation
             return compositeController;
         }
 
-        public static IAnimationController CreateBlendFactorFlicker(UIContent uiContent)
+        public static ISimulatorController CreateBlendFactorFlicker(UIContent uiContent)
         {           
             Random _rand = new Random();
-            return new Core.Animation.Controllers.ActionAnimationController()
+            return new Core.Animation.Controllers.AnonymousActionController()
             {
                 FireImmediately = true,
                 Frequency = 50,
-                Action = () =>
+                Action = (c) =>
                     {
                         float r = (float)_rand.NextDouble(0.7, 1.0);
                         uiContent.BlendFactor = new Color4(r);

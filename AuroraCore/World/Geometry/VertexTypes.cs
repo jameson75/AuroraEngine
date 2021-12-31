@@ -11,7 +11,7 @@ using Float4 = SharpDX.Vector4;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.KillScript.Core.World.Geometry
 {
     /// <summary>
     /// 

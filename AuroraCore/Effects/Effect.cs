@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,9 +17,9 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
-    public abstract class Effect
+    public abstract class Effect : IDisposable
     {   
         protected const int SizeOfMatrix =     64;
         protected const int SizeOfVector4 =    16;
@@ -39,6 +39,8 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public List<EffectPass> Passes { get { return _passes; } }
 
+        public bool IsDisposed { get; private set; }
+
         public virtual void Apply()
         {
             OnBeginApply();
@@ -51,6 +53,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         { }
 
         protected virtual void OnEndApply()
+        { }
+
+        protected virtual void OnDispose()
         { }
 
         protected byte[] LoadVertexShader(string fileName, out VertexShader shader)
@@ -73,6 +78,12 @@ namespace CipherPark.AngelJacket.Core.Effects
             shader = new GeometryShader(Game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
         }
+
+        public void Dispose()
+        {
+            OnDispose();
+            IsDisposed = true;
+        }
     }
 
     public abstract class SurfaceEffect : Effect
@@ -87,7 +98,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         public virtual Matrix Projection { get; set; }
 
-        public virtual byte[] SelectShaderByteCode()
+        public virtual byte[] GetVertexShaderByteCode()
         {
             return null;
         }
@@ -95,7 +106,7 @@ namespace CipherPark.AngelJacket.Core.Effects
         public virtual void Restore()
         {
             for (int i = 0; i < Passes.Count; i++)
-                ((SurfaceEffectPass)Passes[i]).CleanUp();
+                ((SurfaceEffectPass)Passes[i]).Reset();
         }
     }
 }

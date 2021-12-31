@@ -16,7 +16,7 @@ using SharpDX.Direct3D11;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils.Toolkit
+namespace CipherPark.KillScript.Core.Utils.Toolkit
 {
     public class SpriteFont
     {
@@ -94,25 +94,25 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteFont_New")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteFont_New")]
             public static extern IntPtr New(IntPtr NativeDevicePointer, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteFont_New_2")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteFont_New_2")]
             public static extern IntPtr New(IntPtr nativeDevicePointer, IntPtr blob, int dataSize);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteFont_New_3")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteFont_New_3")]
             public static extern IntPtr New(IntPtr nativeTextureShaderResourcePointer, IntPtr glyphCount, float lineSpacing);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteFont_DrawString")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteFont_DrawString")]
             public static extern void DrawString(IntPtr nativeSpriteFontPointer, IntPtr nativeSpriteBatchPointer, [MarshalAs(UnmanagedType.LPTStr)] string text, XMFLOAT2 position, XVECTOR4 color, float rotation, XMFLOAT2 origin, XMFLOAT2 scale, SpriteEffects effects, float layerDepth);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteFont_MeasureString")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteFont_MeasureString")]
             public static extern XVECTOR4 MeasureString(IntPtr nativeSpriteFontPointer, [MarshalAs(UnmanagedType.LPTStr)] string text);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteFont_ContainsCharacter")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteFont_ContainsCharacter")]
             public static extern bool ContainsCharacter(IntPtr nativeSpriteFontPointer, char character);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SpriteFont_Delete")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteFont_Delete")]
             public static extern void Delete(IntPtr nativeSpriteFontPointer);
         }
     }

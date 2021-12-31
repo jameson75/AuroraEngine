@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket;
-using CipherPark.AngelJacket.Core.Services;
+using CipherPark.KillScript;
+using CipherPark.KillScript.Core.Services;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -11,7 +11,7 @@ using CipherPark.AngelJacket.Core.Services;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core
+namespace CipherPark.KillScript.Core
 {
     public class GameTime
     {

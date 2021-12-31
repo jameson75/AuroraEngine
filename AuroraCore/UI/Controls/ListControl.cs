@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -15,7 +15,7 @@ using SharpDX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public abstract class MultiSelectControl : ItemsControl
     {       
@@ -176,15 +176,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             base.OnUpdate(gameTime);
         }
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
             if (_backgroundContent != null)
-                _backgroundContent.Draw(gameTime);
+                _backgroundContent.Draw();
 
             foreach (ListControlItem item in this.Items)
-                item.Draw(gameTime);
+                item.Draw();
 
-            base.OnDraw(gameTime);
+            base.OnDraw();
         }
 
         protected override void OnLayoutChanged()
@@ -334,7 +334,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
      
         public void SetContent(TextContent content, ContentControlTemplate itemTemplate = null, ContentControlTemplate selectTemplate = null)
         {
-            ContentControl label = ContentControl.CreateLabelControl(VisualRoot, content);
+            ContentControl label = new ContentControl(VisualRoot, content);
             SetContent(label, itemTemplate, selectTemplate);
         }           
 

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Module;
+using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.KillScript.Core.Module;
 using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@ using SharpDX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Components
+namespace CipherPark.KillScript.Core.UI.Components
 {
     public class ColorStyle : UIStyle
     {

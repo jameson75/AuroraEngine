@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Components;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -10,7 +10,7 @@ using CipherPark.AngelJacket.Core.UI.Components;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public abstract class ItemControl : ContainerControl, ICommandControl
     {       

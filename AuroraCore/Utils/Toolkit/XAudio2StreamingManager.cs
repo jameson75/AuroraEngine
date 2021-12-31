@@ -19,7 +19,7 @@ using SharpDX.MediaFoundation;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils.Toolkit
+namespace CipherPark.KillScript.Core.Utils.Toolkit
 {       
     public class XAudio2StreamingManager : IDisposable
     {
@@ -117,19 +117,19 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("AngelJacketNative.dll", EntryPoint = "XAudio2StreamingManager_Dispose")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "XAudio2StreamingManager_Dispose")]
             public static extern void Dispose(IntPtr nativePointer);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "XAudio2StreamingManager_IsAtEndOfStream")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "XAudio2StreamingManager_IsAtEndOfStream")]
             public static extern bool IsAtEndOfStream(IntPtr nativePointer);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "XAudio2StreamingManager_GetNextBlock")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "XAudio2StreamingManager_GetNextBlock")]
             public static extern IntPtr GetNextBlock(IntPtr nativePointer, ref int blockLengthRef);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "XAudio2StreamingManager_GetWaveFormat")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "XAudio2StreamingManager_GetWaveFormat")]
             public static extern void GetWaveFormat(IntPtr nativePointer, ref WaveFormatEx formatRef);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "XAudio2StreamingManager_DestroyBlock")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "XAudio2StreamingManager_DestroyBlock")]
             public static extern void DestroyBlock(IntPtr blockPointer);
         }       
     }

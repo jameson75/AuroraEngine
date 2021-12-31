@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.UI.Animation;
-using CipherPark.AngelJacket.Core.Animation.Controllers;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.UI.Animation;
+using CipherPark.KillScript.Core.Animation.Controllers;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -20,7 +20,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class AlertBox : Panel
     {
@@ -83,9 +83,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         //TODO: Get rid of this override - only used for testing.
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {            
-            base.OnDraw(gameTime);
+            base.OnDraw();
         }
        
         private static void ShowAlert(IUIRoot ui, TextContent messageContent, ImageContent iconContent, ColorContent backgroundContent, ulong displayTime)
@@ -116,12 +116,15 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
 
         public static void ShowAlert(IUIRoot ui, string text, Texture2D icon, Color backgroundColor, ulong displayTime)
-        {            
+        {
+            throw new NotImplementedException();
+            /*
             ShowAlert(ui, 
                       new TextContent(text, DefaultTheme.Instance.ControlFont, DefaultTheme.Instance.ControlFontColor),
                       (icon != null) ? new ImageContent(icon) : null,
                       (backgroundColor != Color.Transparent) ? new ColorContent(backgroundColor) : null,
                       displayTime);
+            */
         }
     }
 

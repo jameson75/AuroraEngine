@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
 using SharpDX.DirectInput;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
-using CipherPark.AngelJacket.Core.UI.Controls.Extensions;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.UI.Controls.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,7 +16,7 @@ using CipherPark.AngelJacket.Core.UI.Controls.Extensions;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     /// <summary>
     /// 
@@ -208,11 +208,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             AddMenuItem(item);
         }
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
             foreach (MenuItem item in Items)
                 item.Initialize();
-            base.Initialize();
+            base.OnInitialize();
         }
 
         /*
@@ -231,11 +231,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         }
         */
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
             foreach (MenuItem item in Items)
-                item.Draw(gameTime);
-            base.OnDraw(gameTime);
+                item.Draw();
+            base.OnDraw();
         }
 
         protected override void OnUpdate(GameTime gameTime)
@@ -365,7 +365,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     public delegate void ItemClickedEventHandler(object sender, ItemClickedEventArgs args); 
 }
 
-namespace CipherPark.AngelJacket.Core.UI.Controls.Extensions
+namespace CipherPark.KillScript.Core.UI.Controls.Extensions
 {
     public static class UIControlExtensions
     {

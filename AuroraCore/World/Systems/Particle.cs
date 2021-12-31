@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Effects;
 
-namespace CipherPark.AngelJacket.Core.Systems
+namespace CipherPark.KillScript.Core.Systems
 {
+    /*
     /// <summary>
     /// 
     /// </summary>
@@ -28,7 +29,9 @@ namespace CipherPark.AngelJacket.Core.Systems
         public Particle P1 { get; set; }
         public Particle P2 { get; set; }
     }  
+    */
 
+ 
     /// <summary>
     /// 
     /// </summary>
@@ -38,10 +41,12 @@ namespace CipherPark.AngelJacket.Core.Systems
         public SurfaceEffect Effect { get; set; }
     }
 
+    /*
     public class ParticleInstanceData
     {        
         public Vector3 DirectionalBlur { get; set; }
     }
+    */
 
     /// <summary>
     /// 
@@ -61,17 +66,19 @@ namespace CipherPark.AngelJacket.Core.Systems
         #endregion
 
         #region IRigidBody Members
-        public Vector3 CenterOfMass { get; set; }
-        public float Velocity { get; set; }
+        public BodyMotion BodyMotion { get; set; }       
         #endregion
         
         #region Particle Attributes    
         public long Birth { get; set; }
         public ulong Life { get; set; }
-        public ParticleDescription Description { get; set; }
-        public ParticleInstanceData InstanceData { get; set; }
+        //public ParticleInstanceData InstanceData { get; set; }
         public bool IsVisible { get; set; }
-        #endregion      
+        #endregion
+
+        #region Particle Shared Attributes
+        public ParticleDescription Description { get; set; }
+        #endregion
     }
     
     ///// <summary>

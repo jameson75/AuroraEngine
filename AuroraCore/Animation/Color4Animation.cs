@@ -14,7 +14,7 @@ using SharpDX.Direct3D11;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Animation
+namespace CipherPark.KillScript.Core.Animation
 {
     public class Color4Animation : KeyframeAnimation
     {

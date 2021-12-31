@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
+using CipherPark.KillScript.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.World.Geometry;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Utils.Toolkit
+namespace CipherPark.KillScript.Core.Utils.Toolkit
 {
     public class SkinnedEffect
     {
@@ -199,82 +199,82 @@ namespace CipherPark.AngelJacket.Core.Utils.Toolkit
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_New")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_New")]
             public static extern IntPtr New(IntPtr deviceContext);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_Delete")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_Delete")]
             public static extern void Delete(IntPtr skinnedEffect);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SelectShaderByteCode")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SelectShaderByteCode")]
             public static extern IntPtr SelectShaderByteCode(IntPtr skinnedEfect, out uint bufferSize);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_Apply")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_Apply")]
             public static extern void Apply(IntPtr skinnedEfect, IntPtr deviceContext);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetWorld")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetWorld")]
             public static extern void SetWorld(IntPtr skinnedEfect, float[] m);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetView")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetView")]
             public static extern void SetView(IntPtr skinnedEfect, float[] m);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetProjection")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetProjection")]
             public static extern void SetProjection(IntPtr skinnedEfect, float[] m);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetDiffuseColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetDiffuseColor")]
             public static extern void SetDiffuseColor(IntPtr skinnedEfect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetEmissiveColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetEmissiveColor")]
             public static extern void SetEmissiveColor(IntPtr skinnedEfect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetSpecularColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetSpecularColor")]
             public static extern void SetSpecularColor(IntPtr skinnedEfect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetSpecularPower")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetSpecularPower")]
             public static extern void SetSpecularPower(IntPtr skinnedEfect, float value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetAlpha")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetAlpha")]
             public static extern void SetAlpha(IntPtr skinnedEfect, float value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetPerPixelLighting")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetPerPixelLighting")]
             public static extern void SetPerPixelLighting(IntPtr skinnedEfect, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetAmbientLightColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetAmbientLightColor")]
             public static extern void SetAmbientLightColor(IntPtr skinnedEfect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetLightEnabled")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetLightEnabled")]
             public static extern void SetLightEnabled(IntPtr skinnedEfect, int whichLight, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetLightDirection")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetLightDirection")]
             public static extern void SetLightDirection(IntPtr skinnedEfect, int whichLight, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetLightDiffuseColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetLightDiffuseColor")]
             public static extern void SetLightDiffuseColor(IntPtr skinnedEfect, int whichLight, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetLightSpecularColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetLightSpecularColor")]
             public static extern void SetLightSpecularColor(IntPtr skinnedEfect, int whichLight, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_EnableDefaultLighting")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_EnableDefaultLighting")]
             public static extern void EnableDefaultLighting(IntPtr skinnedEfect);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetFogEnabled")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetFogEnabled")]
             public static extern void SetFogEnabled(IntPtr skinnedEfect, bool value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetFogStart")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetFogStart")]
             public static extern void SetFogStart(IntPtr skinnedEfect, float value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetFogEnd")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetFogEnd")]
             public static extern void SetFogEnd(IntPtr skinnedEfect, float value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetFogColor")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetFogColor")]
             public static extern void SetFogColor(IntPtr skinnedEfect, XVECTOR4 value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetTexture")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetTexture")]
             public static extern void SetTexture(IntPtr skinnedEfect, IntPtr value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetWeightsPerVertexTexture")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetWeightsPerVertexTexture")]
             public static extern void SetWeightsPerVertex(IntPtr skinnedEfect, int value);
 
-            [DllImport("AngelJacketNative.dll", EntryPoint = "SkinnedEffect_SetBoneTransforms")]
+            [DllImport("KillScriptNative.dll", EntryPoint = "SkinnedEffect_SetBoneTransforms")]
             public static extern void SetBoneTransforms(IntPtr skinnedEfect, IntPtr bones, int count);
         }
     }

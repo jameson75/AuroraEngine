@@ -15,7 +15,7 @@ using SharpDX.Direct3D11;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public abstract class PostEffect : Effect
     {
@@ -43,6 +43,9 @@ namespace CipherPark.AngelJacket.Core.Effects
         protected override void OnEndApply()
         {
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(originalDepthStencilView, originalRenderTarget);
+            //It's important to immediately COM Release() any swap chain resource.
+            originalDepthStencilView.Dispose();
+            originalRenderTarget.Dispose();
             base.OnEndApply();
         }
 

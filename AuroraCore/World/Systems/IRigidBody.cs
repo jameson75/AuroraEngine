@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpDX;
-using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Animation;
+﻿using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Systems;
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.KillScript.Core.World.Geometry
 {
     public interface IRigidBody : ITransformable
     {
-        Vector3 CenterOfMass { get; set; }
-        float Velocity { get; set; }
+        BodyMotion BodyMotion { get; set; }
     }
 }

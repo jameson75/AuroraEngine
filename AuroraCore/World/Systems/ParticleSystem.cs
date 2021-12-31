@@ -7,13 +7,13 @@ using System.Collections.ObjectModel;
 using SharpDX;
 using SharpDX.Direct3D11;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Effects;
-using CipherPark.AngelJacket.Core.Services;
-using CipherPark.AngelJacket.Core.World;
-using CipherPark.AngelJacket.Core.World.Scene;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Effects;
+using CipherPark.KillScript.Core.Services;
+using CipherPark.KillScript.Core.World;
+using CipherPark.KillScript.Core.World.Scene;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -23,7 +23,7 @@ using CipherPark.AngelJacket.Core.World.Scene;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Systems
+namespace CipherPark.KillScript.Core.Systems
 {
     public class ParticleSystem : ITransformable
     {
@@ -164,15 +164,15 @@ namespace CipherPark.AngelJacket.Core.Systems
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
-        public virtual void Draw(GameTime gameTime)
+        public virtual void Draw()
         {
             var particleGroupings = _particles.GroupBy(p => p.Description);
             foreach (IGrouping<ParticleDescription, Particle> particleGrouping in particleGroupings)
             {                
                 if (particleGrouping.Key.Mesh.IsInstanced)
-                    DrawInstancedParticles(gameTime, particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());
+                    DrawInstancedParticles(particleGrouping.Key.Mesh, particleGrouping.Key.Effect, particleGrouping.ToArray());
                 else
-                    DrawParticles(gameTime, particleGrouping.ToArray());                               
+                    DrawParticles(particleGrouping.ToArray());                               
             }
         }
 
@@ -183,7 +183,7 @@ namespace CipherPark.AngelJacket.Core.Systems
         /// <param name="instanceMesh"></param>
         /// <param name="instanceEffect"></param>
         /// <param name="particles"></param>
-        private void DrawInstancedParticles(GameTime gameTime, Mesh instanceMesh, SurfaceEffect instanceEffect, IEnumerable<Particle> particles)
+        private void DrawInstancedParticles(Mesh instanceMesh, SurfaceEffect instanceEffect, IEnumerable<Particle> particles)
         {
             if (instanceMesh.IsInstanced == false || instanceMesh.IsDynamic == false)
                 throw new InvalidOperationException("Particle mesh is not both dynamic and instanced.");
@@ -204,7 +204,7 @@ namespace CipherPark.AngelJacket.Core.Systems
                 instanceMesh.UpdateVertexStream<InstanceVertexData>(instanceData.ToArray());
                 instanceEffect.World = this.WorldTransform().ToMatrix();
                 instanceEffect.Apply();
-                instanceMesh.Draw(gameTime);
+                instanceMesh.Draw();
                 instanceEffect.Restore();
             }
         }       
@@ -214,7 +214,7 @@ namespace CipherPark.AngelJacket.Core.Systems
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="particles"></param>
-        private void DrawParticles(GameTime gameTime, IEnumerable<Particle> particles)
+        private void DrawParticles(IEnumerable<Particle> particles)
         {
             foreach (Particle p in particles)
             {
@@ -222,7 +222,7 @@ namespace CipherPark.AngelJacket.Core.Systems
                 {
                     p.Description.Effect.World = p.WorldTransform().ToMatrix();
                     p.Description.Effect.Apply();                   
-                    p.Description.Mesh.Draw(gameTime);
+                    p.Description.Mesh.Draw();
                     p.Description.Effect.Restore();
                 }             
             }
@@ -245,16 +245,7 @@ namespace CipherPark.AngelJacket.Core.Systems
         /// <returns></returns>
         private bool IsParticleInFustrum(Particle particle)
         {
-            IGameContextService contextService = (IGameContextService)_game.Services.GetService(typeof(IGameContextService));
-
-            if (contextService == null)
-                throw new InvalidOperationException("Context service not registered.");
-
-            if (contextService.Context == null)
-                throw new InvalidOperationException("No game context is associated with active game module");
-
-            Scene scene = contextService.Context.Value.Scene;
-
+            SceneGraph scene = Game.GetActiveModuleContext().Scene;
             Matrix viewMatrix = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
             Matrix projMatrix = scene.CameraNode.Camera.ProjectionMatrix;
             BoundingFrustum fustrum = new BoundingFrustum(viewMatrix * projMatrix);

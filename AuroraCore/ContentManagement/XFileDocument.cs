@@ -15,7 +15,7 @@ using SharpDX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Content
+namespace CipherPark.KillScript.Core.Content
 {       
     public abstract class XFileDocument
     {        

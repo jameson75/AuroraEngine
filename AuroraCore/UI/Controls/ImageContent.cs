@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Components;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.Utils;
+using System.Security.Permissions;
+using CipherPark.KillScript.Core.Content;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -13,7 +15,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class ImageContent : UIContent
     {       
@@ -45,13 +47,13 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
        
         public ImageContent()
         { }
-
+     
         public ImageContent(Texture2D texture) 
         {
             Texture = texture;
-        }
+        }       
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw()
         {
             if (this.Container == null)
                 throw new InvalidOperationException("Container is null. Container must be specified before calling Draw method.");
@@ -68,7 +70,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 this.EndDraw();
             }
 
-            base.Draw(gameTime);
+            base.Draw();
         }       
 
         public override RectangleF CalculateSmallestBoundingRect()
@@ -77,6 +79,19 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 return RectangleF.Empty;
             else
                 return new RectangleF(0, 0, Texture.Description.Width, Texture.Description.Height);
+        }
+
+        public override void ApplyStyle(UIStyle style)
+        {
+            ImageStyle imageStyle = style as ImageStyle;
+
+            if (imageStyle == null)
+                throw new ArgumentException("Style is not of type ImageStyle", "imageStyle");
+
+            if (imageStyle.Texture != null)
+                this.Texture = imageStyle.Texture;
+
+            base.ApplyStyle(style);
         }
     }
 }

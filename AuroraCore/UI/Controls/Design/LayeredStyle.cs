@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CipherPark.AngelJacket.Core.UI.Controls;
+using CipherPark.KillScript.Core.UI.Controls;
 
-namespace CipherPark.AngelJacket.Core.UI.Components
+namespace CipherPark.KillScript.Core.UI.Components
 {
+    /*
     public class LayeredStyle : UIStyle
     {
         private List<UIStyle> _styles = new List<UIStyle>();
@@ -27,4 +28,5 @@ namespace CipherPark.AngelJacket.Core.UI.Components
             return new LayeredContent(childContent);           
         }
     }
+    */
 }

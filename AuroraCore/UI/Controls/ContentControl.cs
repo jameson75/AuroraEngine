@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using SharpDX.Direct3D11;
 using SharpDX;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,26 +16,29 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class ContentControl : UIControl
     {        
         private UIContent _content = null;
 
         public ContentControl(IUIRoot visualRoot) : base(visualRoot)
-        { }
+        {
+            visualRoot.Theme?.Apply(this);
+        }
 
         public ContentControl(IUIRoot visualRoot, UIContent content)
             : base(visualRoot)
         {            
-            Content = content;           
+            Content = content;
+            visualRoot.Theme?.Apply(this);
         }     
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
             if(_content != null )
-                _content.Draw(gameTime);
-            base.OnDraw(gameTime);
+                _content.Draw();
+            base.OnDraw();
         }
 
         public UIContent Content
@@ -62,6 +65,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 this.Size = this.Content.CalculateSmallestBoundingRect().Size();           
         }
 
+     
         public override void ApplyTemplate(UIControlTemplate template)
         {
             ContentControlTemplate contentControlTemplate = (ContentControlTemplate)template;
@@ -75,18 +79,10 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             ContentControl contentControl = new ContentControl(visualRoot);
             contentControl.ApplyTemplate(template);
             return contentControl;
-        }
+        }    
+  
 
-        public static ContentControl CreateImageControl(IUIRoot visualRoot, ImageContent image)
-        {
-            return new ContentControl(visualRoot, image);
-        }
-
-        public static ContentControl CreateImageControl(IUIRoot visualRoot, Texture2D image)
-        {
-            return new ContentControl(visualRoot, new ImageContent(image));
-        }
-
+        /*
         public static ContentControl CreateLabelControl(IUIRoot visualRoot, TextContent text, Color? backgroundColor = null)
         {
             Color backgroundColor_ = backgroundColor != null ? backgroundColor.Value : Color.Transparent;
@@ -97,8 +93,8 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             Color backgroundColor_ = backgroundColor != null ? backgroundColor.Value : Color.Transparent;
             return new ContentControl(visualRoot, new LayeredContent(new UIContent[] {  new ColorContent(backgroundColor_),
-                                                                                        new TextContent(text, font, fontColor)
-                                                                                         }));
+                                                                                        new TextContent(text, font, fontColor)                                                                                         }));
         }
+        */
     }
 }

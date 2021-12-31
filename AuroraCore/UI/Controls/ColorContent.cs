@@ -5,7 +5,8 @@ using System.Text;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.Utils;
+using SharpDX.Direct3D9;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -15,7 +16,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class ColorContent : UIContent
     {
@@ -43,7 +44,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }         
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw()
         {            
             if (Container == null)
                 throw new InvalidOperationException("No container for this content was specified.");
@@ -65,8 +66,9 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 //NOTE: We use the transformation in ControlSpriteBatch.Begin() to specify the translation of the drawn texture, so
                 //we specify Vector.Zero as the position parameter in the ControlSpriteBatch.Draw() call to avoid "doubling" the translation
                 //******************************************************************************************************************************             
-                Container.ControlSpriteBatch.Draw(_backgroundTextureView, Vector2.Zero, Color);                                
+                Container.ControlSpriteBatch.Draw(_backgroundTextureView, Vector2.Zero, Color);                
                 this.EndDraw();
+                TransformationMatrix = null;
             }
         }
 
@@ -81,7 +83,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (colorStyle == null)
                 throw new ArgumentException("Template was not of type ColorContentTemplate", "template");
 
-            if (colorStyle.Color != null)
+            if (colorStyle.Color != SharpDX.Color.Transparent)
                 this.Color = colorStyle.Color.Value;
 
             base.ApplyStyle(style);

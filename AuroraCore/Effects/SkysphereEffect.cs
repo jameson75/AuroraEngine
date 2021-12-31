@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Content;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Content;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,7 +16,7 @@ using CipherPark.AngelJacket.Core.Content;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class SkysphereEffect : SurfaceEffect
     {
@@ -98,7 +98,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             }
         }
 
-        public override byte[] SelectShaderByteCode()
+        public override byte[] GetVertexShaderByteCode()
         {
             return _vertexShaderByteCode;
         }
@@ -118,6 +118,16 @@ namespace CipherPark.AngelJacket.Core.Effects
             tProjection.Transpose();
             dataBox.DataPointer = Utilities.WriteAndPosition<Matrix>(dataBox.DataPointer, ref tProjection);
             GraphicsDevice.ImmediateContext.UnmapSubresource(_constantBuffer, 0);   
+        }
+
+        protected override void OnDispose()
+        {
+            _vertexShader?.Dispose();
+            _pixelShader?.Dispose();
+            _constantBuffer?.Dispose();
+            _environmentMapSamplerState?.Dispose();
+            _environmentMapShaderResourceView?.Dispose();
+            base.OnDispose();
         }
     }
 }

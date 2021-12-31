@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Content;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Content;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -16,7 +16,7 @@ using CipherPark.AngelJacket.Core.Content;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public abstract class EffectPass
     {
@@ -119,7 +119,7 @@ namespace CipherPark.AngelJacket.Core.Effects
 
             //EXECUTE SHADERS
             //---------------
-            ScreenQuad.Draw(null);       
+            ScreenQuad.Draw();       
 
             //CLEAN UP VERTEX SHADER
             //----------------------
@@ -229,7 +229,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             }                         
         }
 
-        public void CleanUp()
+        public void Reset()
         {
             //CLEAN UP VERTEX SHADER
             //----------------------

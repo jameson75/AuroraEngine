@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Services;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.KillScript.Core.Services;
+using CipherPark.KillScript.Core.Utils;
 using SharpDX;
 using SharpDX.DirectInput;
 
@@ -16,7 +15,7 @@ using SharpDX.DirectInput;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Components
+namespace CipherPark.KillScript.Core.UI.Components
 {
     public class FocusManager
     {

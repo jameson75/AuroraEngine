@@ -66,15 +66,15 @@ namespace CipherPark.AngelJacket.Core.Effects
             _constantBufferSize = 80;
             _constantsBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, _constantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
 
-            _quad = ContentBuilder.BuildBasicViewportQuad(game.GraphicsDevice, _vertexShaderByteCode);
+            _quad = ContentBuilder.BuildViewportQuad(game.GraphicsDevice, _vertexShaderByteCode);
 
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
             textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
             textureDesc.CpuAccessFlags = CpuAccessFlags.None;
             textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            textureDesc.Height = game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
-            textureDesc.Width = game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
+            textureDesc.Height = game.RenderTargetView.GetTextureDescription().Height;
+            textureDesc.Width = game.RenderTargetView.GetTextureDescription().Width;
             textureDesc.MipLevels = 1;
             textureDesc.OptionFlags = ResourceOptionFlags.None;
             textureDesc.Usage = ResourceUsage.Default;
@@ -124,7 +124,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_currentPassRenderTarget);
             Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_dofPixelShader);            
-            _quad.Draw(null);
+            _quad.Draw();
 
             //Pass 1
             //------    
@@ -138,7 +138,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             Game.GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             Game.GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             Game.GraphicsDevice.ImmediateContext.PixelShader.Set(_smartBlurPixelShader);
-            _quad.Draw(null);
+            _quad.Draw();
 
             //Pass 2
             //------
@@ -152,7 +152,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_horzBlurPixelShader);
-            _quad.Draw(null);
+            _quad.Draw();
 
             //Pass 3
             //------
@@ -166,7 +166,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(2, _lastPassRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_frameVertexShader);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_vertBlurPixelShader);
-            _quad.Draw(null);
+            _quad.Draw();
             
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderTargetView);            
 
@@ -176,6 +176,13 @@ namespace CipherPark.AngelJacket.Core.Effects
                 GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(i, null);
                 //GraphicsDevice.ImmediateContext.PixelShader.SetSampler(i, null);
             }
+
+            //COM Release swap chain resources
+            _originalDepthStencilView.Dispose();
+            _originalRenderTargetView.Dispose();
+
+            _originalRenderTargetView = null;
+            _originalDepthStencilView = null;
         }    
 
         private void SetShaderConstants()

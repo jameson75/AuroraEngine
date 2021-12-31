@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,7 +13,7 @@ using SharpDX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public class MenuItem : ItemControl
     {
@@ -77,11 +77,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        protected override void OnDraw(GameTime gameTime)
+        protected override void OnDraw()
         {
             if (ActiveContent != null)
-                ActiveContent.Draw(gameTime);
-            base.OnDraw(gameTime);
+                ActiveContent.Draw();
+            base.OnDraw();
         }
 
         public override void ApplyTemplate(UIControlTemplate template)

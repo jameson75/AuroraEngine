@@ -7,19 +7,19 @@ using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Direct3D11;
 using SharpDX.DirectInput;
-using CipherPark.AngelJacket.Core;
-using CipherPark.AngelJacket.Core.Module;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.UI.Controls;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
-using CipherPark.AngelJacket.Core.World;
-using CipherPark.AngelJacket.Core.Services;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Animation.Controllers;
-using CipherPark.AngelJacket.Core.Effects;
+using CipherPark.KillScript.Core;
+using CipherPark.KillScript.Core.Module;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.World;
+using CipherPark.KillScript.Core.Services;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Animation.Controllers;
+using CipherPark.KillScript.Core.Effects;
 //using CoreEffect = CipherPark.AngelJacket.Core.Effects.SurfaceEffect;
-using CipherPark.AngelJacket.Core.Systems;
+using CipherPark.KillScript.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -29,12 +29,12 @@ using CipherPark.AngelJacket.Core.Systems;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Geometry
+namespace CipherPark.KillScript.Core.World.Geometry
 {
     /// <summary>
     /// 
     /// </summary>
-    public abstract class Model 
+    public abstract class Model : IDisposable
     {
         private IGameApp _game = null;
     
@@ -61,22 +61,37 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         /// <summary>
         /// 
         /// </summary>
-        public abstract BoundingBox BoundingBox { get; }    
+        public abstract BoundingBox BoundingBox { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            Effect?.Dispose();
+            OnDispose();
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
-        public abstract void Draw(GameTime gameTime);           
+        public abstract void Draw();           
 
         /// <summary>
         /// 
         /// </summary>
         protected virtual void OnApplyingEffect()
-        { }          
+        { } 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void OnDispose()
+        { }
     }
 
-    public class BasicModel : Model
+    public class SingleMeshModel : Model
     {
         public Mesh Mesh { get; set; }
 
@@ -88,27 +103,32 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             }
         }
 
-        public BasicModel(IGameApp game) : base(game)
+        public SingleMeshModel(IGameApp game) : base(game)
         {
            
         }   
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw()
         {
             if (Effect != null)
             {                
                 OnApplyingEffect();
                 Effect.Apply();
                 if (Mesh != null)
-                    Mesh.Draw(gameTime);
+                    Mesh.Draw();
                 Effect.Restore();
             }      
         }
 
         protected virtual void OnMeshChanged()
-        { } 
-    }   
-   
+        { }
+
+        protected override void OnDispose()
+        {
+            Mesh?.Dispose();
+            base.OnDispose();
+        }
+    }      
     
     /// <summary>
     /// 
@@ -130,11 +150,20 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
         Alpha
     }
 
+    /*
     public static class ModelExtension
-    {
-        public static void UpdateInstanceData(this ComplexModel model, string meshName, IEnumerable<Matrix> data)
+    {       
+        public static void UpdateInstanceData(this Model model, IEnumerable<Matrix> data)
         {
-            Mesh mesh = model.Meshes.FirstOrDefault(m => m.Name == meshName);
+            //TODO: Add support for Rigged Model
+
+            if (model is BasicModel == false)
+                throw new NotSupportedException("This method is not supported for the model type. Only BasicModel is supported");
+
+            Mesh mesh = GetMesh(model);
+
+            if (mesh == null)
+                throw new InvalidOperationException("Model does not contain a mesh");                
 
             if (mesh.IsInstanced == false || mesh.IsDynamic == false)
                 throw new InvalidOperationException("Cannot set instance data to a mesh that is not both dynamic and instanced.");
@@ -142,19 +171,26 @@ namespace CipherPark.AngelJacket.Core.World.Geometry
             if (data.Count() > 0)
                 mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
         }
-
-        public static void UpdateInstanceData(this BasicModel model, IEnumerable<Matrix> data)
+        
+        public static bool IsDynamicAndInstanced(this Model model)
         {
-            if (model.Mesh.IsInstanced == false || model.Mesh.IsDynamic == false)
-                throw new InvalidOperationException("Cannot set instance data to a mesh that is not both dynamic and instanced.");
-
-            if (data.Count() > 0)
-                model.Mesh.UpdateVertexStream<InstanceVertexData>(data.Select(m => new InstanceVertexData() { Matrix = Matrix.Transpose(m) }).ToArray());
+            Mesh mesh = GetMesh(model);
+            if (mesh == null)
+                return false;
+            else
+                return mesh.IsDynamic && mesh.IsInstanced;
         }
 
-        public static void UpdateInstanceData(this RiggedModel model, IEnumerable<Matrix> orientationData, IEnumerable<SkinOffset> skinningData)
+        private static Mesh GetMesh(Model model)
         {
-            throw new NotImplementedException();
+            if (model is BasicModel)
+            {
+                return ((BasicModel)model).Mesh;
+            }
+
+            else
+                return null;
         }
     }
+    */
 }

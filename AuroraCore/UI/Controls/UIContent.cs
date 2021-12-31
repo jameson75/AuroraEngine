@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.Utils.Toolkit;
+using CipherPark.KillScript.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -12,7 +12,7 @@ using CipherPark.AngelJacket.Core.Utils.Toolkit;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public abstract class UIContent
     {
@@ -70,7 +70,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             }
         }
 
-        public virtual void Draw(GameTime gameTime)
+        public virtual void Draw()
         { 
 
         }
@@ -111,7 +111,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             {
                 if (ClippingEnabled)
                 {
-                    oldScissorRectangles = game.GraphicsDeviceContext.Rasterizer.GetScissorRectangles();
+                    //oldScissorRectangles = game.GraphicsDeviceContext.Rasterizer.GetScissorRectangles<Rectangle>();
                     oldRasterizerState = game.GraphicsDeviceContext.Rasterizer.State;
                     RasterizerStateDescription newRSDescription = RasterizerStateDescription.Default();                    
                     newRSDescription.IsScissorEnabled = true;
@@ -186,7 +186,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
             if (!HasDrawParameters)
                 Container.ControlSpriteBatch.Begin();
             else
-                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.AngelJacket.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);                                               
+                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.KillScript.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);                                               
 
             _beginDrawCallOpen = true;
         }
@@ -237,6 +237,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             if (typeof(T).IsAssignableFrom(content.GetType()))
                 return (T)content;
+            /*
             else if (content is LayeredContent)
             {
                 LayeredContent layeredContent = (LayeredContent)content;
@@ -244,7 +245,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                     if (typeof(T).IsAssignableFrom(child.GetType()))
                         return (T)child;
             }
-
+            */
             throw new InvalidOperationException("Cannot cast content to specified type");
         }
     }

@@ -5,11 +5,11 @@ using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Direct3D11;
 using SharpDX.DirectInput;
-using CipherPark.AngelJacket.Core;
-using CipherPark.AngelJacket.Core.World.Scene;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core.Services;
-using CipherPark.AngelJacket.Core.Utils;
+using CipherPark.KillScript.Core;
+using CipherPark.KillScript.Core.World.Scene;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core.Services;
+using CipherPark.KillScript.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -19,7 +19,7 @@ using CipherPark.AngelJacket.Core.Utils;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.World.Collision
+namespace CipherPark.KillScript.Core.World.Collision
 {
     /// <summary>
     /// A collision detection system for world objects.
@@ -29,7 +29,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
         const int PartitionTreeDepth = 3;
         IGameApp _game = null;
         //WorldSpacePartitionTree _partitionTree = null;
-        List<ObservedWorldObject> _observedObjects = new List<ObservedWorldObject>();
+        List<ObservedCollidableObject> _observedObjects = new List<ObservedCollidableObject>();
         List<ICollisionResponseHandler> registeredHandlers = new List<ICollisionResponseHandler>();        
 
         /// <summary>
@@ -45,16 +45,16 @@ namespace CipherPark.AngelJacket.Core.World.Collision
         /// Adds a world object to be observed for collision detection
         /// </summary>
         /// <param name="obj"></param>
-        public void AddObservedObject(WorldObject obj)
+        public void AddObservedObject(ICollidable obj)
         {
-            _observedObjects.Add(new ObservedWorldObject() { ObservedObject = obj, PreviousTransform = obj.Transform });    
+            _observedObjects.Add(new ObservedCollidableObject() { ObservedObject = obj, PreviousTransform = obj.Transform });    
         }
 
         /// <summary>
         /// Removes an world object from collision detection observation
         /// </summary>
         /// <param name="obj"></param>
-        public void RemoveObservedObject(WorldObject obj)
+        public void RemoveObservedObject(ICollidable obj)
         {
             _observedObjects.Remove(_observedObjects.First(o => o.ObservedObject == obj));
         }
@@ -91,7 +91,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
         /// </summary>
         /// <param name="gameTme"></param>
         /// <param name="observedObjects"></param>
-        private void Update(GameTime gameTme, List<ObservedWorldObject> observedObjects)
+        private void Update(GameTime gameTme, List<ObservedCollidableObject> observedObjects)
         {
             //***********************************************************************************
             //Basic, Broad-Phase collision detection using spatial partitioning.
@@ -118,18 +118,24 @@ namespace CipherPark.AngelJacket.Core.World.Collision
 
             //foreach(WorldSpacePartitionNode node in _partitionTree.Leaves)
             {
-                foreach (ObservedWorldObject objectA in observedObjects)
+                foreach (ObservedCollidableObject objectA in observedObjects)
                 {
                     Vector3 vectorA = objectA.ObservedObject.ParentToWorldNormal(objectA.ObservedObject.Transform.Translation - objectA.PreviousTransform.Translation);
-                    foreach (ObservedWorldObject objectB in observedObjects)
+                    foreach (ObservedCollidableObject objectB in observedObjects)
                     {
                         if (objectA == objectB)
                             continue;                  
-
+                        
                         Vector3 vectorB = objectB.ObservedObject.ParentToWorldNormal(objectB.ObservedObject.Transform.Translation - objectB.PreviousTransform.Translation);
-                        CollisionEvent collision = objectA.ObservedObject.Collider.DetectCollision(vectorA, objectB.ObservedObject.Collider, vectorB);
-                        if (collision != null)
-                            collisionEvents.Add(collision);
+                        foreach (var colliderA in objectA.ObservedObject.Colliders)
+                        {
+                            foreach (var colliderB in objectB.ObservedObject.Colliders)
+                            {
+                                CollisionEvent collision = colliderA.DetectCollision(vectorA, colliderB, vectorB);
+                                if (collision != null)
+                                    collisionEvents.Add(collision);
+                            }
+                        }
                     }
                 }        
             }
@@ -145,7 +151,7 @@ namespace CipherPark.AngelJacket.Core.World.Collision
         /// Records the current position of each observed object as there respective previous position.
         /// </summary>
         /// <param name="observedObjects"></param>
-        private void SnapshotTransforms(List<ObservedWorldObject> observedObjects)
+        private void SnapshotTransforms(List<ObservedCollidableObject> observedObjects)
         {
             observedObjects.ForEach(o => o.PreviousTransform = o.ObservedObject.Transform);
         }

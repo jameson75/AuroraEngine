@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml.Linq;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.UI.Controls;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.UI.Controls;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -15,7 +15,7 @@ using CipherPark.AngelJacket.Core.UI.Controls;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Design
+namespace CipherPark.KillScript.Core.UI.Design
 {
     public abstract class UIControlParser
     {

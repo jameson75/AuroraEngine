@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using SharpDX;
-using CipherPark.AngelJacket.Core.Animation;
-using CipherPark.AngelJacket.Core;
-using CipherPark.AngelJacket.Core.World;
+using CipherPark.KillScript.Core.Animation;
+using CipherPark.KillScript.Core;
+using CipherPark.KillScript.Core.World;
 
-namespace CipherPark.AngelJacket.Core.Utils
+namespace CipherPark.KillScript.Core.Utils
 {
     /// <summary>
     /// 

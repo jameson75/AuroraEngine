@@ -1,20 +1,12 @@
-﻿using System;
+﻿using CipherPark.KillScript.Core.UI.Controls;
+using System.Collections.Generic;
 
-namespace CipherPark.AngelJacket.Core.UI.Components
+namespace CipherPark.KillScript.Core.UI.Components
 {
     public interface IUITheme
-    {
-        ButtonTemplate Button { get; }
-        CheckBoxTemplate CheckBox { get; }
-        ContentControlTemplate ContentControl { get; }
-        //ImageControlTemplate ImageControl { get; }
-        //LabelTemplate Label { get; }
-        //DropListTemplate DropList { get; }
-        SliderTemplate Slider { get; }
-        TextBoxTemplate TextBox { get; }
-        ListControlItemTemplate ListControlItem { get; }
-        ListControlTemplate ListControl { get; }
-        MenuTemplate Menu { get; }
-        MenuItemTemplate MenuItem { get; }
+    {        
+        void Apply(UITree visualRoot);
+        void Apply(IEnumerable<UIControl> controls);
+        void Apply(UIControl control);
     }
 }

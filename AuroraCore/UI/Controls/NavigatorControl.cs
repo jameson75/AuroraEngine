@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using CipherPark.AngelJacket.Core.Services;
-using CipherPark.AngelJacket.Core;
-using CipherPark.AngelJacket.Core.Utils;
-using CipherPark.AngelJacket.Core.World;
-using CipherPark.AngelJacket.Core.UI.Components;
-using CipherPark.AngelJacket.Core.World.Scene;
-using CipherPark.AngelJacket.Core.Animation;
+using CipherPark.KillScript.Core.Services;
+using CipherPark.KillScript.Core.Utils;
+using CipherPark.KillScript.Core.World;
+using CipherPark.KillScript.Core.UI.Components;
+using CipherPark.KillScript.Core.World.Scene;
 using SharpDX;
-using SharpDX.Direct3D11;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -20,7 +16,7 @@ using SharpDX.Direct3D11;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.UI.Controls
+namespace CipherPark.KillScript.Core.UI.Controls
 {
     public enum ActionMode
     {
@@ -37,9 +33,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
     }
 
     public class NavigatorControl : UIControl
-    {
-        //private Camera _defaultCamera = null;
-        //private Camera _currentCamera = null;
+    {        
         private ActionMode actionMode = ActionMode.None;
         private CameraMode cameraMode = CameraMode.None;
         private RectangleF rotationRectangle = RectangleF.Empty;
@@ -49,34 +43,24 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         private SceneNode _selectedNode = null;
 
         public NavigatorControl(IUIRoot visualRoot) : base(visualRoot)
-        {
-           // _defaultCamera = new Camera(visualRoot.Game,
-           //                             Matrix.LookAtLH(new Vector3(0, 50, 100), new Vector3(0, 0, 0), Vector3.UnitY),
-           //                             Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(45), this.DeviceAspectRatio, 1.0f, 1000.0f));
-            //_currentCamera = _defaultCamera;
+        {          
             this.actionMode = ActionMode.Navigate;
             this.cameraMode = Controls.CameraMode.Rotate;
         }
 
-        public Scene Scene { get; set; }
+        public SceneGraph Scene { get; set; }
 
         public SceneNode SelectedNode { get { return _selectedNode; } }
+
+        public CameraSceneNode CurrentCameraNode
+        {
+            get { return Scene.CameraNode; }
+        }       
 
         public Camera CurrentCamera
         {
             get { return Scene.CameraNode.Camera; }
         }
-
-        //private float DeviceAspectRatio
-        //{
-        //    get { return (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Width / (float)Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0].Height; }
-        //}
-
-        //protected override void OnDraw(long gameTime)
-        //{
-        //    Scene.Draw(gameTime);
-        //    base.OnDraw(gameTime);
-        //}        
 
         protected override void OnSizeChanged()
         {
@@ -123,11 +107,11 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 case ActionMode.Select:
                     if (mouseButton == InputState.MouseButton.Left)
                     {
-                        ViewportF vp = Game.GraphicsDeviceContext.Rasterizer.GetViewports()[0];
+                        ViewportF vp = Game.GraphicsDeviceContext.Rasterizer.GetViewports<ViewportF>()[0];
                         //Vector3 mousePointNear = vp.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
                         //Vector3 mousePointFar = vp.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), CurrentCamera.ProjectionMatrix, CurrentCamera.ViewMatrix, Matrix.Identity);
-                        Vector3 mousePointNear = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
-                        Vector3 mousePointFar = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCamera.ViewMatrix * CurrentCamera.ProjectionMatrix);
+                        Vector3 mousePointNear = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MinDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCameraNode.RiggedViewMatrix * CurrentCameraNode.ProjectionMatrix);
+                        Vector3 mousePointFar = Vector3.Unproject(new Vector3(location.X, location.Y, vp.MaxDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, CurrentCameraNode.RiggedViewMatrix * CurrentCameraNode.ProjectionMatrix);
                         Vector3 mouseRay = mousePointFar - mousePointNear;
                         mouseRay.Normalize();
                         System.Diagnostics.Trace.WriteLine(mousePointNear);
@@ -157,9 +141,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
 
         private static bool HitTestNode(SceneNode node, Vector3 near, Vector3 far)
         {
-            //TODO: Modify this condition when I have suitable design-time entities
-            //for scene graph. The design-time node should lend it's self to hit testing
-            //or, at least, indicate it's hit testable.            
+            /*    
             if (node is ModelSceneNode)
             {          
                 Vector3 dir = far - near;
@@ -169,6 +151,7 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
                 if (wBoundingBox.Intersects(ref ray))
                     return true;                   
             }
+            */
 
             return false;
         }
@@ -263,5 +246,5 @@ namespace CipherPark.AngelJacket.Core.UI.Controls
         {
             
         }
-    } 
+    }   
 }

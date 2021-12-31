@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.AngelJacket.Core.World.Geometry;
-using CipherPark.AngelJacket.Core.Content;
+using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.KillScript.Core.Content;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -17,7 +17,7 @@ using CipherPark.AngelJacket.Core.Content;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.AngelJacket.Core.Effects
+namespace CipherPark.KillScript.Core.Effects
 {
     public class GlowFSPostEffect : PostEffect
     {      
@@ -112,7 +112,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap1RenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP0);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP0P1);
-            _quad.Draw(null);
+            _quad.Draw();
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
 
@@ -126,7 +126,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(_glowMap2RenderTargetView);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP1);
             //NOTE: We're using the same pixel shader from pass0.
-            _quad.Draw(null);
+            _quad.Draw();
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
 
@@ -142,7 +142,7 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousRenderTarget);
             GraphicsDevice.ImmediateContext.VertexShader.Set(_vertexShaderP2);
             GraphicsDevice.ImmediateContext.PixelShader.Set(_pixelShaderP2);
-            _quad.Draw(null);
+            _quad.Draw();
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, null);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, null);
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets((RenderTargetView)null);
@@ -165,6 +165,9 @@ namespace CipherPark.AngelJacket.Core.Effects
             GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;
             //Reset render targets.  
             GraphicsDevice.ImmediateContext.OutputMerger.SetTargets(previousDepthStencil, previousRenderTarget);
+            //Immediately COM Release() swap chain resources.
+            previousRenderTarget.Dispose();
+            previousDepthStencil.Dispose();
         }
 
         private void CreateShaders()
@@ -178,15 +181,15 @@ namespace CipherPark.AngelJacket.Core.Effects
 
         private void CreateResources()
         {
-            _quad = ContentBuilder.BuildBasicViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);            
+            _quad = ContentBuilder.BuildViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);            
             
             Texture2DDescription textureDesc = new Texture2DDescription();
             textureDesc.ArraySize = 1;
             textureDesc.BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource;
             textureDesc.CpuAccessFlags = CpuAccessFlags.None;
             textureDesc.Format = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
-            textureDesc.Height = Game.RenderTarget.ResourceAs<Texture2D>().Description.Height;
-            textureDesc.Width = Game.RenderTarget.ResourceAs<Texture2D>().Description.Width;
+            textureDesc.Height = Game.RenderTargetView.GetTextureDescription().Height;
+            textureDesc.Width = Game.RenderTargetView.GetTextureDescription().Width;
             textureDesc.MipLevels = 1;
             textureDesc.OptionFlags = ResourceOptionFlags.None;
             textureDesc.Usage = ResourceUsage.Default;

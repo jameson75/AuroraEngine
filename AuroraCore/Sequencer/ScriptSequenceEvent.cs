@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CipherPark.AngelJacket.Core.Sequencer
+namespace CipherPark.KillScript.Core.Sequencer
 {
     public class ScriptSequenceEvent : SequenceEvent
     {
         public string Script { get; set; }
 
-        public override void Execute(GameTime gameTime, GameContext context)
+        public override void Execute(GameTime gameTime, ModuleContext context)
         {
             
         }
