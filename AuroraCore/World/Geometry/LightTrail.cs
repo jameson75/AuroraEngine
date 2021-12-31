@@ -8,13 +8,13 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Float4 = SharpDX.Vector4;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.World.Geometry;
-using CipherPark.KillScript.Core.Utils;
-using CipherPark.KillScript.Core.Effects;
-using CipherPark.KillScript.Core.World;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Effects;
+using CipherPark.Aurora.Core.World;
 
-namespace CipherPark.KillScript.Core.World.Systems
+namespace CipherPark.Aurora.Core.World.Systems
 {
     public class LightTrail : IDisposable
     {

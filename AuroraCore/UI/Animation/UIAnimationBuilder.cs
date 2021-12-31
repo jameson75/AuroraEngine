@@ -5,14 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.Animation.Controllers;
-using CipherPark.KillScript.Core.UI.Controls;
-using CipherPark.KillScript.Core.UI.Components;
-using CipherPark.KillScript.Core.Utils;
-using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Animation.Controllers;
+using CipherPark.Aurora.Core.UI.Controls;
+using CipherPark.Aurora.Core.UI.Components;
+using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Utils.Toolkit;
 
-namespace CipherPark.KillScript.Core.UI.Animation
+namespace CipherPark.Aurora.Core.UI.Animation
 {
     public class UIAnimationBuilder
     {

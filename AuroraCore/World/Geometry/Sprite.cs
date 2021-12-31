@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.KillScript.Core.Utils.Toolkit;
-using CipherPark.KillScript.Core.Utils;
+using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Utils;
 
-namespace CipherPark.KillScript.Core.World
+namespace CipherPark.Aurora.Core.World
 {
     public class SpriteBatchContext
     {
@@ -51,7 +51,7 @@ namespace CipherPark.KillScript.Core.World
             if (!HasDrawParameters)
                 _renderer.Begin();
             else
-                _renderer.Begin(SpriteSortMode == null ? CipherPark.KillScript.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);
+                _renderer.Begin(SpriteSortMode == null ? CipherPark.Aurora.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);
 
             for (int i = 0; i < _sprites.Count; i++)   
                 if(_sprites[i].Visible)

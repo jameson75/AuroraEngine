@@ -1,7 +1,7 @@
-﻿using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.Systems;
+﻿using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Systems;
 
-namespace CipherPark.KillScript.Core.World.Geometry
+namespace CipherPark.Aurora.Core.World.Geometry
 {
     public interface IRigidBody : ITransformable
     {

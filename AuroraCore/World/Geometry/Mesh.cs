@@ -8,17 +8,17 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Utils.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.World.Geometry
+namespace CipherPark.Aurora.Core.World.Geometry
 {
     public class Mesh : IDisposable
     {

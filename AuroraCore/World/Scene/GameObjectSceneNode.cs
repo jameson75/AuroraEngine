@@ -1,4 +1,4 @@
-﻿namespace CipherPark.KillScript.Core.World.Scene
+﻿namespace CipherPark.Aurora.Core.World.Scene
 {
     public class GameObjectSceneNode : SceneNode
     {

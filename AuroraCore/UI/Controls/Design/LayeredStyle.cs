@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CipherPark.KillScript.Core.UI.Controls;
+using CipherPark.Aurora.Core.UI.Controls;
 
-namespace CipherPark.KillScript.Core.UI.Components
+namespace CipherPark.Aurora.Core.UI.Components
 {
     /*
     public class LayeredStyle : UIStyle

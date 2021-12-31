@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using SharpDX;
 using SharpDX.XAudio2;
 using SharpDX.Direct3D11;
-using CipherPark.KillScript.Core;
-using CipherPark.KillScript.Core.World;
-using CipherPark.KillScript.Core.World.Geometry;
-using CipherPark.KillScript.Core.World.Scene;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.Effects;
-using CipherPark.KillScript.Core.Utils.Toolkit;
-using CipherPark.KillScript.Core.Systems;
+using CipherPark.Aurora.Core;
+using CipherPark.Aurora.Core.World;
+using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Effects;
+using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.Utils
+namespace CipherPark.Aurora.Core.Utils
 {
     public class GameAssets
     {

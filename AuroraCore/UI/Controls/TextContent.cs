@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using CipherPark.KillScript.Core.Utils;
-using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Utils.Toolkit;
 using SharpDX;
 
-namespace CipherPark.KillScript.Core.UI.Controls
+namespace CipherPark.Aurora.Core.UI.Controls
 {
     public class TextContent : ColorContent
     {

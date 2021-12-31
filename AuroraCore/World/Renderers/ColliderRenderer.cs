@@ -6,31 +6,31 @@ using SharpDX.XAudio2;
 using SharpDX.Direct3D11;
 using SharpDX.DirectInput;
 using SharpDX.XInput;
-using CipherPark.KillScript.Core;
-using CipherPark.KillScript.Core.Module;
-using CipherPark.KillScript.Core.Services;
-using CipherPark.KillScript.Core.Content;
-using CipherPark.KillScript.Core.Utils;
-using CipherPark.KillScript.Core.Utils.Toolkit;
-using CipherPark.KillScript.Core.UI.Controls;
-using CipherPark.KillScript.Core.UI.Components;
-using CipherPark.KillScript.Core.World.Scene;
-using CipherPark.KillScript.Core.World.Geometry;
-using CipherPark.KillScript.Core.World.Collision;
-using CipherPark.KillScript.Core.Sequencer;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.Effects;
-using CipherPark.KillScript.Core.Systems;
+using CipherPark.Aurora.Core;
+using CipherPark.Aurora.Core.Module;
+using CipherPark.Aurora.Core.Services;
+using CipherPark.Aurora.Core.Content;
+using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.UI.Controls;
+using CipherPark.Aurora.Core.UI.Components;
+using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.World.Collision;
+using CipherPark.Aurora.Core.Sequencer;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Effects;
+using CipherPark.Aurora.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.World
+namespace CipherPark.Aurora.Core.World
 {
     public class ColliderRenderer : IRenderer
     {

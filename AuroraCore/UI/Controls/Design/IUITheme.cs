@@ -1,7 +1,7 @@
-﻿using CipherPark.KillScript.Core.UI.Controls;
+﻿using CipherPark.Aurora.Core.UI.Controls;
 using System.Collections.Generic;
 
-namespace CipherPark.KillScript.Core.UI.Components
+namespace CipherPark.Aurora.Core.UI.Components
 {
     public interface IUITheme
     {        

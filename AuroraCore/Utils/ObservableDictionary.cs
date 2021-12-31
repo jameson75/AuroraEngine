@@ -5,9 +5,9 @@ using System.Xml.Serialization;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 //
 // CREDITS
@@ -16,7 +16,7 @@ using System.Xml.Serialization;
 // Anyway... Credits to the author... who ever you are.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.Utils
+namespace CipherPark.Aurora.Core.Utils
 {
     [XmlRoot("dictionary")]
     public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IXmlSerializable

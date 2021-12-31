@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 using System.IO;
 using Ionic.Zlib;
 
-namespace CipherPark.KillScript.Core.Content
+namespace CipherPark.Aurora.Core.Content
 {
     public class TMXDocument
     {        

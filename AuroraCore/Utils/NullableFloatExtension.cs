@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CipherPark.KillScript.Core.Utils
+namespace CipherPark.Aurora.Core.Utils
 {
     /// <summary>
     /// 

@@ -1,12 +1,12 @@
 ﻿using System;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.World.Collision;
-using CipherPark.KillScript.Core.World.Scene;
-using CipherPark.KillScript.Core.World.Geometry;
-using CipherPark.KillScript.Core.Systems;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.World.Collision;
+using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.Systems;
 using System.Collections.Generic;
 
-namespace CipherPark.KillScript.Core.World
+namespace CipherPark.Aurora.Core.World
 {
     public class GameObject : IDisposable
     {       

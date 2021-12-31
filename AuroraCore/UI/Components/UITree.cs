@@ -7,20 +7,20 @@ using System.Xml.Linq;
 using SharpDX.Direct3D11;
 using SharpDX;
 //using CipherPark.KillScript.Core.UI.Design;
-using CipherPark.KillScript.Core.UI.Controls;
-using CipherPark.KillScript.Core.Module;
-using CipherPark.KillScript.Core.UI.Animation;
-using CipherPark.KillScript.Core.Animation;
+using CipherPark.Aurora.Core.UI.Controls;
+using CipherPark.Aurora.Core.Module;
+using CipherPark.Aurora.Core.UI.Animation;
+using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.UI.Components
+namespace CipherPark.Aurora.Core.UI.Components
 {
     public class UITree : IUIRoot
     {

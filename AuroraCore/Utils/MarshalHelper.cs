@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
 
-namespace CipherPark.KillScript.Core.Utils.Toolkit
+namespace CipherPark.Aurora.Core.Utils.Toolkit
 {
     static class MarshalHelper
     {

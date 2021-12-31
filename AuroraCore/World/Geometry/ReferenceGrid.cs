@@ -8,10 +8,10 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Utils.Toolkit;
 
 
-namespace CipherPark.KillScript.Core.World.Geometry
+namespace CipherPark.Aurora.Core.World.Geometry
 {
     public class ReferenceGrid
     {

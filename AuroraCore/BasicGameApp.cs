@@ -10,20 +10,20 @@ using SharpDX.Direct3D;
 using SharpDX.DXGI;
 using SharpDX.XAudio2;
 using SharpDX.DirectInput;
-using CipherPark.KillScript.Core.Services;
+using CipherPark.Aurora.Core.Services;
 using System.Windows.Forms;
 using SharpDX.Mathematics.Interop;
 using SharpDX.Mathematics;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core
+namespace CipherPark.Aurora.Core
 {
     public class BasicGameApp : IGameApp
     {

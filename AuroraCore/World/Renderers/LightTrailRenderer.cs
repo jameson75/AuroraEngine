@@ -1,19 +1,19 @@
 ﻿using System;
 using SharpDX;
-using CipherPark.KillScript.Core.World.Systems;
-using CipherPark.KillScript.Core.Effects;
-using CipherPark.KillScript.Core.World.Scene;
-using CipherPark.KillScript.Core.Animation;
+using CipherPark.Aurora.Core.World.Systems;
+using CipherPark.Aurora.Core.Effects;
+using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.World
+namespace CipherPark.Aurora.Core.World
 {
     public class LightTrailRenderer : IRenderer
     {

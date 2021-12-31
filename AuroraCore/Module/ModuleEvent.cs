@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CipherPark.KillScript.Core.Module
+namespace CipherPark.Aurora.Core.Module
 {
     /// <summary>
     /// Encapsulates arguments for a game module's switch event.

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Credits: NVIDIA
 // Comments: Source was derived from NVIDIA Shader Library for FX Composer
 //			 and coverted to shader 4.x syntax.

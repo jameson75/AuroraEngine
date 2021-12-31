@@ -8,13 +8,13 @@ using SharpDX.Direct3D11;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core
+namespace CipherPark.Aurora.Core
 {
     public static class ResourceViewExtension
     {
@@ -34,7 +34,7 @@ namespace CipherPark.KillScript.Core
     }
 }
 
-namespace CipherPark.KillScript.Core.Utils
+namespace CipherPark.Aurora.Core.Utils
 {
     /// <summary>
     /// 

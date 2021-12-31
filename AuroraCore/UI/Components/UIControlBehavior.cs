@@ -1,4 +1,4 @@
-﻿using CipherPark.KillScript.Core.UI.Controls;
+﻿using CipherPark.Aurora.Core.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CipherPark.KillScript.Core.UI.Components
+namespace CipherPark.Aurora.Core.UI.Components
 {
     public abstract class UIControlBehavior
     {

@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.KillScript.Core.World.Geometry;
+using CipherPark.Aurora.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park
+// Aurora Engine
 // This source code is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.Utils.Toolkit
+namespace CipherPark.Aurora.Core.Utils.Toolkit
 {
     public class SkinnedEffect
     {

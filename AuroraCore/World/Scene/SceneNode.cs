@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using SharpDX;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.Utils;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.World.Scene
+namespace CipherPark.Aurora.Core.World.Scene
 {
     [Obsolete]
     public interface ISceneObject

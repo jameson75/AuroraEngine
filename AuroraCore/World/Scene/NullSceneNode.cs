@@ -5,19 +5,19 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.World.Geometry;
-using CipherPark.KillScript.Core.Utils;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.World.Scene
+namespace CipherPark.Aurora.Core.World.Scene
 {
     public class NullSceneNode : SceneNode
     {

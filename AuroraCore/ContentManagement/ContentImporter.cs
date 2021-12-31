@@ -15,23 +15,23 @@ using SharpDX.XAudio2;
 using SharpDX.Multimedia;
 using SharpDX.MediaFoundation;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CoreTransform = CipherPark.KillScript.Core.Animation.Transform;
-using CipherPark.KillScript.Core.World.Geometry;
-using CipherPark.KillScript.Core.Effects;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.Animation.Controllers;
-using CipherPark.KillScript.Core.Utils.Toolkit;
-using CipherPark.KillScript.Core.Utils;
+using CoreTransform = CipherPark.Aurora.Core.Animation.Transform;
+using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.Effects;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Animation.Controllers;
+using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.Content
+namespace CipherPark.Aurora.Core.Content
 {
     public static class ContentImporter
     {

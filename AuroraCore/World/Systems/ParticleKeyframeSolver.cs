@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.KillScript.Core.World.Geometry;
-using CipherPark.KillScript.Core.Utils;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core.Animation.Controllers;
-using CipherPark.KillScript.Core.Effects;
+using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Animation.Controllers;
+using CipherPark.Aurora.Core.Effects;
 
-namespace CipherPark.KillScript.Core.Systems
+namespace CipherPark.Aurora.Core.Systems
 {
     /// <summary>
     /// 

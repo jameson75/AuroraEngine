@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CipherPark.KillScript.Core.World.Scene
+namespace CipherPark.Aurora.Core.World.Scene
 {
     public abstract class SceneNodeBehaviour
     {

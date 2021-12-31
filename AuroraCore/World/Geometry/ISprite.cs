@@ -1,9 +1,9 @@
 ﻿using System;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Utils.Toolkit;
 
-namespace CipherPark.KillScript.Core.World
+namespace CipherPark.Aurora.Core.World
 {
     public interface ISprite
     {

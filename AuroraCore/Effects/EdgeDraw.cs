@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.KillScript.Core.World.Geometry;
-using CipherPark.KillScript.Core.Utils;
-using CipherPark.KillScript.Core.Animation;
+using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Animation;
 
 
-namespace CipherPark.KillScript.Core.Effects
+namespace CipherPark.Aurora.Core.Effects
 {
     public class EdgeDraw : SurfaceEffect
     {

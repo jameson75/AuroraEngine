@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CipherPark.KillScript.Core.World.Geometry
+namespace CipherPark.Aurora.Core.World.Geometry
 {
     
 }

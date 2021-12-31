@@ -13,13 +13,13 @@ using SharpDX.MediaFoundation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// Company: Cipher Park
+// 
 // Copyright © 2010-2013
-// Angel Jacket by Cipher Park is licensed under 
+// Aurora Engine is licensed under 
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.KillScript.Core.Utils.Toolkit
+namespace CipherPark.Aurora.Core.Utils.Toolkit
 {       
     public class XAudio2StreamingManager : IDisposable
     {

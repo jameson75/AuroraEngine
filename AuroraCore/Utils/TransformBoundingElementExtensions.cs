@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using SharpDX;
-using CipherPark.KillScript.Core.Animation;
-using CipherPark.KillScript.Core;
-using CipherPark.KillScript.Core.World;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core;
+using CipherPark.Aurora.Core.World;
 
-namespace CipherPark.KillScript.Core.Utils
+namespace CipherPark.Aurora.Core.Utils
 {
     /// <summary>
     /// 

@@ -1,11 +1,11 @@
 ﻿using System;
-using CipherPark.KillScript.Core.Utils;
-using CipherPark.KillScript.Core.UI.Components;
-using CipherPark.KillScript.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.UI.Components;
+using CipherPark.Aurora.Core.Utils.Toolkit;
 using SharpDX;
 using SharpDX.DirectInput;
 
-namespace CipherPark.KillScript.Core.UI.Controls
+namespace CipherPark.Aurora.Core.UI.Controls
 {
     public class TextBox : UIControl
     {
