@@ -30,28 +30,28 @@ inline void ConstructXVector4(float c1, float c2, float c3, float c4, XVECTOR4& 
 	x.C4 = (float)XMVectorGetW(v);
 }
 
-ANGELJACKETNATIVE_API SpriteFont* STDCALL SpriteFont_New(ID3D11Device* lpDevice, wchar_t const* lpFileName)
+AURORA_NATIVE_API SpriteFont* STDCALL SpriteFont_New(ID3D11Device* lpDevice, wchar_t const* lpFileName)
 {
 	return new SpriteFont(lpDevice, lpFileName);	
 }
 
-ANGELJACKETNATIVE_API SpriteFont* STDCALL SpriteFont_New_2(ID3D11Device* lpDevice, byte* pBlob, size_t dataSize )
+AURORA_NATIVE_API SpriteFont* STDCALL SpriteFont_New_2(ID3D11Device* lpDevice, byte* pBlob, size_t dataSize )
 {	
 	return new SpriteFont(lpDevice, pBlob, dataSize);
 }
 
-ANGELJACKETNATIVE_API SpriteFont* STDCALL SpriteFont_New_3(ID3D11ShaderResourceView *lpTexture, SpriteFont::Glyph* pGlyph, size_t glyphCount, float lineSpacing)
+AURORA_NATIVE_API SpriteFont* STDCALL SpriteFont_New_3(ID3D11ShaderResourceView *lpTexture, SpriteFont::Glyph* pGlyph, size_t glyphCount, float lineSpacing)
 {
 	return new SpriteFont(lpTexture, pGlyph, glyphCount, lineSpacing);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SpriteFont_DrawString( SpriteFont* spriteFont, SpriteBatch* spriteBatch, const wchar_t* text, XMFLOAT2 position, XVECTOR4 color, float rotation, XMFLOAT2 origin, XMFLOAT2 scale, SpriteEffects effects, float layerDepth)
+AURORA_NATIVE_API void STDCALL SpriteFont_DrawString( SpriteFont* spriteFont, SpriteBatch* spriteBatch, const wchar_t* text, XMFLOAT2 position, XVECTOR4 color, float rotation, XMFLOAT2 origin, XMFLOAT2 scale, SpriteEffects effects, float layerDepth)
 {
 	FXMVECTOR _color = XMVectorSet(color.C1, color.C2, color.C3, color.C4);
 	spriteFont->DrawString( spriteBatch, text, position, _color, rotation, origin, scale, effects, layerDepth);
 }
 
-ANGELJACKETNATIVE_API XVECTOR4 STDCALL SpriteFont_MeasureString(SpriteFont* spriteFont, wchar_t const* text)
+AURORA_NATIVE_API XVECTOR4 STDCALL SpriteFont_MeasureString(SpriteFont* spriteFont, wchar_t const* text)
 {
 	XMVECTOR stringDimensions = spriteFont->MeasureString( text );
 	XVECTOR4 result;
@@ -59,12 +59,12 @@ ANGELJACKETNATIVE_API XVECTOR4 STDCALL SpriteFont_MeasureString(SpriteFont* spri
 	return result;
 }
 
-ANGELJACKETNATIVE_API bool STDCALL SpriteFont_ContainsCharacter(SpriteFont* spriteFont, wchar_t character)
+AURORA_NATIVE_API bool STDCALL SpriteFont_ContainsCharacter(SpriteFont* spriteFont, wchar_t character)
 {
 	return spriteFont->ContainsCharacter(character);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SpriteFont_Delete(SpriteFont* spriteFont)
+AURORA_NATIVE_API void STDCALL SpriteFont_Delete(SpriteFont* spriteFont)
 {
 	delete spriteFont;
 }

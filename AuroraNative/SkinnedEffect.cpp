@@ -13,18 +13,18 @@ using namespace DirectX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-ANGELJACKETNATIVE_API SkinnedEffect* STDCALL SkinnedEffect_New(ID3D11Device* device)
+AURORA_NATIVE_API SkinnedEffect* STDCALL SkinnedEffect_New(ID3D11Device* device)
 {
 	return new SkinnedEffect(device);
 
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_Delete(SkinnedEffect* skinnedEffect)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_Delete(SkinnedEffect* skinnedEffect)
 {
 	delete skinnedEffect;
 }
 
-ANGELJACKETNATIVE_API byte* STDCALL SkinnedEffect_SelectShaderByteCode(SkinnedEffect* skinnedEffect, UINT *pSize)
+AURORA_NATIVE_API byte* STDCALL SkinnedEffect_SelectShaderByteCode(SkinnedEffect* skinnedEffect, UINT *pSize)
 {
 	byte* pShaderByteCode = nullptr;
 	size_t size = 0;
@@ -33,12 +33,12 @@ ANGELJACKETNATIVE_API byte* STDCALL SkinnedEffect_SelectShaderByteCode(SkinnedEf
 	return pShaderByteCode;
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_Apply(SkinnedEffect* skinnedEffect, ID3D11DeviceContext* deviceContext)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_Apply(SkinnedEffect* skinnedEffect, ID3D11DeviceContext* deviceContext)
 {
 	skinnedEffect->Apply(deviceContext);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetWorld(SkinnedEffect* skinnedEffect, float m[16])
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetWorld(SkinnedEffect* skinnedEffect, float m[16])
 {
 	skinnedEffect->SetWorld(XMMatrixSet(m[0], m[1], m[2], m[3], 
 											m[4], m[5], m[6], m[7], 
@@ -46,7 +46,7 @@ ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetWorld(SkinnedEffect* skinned
 											m[12], m[13], m[14], m[15]));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetView(SkinnedEffect* skinnedEffect, float m[16])
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetView(SkinnedEffect* skinnedEffect, float m[16])
 {
 	skinnedEffect->SetView(XMMatrixSet(m[0], m[1], m[2], m[3], 
 											m[4], m[5], m[6], m[7], 
@@ -54,7 +54,7 @@ ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetView(SkinnedEffect* skinnedE
 											m[12], m[13], m[14], m[15]));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetProjection(SkinnedEffect* skinnedEffect, float m[16])
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetProjection(SkinnedEffect* skinnedEffect, float m[16])
 {
 	skinnedEffect->SetProjection(XMMatrixSet(m[0], m[1], m[2], m[3], 
 											m[4], m[5], m[6], m[7], 
@@ -62,110 +62,110 @@ ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetProjection(SkinnedEffect* sk
 											m[12], m[13], m[14], m[15]));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetDiffuseColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetDiffuseColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
 {
 	skinnedEffect->SetDiffuseColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetEmissiveColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetEmissiveColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
 {
 	skinnedEffect->SetEmissiveColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetSpecularColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetSpecularColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
 {
 	skinnedEffect->SetSpecularColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetSpecularPower(SkinnedEffect* skinnedEffect, float value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetSpecularPower(SkinnedEffect* skinnedEffect, float value)
 {
 	skinnedEffect->SetSpecularPower(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetAlpha(SkinnedEffect* skinnedEffect, float value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetAlpha(SkinnedEffect* skinnedEffect, float value)
 {
 	skinnedEffect->SetAlpha(value);
 }        
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetPerPixelLighting(SkinnedEffect* skinnedEffect, bool value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetPerPixelLighting(SkinnedEffect* skinnedEffect, bool value)
 {
 	skinnedEffect->SetPerPixelLighting(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetAmbientLightColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetAmbientLightColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
 {
 	skinnedEffect->SetAmbientLightColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetLightEnabled(SkinnedEffect* skinnedEffect, int whichLight, bool value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetLightEnabled(SkinnedEffect* skinnedEffect, int whichLight, bool value)
 {
 	skinnedEffect->SetLightEnabled(whichLight, value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetLightDirection(SkinnedEffect* skinnedEffect, int whichLight, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetLightDirection(SkinnedEffect* skinnedEffect, int whichLight, XVECTOR4 value)
 {
 	skinnedEffect->SetLightDirection(whichLight, XMVectorSet(value.C1, value.C2, value.C3, value.C4) );
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetLightDiffuseColor(SkinnedEffect* skinnedEffect, int whichLight, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetLightDiffuseColor(SkinnedEffect* skinnedEffect, int whichLight, XVECTOR4 value)
 {
 	skinnedEffect->SetLightDiffuseColor(whichLight, XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetLightSpecularColor(SkinnedEffect* skinnedEffect, int whichLight, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetLightSpecularColor(SkinnedEffect* skinnedEffect, int whichLight, XVECTOR4 value)
 {
 	skinnedEffect->SetLightSpecularColor(whichLight, XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_EnableDefaultLighting(SkinnedEffect* skinnedEffect)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_EnableDefaultLighting(SkinnedEffect* skinnedEffect)
 {
 	skinnedEffect->EnableDefaultLighting();
 }
 
 // Fog settings.
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetFogEnabled(SkinnedEffect* skinnedEffect, bool value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetFogEnabled(SkinnedEffect* skinnedEffect, bool value)
 {
 	skinnedEffect->SetFogEnabled(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetFogStart(SkinnedEffect* skinnedEffect, float value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetFogStart(SkinnedEffect* skinnedEffect, float value)
 {
 	skinnedEffect->SetFogStart(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetFogEnd(SkinnedEffect* skinnedEffect, float value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetFogEnd(SkinnedEffect* skinnedEffect, float value)
 {
 	skinnedEffect->SetFogEnd(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetFogColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetFogColor(SkinnedEffect* skinnedEffect, XVECTOR4 value)
 {
 	skinnedEffect->SetFogColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
 //// Vertex color setting.
-//ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetVertexColorEnabled(SkinnedEffect* skinnedEffect, bool value)
+//AURORA_NATIVE_API void STDCALL SkinnedEffect_SetVertexColorEnabled(SkinnedEffect* skinnedEffect, bool value)
 //{
 //	skinnedEffect->SetVertexColorEnabled(value);
 //}
 //
 //// Texture setting.
-//ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetTextureEnabled(SkinnedEffect* skinnedEffect, bool value)
+//AURORA_NATIVE_API void STDCALL SkinnedEffect_SetTextureEnabled(SkinnedEffect* skinnedEffect, bool value)
 //{
 //	skinnedEffect->SetTextureEnabled(value);
 //}
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetTexture(SkinnedEffect* skinnedEffect, ID3D11ShaderResourceView* value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetTexture(SkinnedEffect* skinnedEffect, ID3D11ShaderResourceView* value)
 {
 	skinnedEffect->SetTexture(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetWeightsPerVertex(SkinnedEffect* skinnedEffect, int value)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetWeightsPerVertex(SkinnedEffect* skinnedEffect, int value)
 {
 	skinnedEffect->SetWeightsPerVertex(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL SkinnedEffect_SetBoneTransforms(SkinnedEffect* skinnedEffect, float* bones, int count)
+AURORA_NATIVE_API void STDCALL SkinnedEffect_SetBoneTransforms(SkinnedEffect* skinnedEffect, float* bones, int count)
 {
 	assert(count <= SkinnedEffect::MaxBones);
 	XMMATRIX _bones[SkinnedEffect::MaxBones];	

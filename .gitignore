@@ -359,4 +359,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Auto generated shaders
-KillScriptGame/Resources/Shaders/
+shaders/

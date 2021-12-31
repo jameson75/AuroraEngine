@@ -101,8 +101,6 @@ namespace CipherPark.Aurora.Core
         public double AverageFrameRate
         {
             get { return _averageFrameRate; }
-        }
-
-        
+        }        
     }
 }

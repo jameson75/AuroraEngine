@@ -13,17 +13,17 @@ using namespace DirectX;
 // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
 ///////////////////////////////////////////////////////////////////////////////
 
-ANGELJACKETNATIVE_API BasicEffect* STDCALL BasicEffect_New(ID3D11Device* device)
+AURORA_NATIVE_API BasicEffect* STDCALL BasicEffect_New(ID3D11Device* device)
 {
 	return new BasicEffect(device);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_Delete(BasicEffect* basicEffect)
+AURORA_NATIVE_API void STDCALL BasicEffect_Delete(BasicEffect* basicEffect)
 {
 	delete basicEffect;
 }
 
-ANGELJACKETNATIVE_API byte* STDCALL BasicEffect_SelectShaderByteCode(BasicEffect* basicEffect, UINT *pSize)
+AURORA_NATIVE_API byte* STDCALL BasicEffect_SelectShaderByteCode(BasicEffect* basicEffect, UINT *pSize)
 {
 	byte* pShaderByteCode = nullptr;
 	size_t size = 0;
@@ -32,12 +32,12 @@ ANGELJACKETNATIVE_API byte* STDCALL BasicEffect_SelectShaderByteCode(BasicEffect
 	return pShaderByteCode;
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_Apply(BasicEffect* basicEffect, ID3D11DeviceContext* deviceContext)
+AURORA_NATIVE_API void STDCALL BasicEffect_Apply(BasicEffect* basicEffect, ID3D11DeviceContext* deviceContext)
 {
 	basicEffect->Apply(deviceContext);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetWorld(BasicEffect* basicEffect, float m[16])
+AURORA_NATIVE_API void STDCALL BasicEffect_SetWorld(BasicEffect* basicEffect, float m[16])
 {
 	basicEffect->SetWorld(XMMatrixSet(m[0], m[1], m[2], m[3], 
 											m[4], m[5], m[6], m[7], 
@@ -45,7 +45,7 @@ ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetWorld(BasicEffect* basicEffect
 											m[12], m[13], m[14], m[15]));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetView(BasicEffect* basicEffect, float m[16])
+AURORA_NATIVE_API void STDCALL BasicEffect_SetView(BasicEffect* basicEffect, float m[16])
 {
 	basicEffect->SetView(XMMatrixSet(m[0], m[1], m[2], m[3], 
 											m[4], m[5], m[6], m[7], 
@@ -53,7 +53,7 @@ ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetView(BasicEffect* basicEffect,
 											m[12], m[13], m[14], m[15]));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetProjection(BasicEffect* basicEffect, float m[16])
+AURORA_NATIVE_API void STDCALL BasicEffect_SetProjection(BasicEffect* basicEffect, float m[16])
 {
 	basicEffect->SetProjection(XMMatrixSet(m[0], m[1], m[2], m[3], 
 											m[4], m[5], m[6], m[7], 
@@ -61,106 +61,106 @@ ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetProjection(BasicEffect* basicE
 											m[12], m[13], m[14], m[15]));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetDiffuseColor(BasicEffect* basicEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetDiffuseColor(BasicEffect* basicEffect, XVECTOR4 value)
 {
 	basicEffect->SetDiffuseColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetEmissiveColor(BasicEffect* basicEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetEmissiveColor(BasicEffect* basicEffect, XVECTOR4 value)
 {
 	basicEffect->SetEmissiveColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetSpecularColor(BasicEffect* basicEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetSpecularColor(BasicEffect* basicEffect, XVECTOR4 value)
 {
 	basicEffect->SetSpecularColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetSpecularPower(BasicEffect* basicEffect, float value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetSpecularPower(BasicEffect* basicEffect, float value)
 {
 	basicEffect->SetSpecularPower(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetAlpha(BasicEffect* basicEffect, float value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetAlpha(BasicEffect* basicEffect, float value)
 {
 	basicEffect->SetAlpha(value);
 }
         
 // Light settings.
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetLightingEnabled(BasicEffect* basicEffect, bool value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetLightingEnabled(BasicEffect* basicEffect, bool value)
 {
 	basicEffect->SetLightingEnabled(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetPerPixelLighting(BasicEffect* basicEffect, bool value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetPerPixelLighting(BasicEffect* basicEffect, bool value)
 {
 	basicEffect->SetPerPixelLighting(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetAmbientLightColor(BasicEffect* basicEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetAmbientLightColor(BasicEffect* basicEffect, XVECTOR4 value)
 {
 	basicEffect->SetAmbientLightColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetLightEnabled(BasicEffect* basicEffect, int whichLight, bool value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetLightEnabled(BasicEffect* basicEffect, int whichLight, bool value)
 {
 	basicEffect->SetLightEnabled(whichLight, value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetLightDirection(BasicEffect* basicEffect, int whichLight, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetLightDirection(BasicEffect* basicEffect, int whichLight, XVECTOR4 value)
 {
 	basicEffect->SetLightDirection(whichLight, XMVectorSet(value.C1, value.C2, value.C3, value.C4) );
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetLightDiffuseColor(BasicEffect* basicEffect, int whichLight, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetLightDiffuseColor(BasicEffect* basicEffect, int whichLight, XVECTOR4 value)
 {
 	basicEffect->SetLightDiffuseColor(whichLight, XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetLightSpecularColor(BasicEffect* basicEffect, int whichLight, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetLightSpecularColor(BasicEffect* basicEffect, int whichLight, XVECTOR4 value)
 {
 	basicEffect->SetLightSpecularColor(whichLight, XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_EnableDefaultLighting(BasicEffect* basicEffect)
+AURORA_NATIVE_API void STDCALL BasicEffect_EnableDefaultLighting(BasicEffect* basicEffect)
 {
 	basicEffect->EnableDefaultLighting();
 }
 
 // Fog settings.
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetFogEnabled(BasicEffect* basicEffect, bool value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetFogEnabled(BasicEffect* basicEffect, bool value)
 {
 	basicEffect->SetFogEnabled(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetFogStart(BasicEffect* basicEffect, float value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetFogStart(BasicEffect* basicEffect, float value)
 {
 	basicEffect->SetFogStart(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetFogEnd(BasicEffect* basicEffect, float value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetFogEnd(BasicEffect* basicEffect, float value)
 {
 	basicEffect->SetFogEnd(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetFogColor(BasicEffect* basicEffect, XVECTOR4 value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetFogColor(BasicEffect* basicEffect, XVECTOR4 value)
 {
 	basicEffect->SetFogColor(XMVectorSet(value.C1, value.C2, value.C3, value.C4));
 }
 
 // Vertex color setting.
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetVertexColorEnabled(BasicEffect* basicEffect, bool value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetVertexColorEnabled(BasicEffect* basicEffect, bool value)
 {
 	basicEffect->SetVertexColorEnabled(value);
 }
 
 // Texture setting.
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetTextureEnabled(BasicEffect* basicEffect, bool value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetTextureEnabled(BasicEffect* basicEffect, bool value)
 {
 	basicEffect->SetTextureEnabled(value);
 }
 
-ANGELJACKETNATIVE_API void STDCALL BasicEffect_SetTexture(BasicEffect* basicEffect, ID3D11ShaderResourceView* value)
+AURORA_NATIVE_API void STDCALL BasicEffect_SetTexture(BasicEffect* basicEffect, ID3D11ShaderResourceView* value)
 {
 	basicEffect->SetTexture(value);
 }

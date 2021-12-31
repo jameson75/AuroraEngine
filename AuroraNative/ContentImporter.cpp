@@ -59,7 +59,7 @@ VOID SkipChunkData(HANDLE hFile, const CHUNKINFO *pChunkInfo)
 	::SetFilePointer(hFile, pChunkInfo->dataSize, 0, FILE_CURRENT);
 }
 
-ANGELJACKETNATIVE_API void STDCALL MeasureString( HWND hWnd, LPCWSTR text, SIZE *pSize)
+AURORA_NATIVE_API void STDCALL MeasureString( HWND hWnd, LPCWSTR text, SIZE *pSize)
 {
 	HDC hDC = ::GetDC(hWnd);
 	::ZeroMemory(pSize, sizeof(SIZE));
@@ -67,7 +67,7 @@ ANGELJACKETNATIVE_API void STDCALL MeasureString( HWND hWnd, LPCWSTR text, SIZE 
 	::ReleaseDC(hWnd, hDC);
 }
 
-ANGELJACKETNATIVE_API void STDCALL ContentImporter_LoadVoiceDataFromWav( LPCWSTR fileName, VOICE_DATA *pVoiceData )
+AURORA_NATIVE_API void STDCALL ContentImporter_LoadVoiceDataFromWav( LPCWSTR fileName, VOICE_DATA *pVoiceData )
 {
 	HANDLE hFile = ::CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	::SetFilePointer(hFile, 0, 0, FILE_CURRENT);
@@ -103,13 +103,13 @@ ANGELJACKETNATIVE_API void STDCALL ContentImporter_LoadVoiceDataFromWav( LPCWSTR
 	pVoiceData->pAudioData = pBuffer;	
 }
 
-ANGELJACKETNATIVE_API LPVOID STDCALL ContentImporter_LoadStreamingAudio(LPCWSTR fileName)
+AURORA_NATIVE_API LPVOID STDCALL ContentImporter_LoadStreamingAudio(LPCWSTR fileName)
 {	
 	MFStartup(MF_VERSION);
 	return (LPVOID)XAudio2StreamingManager::Create(fileName);
 }
  
-ANGELJACKETNATIVE_API ID3D11Resource* STDCALL ContentImporter_CreateTextureFromFile( ID3D11DeviceContext *pDeviceContext, const wchar_t* fileName)
+AURORA_NATIVE_API ID3D11Resource* STDCALL ContentImporter_CreateTextureFromFile( ID3D11DeviceContext *pDeviceContext, const wchar_t* fileName)
 {
 	ID3D11Device *pDevice = nullptr;
 	ID3D11Resource *pTexture = nullptr;
@@ -147,7 +147,7 @@ ANGELJACKETNATIVE_API ID3D11Resource* STDCALL ContentImporter_CreateTextureFromF
 //	}	
 //}
 
-ANGELJACKETNATIVE_API XFBX_SCENE* STDCALL ContentImporter_LoadFBX(LPCWSTR fileName)
+AURORA_NATIVE_API XFBX_SCENE* STDCALL ContentImporter_LoadFBX(LPCWSTR fileName)
 {
 	XFbxScene *pXScene = XFbxScene::CreateFromFile(fileName);
 	XFBX_SCENE *pXMScene = pXScene->ConvertToMarshableType(true);		

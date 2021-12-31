@@ -16,5 +16,5 @@
 #include <DirectXMath.h>
 
 #define NATIVE_API extern "C" __declspec(dllexport)
-#define ANGELJACKETNATIVE_API NATIVE_API
+#define AURORA_NATIVE_API NATIVE_API
 #define STDCALL __stdcall
