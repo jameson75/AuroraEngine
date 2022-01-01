@@ -11,7 +11,7 @@ namespace CipherPark.Aurora.Core.Sequencer
     //  LLC
     // Copyright © 2010-2013
     // Aurora Engine is licensed under 
-    // a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+    // MIT License.
     ///////////////////////////////////////////////////////////////////////////////
 
     public class CodeBlockSequenceEvent : SequenceEvent

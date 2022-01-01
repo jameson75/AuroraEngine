@@ -28,7 +28,7 @@ using CipherPark.Aurora.Core.Utils;
 // 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
-// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+// MIT License.
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.Aurora.Core.Content
@@ -574,16 +574,16 @@ namespace CipherPark.Aurora.Core.Content
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("KillScriptNative.dll", EntryPoint = "ContentImporter_LoadVoiceDataFromWav")]
+            [DllImport("AuroraNative.dll", EntryPoint = "ContentImporter_LoadVoiceDataFromWav")]
             public static extern int LoadVoiceDataFromWav([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref VoiceDataThunk voiceData);
 
-            [DllImport("KillScriptNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
+            [DllImport("AuroraNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
             public static extern IntPtr CreateTextureFromFile(IntPtr deviceContext, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
 
-            [DllImport("KillScriptNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
+            [DllImport("AuroraNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
             public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);
             
-            [DllImport("KillScriptNative.dll", EntryPoint = "ContentImporter_LoadStreamingAudio")]
+            [DllImport("AuroraNative.dll", EntryPoint = "ContentImporter_LoadStreamingAudio")]
             public static extern IntPtr LoadStreamingAudio([MarshalAs(UnmanagedType.LPWStr)] string fileName);
         }       
     }

@@ -11,7 +11,7 @@ using namespace DirectX;
 // 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
-// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+// MIT License.
 ///////////////////////////////////////////////////////////////////////////////
 
 AURORA_NATIVE_API SpriteBatch* STDCALL SpriteBatch_New(ID3D11DeviceContext* deviceContext)

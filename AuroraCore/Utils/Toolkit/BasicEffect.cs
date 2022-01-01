@@ -14,7 +14,7 @@ using CipherPark.Aurora.Core.World.Geometry;
 // Copyright © 2010-2013
 // Aurora Engine
 // This source code is licensed under 
-// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+// MIT License.
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.Aurora.Core.Utils.Toolkit
@@ -185,85 +185,85 @@ namespace CipherPark.Aurora.Core.Utils.Toolkit
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_New")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_New")]
             public static extern IntPtr New(IntPtr deviceContext);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_Delete")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_Delete")]
             public static extern void Delete(IntPtr basicEffect);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SelectShaderByteCode")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SelectShaderByteCode")]
             public static extern IntPtr SelectShaderByteCode(IntPtr basicEffect, out uint bufferSize);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_Apply")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_Apply")]
             public static extern void Apply(IntPtr basicEffect, IntPtr deviceContext);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetWorld")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetWorld")]
              public static extern void SetWorld(IntPtr basicEffect, float[] m);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetView")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetView")]
              public static extern void SetView(IntPtr basicEffect, float[] m);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetProjection")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetProjection")]
              public static extern void SetProjection(IntPtr basicEffect, float[] m);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetDiffuseColor")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetDiffuseColor")]
              public static extern void SetDiffuseColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetEmissiveColor")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetEmissiveColor")]
              public static extern void SetEmissiveColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetSpecularColor")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetSpecularColor")]
              public static extern void SetSpecularColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetSpecularPower")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetSpecularPower")]
              public static extern void SetSpecularPower(IntPtr basicEffect, float value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetAlpha")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetAlpha")]
              public static extern void SetAlpha(IntPtr basicEffect, float value);      
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightingEnabled")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetLightingEnabled")]
              public static extern void SetLightingEnabled(IntPtr basicEffect, bool value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetPerPixelLighting")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetPerPixelLighting")]
              public static extern void SetPerPixelLighting(IntPtr basicEffect, bool value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetAmbientLightColor")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetAmbientLightColor")]
              public static extern void SetAmbientLightColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightEnabled")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetLightEnabled")]
              public static extern void SetLightEnabled(IntPtr basicEffect, int whichLight, bool value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightDirection")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetLightDirection")]
              public static extern void SetLightDirection(IntPtr basicEffect, int whichLight, XVECTOR4 value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightDiffuseColor")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetLightDiffuseColor")]
              public static extern void SetLightDiffuseColor(IntPtr basicEffect, int whichLight, XVECTOR4 value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetLightSpecularColor")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetLightSpecularColor")]
              public static extern void SetLightSpecularColor(IntPtr basicEffect, int whichLight, XVECTOR4 value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_EnableDefaultLighting")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_EnableDefaultLighting")]
              public static extern void EnableDefaultLighting(IntPtr basicEffect);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetFogEnabled")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetFogEnabled")]
              public static extern void SetFogEnabled(IntPtr basicEffect, bool value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetFogStart")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetFogStart")]
              public static extern void SetFogStart(IntPtr basicEffect, float value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetFogEnd")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetFogEnd")]
              public static extern void SetFogEnd(IntPtr basicEffect, float value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetFogColor")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetFogColor")]
              public static extern void SetFogColor(IntPtr basicEffect, XVECTOR4 value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetVertexColorEnabled")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetVertexColorEnabled")]
              public static extern void SetVertexColorEnabled(IntPtr basicEffect, bool value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetTextureEnabled")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetTextureEnabled")]
              public static extern void SetTextureEnabled(IntPtr basicEffect, bool value);
 
-            [DllImport("KillScriptNative.dll", EntryPoint="BasicEffect_SetTexture")]
+            [DllImport("AuroraNative.dll", EntryPoint="BasicEffect_SetTexture")]
              public static extern void SetTexture(IntPtr basicEffect, IntPtr value);
         }
     }      

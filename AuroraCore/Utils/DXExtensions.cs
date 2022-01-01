@@ -11,7 +11,7 @@ using SharpDX.Direct3D11;
 // 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
-// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+// MIT License.
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.Aurora.Core

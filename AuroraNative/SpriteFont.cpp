@@ -11,7 +11,7 @@ using namespace DirectX;
 // 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
-// a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+// MIT License.
 ///////////////////////////////////////////////////////////////////////////////
 
 inline void ConstructXVector4(float c1, float c2, float c3, float c4, XVECTOR4& v)

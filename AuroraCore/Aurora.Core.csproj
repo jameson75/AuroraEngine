@@ -7,8 +7,8 @@
     <ProjectGuid>{AC4AD65F-13F6-452F-BC30-DC1A784FB660}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CipherPark.KillScript.Core</RootNamespace>
-    <AssemblyName>KillScriptCore</AssemblyName>
+    <RootNamespace>CipherPark.Aurora.Core</RootNamespace>
+    <AssemblyName>AuroraCore</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -283,6 +283,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>echo Copying native dependencies..."
+echo F|xcopy /y /q "$(SolutionDir)AuroraNative\Output\$(Configuration)\Aurora.Native.dll" "$(ProjectDir)$(OutDir)AuroraNative.dll"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
