@@ -148,6 +148,7 @@
     <Compile Include="UI\Components\UIControlBehavior.cs" />
     <Compile Include="UI\Controls\Design\IUITheme.cs" />
     <Compile Include="UI\Controls\Design\LayeredStyle.cs" />
+    <Compile Include="UI\Controls\LayeredContent.cs" />
     <Compile Include="UI\Controls\TabControl.cs" />
     <Compile Include="Utils\AudioVisualization.cs" />
     <Compile Include="Utils\BoundingBoxOA.cs" />
