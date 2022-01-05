@@ -10,7 +10,6 @@ using CipherPark.Aurora.Core.UI.Controls.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -128,8 +127,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
     /// 
     /// </summary>
     public class Menu : SelectControl
-    {
-        //private MenuOrientation _orientation = MenuOrientation.Vertical;
+    {        
         private StackLayoutManager _layoutManager = null;
 
         public Menu(Components.IUIRoot visualRoot)
@@ -213,23 +211,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
             foreach (MenuItem item in Items)
                 item.Initialize();
             base.OnInitialize();
-        }
-
-        /*
-        public void SetItemsPadding(BoundaryF padding)
-        {
-            foreach (ItemControl item in this.Items)
-                item.Padding = padding;
-            UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
-        }
-
-        public void SetItemsMargin(BoundaryF margin)
-        {
-            foreach(ItemControl item in this.Items)
-                item.Margin = margin;
-            UpdateLayout(LayoutUpdateReason.ChildSizeChanged);
-        }
-        */
+        }       
 
         protected override void OnDraw()
         {

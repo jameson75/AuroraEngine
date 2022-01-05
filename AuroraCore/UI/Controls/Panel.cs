@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using CipherPark.Aurora.Core.UI.Components;
+﻿using CipherPark.Aurora.Core.UI.Components;
 using CipherPark.Aurora.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Developer: Eugene Adams
-// 
+// Developer: Eugene Adams 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
