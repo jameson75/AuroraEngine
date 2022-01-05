@@ -196,7 +196,7 @@ namespace CipherPark.Aurora.Core.Effects
             return _vertexShaderByteCode;
         }
 
-        public void SetupLights(Light[] lights)
+        private void SetupLights(Light[] lights)
         {
             FirstActiveLightsCount = lights.Length;
             for (int i = 0; i < MaxLights; i++)

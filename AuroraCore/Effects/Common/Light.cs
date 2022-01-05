@@ -4,23 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
-using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.World.Geometry;
-using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Developer: Eugene Adams
-// 
+// Developer: Eugene Adams// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
 ///////////////////////////////////////////////////////////////////////////////
 
-
 namespace CipherPark.Aurora.Core.Effects
 {
-    public class Light
+    public abstract class Light
     {
         public Color Diffuse { get; set; }        
     }

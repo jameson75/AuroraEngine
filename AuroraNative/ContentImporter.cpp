@@ -2,7 +2,6 @@
 #include "ContentImporter.h"
 #include <WICTextureLoader.h>
 #include "MarshableDXTypes.h"
-#include "FBXWrapper.h"
 #include "XAudio2StreamManager.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,12 +146,13 @@ AURORA_NATIVE_API ID3D11Resource* STDCALL ContentImporter_CreateTextureFromFile(
 //	}	
 //}
 
-AURORA_NATIVE_API XFBX_SCENE* STDCALL ContentImporter_LoadFBX(LPCWSTR fileName)
-{
-	XFbxScene *pXScene = XFbxScene::CreateFromFile(fileName);
-	XFBX_SCENE *pXMScene = pXScene->ConvertToMarshableType(true);		
-	delete pXScene;
-	pXScene = nullptr;
-	return pXMScene;
-}
+
+//AURORA_NATIVE_API XFBX_SCENE* STDCALL ContentImporter_LoadFBX(LPCWSTR fileName)
+//{
+//	XFbxScene *pXScene = XFbxScene::CreateFromFile(fileName);
+//	XFBX_SCENE *pXMScene = pXScene->ConvertToMarshableType(true);		
+//	delete pXScene;
+//	pXScene = nullptr;
+//	return pXMScene;
+//}
 

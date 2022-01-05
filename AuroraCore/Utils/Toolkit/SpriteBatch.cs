@@ -122,25 +122,25 @@ namespace CipherPark.Aurora.Core.Utils.Toolkit
 
         private static class UnsafeNativeMethods
         {
-            [DllImport("KillScriptNative.dll", EntryPoint="SpriteBatch_New")]
+            [DllImport("AuroraNative.dll", EntryPoint="SpriteBatch_New")]
             public static extern IntPtr New(IntPtr deviceContext);
 
-            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Begin")]
+            [DllImport("AuroraNative.dll", EntryPoint = "SpriteBatch_Begin")]
             public static extern void Begin(IntPtr nativeSpriteBatch, SpriteSortMode sortMode, IntPtr blendState, IntPtr samplerState, IntPtr depthStencilState, IntPtr rasterizerState, IntPtr customShaderFunction, [MarshalAs(UnmanagedType.LPArray, SizeConst=16)] float[] transformationMatrix);
 
-            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Begin_2")]
+            [DllImport("AuroraNative.dll", EntryPoint = "SpriteBatch_Begin_2")]
             public static extern void Begin(IntPtr nativeSpriteBatch);
 
-            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Draw")]
+            [DllImport("AuroraNative.dll", EntryPoint = "SpriteBatch_Draw")]
             public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, XMFLOAT2 position, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, XMFLOAT2 origin, XMFLOAT2 scale, SpriteEffects effects, float layerDepth);
 
-            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Draw_2")]
+            [DllImport("AuroraNative.dll", EntryPoint = "SpriteBatch_Draw_2")]
             public static extern void Draw(IntPtr nativeSpriteBatch, IntPtr texture, WIN32_RECT destinationRectangle, IntPtr sourceRectangle, XVECTOR4 clr, float rotation, XMFLOAT2 origin, SpriteEffects effects, float layerDepth); 
 
-            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_End")]
+            [DllImport("AuroraNative.dll", EntryPoint = "SpriteBatch_End")]
             public static extern void End(IntPtr nativeSpriteBatch);
 
-            [DllImport("KillScriptNative.dll", EntryPoint = "SpriteBatch_Delete")]
+            [DllImport("AuroraNative.dll", EntryPoint = "SpriteBatch_Delete")]
             public static extern void Delete(IntPtr nativeSpriteBatch);
         }
     }

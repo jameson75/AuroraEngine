@@ -84,9 +84,6 @@
     <ClInclude Include="ContentImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FBXWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MarshableDXTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -114,9 +111,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BasicEffect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FBXWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SkinnedEffect.cpp">

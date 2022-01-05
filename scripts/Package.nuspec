@@ -2,10 +2,10 @@
 <package >
   <metadata>
     <id>CipherPark.AuroraEngine</id>
-    <version>0.0.1</version>
+    <version>0.0.0</version>
     <authors>Eugene Adams</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license type="expression">CC-BY-NC-ND-3.0</license>    
+    <license type="expression">MIT</license>    
     <projectUrl>http://github.com/jameson75/AuroraEngine</projectUrl>
     <description>Homebrew game engine</description>
     <releaseNotes>Alpha Release</releaseNotes>
@@ -28,8 +28,9 @@
 	</dependencies>	
   </metadata>
  <files>	
-   <file src="..\AuroraCore\bin\Debug\AuroraCore.dll" target="lib\net45\" />
-   <file src="..\AuroraCore\bin\Debug\AuroraNative.dll" target="native\" />
-   <file src="..\shaders\*" target="shaders" />
+   <file src="..\AuroraCore\bin\Debug\AuroraCore.dll" target="lib\net45" />
+   <file src="..\lib\Exocortex\Exocortex.DSP.v1.dll" target="lib\net45" />
+   <file src="..\AuroraCore\bin\Debug\AuroraNative.dll" target="Build" />
+   <file src="..\scripts\CipherPark.AuroraEngine.targets" target="Build" />
  </files>	
 </package>

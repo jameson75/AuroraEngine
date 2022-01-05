@@ -15,17 +15,19 @@ namespace CipherPark.Aurora.Core.Module
 {
     public abstract class GameModule
     {
-        private IGameApp _game = null;
+        private readonly IGameApp gameApp = null;
 
-        public IGameApp Game { get { return _game; } }
+        public IGameApp Game { get { return gameApp; } }
 
-        public GameModule() { }
+        public GameModule(IGameApp gameApp) 
+        {
+            this.gameApp = gameApp;
+        }
 
         public string Name { get; set; }
 
-        public void Initialize(IGameApp gameApp)
-        {
-            _game = gameApp;
+        public void Initialize()
+        {            
             OnInitialize();
             IsInitialized = true;
         }

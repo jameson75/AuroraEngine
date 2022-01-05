@@ -136,10 +136,10 @@ namespace CipherPark.Aurora.Core.Effects
             
             //Load Shaders
             //-------------
-            byte[] _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\postpassthru-vs.cso", out _passThruVertexShader);
-            LoadPixelShader("Content\\Shaders\\msbloom-guassian-ps.cso", out _gaussianBlurPixelShader);
-            LoadPixelShader("Content\\Shaders\\msbloom-extract-ps.cso", out _bloomExtractPixelShader);           
-            LoadPixelShader("Content\\Shaders\\msbloom-combine-ps.cso", out _bloomCombinePixelShader);
+            byte[] _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\postpassthru-vs.cso", out _passThruVertexShader);
+            LoadPixelShader("Resources\\Shaders\\msbloom-guassian-ps.cso", out _gaussianBlurPixelShader);
+            LoadPixelShader("Resources\\Shaders\\msbloom-extract-ps.cso", out _bloomExtractPixelShader);           
+            LoadPixelShader("Resources\\Shaders\\msbloom-combine-ps.cso", out _bloomCombinePixelShader);
 
             //Create Screen Quad
             //------------------

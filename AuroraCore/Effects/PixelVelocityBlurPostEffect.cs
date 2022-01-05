@@ -279,12 +279,12 @@ namespace CipherPark.Aurora.Core.Effects
 
         private void CreateShaders()
         {
-            _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\pixel-velocity-blur-calc-vs.cso", out _worldVertexShader);
-            LoadVertexShader("Content\\Shaders\\postpassthru-vs.cso", out _passThruVertexShader);
-            LoadPixelShader("Content\\Shaders\\pixel-velocity-blur-clr-ps.cso", out _worldColorPixelShader);
-            LoadPixelShader("Content\\Shaders\\pixel-velocity-blur-vel-ps.cso", out _worldVelocityPixelShader);
-            LoadPixelShader("Content\\Shaders\\pixel-velocity-blur-blr-ps.cso", out _blurPixelShader);
-            LoadPixelShader("Content\\Shaders\\postpassthru-ps.cso", out _passThruPixelShader);
+            _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\pixel-velocity-blur-calc-vs.cso", out _worldVertexShader);
+            LoadVertexShader("Resources\\Shaders\\postpassthru-vs.cso", out _passThruVertexShader);
+            LoadPixelShader("Resources\\Shaders\\pixel-velocity-blur-clr-ps.cso", out _worldColorPixelShader);
+            LoadPixelShader("Resources\\Shaders\\pixel-velocity-blur-vel-ps.cso", out _worldVelocityPixelShader);
+            LoadPixelShader("Resources\\Shaders\\pixel-velocity-blur-blr-ps.cso", out _blurPixelShader);
+            LoadPixelShader("Resources\\Shaders\\postpassthru-ps.cso", out _passThruPixelShader);
         }
 
         private void WriteConstants()

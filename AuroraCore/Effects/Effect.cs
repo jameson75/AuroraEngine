@@ -8,6 +8,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Utils;
+using System.IO;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -58,25 +59,42 @@ namespace CipherPark.Aurora.Core.Effects
         protected virtual void OnDispose()
         { }
 
-        protected byte[] LoadVertexShader(string fileName, out VertexShader shader)
+        protected byte[] LoadVertexShader(string resourcePath, out VertexShader shader)
         {
-            byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
+            byte[] shaderByteCode = ReadByteStream(resourcePath);
             shader = new VertexShader(Game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
         }
 
-        protected byte[] LoadPixelShader(string fileName, out PixelShader shader)
+        protected byte[] LoadPixelShader(string resourcePath, out PixelShader shader)
         {
-            byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
+            byte[] shaderByteCode = ReadByteStream(resourcePath);
             shader = new PixelShader(Game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
         }
 
-        protected byte[] LoadGeometryShader(string fileName, out GeometryShader shader)
+        protected byte[] LoadGeometryShader(string resourcePath, out GeometryShader shader)
         {
-            byte[] shaderByteCode = System.IO.File.ReadAllBytes(fileName);
+            byte[] shaderByteCode = ReadByteStream(resourcePath);
             shader = new GeometryShader(Game.GraphicsDevice, shaderByteCode);
             return shaderByteCode;
+        }
+
+        protected byte[] ReadByteStream(string resourcePath)
+        {               
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var assemblyResourceNamespace = "CipherPark.Aurora.Core";
+            var stream = assembly.GetManifestResourceStream($"{assemblyResourceNamespace}.{resourcePath.Replace(@"\", @".")}");
+            if (stream != null)
+            {
+                var bytes = new byte[stream.Length];
+                stream.Read(bytes, 0, bytes.Length);
+                return bytes;
+            }
+            else
+            {
+                return File.ReadAllBytes(resourcePath);
+            }
         }
 
         public void Dispose()

@@ -42,11 +42,11 @@ namespace CipherPark.Aurora.Core.Effects
             
             //Load Shaders
             //------------
-            _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
+            _vertexShaderByteCode = ReadByteStream(vsFileName);
             _samplerState = new SamplerState(game.GraphicsDevice, SamplerStateDescription.Default());
             _vertexShaderNoFix = new VertexShader(Game.GraphicsDevice, _vertexShaderByteCode);
-            _pixelShader = new PixelShader(Game.GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));
-            _vertexShaderWithFix = new VertexShader(Game.GraphicsDevice, System.IO.File.ReadAllBytes(vsFixFileName));
+            _pixelShader = new PixelShader(Game.GraphicsDevice, ReadByteStream(psFileName));
+            _vertexShaderWithFix = new VertexShader(Game.GraphicsDevice, ReadByteStream(vsFixFileName));
             
             //Create Scree Quad
             //------------------

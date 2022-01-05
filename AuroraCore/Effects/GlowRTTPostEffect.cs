@@ -181,11 +181,11 @@ namespace CipherPark.Aurora.Core.Effects
 
         private void CreateShaders()
         {
-            _vertexShaderByteCode = LoadVertexShader(@"Content\Shaders\glowrtt-horz9-vs.cso", out _horzVertexShader);
-            LoadVertexShader(@"Content\Shaders\glowrtt-vert9-vs.cso", out _vertVertexShader);
-            LoadPixelShader(@"Content\Shaders\glowrtt-blur.cso", out _blurPixelShader);
-            LoadPixelShader(@"Content\Shaders\glowrtt-glow.cso", out _glowPixelShader);
-            LoadVertexShader(@"Content\Shaders\passthru-vs.cso", out _passThruVertexShader);
+            _vertexShaderByteCode = LoadVertexShader(@"Resources\Shaders\glowrtt-horz9-vs.cso", out _horzVertexShader);
+            LoadVertexShader(@"Resources\Shaders\glowrtt-vert9-vs.cso", out _vertVertexShader);
+            LoadPixelShader(@"Resources\Shaders\glowrtt-blur.cso", out _blurPixelShader);
+            LoadPixelShader(@"Resources\Shaders\glowrtt-glow.cso", out _glowPixelShader);
+            LoadVertexShader(@"Resources\Shaders\passthru-vs.cso", out _passThruVertexShader);
         }
 
         private void CreateTargets()

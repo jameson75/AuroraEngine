@@ -358,5 +358,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Auto generated shaders
-shaders/
+# Generated Native files
+AuroraCore/shaders
+
+# Other distributed files
+dist/

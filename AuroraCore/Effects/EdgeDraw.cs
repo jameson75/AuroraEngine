@@ -27,9 +27,9 @@ namespace CipherPark.Aurora.Core.Effects
         public EdgeDraw(IGameApp game)
             : base(game)
         {
-            _shaderByteCode = LoadVertexShader("Content\\Shaders\\edgedraw-vs.cso", out _vertexShader);
-            LoadGeometryShader("Content\\Shaders\\edgedraw-gs.cso", out _geometryShader);
-            LoadPixelShader("Content\\Shaders\\edgedraw-ps.cso", out _pixelShader);
+            _shaderByteCode = LoadVertexShader("Resources\\Shaders\\edgedraw-vs.cso", out _vertexShader);
+            LoadGeometryShader("Resources\\Shaders\\edgedraw-gs.cso", out _geometryShader);
+            LoadPixelShader("Resources\\Shaders\\edgedraw-ps.cso", out _pixelShader);
             _vertexShaderConstants = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexShaderConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _geometryShaderConstants = new SharpDX.Direct3D11.Buffer(GraphicsDevice, GeometryShaderConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);           
         }

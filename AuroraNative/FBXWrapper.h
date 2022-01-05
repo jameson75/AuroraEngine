@@ -1,7 +1,6 @@
 #define FBXSDK_SHARED
 #define FBXSDK_NEW_API
 #define N_TRIANGLE_POINTS 3
-#include <fbxsdk.h>
 #include <list>
 #include <map>
 #include <iostream>

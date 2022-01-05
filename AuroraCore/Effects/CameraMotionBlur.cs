@@ -126,9 +126,9 @@ namespace CipherPark.Aurora.Core.Effects
 
         private void CreateShaders()
         {
-            _vertexShaderByteCode = LoadVertexShader("Content\\Shaders\\postpassthru-fix-vs.cso", out _passThruFixVertexShader);
-            LoadPixelShader("Content\\Shaders\\motionblur-combine-ps.cso", out _combinePixelShader);
-            LoadPixelShader("Content\\Shaders\\postpassthru-ps.cso", out _passThruPixelShader);
+            _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\postpassthru-fix-vs.cso", out _passThruFixVertexShader);
+            LoadPixelShader("Resources\\Shaders\\motionblur-combine-ps.cso", out _combinePixelShader);
+            LoadPixelShader("Resources\\Shaders\\postpassthru-ps.cso", out _passThruPixelShader);
         }
 
         private void CreateTextures()

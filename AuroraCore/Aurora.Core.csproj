@@ -267,7 +267,7 @@
     <Compile Include="World\Scene\NullSceneNode.cs" />
     <Compile Include="World\Scene\SceneGraph.cs" />
     <Compile Include="World\Scene\SceneNode.cs" />
-    <Compile Include="World\Scene\SceneNodeAnimationController.cs" />
+    <Compile Include="World\Scene\OffsetSceneNodeAnimationController.cs" />
     <Compile Include="World\Geometry\Sprite.cs" />
     <Compile Include="World\Geometry\PathTracker.cs" />
     <Compile Include="World\WorldSimulator.cs" />
