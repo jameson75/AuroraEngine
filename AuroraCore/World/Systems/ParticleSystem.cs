@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using SharpDX;
-using SharpDX.Direct3D11;
-using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.Animation;
-using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -56,10 +48,12 @@ namespace CipherPark.Aurora.Core.Systems
         /// </summary>
         public ReadOnlyCollection<Particle> Particles { get { return _particles.ToList().AsReadOnly(); } }    
         
+        /*
         /// <summary>
         /// 
         /// </summary>
         public bool EnableFustrumClipping { get; set; } 
+        */
 
         /// <summary>
         /// 
@@ -160,6 +154,7 @@ namespace CipherPark.Aurora.Core.Systems
             _particles.ForEach(p => p.TransformableParent = null);
         }
        
+        /*
         /// <summary>
         /// 
         /// </summary>
@@ -226,24 +221,25 @@ namespace CipherPark.Aurora.Core.Systems
                     p.Description.Effect.Restore();
                 }             
             }
-        }
+        }        
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private bool IsParticleClipped(Particle p)
+        public bool IsParticleClipped(Particle p)
         {
             return EnableFustrumClipping && IsParticleInFustrum(p);
         }
+        */
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="particle"></param>
         /// <returns></returns>
-        private bool IsParticleInFustrum(Particle particle)
+        public bool IsParticleInFustrum(Particle particle)
         {
             SceneGraph scene = Game.GetActiveModuleContext().Scene;
             Matrix viewMatrix = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());

@@ -10,7 +10,6 @@ using CipherPark.Aurora.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -1276,8 +1275,7 @@ namespace CipherPark.Aurora.Core.Content
             }).ToArray();
 
             return ContentBuilder.BuildMesh(device, shaderByteCode, verts, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, bounds);
-        }
-       
+        }       
 
         public static Mesh BuildLandStructureOutline(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType)
         {

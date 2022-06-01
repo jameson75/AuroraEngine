@@ -117,7 +117,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
 
         public static void ShowAlert(IUIRoot ui, string text, Texture2D icon, Color backgroundColor, ulong displayTime)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
             /*
             ShowAlert(ui, 
                       new TextContent(text, DefaultTheme.Instance.ControlFont, DefaultTheme.Instance.ControlFontColor),

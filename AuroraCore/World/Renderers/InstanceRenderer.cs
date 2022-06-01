@@ -45,7 +45,12 @@ namespace CipherPark.Aurora.Core.World
         /// <summary>
         /// 
         /// </summary>
-        public List<ITransformable> Instances { get; set; } = new List<ITransformable>();
+        public List<ITransformable> Instances { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Func<List<ITransformable>> GetInstances { get; set; }
 
         /// <summary>
         /// 
@@ -67,7 +72,11 @@ namespace CipherPark.Aurora.Core.World
         /// <param name="container"></param>
         public void Draw(ITransformable container)
         {
-            DrawInstances(container, Mesh, Effect, Instances);
+            IEnumerable<ITransformable> instances = Instances ?? GetInstances?.Invoke();
+            if (instances != null)
+            {
+                DrawInstances(container, Mesh, Effect, instances);
+            }
         }
 
         /// <summary>

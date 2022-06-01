@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -172,8 +171,7 @@ namespace CipherPark.Aurora.Core.World.Scene
         public event EventHandler BeginDraw;
         public event EventHandler EndDraw;
         public event EventHandler BeginUpdate;
-        public event EventHandler EndUpdate;
-       
+        public event EventHandler EndUpdate;       
     }
 
     public enum SpatialReference
