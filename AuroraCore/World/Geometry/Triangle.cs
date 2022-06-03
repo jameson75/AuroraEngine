@@ -24,11 +24,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
             _device = device;
             _effect = new BasicEffect(device);            
             _effect.SetVertexColorEnabled(true);
-            byte[] shaderCode = _effect.SelectShaderByteCode();
-            //_effect = new TriEffect(app.GraphicsDevice);
-            //_effect.Load("..\\..\\..\\Debug\\angelShader-vs.cso", "..\\..\\..\\Debug\\angelShader-ps.cso");
-            //_effect.World = Matrix.Identity;
-            //byte[] shaderCode = _effect.VertexShaderByteCode;
+            byte[] shaderCode = _effect.SelectShaderByteCode();           
             VertexPositionColor[] verts = new VertexPositionColor[3];
             verts[0] = new VertexPositionColor(new Vector3(0, 0, 20), Color.Blue.ToVector4());
             verts[1] = new VertexPositionColor(new Vector3(15, 0, 0), Color.Blue.ToVector4());
@@ -39,16 +35,15 @@ namespace CipherPark.Aurora.Core.World.Geometry
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
             vertexBufferDesc.SizeInBytes = verts.Length * VertexPositionColor.ElementSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-            vertexBufferDesc.StructureByteStride = 0;            
-            DXBuffer vBuffer = DXBuffer.Create<VertexPositionColor>(device, verts, vertexBufferDesc);
-            meshDesc.VertexBuffer = vBuffer;
+            vertexBufferDesc.StructureByteStride = 0;          
+            meshDesc.VertexBufferDescription = vertexBufferDesc;
             meshDesc.VertexCount = verts.Length;
             meshDesc.VertexLayout = new InputLayout(device, shaderCode, VertexPositionColor.InputElements);
             meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             Vector3[] positions = (from v in verts select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
             meshDesc.BoundingBox = BoundingBox.FromPoints(positions);         
-            _mesh = new Mesh(device, meshDesc); 
+            _mesh = Mesh.Create(device, meshDesc, verts, null); 
         }
 
         public void Draw()

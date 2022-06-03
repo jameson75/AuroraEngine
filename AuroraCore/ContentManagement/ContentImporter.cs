@@ -454,7 +454,7 @@ namespace CipherPark.Aurora.Core.Content
                             Normal = normals[i],
                             Color = colors[i].ToVector4()
                         }).ToArray();
-                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionNormalColor, Matrix>(device, shaderByteCode, _vertices, indices, indices.Length, InstanceVertexPositionNormalColor.InputElements, InstanceVertexPositionNormalColor.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionNormalColor.InstanceSize, boundingBox);
+                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionNormalColor, Matrix>(device, shaderByteCode, _vertices, indices, InstanceVertexPositionNormalColor.InputElements, InstanceVertexPositionNormalColor.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionNormalColor.InstanceSize, boundingBox);
                     }
                 }
                 else
@@ -479,7 +479,7 @@ namespace CipherPark.Aurora.Core.Content
                             Position = new Vector4(v.X, v.Y, v.Z, 1.0f),                           
                             Color = colors[i].ToVector4()
                         }).ToArray();
-                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionColor, Matrix>(device, shaderByteCode, _vertices, indices, indices.Length, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionColor.InstanceSize, boundingBox);
+                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionColor, Matrix>(device, shaderByteCode, _vertices, indices, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionColor.InstanceSize, boundingBox);
 
                     }
                 }
@@ -512,7 +512,7 @@ namespace CipherPark.Aurora.Core.Content
                             Normal = normals[i],
                             TextureCoord = texCoords[i]
                         }).ToArray();
-                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPostionNormalTexture, Matrix>(device, shaderByteCode, _vertices, indices, indices.Length, InstanceVertexPostionNormalTexture.InputElements, InstanceVertexPostionNormalTexture.ElementSize, null, DefaultInstanceSize, InstanceVertexPostionNormalTexture.InstanceSize, boundingBox);
+                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPostionNormalTexture, Matrix>(device, shaderByteCode, _vertices, indices, InstanceVertexPostionNormalTexture.InputElements, InstanceVertexPostionNormalTexture.ElementSize, null, DefaultInstanceSize, InstanceVertexPostionNormalTexture.InstanceSize, boundingBox);
                     }
                 }
                 else
@@ -537,7 +537,7 @@ namespace CipherPark.Aurora.Core.Content
                             Position = new Vector4(v.X, v.Y, v.Z, 1.0f),                            
                             TextureCoord = texCoords[i]
                         }).ToArray();
-                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionTexture, Matrix>(device, shaderByteCode, _vertices, indices, indices.Length, InstanceVertexPositionTexture.InputElements, InstanceVertexPositionTexture.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionTexture.InstanceSize, boundingBox);
+                        return ContentBuilder.BuildDynamicInstancedMesh<InstanceVertexPositionTexture, Matrix>(device, shaderByteCode, _vertices, indices, InstanceVertexPositionTexture.InputElements, InstanceVertexPositionTexture.ElementSize, null, DefaultInstanceSize, InstanceVertexPositionTexture.InstanceSize, boundingBox);
                     }
                 }
             }

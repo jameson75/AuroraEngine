@@ -19,6 +19,10 @@ namespace CipherPark.Aurora.Core.Content
 {
     public static class ContentBuilder
     {
+        private const int DefaultInstanceIncrement = 128;
+        private const int DefaultIndicesIncrement = 128;
+        private const int DefaultVertexIncrement = 128;
+
         #region Quad
         public static Mesh BuildColoredQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
         {   
@@ -39,8 +43,7 @@ namespace CipherPark.Aurora.Core.Content
             for (int i = 0; i < positions.Length; i++)
                 verts[i] = new InstanceVertexPositionNormalColor(positions[i], Vector3.UnitY, color);
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            //InstanceVertexData[] instanceData = null; //new InstanceVertexData[maxInstances];
-            return BuildDynamicInstancedMesh<InstanceVertexPositionNormalColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionNormalColor.InputElements, InstanceVertexPositionNormalColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox);
+            return BuildDynamicInstancedMesh<InstanceVertexPositionNormalColor, InstanceVertexData>(device, shaderByteCode, verts, indices, InstanceVertexPositionNormalColor.InputElements, InstanceVertexPositionNormalColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, DefaultInstanceIncrement, boundingBox);
         }
 
         public static Mesh BuildLitQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Color color)
@@ -62,7 +65,7 @@ namespace CipherPark.Aurora.Core.Content
             for (int i = 0; i < positions.Length; i++)
                 verts[i] = new InstanceVertexPositionColor(positions[i], color.ToVector4());            
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);           
-            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox);
+            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, DefaultInstanceIncrement, boundingBox);
         }
 
         public static Mesh BuildTexturedQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
@@ -86,7 +89,7 @@ namespace CipherPark.Aurora.Core.Content
             for (int i = 0; i < positions.Length; i++)
                 verts[i] = new InstanceVertexPositionTexture(positions[i], _textureCoords[i]);
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);            
-            return BuildDynamicInstancedMesh<InstanceVertexPositionTexture, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionTexture.InputElements, InstanceVertexPositionTexture.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox);
+            return BuildDynamicInstancedMesh<InstanceVertexPositionTexture, InstanceVertexData>(device, shaderByteCode, verts, indices, InstanceVertexPositionTexture.InputElements, InstanceVertexPositionTexture.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, DefaultInstanceIncrement, boundingBox);
         }
 
         public static Mesh BuildLitTexturedQuad(Device device, byte[] shaderByteCode, RectangleF dimension, Vector2[] textureCoords = null)
@@ -120,7 +123,7 @@ namespace CipherPark.Aurora.Core.Content
             for (int i = 0; i < positions.Length; i++)
                 verts[i] = new InstanceVertexPositionColor(positions[i], color.ToVector4());
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox, PrimitiveTopology.LineStrip);
+            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, DefaultInstanceIncrement, boundingBox, PrimitiveTopology.LineStrip);
         }
         
         /*
@@ -869,13 +872,13 @@ namespace CipherPark.Aurora.Core.Content
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
             meshDesc.VertexCount = vertices.Length;
-            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(device, vertices, vertexBufferDesc);
+            meshDesc.VertexBufferDescription = vertexBufferDesc;
             meshDesc.VertexLayout = new InputLayout(device, shaderByteCode, VertexPositionColor.InputElements);
             meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = PrimitiveTopology.LineList;
             Vector3[] positions = (from v in vertices select new Vector3(v.Position.X, v.Position.Y, v.Position.Z)).ToArray();
             BoundingBox boundingBox = BoundingBox.FromPoints(positions); 
-            return new Mesh(device, meshDesc); 
+            return Mesh.Create(device, meshDesc, vertices, null); 
         }
         #endregion
 
@@ -956,7 +959,7 @@ namespace CipherPark.Aurora.Core.Content
             short[] indices = CreateDiscIndices(segments);            
             InstanceVertexPositionColor[] verts = positions.Select(p => new InstanceVertexPositionColor(p, color.ToVector4())).ToArray();
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
-            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, indices.Length, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, boundingBox);
+            return BuildDynamicInstancedMesh<InstanceVertexPositionColor, InstanceVertexData>(device, shaderByteCode, verts, indices, InstanceVertexPositionColor.InputElements, InstanceVertexPositionColor.ElementSize, null, maxInstances, InstanceVertexData.SizeInBytes, DefaultInstanceIncrement, boundingBox);
         }
 
         private static Vector3[] CreateDiscPoints(float radius, int segments)
@@ -992,19 +995,16 @@ namespace CipherPark.Aurora.Core.Content
         #endregion
 
         #region Ring
-        public static Mesh BuildColoredRing(Device device, byte[] shaderByteCode, Color color, float radius, float width, int segments, bool isDynamic = false)
+        public static Mesh BuildColoredRing(Device device, byte[] shaderByteCode, Color color, float radius, float width, int segments)
         {          
             Vector3[] positions = CreateRingPoints(radius, width, segments);
             short[] indices = CreateRingIndices(segments);
             BoundingBox boundingBox = BoundingBox.FromPoints(positions);
             VertexPositionColor[] verts = new VertexPositionColor[positions.Length];
             for (int i = 0; i < verts.Length; i++)
-                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());
-            if (!isDynamic)
-                return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
-            else
-                return BuildDynamicMesh<VertexPositionColor>(device, shaderByteCode, verts, verts.Length, indices, indices.Length, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
-        }      
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());            
+            return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
+        }  
 
         private static Vector3[] CreateRingPoints(float radius, float width, int segments)
         {
@@ -1057,12 +1057,27 @@ namespace CipherPark.Aurora.Core.Content
         #endregion
 
         #region Mesh
-        public static Mesh BuildMesh<T>(Device device, byte[] shaderByteCode, T[] verts, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
+        public static Mesh BuildMesh<T>(
+            Device device, 
+            byte[] shaderByteCode, 
+            T[] verts, 
+            InputElement[] inputElements, 
+            int vertexSize, 
+            BoundingBox boundingBox, 
+            PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
         {
             return BuildMesh<T>(device, shaderByteCode, verts, null, inputElements, vertexSize, boundingBox, topology);
         }
 
-        public static Mesh BuildMesh<T>(Device device, byte[] shaderByteCode, T[] verts, short[] indices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
+        public static Mesh BuildMesh<T>(
+            Device device, 
+            byte[] shaderByteCode, 
+            T[] verts, 
+            short[] indices, 
+            InputElement[] inputElements, 
+            int vertexSize, 
+            BoundingBox boundingBox, 
+            PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
         {            
             MeshDescription meshDesc = new MeshDescription();
 
@@ -1075,9 +1090,8 @@ namespace CipherPark.Aurora.Core.Content
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
             vertexBufferDesc.SizeInBytes = verts.Length * vertexSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-            vertexBufferDesc.StructureByteStride = 0;
-            DXBuffer vBuffer = DXBuffer.Create<T>(device, verts, vertexBufferDesc);
-            meshDesc.VertexBuffer = vBuffer;
+            vertexBufferDesc.StructureByteStride = 0;            
+            meshDesc.VertexBufferDescription = vertexBufferDesc;
             meshDesc.VertexCount = verts.Length;
             meshDesc.VertexLayout = new InputLayout(device, shaderByteCode, inputElements);
             meshDesc.VertexStride = vertexSize;           
@@ -1089,66 +1103,107 @@ namespace CipherPark.Aurora.Core.Content
                 indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
                 indexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
                 indexBufferDesc.SizeInBytes = indices.Length * sizeof(short);
-                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-                DXBuffer iBuffer = DXBuffer.Create<short>(device, indices, indexBufferDesc);
+                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;                
                 meshDesc.IndexCount = indices.Length;
-                meshDesc.IndexBuffer = iBuffer;
+                meshDesc.IndexBufferDescription = indexBufferDesc;
             }
 
-            meshDesc.Topology = topology; // SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            meshDesc.Topology = topology;
             meshDesc.BoundingBox = boundingBox;
-            
-            return new Mesh(device, meshDesc);
+
+            return Mesh.Create(device, meshDesc, verts, indices);
         }
 
-        public static Mesh BuildDynamicMesh<T>(Device device, byte[] shaderByteCode, T[] verts, int maxVertices, short[] indices, int maxIndices, InputElement[] inputElements, int vertexSize, BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
+        public static Mesh BuildDynamicMesh<T>(
+            Device device,
+            byte[] shaderByteCode,
+            T[] verts,
+            int maxVertices,
+            short[] indices,
+            int maxIndices,
+            InputElement[] inputElements,
+            int vertexSize,
+            BoundingBox boundingBox,
+            PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
         {
-            MeshDescription meshDesc = new MeshDescription();
+            return BuildDynamicMesh(
+                device,
+                shaderByteCode,
+                verts,
+                maxVertices,
+                DefaultVertexIncrement,
+                indices,
+                maxIndices,
+                DefaultIndicesIncrement,
+                inputElements,
+                vertexSize,
+                boundingBox,
+                topology);
+        }
 
-            if (maxVertices <= 0)
-                throw new ArgumentOutOfRangeException("maxVertices");
-
-            if (indices != null && maxIndices <= 0)
-                throw new ArgumentOutOfRangeException("maxIndices");
+        public static Mesh BuildDynamicMesh<T>(
+            Device device, 
+            byte[] shaderByteCode, 
+            T[] verts, 
+            int maxVertices, 
+            int verticesIncrement,
+            short[] indices, 
+            int maxIndices, 
+            int indicesIncrement,
+            InputElement[] inputElements, 
+            int vertexSize, 
+            BoundingBox boundingBox, 
+            PrimitiveTopology topology = PrimitiveTopology.TriangleList) where T : struct
+        {
+            MeshDescription meshDesc = new MeshDescription(); 
 
             //Vertices...
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
-            vertexBufferDesc.SizeInBytes = maxVertices * vertexSize;
+            vertexBufferDesc.SizeInBytes = (verticesIncrement > 0 ? verticesIncrement : maxVertices) * vertexSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
-            vertexBufferDesc.Usage = ResourceUsage.Dynamic;
-            DXBuffer vBuffer = (verts != null) ? DXBuffer.Create<T>(device, verts, vertexBufferDesc) : new DXBuffer(device, vertexBufferDesc);
+            vertexBufferDesc.Usage = ResourceUsage.Dynamic;            
             meshDesc.VertexCount = (verts != null) ? verts.Length : 0;
-            meshDesc.VertexBuffer = vBuffer;            
+            meshDesc.VertexBufferDescription = vertexBufferDesc;
             meshDesc.VertexLayout = new InputLayout(device, shaderByteCode, inputElements);
             meshDesc.VertexStride = vertexSize;
+            meshDesc.VertexBufferIncrement = verticesIncrement;
+            meshDesc.VertexBufferMaxElements = maxVertices;
 
             //Optional Indices...
-            if (maxIndices != 0)
+            if (maxIndices > 0)
             {                
                 BufferDescription indexBufferDesc = new BufferDescription();
                 indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
                 indexBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
-                indexBufferDesc.SizeInBytes = maxIndices * sizeof(short);
+                indexBufferDesc.SizeInBytes = (indicesIncrement > 0 ? indicesIncrement : maxIndices) * sizeof(short);
                 indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-                indexBufferDesc.Usage = ResourceUsage.Dynamic;
-                DXBuffer iBuffer = (indices != null) ? DXBuffer.Create<short>(device, indices, indexBufferDesc) : new DXBuffer(device, indexBufferDesc);
+                indexBufferDesc.Usage = ResourceUsage.Dynamic;                
                 meshDesc.IndexCount = (indices != null) ? indices.Length : 0;
-                meshDesc.IndexBuffer = iBuffer;
+                meshDesc.IndexBufferDescription = indexBufferDesc;
+                meshDesc.IndexBufferIncrement = indicesIncrement;
+                meshDesc.IndexBufferMaxElements = maxIndices;
             }
 
             meshDesc.Topology = topology;
             meshDesc.BoundingBox = boundingBox;
-            return new Mesh(device, meshDesc);
+            return Mesh.Create(device, meshDesc, verts, indices);
         }      
 
-        public static Mesh BuildInstancedMesh<Tv, Ti>(Device device, byte[] shaderByteCode, Tv[] verts, short[] indices, 
+        public static Mesh BuildInstancedMesh<Tv, Ti>(
+            Device device, byte[] shaderByteCode, Tv[] verts, short[] indices, 
             InputElement[] vertexInputElements, int vertexSize, Ti[] instances,  
             int instanceSize, PrimitiveTopology topology = PrimitiveTopology.TriangleList) where Ti : struct where Tv : struct
         {
             MeshDescription meshDesc = new MeshDescription();
+
+            if (verts == null)
+                throw new ArgumentNullException(nameof(verts));
+
+            if (instances == null)
+                throw new ArgumentNullException(nameof(instances));
             
             //Vertices..
             BufferDescription vertexBufferDesc = new BufferDescription();
@@ -1156,23 +1211,20 @@ namespace CipherPark.Aurora.Core.Content
             vertexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
             vertexBufferDesc.SizeInBytes = verts.Length * vertexSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-            vertexBufferDesc.StructureByteStride = 0;
-            DXBuffer vBuffer = DXBuffer.Create<Tv>(device, verts, vertexBufferDesc);
-            meshDesc.VertexBuffer = vBuffer;
+            vertexBufferDesc.StructureByteStride = 0;           
+            meshDesc.VertexBufferDescription = vertexBufferDesc;
             meshDesc.VertexCount = verts.Length;
             meshDesc.VertexLayout = new InputLayout(device, shaderByteCode, vertexInputElements);
             meshDesc.VertexStride = vertexSize;
             
-            //Instances...
-            //NOTE: We always make the instance buffer a dynamic/writable one.
+            //Instances...            
             BufferDescription instanceBufferDesc = new BufferDescription();
             instanceBufferDesc.BindFlags = BindFlags.VertexBuffer;
             instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
             instanceBufferDesc.SizeInBytes = instanceSize * instances.Length;
             instanceBufferDesc.OptionFlags = ResourceOptionFlags.None;            
-            instanceBufferDesc.StructureByteStride = 0;
-            DXBuffer nBuffer = DXBuffer.Create<Ti>(device, instances, instanceBufferDesc);
-            meshDesc.InstanceBuffer = nBuffer;
+            instanceBufferDesc.StructureByteStride = 0;            
+            meshDesc.InstanceBufferDescription = instanceBufferDesc;
             meshDesc.InstanceCount = instances.Length;
             meshDesc.InstanceStride = instanceSize;
             
@@ -1183,30 +1235,58 @@ namespace CipherPark.Aurora.Core.Content
                 indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
                 indexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
                 indexBufferDesc.SizeInBytes = indices.Length * sizeof(short);
-                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-                DXBuffer iBuffer = DXBuffer.Create<short>(device, indices, indexBufferDesc);                            
+                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;                                         
                 meshDesc.IndexCount = indices.Length;
-                meshDesc.IndexBuffer = iBuffer;
+                meshDesc.IndexBufferDescription = indexBufferDesc;
             }
             
             meshDesc.Topology = topology;
-            return new Mesh(device, meshDesc);
+            return Mesh.Create(device, meshDesc, verts, indices, instances);
         }
 
-        public static Mesh BuildDynamicInstancedMesh<Tv, Ti>(Device device, byte[] shaderByteCode, Tv[] verts, short[] indices,
-            int maxIndices, InputElement[] vertexInputElements, int vertexSize, Ti[] instances, int maxInstances,
-            int instanceSize, BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
+        public static Mesh BuildDynamicInstancedMesh<Tv, Ti>(
+            Device device,
+            byte[] shaderByteCode,
+            Tv[] verts,
+            short[] indices,
+            InputElement[] vertexInputElements,
+            int vertexSize, Ti[] instances, int maxInstances,
+            int instanceSize,
+            BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
+            where Ti : struct
+            where Tv : struct
+        {
+            return BuildDynamicInstancedMesh(
+                device,
+                shaderByteCode,
+                verts,
+                indices,
+                vertexInputElements,
+                vertexSize, instances, maxInstances,
+                instanceSize,
+                DefaultInstanceIncrement,
+                boundingBox,
+                topology);
+        }
+
+        public static Mesh BuildDynamicInstancedMesh<Tv, Ti>(
+            Device device, 
+            byte[] shaderByteCode, 
+            Tv[] verts, 
+            short[] indices,
+            InputElement[] vertexInputElements, 
+            int vertexSize, Ti[] instances, int maxInstances,
+            int instanceSize, 
+            int instancesIncrement,
+            BoundingBox boundingBox, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
             where Ti : struct
             where Tv : struct
         {
             MeshDescription meshDesc = new MeshDescription();
 
-            if (maxInstances <= 0)
-                throw new ArgumentOutOfRangeException("maxVertices");
-
-            if (indices != null && maxIndices <= 0)
-                throw new ArgumentOutOfRangeException("maxIndices");
-
+            if (verts == null)
+                throw new ArgumentNullException(nameof(verts));
+           
             //Vertices...
             BufferDescription vertexBufferDesc = new BufferDescription();
             vertexBufferDesc.BindFlags = BindFlags.VertexBuffer;
@@ -1214,85 +1294,43 @@ namespace CipherPark.Aurora.Core.Content
             vertexBufferDesc.SizeInBytes = verts.Length * vertexSize;
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
-            DXBuffer vBuffer = DXBuffer.Create<Tv>(device, verts, vertexBufferDesc);
-            meshDesc.VertexBuffer = vBuffer;
+            meshDesc.VertexBufferDescription = vertexBufferDesc;
             meshDesc.VertexCount = verts.Length;
             meshDesc.VertexLayout = new InputLayout(device, shaderByteCode, vertexInputElements);
             meshDesc.VertexStride = vertexSize;
 
-            //Instances...
-            //NOTE: We always make the instance buffer a dynamic/writable one.
+            //Instances...            
             BufferDescription instanceBufferDesc = new BufferDescription();
             instanceBufferDesc.BindFlags = BindFlags.VertexBuffer;
             instanceBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
-            instanceBufferDesc.SizeInBytes = instanceSize * maxInstances;
+            instanceBufferDesc.SizeInBytes = (instancesIncrement > 0 ? instancesIncrement : maxInstances) * instanceSize;
             instanceBufferDesc.OptionFlags = ResourceOptionFlags.None;
             instanceBufferDesc.Usage = ResourceUsage.Dynamic;
             instanceBufferDesc.StructureByteStride = 0;
-            DXBuffer nBuffer = (instances != null) ? DXBuffer.Create<Ti>(device, instances, instanceBufferDesc)  : new DXBuffer(device, instanceBufferDesc);           
             meshDesc.InstanceCount = (instances != null) ? instances.Length : 0;
-            meshDesc.InstanceBuffer = nBuffer;
+            meshDesc.InstanceBufferDescription = instanceBufferDesc;
             meshDesc.InstanceStride = instanceSize;
+            meshDesc.InstanceBufferIncrement = instancesIncrement;
+            meshDesc.InstanceBufferMaxElements = maxInstances;
 
             //Optional Indices...
             if (indices != null)
             {
                 BufferDescription indexBufferDesc = new BufferDescription();
                 indexBufferDesc.BindFlags = BindFlags.IndexBuffer;
-                indexBufferDesc.CpuAccessFlags = CpuAccessFlags.Write;
-                indexBufferDesc.SizeInBytes = maxIndices * sizeof(short);
-                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;
-                indexBufferDesc.Usage = ResourceUsage.Dynamic;
-                DXBuffer iBuffer = /*(indices != null) ?*/ DXBuffer.Create<short>(device, indices, indexBufferDesc) /*: new DXBuffer(device, indexBufferDesc)*/;
-                meshDesc.IndexCount = /*(indices != null) ?*/ indices.Length /*: 0*/;
-                meshDesc.IndexBuffer = iBuffer;
+                indexBufferDesc.CpuAccessFlags = CpuAccessFlags.None;
+                indexBufferDesc.SizeInBytes = indices.Length * sizeof(short);
+                indexBufferDesc.OptionFlags = ResourceOptionFlags.None;                
+                meshDesc.IndexCount = indices.Length;
+                meshDesc.IndexBufferDescription = indexBufferDesc;
             }
 
             meshDesc.Topology = topology;
             meshDesc.BoundingBox = boundingBox;
 
-            return new Mesh(device, meshDesc);
+            return Mesh.Create(device, meshDesc, verts, indices, instances);
         }
-        #endregion
-
-        /*
-        #region Buildings
-        public static Mesh BuildLandStructureMeshC(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType, Color color)
-        {
-            Vector3[] points = null;
-            switch (structureType)
-            {
-                case LandStructureType.BasicOne:
-                    points = CreateQuadPoints3DNI(bounds);
-                    break;
-                default:
-                    throw new ArgumentException("Unsupported building type specified.", "buildingType");
-            }           
-            VertexPositionColor[] verts = points.Select(p => new VertexPositionColor()
-            {
-                Color = color.ToVector4(),
-                Position = new Vector4(p, 1.0f)
-            }).ToArray();
-
-            return ContentBuilder.BuildMesh(device, shaderByteCode, verts, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, bounds);
-        }       
-
-        public static Mesh BuildLandStructureOutline(Device device, byte[] shaderByteCode, BoundingBox bounds, LandStructureType structureType)
-        {
-            OutlineVertex[] verts = null;
-            switch (structureType)
-            {
-                case LandStructureType.BasicOne:
-                    verts = CreateQuadOutlineVertices(bounds);
-                    break;
-                default:
-                    throw new ArgumentException("Unsupported building type specified.", "buildingType");
-            }   
-            return ContentBuilder.BuildMesh(device, shaderByteCode, verts, OutlineVertex.InputElements, OutlineVertex.ElementSize, bounds, PrimitiveTopology.LineList);
-        }
-
-        #endregion
-        */
+        #endregion     
 
         public static Vector3[] GenerateNormals(Vector3[] positions, short[] indices)
         {           

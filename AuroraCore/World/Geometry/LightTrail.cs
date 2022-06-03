@@ -126,10 +126,10 @@ namespace CipherPark.Aurora.Core.World.Systems
                 Radius = 5.0f,
                 StepSize = 10.0f,
                 Effect = effect,
-                _mesh = Content.ContentBuilder.BuildDynamicMesh<VertexPositionColor>(
+                _mesh = Content.ContentBuilder.BuildDynamicMesh(
                     game.GraphicsDevice,
                     effect.GetVertexShaderByteCode(),
-                    null,
+                    (VertexPositionColor[])null,
                     6000,
                     null,
                     0,

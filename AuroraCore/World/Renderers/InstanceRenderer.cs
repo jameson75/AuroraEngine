@@ -83,13 +83,13 @@ namespace CipherPark.Aurora.Core.World
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
-        /// <param name="instanceMesh"></param>
-        /// <param name="instanceEffect"></param>
+        /// <param name="mesh"></param>
+        /// <param name="effect"></param>
         /// <param name="instances"></param>
-        private void DrawInstances(ITransformable container, Mesh instanceMesh, SurfaceEffect instanceEffect, IEnumerable<ITransformable> instances)
+        private void DrawInstances(ITransformable container, Mesh mesh, SurfaceEffect effect, IEnumerable<ITransformable> instances)
         {
-            if (instanceMesh.IsInstanced == false || instanceMesh.IsDynamic == false)
-                throw new InvalidOperationException("Mesh is not both dynamic and instanced.");
+            if (mesh.IsInstanced == false)
+                throw new InvalidOperationException("Mesh is not instanced.");
 
             if (instances.Count() > 0)
             {
@@ -99,21 +99,21 @@ namespace CipherPark.Aurora.Core.World
                 //**************************************************************************************    
 
                 //TODO: Ensure that the correct buffer size of instance data is being determined.                
-                IEnumerable<InstanceVertexData> instanceData = instances.Where(p => !IsInstanceClipped(p, instanceMesh))
+                IEnumerable<InstanceVertexData> instanceData = instances.Where(p => !IsInstanceClipped(p, mesh))
                                                                                 .Select(p => new InstanceVertexData()
                                                                                 {
                                                                                     Matrix = Matrix.Transpose(p.Transform.ToMatrix())
                                                                                 });
-                instanceMesh.UpdateVertexStream<InstanceVertexData>(instanceData.ToArray());
+                mesh.UpdateInstanceStream(instanceData.ToArray());
                 var cameraNode = _game.GetActiveModuleContext()
-                                  .Scene
-                                  .CameraNode;
-                instanceEffect.View = cameraNode.RiggedViewMatrix;
-                instanceEffect.Projection = cameraNode.ProjectionMatrix;
-                instanceEffect.World = container == null ? Matrix.Identity : container.WorldTransform().ToMatrix();
-                instanceEffect.Apply();
-                instanceMesh.Draw();
-                instanceEffect.Restore();
+                                      .Scene
+                                      .CameraNode;
+                effect.View = cameraNode.RiggedViewMatrix;
+                effect.Projection = cameraNode.ProjectionMatrix;
+                effect.World = container == null ? Matrix.Identity : container.WorldTransform().ToMatrix();
+                effect.Apply();
+                mesh.Draw();
+                effect.Restore();
             }
         }
        
@@ -122,9 +122,9 @@ namespace CipherPark.Aurora.Core.World
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private bool IsInstanceClipped(ITransformable p, Mesh instanceMesh)
+        private bool IsInstanceClipped(ITransformable p, Mesh mesh)
         {
-            return EnableFustrumClipping && IsInstanceInFustrum(p, instanceMesh);
+            return EnableFustrumClipping && IsInstanceInFustrum(p, mesh);
         }
 
         /// <summary>
@@ -132,13 +132,13 @@ namespace CipherPark.Aurora.Core.World
         /// </summary>
         /// <param name="instance"></param>
         /// <returns></returns>
-        private bool IsInstanceInFustrum(ITransformable instance, Mesh instanceMesh)
+        private bool IsInstanceInFustrum(ITransformable instance, Mesh mesh)
         {
             SceneGraph scene = Game.GetActiveModuleContext().Scene;
             Matrix viewMatrix = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
             Matrix projMatrix = scene.CameraNode.Camera.ProjectionMatrix;
             BoundingFrustum fustrum = new BoundingFrustum(viewMatrix * projMatrix);
-            BoundingBox box = instanceMesh.BoundingBox.Transform(instance.WorldTransform().ToMatrix());
+            BoundingBox box = mesh.BoundingBox.Transform(instance.WorldTransform().ToMatrix());
             return fustrum.Intersects(ref box);
         }
 

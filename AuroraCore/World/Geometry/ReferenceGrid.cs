@@ -69,11 +69,11 @@ namespace CipherPark.Aurora.Core.World.Geometry
             vertexBufferDesc.OptionFlags = ResourceOptionFlags.None;
             vertexBufferDesc.StructureByteStride = 0;
             meshDesc.VertexCount = vertices.Length;
-            meshDesc.VertexBuffer = DXBuffer.Create<VertexPositionColor>(device, vertices, vertexBufferDesc);
+            meshDesc.VertexBufferDescription = vertexBufferDesc;
             meshDesc.VertexLayout = new InputLayout(device, shaderCode, VertexPositionColor.InputElements);
             meshDesc.VertexStride = VertexPositionColor.ElementSize;
             meshDesc.Topology = PrimitiveTopology.LineList;
-            _mesh = new Mesh(device, meshDesc);
+            _mesh = Mesh.Create(device, meshDesc, vertices, null);
         }
 
         public void Draw()

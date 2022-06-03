@@ -157,7 +157,9 @@
     <Compile Include="Utils\SourceVoiceEx.cs" />
     <Compile Include="Utils\TransformBoundingElementExtensions.cs" />
     <Compile Include="World\GameObject.cs" />
+    <Compile Include="Utils\BufferResizeCalculator.cs" />
     <Compile Include="World\Geometry\IAnimatedModel.cs" />
+    <Compile Include="World\Geometry\MeshDescription.cs" />
     <Compile Include="World\Geometry\MultiMeshModel.cs" />
     <Compile Include="World\Geometry\ObjectOutlineModel.cs" />
     <Compile Include="World\Renderers\InstanceRenderer.cs" />

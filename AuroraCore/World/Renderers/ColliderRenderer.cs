@@ -159,16 +159,16 @@ namespace CipherPark.Aurora.Core.World
 
             BoundingBox meshBoundingBox = BoundingBox.FromPoints(points);
 
-            return ContentBuilder.BuildDynamicMesh<VertexPositionColor>(_app.GraphicsDevice,
-                                                          _effect.GetVertexShaderByteCode(),
-                                                          vertices,
-                                                          vertices.Count(),
-                                                          indices,
-                                                          indices.Count(),
-                                                          VertexPositionColor.InputElements,
-                                                          VertexPositionColor.ElementSize,
-                                                          meshBoundingBox, 
-                                                          SharpDX.Direct3D.PrimitiveTopology.LineList);                                                                      
+            return ContentBuilder.BuildDynamicMesh(_app.GraphicsDevice,
+                                                   _effect.GetVertexShaderByteCode(),
+                                                   vertices,
+                                                   vertices.Count(),
+                                                   indices,
+                                                   indices.Count(),
+                                                   VertexPositionColor.InputElements,
+                                                   VertexPositionColor.ElementSize,
+                                                   meshBoundingBox, 
+                                                   SharpDX.Direct3D.PrimitiveTopology.LineList);                                                                      
         }
 
         /// <summary>
