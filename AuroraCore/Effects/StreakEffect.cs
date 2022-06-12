@@ -36,8 +36,8 @@ namespace CipherPark.Aurora.Core.Effects
 
         private void CreateShaders()
         {
-            _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\streak_vs.cso", out _vertexShader);
-            LoadPixelShader("Resources\\Shaders\\streak_ps.cso", out _pixelShader);
+            _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\streak_vs.cso", out _vertexShader);
+            LoadPixelShader("Assets\\Shaders\\streak_ps.cso", out _pixelShader);
             _vertexConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, VertexConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _pixelConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, PixelConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }

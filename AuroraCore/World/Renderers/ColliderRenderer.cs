@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
-using SharpDX.XAudio2;
-using SharpDX.Direct3D11;
-using SharpDX.DirectInput;
-using SharpDX.XInput;
-using CipherPark.Aurora.Core;
-using CipherPark.Aurora.Core.Module;
-using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.Utils.Toolkit;

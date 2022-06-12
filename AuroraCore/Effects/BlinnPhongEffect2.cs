@@ -111,22 +111,22 @@ namespace CipherPark.Aurora.Core.Effects
             switch (svt)
             {
                 case SurfaceVertexType.SkinNormalTexture:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\blinnphong2-skin-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-skin-vs.cso", out _vertexShader);
                     break;
                 case SurfaceVertexType.PositionNormalTexture:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\blinnphong2-pnt-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-pnt-vs.cso", out _vertexShader);
                     break;
                 case SurfaceVertexType.PositionNormalColor:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\blinnphong2-pnc-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-pnc-vs.cso", out _vertexShader);
                     break;
                 case SurfaceVertexType.InstancePositionNormalColor:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\blinnphong2-p-pnc-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-p-pnc-vs.cso", out _vertexShader);
                     break;
                 default:
                     throw new InvalidOperationException($"Unsupported surface vertex type {svt} specified");
             }
 
-            LoadPixelShader("Resources\\Shaders\\blinnphong2-ps.cso", out _pixelShader);
+            LoadPixelShader("Assets\\Shaders\\blinnphong2-ps.cso", out _pixelShader);
         }       
 
         public override void Apply()

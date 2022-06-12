@@ -49,13 +49,12 @@ namespace CipherPark.Aurora.Core.World.Scene
 
         public void Draw()
         {
-            OnBeginDraw();
-            //CameraNode.Camera.PostEffectChain.Begin(gameTime);            
+            OnBeginDraw();                    
             _DrawSkyModel();
+           
             foreach (SceneNode node in Nodes)
                 _DrawNodeHierarchy(node);            
-            //CameraNode.Camera.PostEffectChain.End(gameTime);
-            
+                        
             CameraNode.Camera.PostEffectChain.InputTexture = Game.RenderTargetShaderResource;
             CameraNode.Camera.PostEffectChain.OutputView = Game.RenderTargetView;
             CameraNode.Camera.PostEffectChain.Apply();

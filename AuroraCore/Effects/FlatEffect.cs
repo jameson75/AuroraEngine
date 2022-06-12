@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.World.Geometry;
-using CipherPark.Aurora.Core.Utils;
-using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Developer: Eugene Adams
-// 
+// Developer: Eugene Adams// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -63,27 +57,27 @@ namespace CipherPark.Aurora.Core.Effects
             switch (svt)
             {
                 case SurfaceVertexType.SkinTexture:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\flat-skint-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\flat-skint-vs.cso", out _vertexShader);
                     break;
                 case SurfaceVertexType.SkinColor:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\flat-skinc-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\flat-skinc-vs.cso", out _vertexShader);
                     break;
                 case SurfaceVertexType.PositionTexture:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\flat-pt-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\flat-pt-vs.cso", out _vertexShader);
                     break;
                 case SurfaceVertexType.PositionColor:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\flat-pc-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\flat-pc-vs.cso", out _vertexShader);
                     break;
                 case SurfaceVertexType.InstancePositionTexture:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\flat-i-pt-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\flat-i-pt-vs.cso", out _vertexShader);
                     break;
                 case SurfaceVertexType.InstancePositionColor:
-                    _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\flat-i-pc-vs.cso", out _vertexShader);
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\flat-i-pc-vs.cso", out _vertexShader);
                     break;
                 default:
                     throw new InvalidOperationException($"Unsupported surface vertex type {svt} specified");
             }
-            LoadPixelShader("Resources\\Shaders\\flat-ps.cso", out _pixelShader);
+            LoadPixelShader("Assets\\Shaders\\flat-ps.cso", out _pixelShader);
         }
 
         public Matrix[] BoneTransforms { get; set; }

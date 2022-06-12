@@ -172,11 +172,11 @@ namespace CipherPark.Aurora.Core.Effects
 
         private void CreateShaders()
         {
-            _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\postglowfs-x1-vs.cso", out _vertexShaderP0);                       
-            LoadPixelShader("Resources\\Shaders\\postglowfs-x1x2-ps.cso", out _pixelShaderP0P1);
-            LoadVertexShader("Resources\\Shaders\\postglowfs-x2-vs.cso", out _vertexShaderP1);
-            LoadVertexShader("Resources\\Shaders\\postglowfs-x3-vs.cso", out _vertexShaderP2);
-            LoadPixelShader("Resources\\Shaders\\postglowfs-x3-ps.cso", out _pixelShaderP2);           
+            _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\postglowfs-x1-vs.cso", out _vertexShaderP0);                       
+            LoadPixelShader("Assets\\Shaders\\postglowfs-x1x2-ps.cso", out _pixelShaderP0P1);
+            LoadVertexShader("Assets\\Shaders\\postglowfs-x2-vs.cso", out _vertexShaderP1);
+            LoadVertexShader("Assets\\Shaders\\postglowfs-x3-vs.cso", out _vertexShaderP2);
+            LoadPixelShader("Assets\\Shaders\\postglowfs-x3-ps.cso", out _pixelShaderP2);           
         }
 
         private void CreateResources()

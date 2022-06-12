@@ -39,9 +39,9 @@ namespace CipherPark.Aurora.Core.Effects
             View = Matrix.Identity;
             Projection = Matrix.Identity;
 
-            string psFileName = "Resources\\Shaders\\billboard-ps.cso";
-            string vsFileName = "Resources\\Shaders\\billboard-vs.cso";
-            string ivsFileName = "Resources\\Shaders\\billboard-i-vs.cso";
+            string psFileName = "Assets\\Shaders\\billboard-ps.cso";
+            string vsFileName = "Assets\\Shaders\\billboard-vs.cso";
+            string ivsFileName = "Assets\\Shaders\\billboard-i-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
             _ivertexShaderByteCode = System.IO.File.ReadAllBytes(ivsFileName);
             _vertexShader = new VertexShader(Game.GraphicsDevice, _vertexShaderByteCode);

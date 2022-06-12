@@ -36,9 +36,9 @@ namespace CipherPark.Aurora.Core.Effects
         public PassThruPostEffect(IGameApp game)
             : base(game)
         {
-            string psFileName = "Resources\\Shaders\\postpassthru-ps.cso";
-            string vsFileName = "Resources\\Shaders\\postpassthru-vs.cso";
-            string vsFixFileName = "Resources\\Shaders\\postpassthru-fix-vs.cso";
+            string psFileName = "Assets\\Shaders\\postpassthru-ps.cso";
+            string vsFileName = "Assets\\Shaders\\postpassthru-vs.cso";
+            string vsFixFileName = "Assets\\Shaders\\postpassthru-fix-vs.cso";
             
             //Load Shaders
             //------------

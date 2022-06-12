@@ -58,15 +58,15 @@ namespace CipherPark.Aurora.Core.Effects
 
         private void CreateShaders()
         {
-            _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\dof_downsample_vs.cso", out _downSampleVertexShader);
-            LoadPixelShader("Resources\\Shaders\\dof_downsample_ps.cso", out _downSamplePixelShader);
-            LoadVertexShader("Resources\\Shaders\\dof_gaussian_vs.cso", out _gaussianVertexShader);
-            LoadPixelShader("Resources\\Shaders\\dof_gaussian_ps.cso", out _gaussianPixelShader);
-            LoadPixelShader("Resources\\Shaders\\dof_gaussian2_ps.cso", out _gaussianPixelShader2);
-            LoadVertexShader("Resources\\Shaders\\dof_depthfinal1_vs.cso", out _depthFinal1VertexShader);
-            LoadPixelShader("Resources\\Shaders\\dof_depthfinal1_ps.cso", out _depthFinal1PixelShader);
-            LoadVertexShader("Resources\\Shaders\\dof_depthfinal2_vs.cso", out _depthFinal2VertexShader);
-            LoadPixelShader("Resources\\Shaders\\dof_depthfinal2_ps.cso", out _depthFinal2PixelShader);
+            _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\dof_downsample_vs.cso", out _downSampleVertexShader);
+            LoadPixelShader("Assets\\Shaders\\dof_downsample_ps.cso", out _downSamplePixelShader);
+            LoadVertexShader("Assets\\Shaders\\dof_gaussian_vs.cso", out _gaussianVertexShader);
+            LoadPixelShader("Assets\\Shaders\\dof_gaussian_ps.cso", out _gaussianPixelShader);
+            LoadPixelShader("Assets\\Shaders\\dof_gaussian2_ps.cso", out _gaussianPixelShader2);
+            LoadVertexShader("Assets\\Shaders\\dof_depthfinal1_vs.cso", out _depthFinal1VertexShader);
+            LoadPixelShader("Assets\\Shaders\\dof_depthfinal1_ps.cso", out _depthFinal1PixelShader);
+            LoadVertexShader("Assets\\Shaders\\dof_depthfinal2_vs.cso", out _depthFinal2VertexShader);
+            LoadPixelShader("Assets\\Shaders\\dof_depthfinal2_ps.cso", out _depthFinal2PixelShader);
             _constantsBuffer1 = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, ConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _constantsBuffer2 = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, ConstantsBufferSize2, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
@@ -314,8 +314,8 @@ namespace CipherPark.Aurora.Core.Effects
             World = Matrix.Identity;
             View = Matrix.Identity;
             Projection = Matrix.Identity;
-            _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\dof_lighting_vs.cso", out _vertexShader);
-            LoadPixelShader("Resources\\Shaders\\dof_lighting_ps.cso", out _pixelShader);
+            _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\dof_lighting_vs.cso", out _vertexShader);
+            LoadPixelShader("Assets\\Shaders\\dof_lighting_ps.cso", out _pixelShader);
             _vsConstantsBuffer = new SharpDX.Direct3D11.Buffer(game.GraphicsDevice, VSConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
             _psConstantsBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, PSConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }     

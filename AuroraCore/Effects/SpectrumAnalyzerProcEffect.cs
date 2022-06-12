@@ -82,8 +82,8 @@ namespace CipherPark.Aurora.Core.Effects
 
         private void CreateShaders()
         {
-            _vertexShaderByteCode = LoadVertexShader("Resources\\Shaders\\postpassthru-vs.cso", out _vertexShader);
-            LoadPixelShader("Resources\\Shaders\\spectrum-analyzer-ps.cso", out _pixelShader);
+            _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\postpassthru-vs.cso", out _vertexShader);
+            LoadPixelShader("Assets\\Shaders\\spectrum-analyzer-ps.cso", out _pixelShader);
             _constantsBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, ConstantsBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
         }
 

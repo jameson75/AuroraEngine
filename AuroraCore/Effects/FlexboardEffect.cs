@@ -37,8 +37,8 @@ namespace CipherPark.Aurora.Core.Effects
             View = Matrix.Identity;
             Projection = Matrix.Identity;
 
-            string psFileName = "Resources\\Shaders\\flexboard-ps.cso";
-            string vsFileName = "Resources\\Shaders\\flexboard-vs.cso";
+            string psFileName = "Assets\\Shaders\\flexboard-ps.cso";
+            string vsFileName = "Assets\\Shaders\\flexboard-vs.cso";
             _vertexShaderByteCode = System.IO.File.ReadAllBytes(vsFileName);
             _vertexShader = new VertexShader(Game.GraphicsDevice, _vertexShaderByteCode);
             _pixelShader = new PixelShader(Game.GraphicsDevice, System.IO.File.ReadAllBytes(psFileName));

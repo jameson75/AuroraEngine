@@ -9,6 +9,7 @@ using SharpDX.Direct3D11;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Utils;
 using System.IO;
+using CipherPark.Aurora.Core.Content;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -81,20 +82,9 @@ namespace CipherPark.Aurora.Core.Effects
         }
 
         protected byte[] ReadByteStream(string resourcePath)
-        {               
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var assemblyResourceNamespace = "CipherPark.Aurora.Core";
-            var stream = assembly.GetManifestResourceStream($"{assemblyResourceNamespace}.{resourcePath.Replace(@"\", @".")}");
-            if (stream != null)
-            {
-                var bytes = new byte[stream.Length];
-                stream.Read(bytes, 0, bytes.Length);
-                return bytes;
-            }
-            else
-            {
-                return File.ReadAllBytes(resourcePath);
-            }
+        {
+            return ContentImporter.ReadEmbeddedResource(resourcePath) ??
+                   File.ReadAllBytes(resourcePath);
         }
 
         public void Dispose()
