@@ -45,7 +45,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetZip, Version=1.13.3.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
@@ -120,6 +120,7 @@
     <Compile Include="Effects\BlinnPhongEffect2.cs" />
     <Compile Include="Effects\PixelVelocityBlurPostEffect.cs" />
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
+    <Compile Include="GameAppWPF.cs" />
     <Compile Include="Services\ICommandTerminalService.cs" />
     <Compile Include="Terminal\ICommandTerminal.cs" />
     <Compile Include="GameTime.cs" />
@@ -136,7 +137,7 @@
     <Compile Include="Animation\RectangleAnimation.cs" />
     <Compile Include="Animation\Transform.cs" />
     <Compile Include="Animation\TransformAnimation.cs" />
-    <Compile Include="BasicGameApp.cs" />
+    <Compile Include="GameAppWinforms.cs" />
     <Compile Include="Effects\DofEffect.cs" />
     <Compile Include="Effects\Effect.cs" />
     <Compile Include="Effects\PassThruPostEffect.cs" />
@@ -275,9 +276,7 @@
     <Compile Include="World\Geometry\PathTracker.cs" />
     <Compile Include="World\WorldSimulator.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\Resources\DefaultTheme\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Properties\Docs\FocusManagerBehavior.txt" />
     <Content Include="Properties\Docs\HandlingControlInput.txt" />
