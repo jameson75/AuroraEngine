@@ -6,7 +6,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -113,46 +112,17 @@ AURORA_NATIVE_API ID3D11Resource* STDCALL ContentImporter_CreateTextureFromFile(
 	ID3D11Device *pDevice = nullptr;
 	ID3D11Resource *pTexture = nullptr;
 	pDeviceContext->GetDevice(&pDevice);
-	DirectX::CreateWICTextureFromFile(pDevice, pDeviceContext, fileName, &pTexture, nullptr);
+	DirectX::CreateWICTextureFromFile(pDevice, pDeviceContext, fileName, &pTexture, nullptr);	
 	pDevice->Release();
 	return pTexture;
 }
 
-//VOID SetupExportMesh(XFbxMesh *pMesh, FBX_MESH* pFbxMesh)
-//{	
-//	for(int i = 0; i < 4; i++)
-//		for(int j = 0; j < 4; j++)
-//			pFbxMesh->m[i * 4 + j] = DirectX::XMVectorGetByIndex(pMesh->Transform.r[i], j);
-//	pFbxMesh->Vertices = pMesh->VertexBuffer;
-//	pFbxMesh->VertexCount = pMesh->VertexCount;
-//	pFbxMesh->Indices = pMesh->IndexBuffer;
-//	pFbxMesh->IndexCount = pMesh->IndexCount;
-//
-//	if( pMesh->Children->size() != 0 )
-//	{
-//		SIZE_T childrenMemSize = sizeof(FBX_MESH) * pMesh->Children->size();
-//		pFbxMesh->Children = (FBX_MESH*)::LocalAlloc(0, childrenMemSize);
-//		::ZeroMemory(pFbxMesh->Children, childrenMemSize);
-//		pFbxMesh->ChildCount = pMesh->Children->size();
-//		std::list<XFbxMesh*>::iterator iterator = pMesh->Children->begin();		
-//		while(iterator != pMesh->Children->end())
-//		{
-//			int i = std::distance(pMesh->Children->begin(), iterator);
-//			FBX_MESH* pFbxChildMesh = (pFbxMesh->Children + i);
-//			XFbxMesh* pChildMesh = (*iterator);
-//			SetupExportMesh(pChildMesh, pFbxChildMesh);		
-//			iterator++;
-//		}	
-//	}	
-//}
-
-
-//AURORA_NATIVE_API XFBX_SCENE* STDCALL ContentImporter_LoadFBX(LPCWSTR fileName)
-//{
-//	XFbxScene *pXScene = XFbxScene::CreateFromFile(fileName);
-//	XFBX_SCENE *pXMScene = pXScene->ConvertToMarshableType(true);		
-//	delete pXScene;
-//	pXScene = nullptr;
-//	return pXMScene;
-//}
-
+AURORA_NATIVE_API ID3D11Resource* STDCALL ContentImporter_CreateTextureFromMemory(ID3D11DeviceContext *pDeviceContext, const uint8_t *pBlob, size_t dataSize)
+{
+	ID3D11Device *pDevice = nullptr;
+	ID3D11Resource *pTexture = nullptr;
+	pDeviceContext->GetDevice(&pDevice);
+	DirectX::CreateWICTextureFromMemory(pDevice, pDeviceContext, pBlob, dataSize, &pTexture, nullptr);
+	pDevice->Release();
+	return pTexture;
+}

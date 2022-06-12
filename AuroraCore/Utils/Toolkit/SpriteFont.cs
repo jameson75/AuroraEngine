@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine
 // This source code is licensed under 
@@ -22,9 +19,14 @@ namespace CipherPark.Aurora.Core.Utils.Toolkit
     {
         private IntPtr _nativeObject = IntPtr.Zero;
            
-        public SpriteFont(Device graphicsDevice, string textureFileName)
+        public SpriteFont(Device graphicsDevice, string fileName)
         {
-            _nativeObject = UnsafeNativeMethods.New(graphicsDevice.NativePointer, textureFileName);
+            _nativeObject = UnsafeNativeMethods.New(graphicsDevice.NativePointer, fileName);
+        }
+
+        public SpriteFont(Device graphicsDevice, byte[] blob)
+        {
+            _nativeObject = UnsafeNativeMethods.New(graphicsDevice.NativePointer, blob, blob.Length);
         }
 
         ~SpriteFont()
@@ -92,16 +94,29 @@ namespace CipherPark.Aurora.Core.Utils.Toolkit
             return trailingSpacesLength;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Glyph
+        {
+            uint Character;
+            long Subrect_Left;
+            long Subrect_Top;
+            long Subrect_Right;
+            long Subrect_Bottom;
+            float XOffset;
+            float YOffset;
+            float XAdvance;
+        }
+
         private static class UnsafeNativeMethods
         {
             [DllImport("AuroraNative.dll", EntryPoint = "SpriteFont_New")]
             public static extern IntPtr New(IntPtr NativeDevicePointer, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
 
             [DllImport("AuroraNative.dll", EntryPoint = "SpriteFont_New_2")]
-            public static extern IntPtr New(IntPtr nativeDevicePointer, IntPtr blob, int dataSize);
+            public static extern IntPtr New(IntPtr nativeDevicePointer, [MarshalAs(UnmanagedType.LPArray)] byte[] blob, int dataSize);
 
             [DllImport("AuroraNative.dll", EntryPoint = "SpriteFont_New_3")]
-            public static extern IntPtr New(IntPtr nativeTextureShaderResourcePointer, IntPtr glyphCount, float lineSpacing);
+            public static extern IntPtr New(IntPtr nativeTextureShaderResourcePointer, [MarshalAs(UnmanagedType.LPArray)] Glyph[] glyphs, int glyphCount, float lineSpacing);
 
             [DllImport("AuroraNative.dll", EntryPoint = "SpriteFont_DrawString")]
             public static extern void DrawString(IntPtr nativeSpriteFontPointer, IntPtr nativeSpriteBatchPointer, [MarshalAs(UnmanagedType.LPTStr)] string text, XMFLOAT2 position, XVECTOR4 color, float rotation, XMFLOAT2 origin, XMFLOAT2 scale, SpriteEffects effects, float layerDepth);

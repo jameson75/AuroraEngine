@@ -1,7 +1,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <ItemGroup>
   <EmbeddedResource Include="$(MSBuildThisFileDirectory)..\dist\shaders\*">
-     <Link>Resources\Shaders\%(Filename)%(Extension)</Link>
-  </EmbeddedResource> 
+     <Link>Assets\Shaders\%(Filename)%(Extension)</Link>
+  </EmbeddedResource>
+  <EmbeddedResource Include="$(MSBuildThisFileDirectory)..\dist\ui\default_theme\*">
+     <Link>Assets\UI\DefaultTheme\%(Filename)%(Extension)</Link>
+  </EmbeddedResource>
  </ItemGroup>
 </Project>
