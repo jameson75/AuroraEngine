@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 
-namespace Aurora.Sample.ContentBuilderWPF.Properties
+namespace Aurora.Sample.ContentBuilder.Properties
 {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Aurora.Sample.ContentBuilderWPF
+namespace Aurora.Sample.ContentBuilder
 {
     /// <summary>
     /// Interaction logic for App.xaml

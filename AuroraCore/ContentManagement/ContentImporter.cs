@@ -1,31 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.IO;
-using System.Xml.XPath;
-using System.Text.RegularExpressions;
 using SharpDX;
 using SharpDX.Direct3D11;
-using SharpDX.Direct3D;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
-using SharpDX.MediaFoundation;
-using DXBuffer = SharpDX.Direct3D11.Buffer;
 using CoreTransform = CipherPark.Aurora.Core.Animation.Transform;
 using CipherPark.Aurora.Core.World.Geometry;
-using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Animation.Controllers;
 using CipherPark.Aurora.Core.Utils.Toolkit;
 using CipherPark.Aurora.Core.Utils;
+using System.Reflection;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -67,29 +58,35 @@ namespace CipherPark.Aurora.Core.Content
             return manager;
         }
 
-        public static SpriteFont LoadFont(Device graphicsDevice, string resource)
-        {        
-            SpriteFont font = new SpriteFont(graphicsDevice, resource);
+        public static SpriteFont LoadFont(Device graphicsDevice, string resourceName)
+        {
+            byte[] blob = ReadEmbeddedResource(resourceName);
+            SpriteFont font = (blob != null) ?
+                new SpriteFont(graphicsDevice, blob) : 
+                new SpriteFont(graphicsDevice, resourceName);
             return font;
         }
 
-        public static Texture2D LoadTexture(DeviceContext deviceContext, string fileName)
+        public static Texture2D LoadTexture(DeviceContext deviceContext, string resourceName)
         {
-            IntPtr _nativeTextureResource = UnsafeNativeMethods.CreateTextureFromFile(deviceContext.NativePointer, fileName);
+            byte[] blob = ReadEmbeddedResource(resourceName);
+            IntPtr _nativeTextureResource = (blob != null) ?
+                UnsafeNativeMethods.CreateTextureFromMemory(deviceContext.NativePointer, blob, blob.Length) :
+                UnsafeNativeMethods.CreateTextureFromFile(deviceContext.NativePointer, resourceName);
             if (_nativeTextureResource == IntPtr.Zero)
                 throw new InvalidOperationException("Failed loading texture.");
             return new Texture2D(_nativeTextureResource);
         }
 
-        public static Texture2D LoadTextureCube(DeviceContext deviceContext, string[] fileNames)
+        public static Texture2D LoadTextureCube(DeviceContext deviceContext, string[] resourceNames)
         {
-            if (fileNames.Length != 6)
+            if (resourceNames.Length != 6)
                 throw new InvalidOperationException("Number of specified file names is less or greater than 6");
             Texture2D[] _textures = new Texture2D[6];
             Texture2D[] _stagingTextures = new Texture2D[6];
             DataBox[] _dataBoxes = new DataBox[6];            
             for(int i = 0; i < _textures.Length; i++)                                   
-                _textures[i] = LoadTexture(deviceContext, fileNames[i]);
+                _textures[i] = LoadTexture(deviceContext, resourceNames[i]);
             //NOTE: We have to first copy the textures into a "staging" area because the textures
             //returned by LoadTexture() are all GPU-only.
             Texture2DDescription stagingTextureDesc = _textures[0].Description;
@@ -116,7 +113,29 @@ namespace CipherPark.Aurora.Core.Content
                 deviceContext.UnmapSubresource(_stagingTextures[i], 0);
             return cubeTexture;
         }
-      
+
+        public static byte[] ReadEmbeddedResource(string resourcePath)
+        {
+            return ReadEmbeddedResource(Assembly.GetExecutingAssembly(), resourcePath) ??
+                   ReadEmbeddedResource(Assembly.GetEntryAssembly(), resourcePath);           
+        }
+        
+        private static byte[] ReadEmbeddedResource(Assembly assembly, string resourcePath)
+        {
+            string[] manifsetResourceNames = assembly.GetManifestResourceNames();
+            string resourceNameSuffix = resourcePath.Replace(@"\", @".");
+            string resourceName = manifsetResourceNames.FirstOrDefault(n => n.EndsWith(resourceNameSuffix));
+            if (resourceName != null)
+            {
+                using (var stream = assembly.GetManifestResourceStream(resourceName))
+                {                   
+                    var bytes = new byte[stream.Length];
+                    stream.Read(bytes, 0, bytes.Length);
+                    return bytes;                    
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// 
@@ -579,6 +598,9 @@ namespace CipherPark.Aurora.Core.Content
 
             [DllImport("AuroraNative.dll", EntryPoint = "ContentImporter_CreateTextureFromFile")]
             public static extern IntPtr CreateTextureFromFile(IntPtr deviceContext, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
+
+            [DllImport("AuroraNative.dll", EntryPoint = "ContentImporter_CreateTextureFromMemory")]
+            public static extern IntPtr CreateTextureFromMemory(IntPtr deviceContext, [MarshalAs(UnmanagedType.LPArray)] byte[] blob, int dataSize);
 
             [DllImport("AuroraNative.dll", EntryPoint = "ContentImporter_LoadFBX")]
             public static extern IntPtr LoadFBX([MarshalAs(UnmanagedType.LPWStr)] string fileName, ref FBXMeshThunk fbxMesh);

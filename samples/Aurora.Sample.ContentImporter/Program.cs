@@ -14,9 +14,8 @@ namespace Aurora.Sample.ContentImporter
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            var app = new ContentImporterApp();
+            app.Run(new MainForm());
         }
     }
 }
