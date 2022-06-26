@@ -199,8 +199,8 @@ namespace CipherPark.Aurora.Core
 
             //Initialize XAudio2 Resources.
             //-----------------------------
-            //_xaudio2Device = new XAudio2();
-            //_masteringVoice = new MasteringVoice(AudioDevice);
+            _xaudio2Device = new XAudio2();
+            _masteringVoice = new MasteringVoice(AudioDevice);
 
             //Initialize Direct Input Resources.
             //----------------------------------
