@@ -26,7 +26,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
     /// <summary>
     /// 
     /// </summary>
-    public class SkinnedMeshModel : SingleMeshModel, IAnimatedModel
+    public class SkinnedMeshModel : StaticMeshModel, IAnimatedModel
     {
         private SkinOffsets _bones = new SkinOffsets();
        
