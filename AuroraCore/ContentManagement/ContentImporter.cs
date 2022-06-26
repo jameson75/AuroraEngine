@@ -14,6 +14,7 @@ using CipherPark.Aurora.Core.Animation.Controllers;
 using CipherPark.Aurora.Core.Utils.Toolkit;
 using CipherPark.Aurora.Core.Utils;
 using System.Reflection;
+using CipherPark.Aurora.Core.Effects;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -148,7 +149,7 @@ namespace CipherPark.Aurora.Core.Content
         [Obsolete]
         public static Model ImportFBX(IGameApp game, string fileName, byte[] shaderByteCode, FBXFileChannels channels = FBXFileChannels.Default)
         {
-            SingleMeshModel result = null;
+            StaticMeshModel result = null;
             FBXMeshThunk fbxMeshThunk = new FBXMeshThunk();            
             fbxMeshThunk.m = new float[16];
             ContentImporter.UnsafeNativeMethods.LoadFBX(fileName, ref fbxMeshThunk);
@@ -170,7 +171,7 @@ namespace CipherPark.Aurora.Core.Content
                 case FBXFileChannels.PositionColor:
                     VertexPositionColor[] _vertices = vertices.Select(e => new VertexPositionColor() { Position = new Vector4(e.X, e.Y, e.Z, 1.0f), Color = Color.Red.ToVector4() }).ToArray();
                     mesh = ContentBuilder.BuildMesh<VertexPositionColor>(game.GraphicsDevice, shaderByteCode, _vertices, _indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, boundingBox);
-                    result = new SingleMeshModel(game);
+                    result = new StaticMeshModel(game);
                     result.Mesh = mesh;
                     break;
                 default:
@@ -179,7 +180,7 @@ namespace CipherPark.Aurora.Core.Content
             return result;
         }   
 
-        public static Model ImportX(IGameApp game, string fileName, byte[] shaderByteCode, XFileChannels channels, XFileImportOptions options = XFileImportOptions.None, List<string> textureNames = null)
+        public static Model ImportX(IGameApp game, string fileName, SurfaceEffect effect, XFileChannels channels, XFileImportOptions options = XFileImportOptions.None, List<string> textureNames = null)
         {
             Model result = null;
             Mesh mesh = null;
@@ -187,6 +188,7 @@ namespace CipherPark.Aurora.Core.Content
             List<KeyframeAnimationController> animationControllers = null;
             List<SkinOffset> skinOffsets = null;
             XFileTextDocument doc = new XFileTextDocument();
+            var shaderByteCode = effect.GetVertexShaderByteCode();
 
             //Throw an error for unsupported channels.
             //----------------------------------------
@@ -274,20 +276,24 @@ namespace CipherPark.Aurora.Core.Content
                 if (xMesh.MeshMaterialList != null)
                 {
                     if (xMesh.MeshMaterialList.MaterialRefs != null)
-                        defaultMaterial = doc.DataObjects.GetDataObject<XFileMaterialObject>(0);
+                        defaultMaterial = doc.DataObjects.GetDataObject<XFileMaterialObject>(1);
                     else if (xMesh.MeshMaterialList.Materials != null)
                         defaultMaterial = xMesh.MeshMaterialList.Materials[0];
+                    else
+                        throw new InvalidOperationException("Could not find default material");
+
                     colors = xMesh.Vertices.Select(v => new Color(defaultMaterial.FaceColor.Red,
-                                                             defaultMaterial.FaceColor.Green,
-                                                             defaultMaterial.FaceColor.Blue,
-                                                             1.0f)).ToArray();
+                                                                  defaultMaterial.FaceColor.Green,
+                                                                  defaultMaterial.FaceColor.Blue,
+                                                                  1.0f))
+                                           .ToArray();
                 }
                 if (colors == null)
                 {
                     if (!options.HasFlag(XFileImportOptions.IgnoreMissingColors))
                         throw new InvalidOperationException("Expected material color data was not present.");
                     else
-                        colors = xMesh.Vertices.Select(v => Color.Transparent).ToArray();
+                        colors = xMesh.Vertices.Select(v => Color.Gray).ToArray();
                 }
             }
 
@@ -398,11 +404,12 @@ namespace CipherPark.Aurora.Core.Content
             else
             {
                 mesh = BuildMeshForChannels(channels, game.GraphicsDevice, shaderByteCode, xMesh.Vertices, _indices, texCoords, normals, colors, boundingBox, options.HasFlag(XFileImportOptions.EnableInstancing));
-                SingleMeshModel basicModel = new SingleMeshModel(game);
+                StaticMeshModel basicModel = new StaticMeshModel(game);
                 basicModel.Mesh = mesh;
                 result = basicModel;
             }
 
+            result.Effect = effect;
             return result;
         }
 

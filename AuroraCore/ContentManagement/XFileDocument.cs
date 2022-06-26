@@ -1466,6 +1466,9 @@ namespace CipherPark.Aurora.Core.Content
         /// <returns></returns>
         public T GetDataObject<T>(int instance) where T : XFileDataObject
         {
+            if (instance <= 0)
+                throw new ArgumentException("instance must be greater than zero", nameof(instance));
+
             int instancesFound = 0;
             foreach (XFileDataObject dataObj in this)
             {
