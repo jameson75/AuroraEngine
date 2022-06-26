@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using SharpDX;
-using CipherPark.Aurora.Core.World.Systems;
-using CipherPark.Aurora.Core.Effects;
-using CipherPark.Aurora.Core.World.Scene;
+﻿using SharpDX;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -43,9 +37,8 @@ namespace CipherPark.Aurora.Core.World
         {
             if (Model != null)
             {
-                var cameraNode = _game.GetActiveModuleContext()
-                                  .Scene
-                                  .CameraNode;
+                var cameraNode = _game.GetActiveScene()
+                                      .CameraNode;
                
                 Model.Effect.World = container?.WorldTransform().ToMatrix() ?? Matrix.Identity;
                 Model.Effect.View = cameraNode.RiggedViewMatrix;

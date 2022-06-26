@@ -62,8 +62,7 @@ namespace CipherPark.Aurora.Core.World
         {
             if (Effect != null && _mesh != null)
             {
-                var cameraNode = _app.GetActiveModuleContext()
-                                 .Scene
+                var cameraNode = _app.GetActiveScene()
                                  .CameraNode;            
                 //NOTE: When calculating the world transform of the collider, we use the container as the collider's parent
                 //space if one is specified, otherwise, we use the explicit parent space of the collider.

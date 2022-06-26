@@ -241,7 +241,7 @@ namespace CipherPark.Aurora.Core.Systems
         /// <returns></returns>
         public bool IsParticleInFustrum(Particle particle)
         {
-            SceneGraph scene = Game.GetActiveModuleContext().Scene;
+            SceneGraph scene = Game.GetActiveScene();
             Matrix viewMatrix = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
             Matrix projMatrix = scene.CameraNode.Camera.ProjectionMatrix;
             BoundingFrustum fustrum = new BoundingFrustum(viewMatrix * projMatrix);

@@ -105,8 +105,7 @@ namespace CipherPark.Aurora.Core.World
                                                                                     Matrix = Matrix.Transpose(p.Transform.ToMatrix())
                                                                                 });
                 mesh.UpdateInstanceStream(instanceData.ToArray());
-                var cameraNode = _game.GetActiveModuleContext()
-                                      .Scene
+                var cameraNode = _game.GetActiveScene()
                                       .CameraNode;
                 effect.View = cameraNode.RiggedViewMatrix;
                 effect.Projection = cameraNode.ProjectionMatrix;
@@ -134,7 +133,7 @@ namespace CipherPark.Aurora.Core.World
         /// <returns></returns>
         private bool IsInstanceInFustrum(ITransformable instance, Mesh mesh)
         {
-            SceneGraph scene = Game.GetActiveModuleContext().Scene;
+            SceneGraph scene = Game.GetActiveScene();
             Matrix viewMatrix = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
             Matrix projMatrix = scene.CameraNode.Camera.ProjectionMatrix;
             BoundingFrustum fustrum = new BoundingFrustum(viewMatrix * projMatrix);
