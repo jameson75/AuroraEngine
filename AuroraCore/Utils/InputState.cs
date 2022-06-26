@@ -28,10 +28,17 @@ namespace CipherPark.Aurora.Core.Utils
         long _stateUpdateTime = 0;
         IGameApp _game = null;
         HwndMessageHook _messageHook = null;
+        IMouseCoordsTransfomer _mouseCoordsTransformer = null;
 
         public InputState(IGameApp game)
         {
             _game = game;
+        }
+
+        public InputState(IGameApp game, IMouseCoordsTransfomer mouseCoordsTransformer)
+        {
+            _game = game;
+            _mouseCoordsTransformer = mouseCoordsTransformer;
         }
 
         public long StateUpdateTime { get { return _stateUpdateTime; } }
@@ -621,10 +628,17 @@ namespace CipherPark.Aurora.Core.Utils
             if (!UnsafeNativeMethods.GetCursorPos(out point))
                 throw new InvalidOperationException("Failed retreiving win32 mouse coordinates.");
 
-            if(!UnsafeNativeMethods.ScreenToClient(this._game.DeviceHwnd, ref point))
-                throw new InvalidOperationException("Failed converting mouse position to client coordinates.");
+            if (_mouseCoordsTransformer != null)
+            {
+                return _mouseCoordsTransformer.Transform(new Point(point.X, point.Y));
+            }
+            else
+            {
+                if (!UnsafeNativeMethods.ScreenToClient(this._game.DeviceHwnd, ref point))
+                    throw new InvalidOperationException("Failed converting mouse position to client coordinates.");
 
-            return new Point(point.X, point.Y);            
+                return new Point(point.X, point.Y);
+            }                        
         }
         
         private static class UnsafeNativeMethods
@@ -697,6 +711,11 @@ namespace CipherPark.Aurora.Core.Utils
     {
         Down,
         Up,
+    }
+
+    public interface IMouseCoordsTransfomer
+    {
+        Point Transform(Point point);
     }
 
     /*
