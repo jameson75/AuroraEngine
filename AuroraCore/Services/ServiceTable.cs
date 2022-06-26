@@ -21,10 +21,7 @@ namespace CipherPark.Aurora.Core.Services
 
         public object GetService(Type tService)
         {
-            var service = FindService(tService);
-            if (service != null)
-                return service;
-            throw new InvalidOperationException("Service does not exist.");
+            return FindService(tService);
         }
 
         public void RegisterService(object service)

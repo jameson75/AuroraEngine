@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using CipherPark.Aurora.Core.UI.Components;
-using CipherPark.Aurora.Core.Utils;
+﻿using CipherPark.Aurora.Core.Utils;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -50,6 +46,13 @@ namespace CipherPark.Aurora.Core.Services
         public InputService(IGameApp game)
         {
             _ism = new InputState(game);
+            _cim = new BufferedInputState(_ism);
+            Create(_ism, _cim);
+        }
+
+        public InputService(IGameApp game, IMouseCoordsTransfomer mouseCoordsTransfomer)
+        {
+            _ism = new InputState(game, mouseCoordsTransfomer);
             _cim = new BufferedInputState(_ism);
             Create(_ism, _cim);
         }
