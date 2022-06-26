@@ -72,7 +72,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
    
             if (this.HasFocus)
             {        
-                Services.InputService inputServices = (Services.InputService)Game.Services.GetService(typeof(Services.InputService));
+                Services.IInputService inputServices = Game.Services.GetService<Services.IInputService>();
                 if (inputServices == null)
                     throw new InvalidOperationException("Input services not available.");
                 BufferedInputState cim = inputServices.GetBufferedInputState();                

@@ -1,5 +1,4 @@
 ﻿using CipherPark.Aurora.Core;
-using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.UI.Components;
@@ -39,7 +38,7 @@ namespace Aurora.Sample.ContentBuilder
         protected override void OnUpdate()
         {
             //Update the input service (poll directx input devices).
-            Services.GetService<InputService>().UpdateState();           
+            Services.GetService<IInputService>().UpdateState();           
         }
 
         protected override void OnRender(bool isNewSurface)
