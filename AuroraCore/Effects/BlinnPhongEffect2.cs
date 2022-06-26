@@ -315,7 +315,7 @@ namespace CipherPark.Aurora.Core.Effects
             //----------------------
             offset += sizeof(float) * 3;
             for (int i = 0; i < MaxLights; i++)
-                dataBuffer.Set(offset + (i * Vector4.SizeInBytes), new Vector4(LampDirPosArray[i], (float)BlinnPhongLampType.Point));
+                dataBuffer.Set(offset + (i * Vector4.SizeInBytes), new Vector4(LampDirPosArray[i], (float)LightTypes[i]));
 
             //Write EnableAlphaMap
             //--------------------
