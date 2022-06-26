@@ -110,9 +110,8 @@ namespace Aurora.Sample.ContentImporter
             var model = CipherPark.Aurora.Core.Content.ContentImporter.ImportX(
                 this,
                 modelFilePath,
-                modelEffect.GetVertexShaderByteCode(),
-                XFileChannels.CommonAlinRiggedLitTexture1);
-            model.Effect = modelEffect;
+                modelEffect,
+                XFileChannels.CommonAlinRiggedLitTexture1);            
             model.Effect.World = Matrix.Identity;
             var eyeLevel = 100;
             model.Effect.View = Matrix.LookAtLH(new Vector3(0, eyeLevel, -200), new Vector3(0, eyeLevel, 0), Vector3.UnitY);
