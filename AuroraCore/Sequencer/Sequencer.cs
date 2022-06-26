@@ -35,7 +35,7 @@ namespace CipherPark.Aurora.Core.Sequencer
             _game = game;
         }
 
-        public void Update(GameTime gameTime, ModuleContext context)
+        public void Update(GameTime gameTime)
         {
             if (!_isStarted)
                 Start(gameTime);
@@ -51,7 +51,7 @@ namespace CipherPark.Aurora.Core.Sequencer
             {
                 if (sequenceEvent.Time <= elapsedSequencerTime)
                 {
-                    sequenceEvent.Execute(gameTime, context);
+                    sequenceEvent.Execute(gameTime);
                     Sequence.Remove(sequenceEvent);
                 }
             }
@@ -73,6 +73,6 @@ namespace CipherPark.Aurora.Core.Sequencer
     public abstract class SequenceEvent
     {
         public long Time { get; set; }
-        public abstract void Execute(GameTime gameTime, ModuleContext context);
+        public abstract void Execute(GameTime gameTime);
     }
 }

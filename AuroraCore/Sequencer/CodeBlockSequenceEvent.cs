@@ -16,14 +16,14 @@ namespace CipherPark.Aurora.Core.Sequencer
 
     public class CodeBlockSequenceEvent : SequenceEvent
     {
-        public override void Execute(GameTime gameTime, ModuleContext context)
+        public override void Execute(GameTime gameTime)
         {
             if (CodeBlock != null)
-                CodeBlock(gameTime, context);
+                CodeBlock(gameTime);
         }
 
         public ExecuteSequenceDelegate CodeBlock { get; set; }
     }
 
-    public delegate void ExecuteSequenceDelegate(GameTime gameTime, ModuleContext context);
+    public delegate void ExecuteSequenceDelegate(GameTime gameTime);
 }

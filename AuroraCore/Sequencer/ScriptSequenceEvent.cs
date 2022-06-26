@@ -10,7 +10,7 @@ namespace CipherPark.Aurora.Core.Sequencer
     {
         public string Script { get; set; }
 
-        public override void Execute(GameTime gameTime, ModuleContext context)
+        public override void Execute(GameTime gameTime)
         {
             
         }
