@@ -33,23 +33,23 @@ namespace Aurora.Core.UnitTests
 
             // Act
             sut.UnregisterService<IGameStateService>();
-            Action action = () => sut.GetService<IGameStateService>();
+            var result = sut.GetService<IGameStateService>();
 
             // Assert
-            action.Should().Throw<Exception>();
+            result.Should().BeNull();
         }
 
         [Test]
-        public void When_AccessUnregisteredService_Then_ExceptionIsThrown()
+        public void When_AccessUnregisteredService_Then_ResultIsNull()
         {
             // Arrange
             ServiceTable sut = new ServiceTable();
             
             // Act
-            Action action = () => sut.GetService<IGameStateService>();
+            var result = sut.GetService<IGameStateService>();
 
             // Assert
-            action.Should().Throw<Exception>();
+            result.Should().BeNull();
         }
 
         [Test]
