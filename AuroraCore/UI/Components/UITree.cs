@@ -4,6 +4,7 @@ using SharpDX.Direct3D11;
 using SharpDX;
 using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.Animation;
+using System.Linq;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -62,7 +63,7 @@ namespace CipherPark.Aurora.Core.UI.Components
 
             UpdateAnimations(gameTime);
 
-            foreach (UIControl control in this.controls)
+            foreach (UIControl control in this.controls.ToList())
                 control.Update(gameTime);
 
             focusManager.PostUpdate();
