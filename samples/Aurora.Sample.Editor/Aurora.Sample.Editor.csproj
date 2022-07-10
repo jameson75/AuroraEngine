@@ -70,8 +70,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EditorMode.cs" />
+    <Compile Include="MainWindowController.cs" />
     <Compile Include="SampleGameAppTheme.cs" />
+    <Compile Include="Scene\IEditableContext.cs" />
+    <Compile Include="Scene\ReferenceGrid.cs" />
+    <Compile Include="Scene\ReferenceGridEditContext.cs" />
+    <Compile Include="Scene\ReferenceGridRenderer.cs" />
+    <Compile Include="Scene\UI\Behavior\EditorModeLabelBehavior.cs" />
+    <Compile Include="Scene\UI\Behavior\RotationOverlayControlBehavior.cs" />
+    <Compile Include="Scene\UI\Behavior\NavigatorControlBehavior.cs" />
+    <Compile Include="Scene\UI\Extensions.cs" />
     <Compile Include="Services\MouseCoordsTransfomerWPF.cs" />
+    <Compile Include="Windows\SettingsDialog.xaml.cs">
+      <DependentUpon>SettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ViewportColor.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -87,6 +101,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\SettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -128,6 +146,28 @@
     <Content Include="AuroraNative.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Icons\transform_scale.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\Hand.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\arrow-move.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\arrow-in.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\arrow-curve-180.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\arrow-circle-135.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\rotate-ccw.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

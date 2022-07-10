@@ -9,20 +9,56 @@
         Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20" />
+            <RowDefinition Height="50" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <DockPanel>
-            <Menu DockPanel.Dock="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="300" />
+        </Grid.ColumnDefinitions>
+        <DockPanel Grid.ColumnSpan="2">
+            <Menu DockPanel.Dock="Top" >
                 <MenuItem Header="_File">
                     <MenuItem Header="_Open" Click="Menu_File_Open_Click"/>
                     <MenuItem Header="_Close"/>
                     <MenuItem Header="_Save"/>
                 </MenuItem>
-            </Menu>           
+                <MenuItem Header="_Edit">                    
+                </MenuItem>
+                <MenuItem Header="_Project">
+                    <MenuItem Header="_Settings" Click="Menu_Project_Settings_Click"/>
+                </MenuItem>
+            </Menu>
+            <ToolBarTray Height="30" DockPanel.Dock="Bottom">
+                <ToolBar Name="MyToolbar" Height="30" >
+                    <Button ToolTip="Rotate Camera" Click="ToolBar_RotateCamera_Click">
+                        <Image Source="Resources\Icons\rotate-ccw.ico"/>
+                    </Button>
+                    <Button ToolTip="Traverse Camera" Click="ToolBar_TraverseCamera_Click">
+                        <Image Source="Resources\Icons\arrow-move.ico"/>
+                    </Button>
+                    <Button ToolTip="Pan Camera" Click="ToolBar_PanCamera_Click">
+                        <Image Source="Resources\Icons\Hand.ico"/>
+                    </Button>
+                    <Button ToolTip="Reset Camera" Click="ToolBar_ResetCamera_Click">
+                        <Image Source="Resources\Icons\arrow-curve-180.ico"/>
+                    </Button>
+                    <Separator/>
+                    <Button ToolTip="Select Scene Object" Click="ToolBar_SelectSceneObject_Click">
+                        <Image Source="Resources\Icons\arrow-in.ico"/>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
         </DockPanel>
         <ContentControl x:Name="host" BorderThickness="0" Grid.Row="1">
             <Image Name="hostImage"/>
         </ContentControl>
+        <TabControl Grid.Row="1" Grid.Column="1">
+            <TabItem Header="General">
+                <Label Content="Content goes here..." />
+            </TabItem>
+            <TabItem Header="Security" />
+            <TabItem Header="Details" />
+        </TabControl>
     </Grid>
 </Window>

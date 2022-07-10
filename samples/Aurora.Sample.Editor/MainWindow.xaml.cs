@@ -2,10 +2,7 @@
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
-using CipherPark.Aurora.Core.Content;
-using CipherPark.Aurora.Core.Effects;
-using CipherPark.Aurora.Core.World;
-using CipherPark.Aurora.Core.World.Scene;
+using Aurora.Sample.Editor.Windows;
 using Microsoft.Wpf.Interop.DirectX;
 using SharpDX;
 
@@ -128,60 +125,45 @@ namespace Aurora.Sample.Editor
         private void Menu_File_Open_Click(object sender, RoutedEventArgs e)
         {
             string filePath = controller.ChooseFile();
-            if(filePath != null)
+            if (filePath != null)
             {
-                controller.ImportModel(game, filePath);                
+                controller.ImportModel(game, filePath);
             }
+        }        
+
+        private void Menu_Project_Settings_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SettingsDialog();
+            dialog.ShowDialog();
+            game.ChangeViewportColor(dialog.SelectedViewportColor);
         }
         #endregion
-    }
 
-    public class MainWindowController
-    {
-        public string ChooseFile()
+        #region ToolBar Handlers
+        private void ToolBar_RotateCamera_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.DefaultExt = ".x";
-            dialog.Filter = "Direct X (.x)|*.x";
-            return dialog.ShowDialog() == true ? dialog.FileName : null;
+            game.EditorMode = EditorMode.RotateCamera;
         }
 
-        public byte[] LoadFile(string filePath)
+        private void ToolBar_TraverseCamera_Click(object sender, RoutedEventArgs e)
         {
-            return System.IO.File.ReadAllBytes(filePath);
+            game.EditorMode = EditorMode.TraverseCamera;
         }
 
-        public void ImportModel(EditorGameApp game, string filePath)
+        private void ToolBar_PanCamera_Click(object sender, RoutedEventArgs e)
         {
-            /*
-            BlinnPhongEffect2 effect = new BlinnPhongEffect2(game, SurfaceVertexType.InstancePositionNormalColor);                        
-            effect.AmbientColor = SharpDX.Color.White;
-            effect.Lighting = new Light[]
-            {
-                    new PointLight
-                    {
-                        Diffuse = SharpDX.Color.White,
-                        Transform = new CipherPark.Aurora.Core.Animation.Transform(new Vector3(500, 500, 500))
-                    },
-                    new PointLight
-                    {
-                        Diffuse = SharpDX.Color.White,
-                        Transform = new CipherPark.Aurora.Core.Animation.Transform(new Vector3(-500, -500, -500))
-                    }
-            };
-            */
-            FlatEffect effect = new FlatEffect(game, SurfaceVertexType.PositionColor);
-            var model = ContentImporter.ImportX(game, filePath, effect, XFileChannels.Mesh | XFileChannels.DefaultMaterialColor , XFileImportOptions.IgnoreMissingColors);
-            game.Scene.Nodes.Add(new GameObjectSceneNode(game)
-            {
-                GameObject = new GameObject(game)
-                {
-                    Renderer = new ModelRenderer(game)
-                    {
-                        Model = model
-                    }
-                },
-            });
+            game.EditorMode = EditorMode.PanCamera;
         }
+
+        private void ToolBar_SelectSceneObject_Click(object sender, RoutedEventArgs e)
+        {
+            game.EditorMode = EditorMode.SelectSceneObject;
+        }
+
+        private void ToolBar_ResetCamera_Click(object sender, RoutedEventArgs e)
+        {
+            game.ResetCamera();
+        }
+        #endregion
     }
 }

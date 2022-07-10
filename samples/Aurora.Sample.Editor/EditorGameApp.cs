@@ -1,11 +1,9 @@
 ﻿using CipherPark.Aurora.Core;
 using CipherPark.Aurora.Core.Content;
-using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.UI.Components;
 using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.World;
-using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.Utils;
 using SharpDX;
@@ -13,12 +11,16 @@ using SharpDX.Direct3D11;
 using System;
 using System.Windows;
 using Aurora.Sample.Editor.Services;
+using Aurora.Sample.Editor.Scene;
+using Aurora.Sample.Editor.Scene.UI.Behavior;
 
 namespace Aurora.Sample.Editor
 {
     public class EditorGameApp : GameAppWPF, IContainActiveScene
     {
         private readonly UIElement imageHost;
+        private Color viewportColor = Color.Black;
+        private EditorMode editorMode = EditorMode.RotateCamera;
 
         public UITree UI { get; private set; }
         public SceneGraph Scene { get; private set; }
@@ -52,9 +54,8 @@ namespace Aurora.Sample.Editor
                     ViewMatrix = GetDefaultViewMatrix(),
                     ProjectionMatrix = CalculateProjection(),
                 });
-
-            //AddTestCube();
-            AddTestQuad();
+            
+            AddReferenceGrid();
         }
 
         private void InitializeUI()
@@ -64,28 +65,43 @@ namespace Aurora.Sample.Editor
 
             UI.Controls.Add(new NavigatorControl(UI)
             {
-                NavigationMode = MouseNavigatorService.NavigationMode.Rotate,
+                Behavior = new NavigatorControlBehavior(),
             });
 
-            var crossHairControl = new ContentControl(
+            var rotationOverlayControl = new ContentControl(
                 UI,
                 new ImageContent(ContentImporter.LoadTexture(UI.Game.GraphicsDeviceContext, @"Assets\UI\cross_hair.png"))
                 {
                     ScaleImage = true,
                     PredefinedBlend = PredefinedBlend.AlphaBlend,
-                });
-            crossHairControl.Size = new Size2F(MouseNavigatorService.RotationEllipseDiameter, MouseNavigatorService.RotationEllipseDiameter);
-            crossHairControl.HorizontalAlignment = CipherPark.Aurora.Core.UI.Controls.HorizontalAlignment.Center;
-            crossHairControl.VerticalAlignment = CipherPark.Aurora.Core.UI.Controls.VerticalAlignment.Center;
+                })
+            {
+                Size = new Size2F(MouseNavigatorService.RotationEllipseDiameter, MouseNavigatorService.RotationEllipseDiameter),
+                HorizontalAlignment = CipherPark.Aurora.Core.UI.Controls.HorizontalAlignment.Center,
+                VerticalAlignment = CipherPark.Aurora.Core.UI.Controls.VerticalAlignment.Center,
+                Behavior = new RotationOverlayControlBehavior(),               
+            };
 
-            Panel crossHairPanelControl = new Panel(UI)
+            Panel navigationOverlayPanel = new Panel(UI)
             {
                 IsFullSize = true,
                 ZOrder = 1,
             };
 
-            crossHairPanelControl.Children.Add(crossHairControl);
-            UI.Controls.Add(crossHairPanelControl);
+            navigationOverlayPanel.Children.Add(rotationOverlayControl);
+            UI.Controls.Add(navigationOverlayPanel);
+
+            ContentControl editorModelLabel = new ContentControl(UI, new TextContent()
+                {
+                    PredefinedBlend = PredefinedBlend.Opacity,
+                    BlendFactor = new Color4(.5f, .5f, .5f , .5f),
+                })
+            {                
+                Size = new Size2F(100, 18),
+                Behavior = new EditorModeLabelBehavior(),
+            };
+            editorModelLabel.Content.As<TextContent>().Color = Color.DarkGray;
+            UI.Controls.Add(editorModelLabel);
         }
 
         #endregion
@@ -95,13 +111,16 @@ namespace Aurora.Sample.Editor
             //Update the input service (poll directx input devices).
             Services.GetService<IInputService>().UpdateState();
 
+            //Update scene
+            Scene.Update(GameTime);
+
             //Update Game UI.
             UI.Update(GameTime);
         }
 
         protected override void OnRender(bool isNewSurface)
         {
-            GraphicsDevice.ImmediateContext.ClearRenderTargetView(this.RenderTargetView, Color.Black);
+            GraphicsDevice.ImmediateContext.ClearRenderTargetView(this.RenderTargetView, viewportColor);
             GraphicsDevice.ImmediateContext.ClearDepthStencilView(this.DepthStencil, DepthStencilClearFlags.Depth, 1, 0);
             bool success = Render();
             if (success)
@@ -148,54 +167,53 @@ namespace Aurora.Sample.Editor
                 Scene.CameraNode.Camera.ProjectionMatrix = CalculateProjection();
         }
 
-        private void AddTestCube()
+        private void AddReferenceGrid()
         {
-            var effect = new FlatEffect(this, SurfaceVertexType.PositionColor);
-            
-            var cube = CipherPark.Aurora.Core.Content.ContentBuilder.BuildColoredBox(
-                this.GraphicsDevice,
-                effect.GetVertexShaderByteCode(),
-                new BoundingBox(new Vector3(-200, -200, -200), new Vector3(200, 200, 200)),               
-                Color.Aquamarine);
-
-            Scene.Nodes.Add(new GameObjectSceneNode(this)
+            var referenceGridNode = new GameObjectSceneNode(this)
             {
-                Name = "Test Cube Node",
+                Name = "Reference Grid Node",
                 GameObject = new GameObject(this)
                 {
-                    Renderer = new ModelRenderer(new StaticMeshModel(this)
-                    {
-                        Name = "Test Cube",
-                        Mesh = cube,
-                        Effect = effect,
-                    })
+                    Renderer = new ReferenceGridRenderer(this, new Scene.ReferenceGrid(
+                        5000,
+                        10,
+                        10,
+                        5000,
+                        10,
+                        10)),
                 }
+            };
+            referenceGridNode.GameObject.AddContext(new TraversingPlaneContext
+            {
+                Plane = new Plane(Vector3.UnitY, 0)
             });
+            referenceGridNode.Transform = new CipherPark.Aurora.Core.Animation.Transform(Matrix.Translation(100, 100, 100));
+            Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(new Vector3(100, 101, 100), new Vector3(100, 100, 100), Vector3.UnitZ);
+            Scene.Nodes.Add(referenceGridNode);            
         }
 
-        private void AddTestQuad()
+        public void ChangeViewportColor(Color newViewportColor)
         {
-            var effect = new FlatEffect(this, SurfaceVertexType.PositionColor);
+            viewportColor = newViewportColor;
+        }
 
-            var quad = CipherPark.Aurora.Core.Content.ContentBuilder.BuildColoredQuad(
-                this.GraphicsDevice,
-                effect.GetVertexShaderByteCode(),
-                RectangleDimensions.FromCenter(200, 200),
-                Color.Aquamarine);
-
-            Scene.Nodes.Add(new GameObjectSceneNode(this)
+        public EditorMode EditorMode
+        {
+            get => editorMode;
+            set
             {
-                Name = "Test Quad Node",
-                GameObject = new GameObject(this)
+                editorMode = value;
+                switch(editorMode)
                 {
-                    Renderer = new ModelRenderer(new StaticMeshModel(this)
-                    {
-                        Name = "Test Quad",
-                        Mesh = quad,
-                        Effect = effect,
-                    })
+                    case EditorMode.RotateCamera:                        
+                        break;
                 }
-            });
+            }
+        }
+
+        public void ResetCamera()
+        {
+            Scene.CameraNode.Camera.ViewMatrix = GetDefaultViewMatrix();
         }
     }
 }
