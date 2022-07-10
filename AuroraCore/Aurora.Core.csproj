@@ -121,10 +121,18 @@
     <Compile Include="Effects\PixelVelocityBlurPostEffect.cs" />
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
     <Compile Include="GameAppWPF.cs" />
+    <Compile Include="Services\CastExtensions.cs" />
     <Compile Include="Services\ICommandTerminalService.cs" />
     <Compile Include="Services\MouseNavigatorService.cs" />
     <Compile Include="Services\MouseTrackingService.cs" />
     <Compile Include="Services\ActiveSceneService.cs" />
+    <Compile Include="Utils\BoundingContext.cs" />
+    <Compile Include="Utils\PickExtensions.cs" />
+    <Compile Include="Utils\PickInfo.cs" />
+    <Compile Include="Utils\SceneExtensions.cs" />
+    <Compile Include="Utils\ScenePicker.cs" />
+    <Compile Include="Utils\SharpDXExtensions.cs" />
+    <Compile Include="Utils\TraversingPlaneContext.cs" />
     <Compile Include="Terminal\ICommandTerminal.cs" />
     <Compile Include="GameTime.cs" />
     <Compile Include="Animation\Controllers\SimulatorController.cs" />
@@ -168,6 +176,7 @@
     <Compile Include="World\Geometry\ModelTextureChannel.cs" />
     <Compile Include="World\Geometry\MultiMeshModel.cs" />
     <Compile Include="World\Geometry\StaticMeshModel.cs" />
+    <Compile Include="World\Renderers\IProvideBoundingContext.cs" />
     <Compile Include="World\Renderers\InstanceRenderer.cs" />
     <Compile Include="World\Renderers\ModelRenderer.cs" />
     <Compile Include="World\Scene\GameObjectSceneNode.cs" />

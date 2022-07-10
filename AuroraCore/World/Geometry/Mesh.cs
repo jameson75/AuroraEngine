@@ -25,7 +25,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
 
         public string Name { get; set; }
 
-        public BoundingBox BoundingBox { get; private set; }
+        public BoundingBox BoundingBox { get => _description.BoundingBox; }
 
         private Mesh(SharpDX.Direct3D11.Device device, MeshDescription description)
         {

@@ -356,11 +356,16 @@ namespace CipherPark.Aurora.Core.Utils
         {
             return float.IsNaN(v.X) || float.IsNaN(v.Y) || float.IsNaN(v.Z);
         }
+
+        public static Vector2 XY(this Vector3 v)
+        {
+            return new Vector2(v.X, v.Y);
+        }
     }   
 
     public static class Vector4Extension
     {
-        public static Vector3 ToVector3(this Vector4 v)
+        public static Vector3 XYZ(this Vector4 v)
         {
             return new Vector3(v.X, v.Y, v.Z);
         }

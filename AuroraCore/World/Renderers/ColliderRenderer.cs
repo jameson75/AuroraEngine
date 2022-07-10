@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using SharpDX;
 using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Utils;
-using CipherPark.Aurora.Core.Utils.Toolkit;
-using CipherPark.Aurora.Core.UI.Controls;
-using CipherPark.Aurora.Core.UI.Components;
-using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.World.Collision;
-using CipherPark.Aurora.Core.Sequencer;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Effects;
-using CipherPark.Aurora.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.

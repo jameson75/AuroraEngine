@@ -11,7 +11,7 @@ using CipherPark.Aurora.Core.World.Geometry;
 
 namespace CipherPark.Aurora.Core.World
 {
-    public class ModelRenderer : IRenderer
+    public class ModelRenderer : IRenderer, IProvideBoundingContext
     {
         IGameApp _game = null;
 
@@ -46,7 +46,12 @@ namespace CipherPark.Aurora.Core.World
                 Model.Draw();
             }
         }
-
+     
         public void Update(GameTime gameTime) { }
+
+        public BoundingBox? GetBoundingBox()
+        {
+            return Model?.BoundingBox;
+        }
     }
 }

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.Utils.Toolkit;
 using SharpDX;
+using SharpDX.Direct3D11;
 
 namespace CipherPark.Aurora.Core.UI.Controls
 {
     public class TextContent : ColorContent
     {
+        private BlendState cachedBlendState;
+
         public TextContent()
         {
             VAlignment = VerticalAlignment.Top;
@@ -45,10 +48,12 @@ namespace CipherPark.Aurora.Core.UI.Controls
            
             Vector2 contentSurfacePosition = Container.PositionToSurface(Container.Position);
 
+            this.BlendingDisabled = true;
             this.BeginDraw();
             string outputString = string.IsNullOrEmpty(Text) ? string.Empty : string.IsNullOrEmpty(Format) ? Text : string.Format(Format, Text);            
             Container.ControlSpriteBatch.DrawString(Font, outputString, contentSurfacePosition.ToVector2(), FontColor);               
-            this.EndDraw();                   
+            this.EndDraw();
+            this.BlendingDisabled = false;
         }
 
         public override RectangleF CalculateSmallestBoundingRect()

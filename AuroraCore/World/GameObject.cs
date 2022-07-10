@@ -1,10 +1,11 @@
 ﻿using System;
-using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.World.Collision;
 using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Systems;
 using System.Collections.Generic;
+using SharpDX;
+using System.Linq;
 
 namespace CipherPark.Aurora.Core.World
 {
@@ -40,11 +41,7 @@ namespace CipherPark.Aurora.Core.World
             }
         }
 
-        public IGameApp Game { get; private set; }
-
-        /*
-        public string Name { get; set; }
-        */
+        public IGameApp Game { get; private set; }       
 
         public IRigidBody RigidBody { get; set; }
 
@@ -56,9 +53,21 @@ namespace CipherPark.Aurora.Core.World
         {
             var type = typeof(T);
             if (!_contextualContent.ContainsKey(type))
-                return null;
+                return FindContextByContract<T>();
             return (T)_contextualContent[type];
-        }         
+        }       
+
+        public BoundingBox? GetBoundingBox()
+        {
+            var boundingContext = FindContextByContract<IProvideBoundingContext>();
+
+            if (boundingContext != null)
+                return boundingContext.GetBoundingBox();
+            else if (Renderer is IProvideBoundingContext)
+                return ((IProvideBoundingContext)Renderer).GetBoundingBox();            
+
+            return null;
+        }
 
         public void AddContext<T>(T content) where T : class
         {
@@ -68,13 +77,7 @@ namespace CipherPark.Aurora.Core.World
             if (_contextualContent.ContainsKey(type))
                 throw new InvalidOperationException("Content type already exists.");
             _contextualContent.Add(type, content);
-        }
-       
-        /*
-        public Transform Transform { get; set; }
-
-        public ITransformable TransformableParent { get; set; }
-        */        
+        }      
 
         public BodyMotion BodyMotion { get; set; }
 
@@ -82,8 +85,8 @@ namespace CipherPark.Aurora.Core.World
 
         public void Update(GameTime gameTime)
         {
-            Renderer?.Update(gameTime);
             UpdateAction?.Invoke(gameTime);
+            Renderer?.Update(gameTime);            
             OnUpdate(gameTime);
         }
 
@@ -118,6 +121,16 @@ namespace CipherPark.Aurora.Core.World
         {
             if (Renderer != null)
                 Renderer.Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private T FindContextByContract<T>() where T : class
+        {
+            return (T)_contextualContent.FirstOrDefault(c => c.Key.IsAssignableFrom(typeof(T))).Value;
         }
     }
 }

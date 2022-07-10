@@ -56,6 +56,8 @@ namespace CipherPark.Aurora.Core.UI.Controls
 
         public PredefinedBlend PredefinedBlend { get; set; }
 
+        protected bool BlendingDisabled { get; set; }
+
         protected bool HasDrawParameters
         {
             get
@@ -124,7 +126,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
 
             //Blending
             //--------
-            if (BlendState == null)
+            if (BlendState == null && !BlendingDisabled)
             {
                 //https://msdn.microsoft.com/en-us/library/bb976070.aspx
 

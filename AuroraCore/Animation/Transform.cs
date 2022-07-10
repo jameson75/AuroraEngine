@@ -118,6 +118,21 @@ namespace CipherPark.Aurora.Core.Animation
     /// </summary>
     public static class TransformableExtension
     {
+        public static Ray WorldToLocalRay(this ITransformable transformable, Ray ray)
+        {
+            return new Ray(transformable.WorldToLocalCoordinate(ray.Position), transformable.WorldToLocalNormal(ray.Direction));
+        }
+
+        public static Ray WorldToParentRay(this ITransformable transformable, Ray ray)
+        {
+            return new Ray(transformable.WorldToParentCoordinate(ray.Position), transformable.WorldToParentNormal(ray.Direction));
+        }
+
+        public static Ray ParentToWorldRay(this ITransformable transformable, Ray ray)
+        {
+            return new Ray(transformable.ParentToWorldCoordinate(ray.Position), transformable.ParentToWorldNormal(ray.Direction));
+        }
+
         public static Vector3 ParentToWorldCoordinate(this ITransformable transformable, Vector3 postion)
         {
             if (transformable.TransformableParent != null)

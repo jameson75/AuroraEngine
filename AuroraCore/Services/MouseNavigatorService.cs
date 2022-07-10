@@ -3,6 +3,7 @@ using SharpDX;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.World.Scene;
 using System.Linq;
+using CipherPark.Aurora.Core.Utils;
 
 namespace CipherPark.Aurora.Core.Services
 {
@@ -15,7 +16,6 @@ namespace CipherPark.Aurora.Core.Services
         private IGameApp gameApp = null;
         private Size2 navigationAreaSize = Size2.Empty;
         private int yRotationDirection = 0;
-        private Vector2 lastMouseOffset = Vector2.Zero;
 
         public const int RotationEllipseDiameter = 400;
 
@@ -77,19 +77,35 @@ namespace CipherPark.Aurora.Core.Services
             var camera = cameraNode.Camera;
             var mode = Mode;            
             Vector2 mouseOffset = -Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
-         
+            Vector3 platformLocation = new Vector3(100, 100, 100);
+            Matrix platformTranslation = Matrix.Translation(platformLocation);            
+
             switch (mode)
-            {                
-                case NavigationMode.Rotate:
+            {
+                case NavigationMode.Pan:
                     if (buttonDown && isMouseTracking)
                     {
-                        //
-                        var accumPanTranslation = Matrix.Translation(accumPanVector);
-                        camera.ViewMatrix = Matrix.Invert(accumPanTranslation) * camera.ViewMatrix;                                                                
+                        //TODO: Unhardcode the translation factor using one derived from the z coordinate (in camera space) of
+                        //the intersection point of the bounding box surrounding the visible scene graph object closest to
+                        //the camera.
+                        float translationFactor = 5.0f;
+                        var traverseVector = cameraNode.LocalToWorldNormal(new Vector3(-mouseOffset.X * translationFactor, mouseOffset.Y * translationFactor, 0));
+                        traverseVector = cameraNode.WorldToParentNormal(traverseVector);
+                        camera.ViewMatrix = Matrix.Translation(traverseVector) * camera.ViewMatrix;
+                        mouseMoveFrom = location;
+                        accumTraverseVector += traverseVector;
+                    }
+                    break;
+                case NavigationMode.PlatformRotate:
+                    if (buttonDown && isMouseTracking)
+                    {
+                        var accumTraverseTranslation = Matrix.Translation(accumTraverseVector);
+                        camera.ViewMatrix = Matrix.Invert(accumTraverseTranslation) * camera.ViewMatrix;                                                                
                         //Capture translation of camera.
                         Matrix cameraTranslation = Matrix.Translation(camera.ViewMatrix.TranslationVector);
                         Matrix cameraTranslationInverse = Matrix.Invert(cameraTranslation);
-                        //if the verticle mouse movement results in a rotation about the z-axis, we rotate the camera around it's own z-axis (view-space z-axis).
+                        Matrix platformTranslationLocal = Matrix.Translation(Vector3.TransformCoordinate(platformLocation, cameraNode.ViewMatrix * cameraTranslationInverse));
+                        //if the mouse movement results in a rotation about the z-axis, we rotate the camera around it's own z-axis (view-space z-axis).
                         //We accomplish this by right multiplying the rotation about z before we re-apply the translations.
                         if (rotateAboutZ)
                         {
@@ -104,7 +120,9 @@ namespace CipherPark.Aurora.Core.Services
 
                             camera.ViewMatrix = camera.ViewMatrix *
                                                 cameraTranslationInverse *
+                                                Matrix.Invert(platformTranslationLocal) *
                                                 Matrix.RotationZ((float)zRotation * spinDir) *
+                                                platformTranslationLocal *
                                                 cameraTranslation;
                         }
                         //otherwise, the verticle mouse movement results in a revolution of the camera about an axis, v, which passes through
@@ -113,11 +131,13 @@ namespace CipherPark.Aurora.Core.Services
                         else
                             camera.ViewMatrix = camera.ViewMatrix *
                                                 cameraTranslationInverse *
+                                                Matrix.Invert(platformTranslationLocal) *
                                                 Matrix.RotationX(MathUtil.DegreesToRadians(mouseOffset.Y)) *
+                                                platformTranslationLocal *
                                                 cameraTranslation;
 
-                        //if verticle mouse movement doesn't result in a rotation about the z-axis, we revolve the camera about the world's (world space) y-axis by
-                        //left multiplying a rotation about y, after reapplying the translations.
+                        //if  mouse movement doesn't result in a rotation about the z-axis, we revolve the camera about the world's y-axis by
+                        //left multiplying a rotation about y, after reapplying the translations above.
                         if (!rotateAboutZ)
                         {                            
                             if (yRotationDirection == 0)
@@ -132,50 +152,42 @@ namespace CipherPark.Aurora.Core.Services
                                 yRotationDirection*= camera.Location.Y > 0 ? 1 : -1;
                             }
                            
-                            camera.ViewMatrix = Matrix.RotationY(MathUtil.DegreesToRadians(mouseOffset.X) * yRotationDirection) * camera.ViewMatrix;
+                            camera.ViewMatrix = Matrix.Invert(platformTranslation) * 
+                                                Matrix.RotationY(MathUtil.DegreesToRadians(mouseOffset.X) * yRotationDirection) * 
+                                                platformTranslation *
+                                                camera.ViewMatrix;
                         }
                         
-                        camera.ViewMatrix = accumPanTranslation * camera.ViewMatrix;
+                        camera.ViewMatrix = accumTraverseTranslation * camera.ViewMatrix;
                         mouseMoveFrom = location;
                     }
                     break;
-                case NavigationMode.PanPlatform:                    
+                case NavigationMode.PlaformTraverse:                    
                     if (buttonDown && isMouseTracking)
                     {                        
-                        var floorPickFrom = ScenePicker.PickNodes(
+                        var planePickFrom = ScenePicker.PickNodes(
                             Game, 
                             mouseMoveFrom.X, 
                             mouseMoveFrom.Y,
-                            n => n.As<GameObjectSceneNode>()?.GameObject.GetContext<PlatformPlane>() != null)
+                            n => n.As<GameObjectSceneNode>()?.GameObject.GetContext<TraversingPlaneContext>() != null)
                             .GetClosest(camera.Location);
                         
                         Vector3 panVector = Vector3.Zero;
-                        if (floorPickFrom != null)
+                        if (planePickFrom != null)
                         {
-                            var floorPickTo = ScenePicker.PickNodes(Game, location.X, location.Y, n => n == floorPickFrom.Node).First();
-                            var v = floorPickTo.IntersectionPoint - floorPickFrom.IntersectionPoint;
-                            panVector = v;
-
-                            panVector = cameraNode.WorldToParentNormal(panVector);
-                            camera.ViewMatrix = Matrix.Translation(panVector) * camera.ViewMatrix;
-                            mouseMoveFrom = location;
-                            accumPanVector += panVector;
+                            var planePickTo = ScenePicker.PickNodes(Game, location.X, location.Y, n => n == planePickFrom.Node).FirstOrDefault();
+                            if (planePickTo != null)
+                            {
+                                var v = planePickTo.IntersectionPoint - planePickFrom.IntersectionPoint;
+                                panVector = v;
+                                panVector = cameraNode.WorldToParentNormal(panVector);
+                                camera.ViewMatrix = Matrix.Translation(panVector) * camera.ViewMatrix;
+                                mouseMoveFrom = location;
+                                accumTraverseVector += panVector;
+                            }
                         }
                     }
-                    break;
-                case NavigationMode.PanCamera:                    
-                    if (buttonDown && isMouseTracking)
-                    {                                           
-                        //TODO: Unhardcode the translation factor using one derived from the z coordinate (in camera space) of
-                        //the intersection point of the bounding box surrounding the visible scene graph object closest to
-                        //the camera.
-                        float translationFactor = 5.0f;
-                        var panVector = new Vector3(-mouseOffset.X * translationFactor, mouseOffset.Y * translationFactor, 0);                        
-                        camera.ViewMatrix = camera.ViewMatrix * Matrix.Translation(panVector);
-                        mouseMoveFrom = location;
-                        accumPanVector += panVector;
-                    }
-                    break;
+                    break;                
                 case NavigationMode.None:                    
                     break;
             }            
@@ -183,17 +195,17 @@ namespace CipherPark.Aurora.Core.Services
 
         internal void NotifyReset()
         {
-            accumPanVector = Vector3.Zero;            
+            accumTraverseVector = Vector3.Zero;            
         }
 
-        private Vector3 accumPanVector = Vector3.Zero;
+        private Vector3 accumTraverseVector = Vector3.Zero;
 
         public enum NavigationMode
         {
             None,
-            Rotate,           
-            PanPlatform,
-            PanCamera
+            PlatformRotate,           
+            PlaformTraverse,
+            Pan
         }
     }   
 }
