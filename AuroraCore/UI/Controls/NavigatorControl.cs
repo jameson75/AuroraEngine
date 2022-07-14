@@ -2,7 +2,6 @@
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.UI.Components;
-using CipherPark.Aurora.Core.Content;
 using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,36 +12,25 @@ using SharpDX;
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.Aurora.Core.UI.Controls
-{
-    public enum ActionMode
-    {
-        None,
-        Select,
-        Navigate      
-    }
-
-    public enum CameraMode
-    {
-        None,
-        Rotate,
-        Pan
-    }
-
+{   
     public class NavigatorControl : UIControl
     {          
         private MouseNavigatorService mouseNavigatorService;
+        private SceneModifierService sceneModifierService;
 
         public NavigatorControl(IUIRoot visualRoot) : base(visualRoot)
         {
             mouseNavigatorService = new MouseNavigatorService(visualRoot.Game);
+            sceneModifierService = new SceneModifierService(visualRoot.Game);
         }       
         
         public MouseNavigatorService.NavigationMode NavigationMode { get => mouseNavigatorService.Mode; set => mouseNavigatorService.Mode = value; }    
+        public bool IsInPickingMode { get => sceneModifierService.IsActive; set => sceneModifierService.IsActive = value; }
 
         protected override void OnUpdate(GameTime gameTime)
         {            
             IInputService inputServices = Game.Services.GetService<IInputService>();
-            InputState inputState = inputServices.GetInputState();
+            InputState inputState = inputServices.GetInputState();           
 
             if (IsMouseInViewport(inputState) || this.Capture)
             {
@@ -67,8 +55,9 @@ namespace CipherPark.Aurora.Core.UI.Controls
         {
             if (mouseButton == InputState.MouseButton.Left)
             {
-                this.Capture = true;
-                mouseNavigatorService.BeginMouseTracking(location);
+                Capture = true;
+                mouseNavigatorService.NotifyMouseDown(location);
+                sceneModifierService.NotifyMouseDown(location);
             }
         }
         
@@ -76,8 +65,9 @@ namespace CipherPark.Aurora.Core.UI.Controls
         {
             if (mouseButton == InputState.MouseButton.Left && this.Capture)
             {
-                this.Capture = false;
-                mouseNavigatorService.EndMouseTracking(location);
+                Capture = false;
+                mouseNavigatorService.NotifyMouseUp(location);
+                sceneModifierService.NotifyMouseUp(location);
             }
         }
 
@@ -90,6 +80,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
         {
             bool leftButtonDown = mouseButtonsDown.Contains(InputState.MouseButton.Left);
             mouseNavigatorService.NotifyMouseMove(leftButtonDown, location);
+            sceneModifierService.NotifyMouseMove(leftButtonDown, location);
         }
 
         private bool IsMouseInViewport(InputState state)

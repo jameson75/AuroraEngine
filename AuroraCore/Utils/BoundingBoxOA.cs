@@ -72,10 +72,10 @@ namespace CipherPark.Aurora.Core.Utils
             return newBox;
         }
 
-        public static BoundingBoxOA FromBox(BoundingBox box)
+        public static BoundingBoxOA FromAABoundingBox(BoundingBox box)
         {
             Vector3[] corners = box.GetCorners();
-            return Utils.BoundingBoxOA.FromCorners(corners);
+            return FromCorners(corners);
         }
 
         /// <summary>

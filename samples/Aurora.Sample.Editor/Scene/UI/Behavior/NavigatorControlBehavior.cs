@@ -20,21 +20,25 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
         {
             if (HasEditorModeChanged(gameApp))
             {
+                var activatePickingMode = false;
+                var navigationMode = MouseNavigatorService.NavigationMode.None;
                 switch (gameApp.EditorMode)
                 {
                     case EditorMode.RotateCamera:
-                        navigatorControl.NavigationMode = MouseNavigatorService.NavigationMode.PlatformRotate;
+                        navigationMode = MouseNavigatorService.NavigationMode.PlatformRotate;
                         break;
                     case EditorMode.TraverseCamera:
-                        navigatorControl.NavigationMode = MouseNavigatorService.NavigationMode.PlaformTraverse;
+                        navigationMode = MouseNavigatorService.NavigationMode.PlaformTraverse;
                         break;
                     case EditorMode.PanCamera:
-                        navigatorControl.NavigationMode = MouseNavigatorService.NavigationMode.Pan;
+                        navigationMode = MouseNavigatorService.NavigationMode.Pan;
                         break;
-                    default:
-                        navigatorControl.NavigationMode = MouseNavigatorService.NavigationMode.None;
+                    case EditorMode.SelectSceneObject:
+                        activatePickingMode = true;
                         break;
                 }
+                navigatorControl.NavigationMode = navigationMode;
+                navigatorControl.IsInPickingMode = activatePickingMode;
             }
         }
 

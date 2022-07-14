@@ -4,12 +4,13 @@ using System.Linq;
 using SharpDX;
 using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Services;
 
 namespace CipherPark.Aurora.Core.Utils
 {
     public class ScenePicker
     {        
-        public static IEnumerable<PickInfo> PickNodes(IGameApp gameApp, int x, int y, Func<SceneNode, bool> customFilter = null)
+        public static IEnumerable<PickInfo> PickNodes(IGameApp gameApp, int x, int y, Func<GameObjectSceneNode, bool> customFilter = null)
         {
             List<PickInfo> results = new List<PickInfo>();
 
@@ -17,7 +18,7 @@ namespace CipherPark.Aurora.Core.Utils
 
             var camera = scene.CameraNode;
 
-            Func<SceneNode, bool> filter = (node) => (customFilter == null || customFilter(node)) && node is GameObjectSceneNode;
+            Func<SceneNode, bool> filter = (node) => node is GameObjectSceneNode && (customFilter == null || customFilter(node.As<GameObjectSceneNode>()));
 
             var nodes = scene.Select(filter)
                                      .Distinct()
@@ -39,23 +40,24 @@ namespace CipherPark.Aurora.Core.Utils
 
             return results;
         }
-        
+
         public static PickInfo GetPickInfo(Ray ray, GameObjectSceneNode node)
         {
             var gameObjectBounds = node.GameObject
                                        .GetBoundingBox()
                                        .GetValueOrDefault();
             Vector3 intersectionPoint;
-            bool isHit = node.WorldToLocalRay(ray).Intersects(ref gameObjectBounds, out intersectionPoint);
+            var localRay = node.WorldToLocalRay(ray);
+            bool isHit = localRay.Intersects(ref gameObjectBounds, out intersectionPoint);
             if (isHit)
             {
                 return new PickInfo()
-                { 
+                {
                     IntersectionPoint = node.LocalToWorldCoordinate(intersectionPoint),
                     Node = node,
                 };
-            }
+            }            
             return null;
-        }
+        }      
     } 
 }

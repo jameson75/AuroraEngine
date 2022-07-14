@@ -38,7 +38,7 @@ namespace CipherPark.Aurora.Core.Services
 
         public bool IsMouseTracking { get => isMouseTracking; }
 
-        public void BeginMouseTracking(Point location)
+        public void NotifyMouseDown(Point location)
         {            
             this.isMouseTracking = true;
             this.mouseMoveFrom = location;
@@ -48,7 +48,7 @@ namespace CipherPark.Aurora.Core.Services
             rotateAboutZ = (distance > RotationEllipseDiameter / 2);
         }
 
-        public void EndMouseTracking(Point location)
+        public void NotifyMouseUp(Point location)
         {
             this.isMouseTracking = false;
             this.mouseMoveFrom = new Point(0, 0);
@@ -77,7 +77,7 @@ namespace CipherPark.Aurora.Core.Services
             var camera = cameraNode.Camera;
             var mode = Mode;            
             Vector2 mouseOffset = -Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
-            Vector3 platformLocation = new Vector3(100, 100, 100);
+            Vector3 platformLocation = new Vector3(0, 0, 0);
             Matrix platformTranslation = Matrix.Translation(platformLocation);            
 
             switch (mode)
@@ -169,7 +169,7 @@ namespace CipherPark.Aurora.Core.Services
                             Game, 
                             mouseMoveFrom.X, 
                             mouseMoveFrom.Y,
-                            n => n.As<GameObjectSceneNode>()?.GameObject.GetContext<TraversingPlaneContext>() != null)
+                            n => n.GameObject.SupportsCameraTraversing())
                             .GetClosest(camera.Location);
                         
                         Vector3 panVector = Vector3.Zero;

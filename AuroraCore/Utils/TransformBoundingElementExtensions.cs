@@ -18,10 +18,21 @@ namespace CipherPark.Aurora.Core.Utils
         /// <param name="transformable"></param>
         /// <param name="box"></param>
         /// <returns></returns>
-        public static BoundingBox LocalToWorldBoundingBox(this ITransformable transformable, BoundingBox box)
-        {
-            Vector3 thisWorldPosition = transformable.WorldTransform().Translation;
-            return new BoundingBox(thisWorldPosition + box.Minimum, thisWorldPosition + box.Maximum);
+        public static BoundingBoxOA LocalToWorldBoundingBox(this ITransformable transformable, BoundingBox box)
+        {            
+            var boundingBoxOA = BoundingBoxOA.FromAABoundingBox(box);
+            return LocalToWorldBoundingBox(transformable, boundingBoxOA);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transformable"></param>
+        /// <param name="box"></param>
+        /// <returns></returns>
+        public static BoundingBoxOA LocalToWorldBoundingBox(this ITransformable transformable, BoundingBoxOA box)
+        {                  
+            return box.Transform(transformable.WorldTransform().ToMatrix());
         }
     }      
     

@@ -93,8 +93,7 @@ namespace Aurora.Sample.Editor.Scene
                 {
                     Mesh = mesh,
                     Effect = effect,
-                    Name = "Reference Grid",
-  
+                    Name = "Reference Grid",  
                 };
 
                 modelRenderer.Model = model;

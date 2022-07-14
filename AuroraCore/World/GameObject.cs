@@ -1,11 +1,11 @@
 ﻿using System;
+using SharpDX;
+using System.Linq;
+using System.Collections.Generic;
 using CipherPark.Aurora.Core.World.Collision;
 using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Systems;
-using System.Collections.Generic;
-using SharpDX;
-using System.Linq;
 
 namespace CipherPark.Aurora.Core.World
 {
@@ -18,6 +18,14 @@ namespace CipherPark.Aurora.Core.World
         {
             Game = game;
             _contextualContent = new Dictionary<Type, object>();
+        }
+
+        public GameObject(IGameApp game, object[] contextualContent) : this(game)
+        {
+            foreach (var contextualObject in contextualContent)
+            {
+                _contextualContent.Add(contextualObject.GetType(), contextualObject);
+            }
         }
 
         public GameObjectSceneNode ContainerNode
@@ -60,12 +68,10 @@ namespace CipherPark.Aurora.Core.World
         public BoundingBox? GetBoundingBox()
         {
             var boundingContext = FindContextByContract<IProvideBoundingContext>();
-
             if (boundingContext != null)
                 return boundingContext.GetBoundingBox();
             else if (Renderer is IProvideBoundingContext)
-                return ((IProvideBoundingContext)Renderer).GetBoundingBox();            
-
+                return ((IProvideBoundingContext)Renderer).GetBoundingBox();
             return null;
         }
 

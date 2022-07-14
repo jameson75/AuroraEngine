@@ -23,9 +23,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
         private List<KeyframeAnimationController> _animationControllers = new List<KeyframeAnimationController>();       
 
         public List<Mesh> Meshes { get { return _meshes; } }
-
-        /* public List<MeshTextures> MeshTextures { get; set; }      */
-
+        
         public override BoundingBox BoundingBox
         {
             get
@@ -65,18 +63,9 @@ namespace CipherPark.Aurora.Core.World.Geometry
                 Effect.Apply();
               
                 foreach (Mesh mesh in Meshes)
-                {                   
-                    //*************************************************************************************************
-                    //NOTES: It is expectected that the World (and Projection) matrix of the Effect has already been
-                    //set before calling this method. 
-                    //*************************************************************************************************
-                       
-                    //We need to combine the mesh's frame-tree transformation to the current world matrix.
-                    //We cache the world matrix specified before this call and apply the mesh's frame transformation
-                    //be fore drawing. We restore the orginal world matrix after drawing is complete.                        
-                        
+                {                  
                     Matrix originalWorld = Effect.World;
-                    Frame meshFrame = frameList.First(f => f.Name == mesh.Name);
+                    Frame meshFrame = frameList?.First(f => f.Name == mesh.Name);
                     Effect.World = meshFrame != null ? Effect.World * meshFrame.WorldTransform().ToMatrix() : Effect.World;
                     mesh.Draw();
                     Effect.World = originalWorld;                

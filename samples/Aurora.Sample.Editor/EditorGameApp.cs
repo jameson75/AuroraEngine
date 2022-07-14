@@ -183,12 +183,15 @@ namespace Aurora.Sample.Editor
                         10)),
                 }
             };
-            referenceGridNode.GameObject.AddContext(new TraversingPlaneContext
+            referenceGridNode.GameObject.AddContext(new EditorObjectContext
             {
-                Plane = new Plane(Vector3.UnitY, 0)
+                IsTraversingPlane = true,
             });
+            /*
             referenceGridNode.Transform = new CipherPark.Aurora.Core.Animation.Transform(Matrix.Translation(100, 100, 100));
             Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(new Vector3(100, 101, 100), new Vector3(100, 100, 100), Vector3.UnitZ);
+            */            
+            Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(new Vector3(0, 101, 0), new Vector3(0, 0, 0), Vector3.UnitZ);
             Scene.Nodes.Add(referenceGridNode);            
         }
 
@@ -197,19 +200,7 @@ namespace Aurora.Sample.Editor
             viewportColor = newViewportColor;
         }
 
-        public EditorMode EditorMode
-        {
-            get => editorMode;
-            set
-            {
-                editorMode = value;
-                switch(editorMode)
-                {
-                    case EditorMode.RotateCamera:                        
-                        break;
-                }
-            }
-        }
+        public EditorMode EditorMode { get; set; }
 
         public void ResetCamera()
         {

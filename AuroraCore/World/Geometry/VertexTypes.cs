@@ -48,6 +48,10 @@ namespace CipherPark.Aurora.Core.World.Geometry
             Position = new Vector4(position, 1.0f);
             Color = color;
         }
+
+        public VertexPositionColor(Vector3 position, Color color) : this(position, color.ToVector4())
+        {
+        }
     }
    
     /// <summary>

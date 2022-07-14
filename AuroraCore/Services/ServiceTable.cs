@@ -26,10 +26,11 @@ namespace CipherPark.Aurora.Core.Services
 
         public void RegisterService(object service)
         {
-            if( FindService(service.GetType()) == null )
+            var tService = service.GetType();
+            if( FindService(tService) == null )
                 _services.Add(service);
             else
-                throw new InvalidOperationException("Service already registered.");
+                throw new InvalidOperationException($"Service {tService.Name} already registered.");
         }
 
         public void UnregisterService<T>()
@@ -43,7 +44,7 @@ namespace CipherPark.Aurora.Core.Services
             if (service != null)
                 _services.Remove(service);
             else
-                throw new InvalidOperationException("Service was not registered.");
+                throw new InvalidOperationException($"Service {tService.Name} was not registered.");
         }
 
         private object FindService(Type tService)

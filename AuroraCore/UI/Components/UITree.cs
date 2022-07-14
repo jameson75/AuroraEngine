@@ -71,10 +71,10 @@ namespace CipherPark.Aurora.Core.UI.Components
 
         public void Draw()
         {
-            //******************************************************************************
+            //*************************************************************************************
             // NOTE: When using the SpriteBatch, the DepthStencilState and RasterizerState
-            // resets so we cache them before drawing the control tree, then use it later.
-            //******************************************************************************
+            // resets so we cache them before drawing the control tree, then restore them later.
+            //*************************************************************************************
             DepthStencilState oldState = Game.GraphicsDeviceContext.OutputMerger.DepthStencilState;
             RasterizerState oldRasterizerState = Game.GraphicsDeviceContext.Rasterizer.State;
             
