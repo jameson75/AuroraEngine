@@ -3,6 +3,7 @@ using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.UI.Components;
 using SharpDX;
+using System;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -22,10 +23,12 @@ namespace CipherPark.Aurora.Core.UI.Controls
         {
             mouseNavigatorService = new MouseNavigatorService(visualRoot.Game);
             sceneModifierService = new SceneModifierService(visualRoot.Game);
-        }       
-        
+            sceneModifierService.NodeTransformed += SceneModifierService_NodeTransformed;
+        }
+
         public MouseNavigatorService.NavigationMode NavigationMode { get => mouseNavigatorService.Mode; set => mouseNavigatorService.Mode = value; }    
         public bool IsInPickingMode { get => sceneModifierService.IsActive; set => sceneModifierService.IsActive = value; }
+        public TranslationPlane TransformPlane { get => sceneModifierService.TranslationPlane; set => sceneModifierService.TranslationPlane = value; }
 
         protected override void OnUpdate(GameTime gameTime)
         {            
@@ -90,5 +93,12 @@ namespace CipherPark.Aurora.Core.UI.Controls
             return location.X >= 0 && location.X <= renderTargetSize.Width &&
                    location.Y >= 0 && location.Y <= renderTargetSize.Height;
         }
+
+        private void SceneModifierService_NodeTransformed(object sender, NodeTransformedArgs args)
+        {
+            NodeTransformed?.Invoke(this, args);
+        }
+
+        public event Action<object, NodeTransformedArgs> NodeTransformed;
     }
 }

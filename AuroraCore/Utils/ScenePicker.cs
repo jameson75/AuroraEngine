@@ -14,9 +14,7 @@ namespace CipherPark.Aurora.Core.Utils
         {
             List<PickInfo> results = new List<PickInfo>();
 
-            var scene = gameApp.GetActiveScene();
-
-            var camera = scene.CameraNode;
+            var scene = gameApp.GetActiveScene();            
 
             Func<SceneNode, bool> filter = (node) => node is GameObjectSceneNode && (customFilter == null || customFilter(node.As<GameObjectSceneNode>()));
 
@@ -25,11 +23,7 @@ namespace CipherPark.Aurora.Core.Utils
                                      .Cast<GameObjectSceneNode>()
                                      .ToArray();
 
-            ViewportF vp = gameApp.GraphicsDeviceContext.Rasterizer.GetViewports<ViewportF>()[0];
-            Vector3 near = Vector3.Unproject(new Vector3(x, y, vp.MinDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, camera.RiggedViewMatrix * camera.ProjectionMatrix);
-            Vector3 far = Vector3.Unproject(new Vector3(x, y, vp.MaxDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, camera.RiggedViewMatrix * camera.ProjectionMatrix);
-            Vector3 dir = Vector3.Normalize(far - near);
-            Ray ray = new Ray(near, dir);
+            var ray = GetPickRay(gameApp, x, y);
 
             foreach (var node in nodes)
             {
@@ -39,6 +33,16 @@ namespace CipherPark.Aurora.Core.Utils
             }
 
             return results;
+        }        
+
+        public static Ray GetPickRay(IGameApp gameApp, int x, int y)
+        {
+            var camera = gameApp.GetActiveScene().CameraNode;
+            ViewportF vp = gameApp.GraphicsDeviceContext.Rasterizer.GetViewports<ViewportF>()[0];
+            Vector3 near = Vector3.Unproject(new Vector3(x, y, vp.MinDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, camera.RiggedViewMatrix * camera.ProjectionMatrix);
+            Vector3 far = Vector3.Unproject(new Vector3(x, y, vp.MaxDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, camera.RiggedViewMatrix * camera.ProjectionMatrix);
+            Vector3 dir = Vector3.Normalize(far - near);
+            return new Ray(near, dir);
         }
 
         public static PickInfo GetPickInfo(Ray ray, GameObjectSceneNode node)
@@ -55,6 +59,7 @@ namespace CipherPark.Aurora.Core.Utils
                 {
                     IntersectionPoint = node.LocalToWorldCoordinate(intersectionPoint),
                     Node = node,
+                    Ray = ray,
                 };
             }            
             return null;

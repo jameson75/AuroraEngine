@@ -3,6 +3,8 @@ using SharpDX;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.Animation;
+using System.Linq;
 
 namespace CipherPark.Aurora.Core.Services
 {
@@ -13,7 +15,7 @@ namespace CipherPark.Aurora.Core.Services
         private Point mouseMoveFrom;
         private GameObjectSceneNode currentPickedNode;
         private GameObjectSceneNode currentModifierNode;
-        private bool isPickingModeActive;        
+        private bool isPickingModeActive;
 
         public SceneModifierService(IGameApp gameApp)
         {
@@ -32,6 +34,10 @@ namespace CipherPark.Aurora.Core.Services
                 }
             }
         }
+
+        public TransformMode TransformMode { get; set; }
+
+        public TranslationPlane TranslationPlane { get; set; }
 
         public void NotifyMouseDown(Point location)
         {
@@ -94,9 +100,65 @@ namespace CipherPark.Aurora.Core.Services
         {
             if (currentPickedNode != null)
             {
-                
+                if (buttonDown)
+                {
+                    var cameraNode = gameApp.GetActiveScene().CameraNode;
+
+                    var pickFromInfo = ScenePicker.PickNodes(
+                                            gameApp,
+                                            mouseMoveFrom.X,
+                                            mouseMoveFrom.Y,
+                                            n => n == currentPickedNode).FirstOrDefault();
+
+                    var pickToInfo = ScenePicker.PickNodes(
+                                            gameApp,
+                                            location.X,
+                                            location.Y,
+                                            n => n == currentPickedNode).FirstOrDefault();
+
+                    var pickedNodeWorldPosition = currentPickedNode.WorldPosition();
+
+                    if (pickFromInfo != null && pickToInfo != null)
+                    {
+                        switch (TransformMode)
+                        {
+                            case TransformMode.Translate:
+                                switch (TranslationPlane)
+                                {
+                                    case TranslationPlane.XZ:
+                                        var pickedNodeWorldAlignedYPlane = new Plane(pickedNodeWorldPosition, Vector3.Up);
+                                        bool fromRayIntersectsPlane = pickFromInfo.Ray.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 fromIntersectionPoint);
+                                        bool toRayIntersectsPlane = pickToInfo.Ray.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 toIntersectionPoint);
+                                        if (fromRayIntersectsPlane && toRayIntersectsPlane)
+                                        {
+                                            var nodeTranslationVector = currentPickedNode.WorldToLocalCoordinate(toIntersectionPoint) - 
+                                                                        currentPickedNode.WorldToLocalCoordinate(fromIntersectionPoint);
+                                            currentPickedNode.Translate(nodeTranslationVector);
+                                            OnNodeTransformed(currentPickedNode);
+                                        }
+                                        break;
+                                    case TranslationPlane.XY:
+                                        var cameraAlignedZPlaneNormal = Vector3.Normalize(cameraNode.WorldPosition() - pickedNodeWorldPosition);
+                                        var pickedNodeCameraAlignedZPlane = new Plane(pickedNodeWorldPosition, cameraAlignedZPlaneNormal);
+                                        fromRayIntersectsPlane = pickFromInfo.Ray.Intersects(ref pickedNodeCameraAlignedZPlane, out fromIntersectionPoint);
+                                        toRayIntersectsPlane = pickToInfo.Ray.Intersects(ref pickedNodeCameraAlignedZPlane, out toIntersectionPoint);
+                                        if (fromRayIntersectsPlane && toRayIntersectsPlane)
+                                        {
+                                            var nodeTranslationVector = currentPickedNode.WorldToLocalCoordinate(toIntersectionPoint) -
+                                                                        currentPickedNode.WorldToLocalCoordinate(fromIntersectionPoint);
+                                            currentPickedNode.Translate(nodeTranslationVector);
+                                            OnNodeTransformed(currentPickedNode);
+                                        }
+                                        break;
+                                }
+                                break;
+                        }
+                    }
+                }
             }
-        }
+
+            mouseMoveFrom = location;
+        }        
 
         private void UpdatePick()
         {
@@ -162,13 +224,35 @@ namespace CipherPark.Aurora.Core.Services
                 currentModifierNode = null;
             }
         }
+
+        private void OnNodeTransformed(GameObjectSceneNode transformedNode)
+        {
+            NodeTransformed?.Invoke(this, new NodeTransformedArgs(transformedNode));
+        }
+
+        public event Action<object, NodeTransformedArgs> NodeTransformed;
     }
 
-    public enum GameObjectModifierMode
+    public class NodeTransformedArgs : EventArgs
     {
-        None,
-        Rotate,
+        public NodeTransformedArgs(SceneNode transformedNode)
+        {
+            TransfromedNode = transformedNode;
+        }
+
+        public SceneNode TransfromedNode { get; }
+    }
+
+    public enum TranslationPlane
+    {        
+        XZ,
+        XY
+    }
+
+    public enum TransformMode
+    {
         Translate,
+        Rotate,
         Scale
     }
 }

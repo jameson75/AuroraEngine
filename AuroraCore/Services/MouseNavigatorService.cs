@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Linq;
 using SharpDX;
 using CipherPark.Aurora.Core.Animation;
-using CipherPark.Aurora.Core.World.Scene;
-using System.Linq;
 using CipherPark.Aurora.Core.Utils;
 
 namespace CipherPark.Aurora.Core.Services
@@ -165,7 +164,7 @@ namespace CipherPark.Aurora.Core.Services
                 case NavigationMode.PlaformTraverse:                    
                     if (buttonDown && isMouseTracking)
                     {                        
-                        var planePickFrom = ScenePicker.PickNodes(
+                        var platformPickFrom = ScenePicker.PickNodes(
                             Game, 
                             mouseMoveFrom.X, 
                             mouseMoveFrom.Y,
@@ -173,12 +172,12 @@ namespace CipherPark.Aurora.Core.Services
                             .GetClosest(camera.Location);
                         
                         Vector3 panVector = Vector3.Zero;
-                        if (planePickFrom != null)
+                        if (platformPickFrom != null)
                         {
-                            var planePickTo = ScenePicker.PickNodes(Game, location.X, location.Y, n => n == planePickFrom.Node).FirstOrDefault();
-                            if (planePickTo != null)
+                            var platfromPickTo = ScenePicker.PickNodes(Game, location.X, location.Y, n => n == platformPickFrom.Node).FirstOrDefault();
+                            if (platfromPickTo != null)
                             {
-                                var v = planePickTo.IntersectionPoint - planePickFrom.IntersectionPoint;
+                                var v = platfromPickTo.IntersectionPoint - platformPickFrom.IntersectionPoint;
                                 panVector = v;
                                 panVector = cameraNode.WorldToParentNormal(panVector);
                                 camera.ViewMatrix = Matrix.Translation(panVector) * camera.ViewMatrix;

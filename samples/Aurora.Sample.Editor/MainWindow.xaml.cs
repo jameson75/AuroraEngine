@@ -2,9 +2,7 @@
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
-using Aurora.Sample.Editor.Windows;
 using Microsoft.Wpf.Interop.DirectX;
-using SharpDX;
 
 namespace Aurora.Sample.Editor
 {
@@ -19,10 +17,15 @@ namespace Aurora.Sample.Editor
         private MainWindowController controller;
 
         public MainWindow()
-        {
-            controller = new MainWindowController();
+        {           
             InitializeComponent();
             InitializeGameHosting();
+            InitializeControllers();
+        }
+
+        private void InitializeControllers()
+        {
+            controller = new MainWindowController(game);
         }
 
         public void InitializeGameHosting()
@@ -124,45 +127,59 @@ namespace Aurora.Sample.Editor
         #region Menu Handlers
         private void Menu_File_Open_Click(object sender, RoutedEventArgs e)
         {
-            string filePath = controller.ChooseFile();
-            if (filePath != null)
-            {
-                controller.ImportModel(game, filePath);
-            }
+            controller.UIOpenProject();            
         }        
+
+        private void Menu_File_Save_Click(object sender, RoutedEventArgs e)
+        {
+            controller.UISaveProject();
+        }
+
+        private void Menu_File_Import_Click(object sender, RoutedEventArgs e)
+        {
+            controller.UIImportModel();
+        }
 
         private void Menu_Project_Settings_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new SettingsDialog();
-            dialog.ShowDialog();
-            game.ChangeViewportColor(dialog.SelectedViewportColor);
+            controller.UIChangeSettings();
         }
         #endregion
 
         #region ToolBar Handlers
         private void ToolBar_RotateCamera_Click(object sender, RoutedEventArgs e)
         {
-            game.EditorMode = EditorMode.RotateCamera;
+            controller.EnterEditorMode(EditorMode.RotateCamera);
         }
 
         private void ToolBar_TraverseCamera_Click(object sender, RoutedEventArgs e)
         {
-            game.EditorMode = EditorMode.TraverseCamera;
+            controller.EnterEditorMode(EditorMode.TraverseCamera);
         }
 
         private void ToolBar_PanCamera_Click(object sender, RoutedEventArgs e)
         {
-            game.EditorMode = EditorMode.PanCamera;
+            controller.EnterEditorMode(EditorMode.PanCamera);
         }
 
         private void ToolBar_SelectSceneObject_Click(object sender, RoutedEventArgs e)
         {
-            game.EditorMode = EditorMode.SelectSceneObject;
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
         }
 
         private void ToolBar_ResetCamera_Click(object sender, RoutedEventArgs e)
         {
-            game.ResetCamera();
+            controller.ResetEditorCamera();
+        }
+        
+        private void ToolBar_SelectTransformPlaneXZ_Click(object sender, RoutedEventArgs e)
+        {
+            controller.SetEditorTransformPlane(EditorTransformPlane.XZ);
+        }
+
+        private void ToolBar_SelectTransformPlaneXY_Click(object sender, RoutedEventArgs e)
+        {
+            controller.SetEditorTransformPlane(EditorTransformPlane.XY);
         }
         #endregion
     }

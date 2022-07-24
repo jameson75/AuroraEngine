@@ -5,7 +5,6 @@ using CipherPark.Aurora.Core.UI.Components;
 using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
-using CipherPark.Aurora.Core.Utils;
 using SharpDX;
 using SharpDX.Direct3D11;
 using System;
@@ -13,6 +12,8 @@ using System.Windows;
 using Aurora.Sample.Editor.Services;
 using Aurora.Sample.Editor.Scene;
 using Aurora.Sample.Editor.Scene.UI.Behavior;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Aurora.Sample.Editor
 {
@@ -37,7 +38,7 @@ namespace Aurora.Sample.Editor
         {
             //Register game app services.                            
             Services.RegisterService(new InputService(this, new MouseCoordsTransfomerWPF(imageHost))); //Required For Graphics UI
-        }
+        }        
 
         protected override void OnInitialized()
         {
@@ -63,10 +64,12 @@ namespace Aurora.Sample.Editor
             UI = new UITree(this);
             UI.Theme = new SampleGameAppTheme(this);
 
-            UI.Controls.Add(new NavigatorControl(UI)
+            var navigatorControl = new NavigatorControl(UI)
             {
                 Behavior = new NavigatorControlBehavior(),
-            });
+            };
+            navigatorControl.NodeTransformed += NavigatorControl_NodeTransformed;
+            UI.Controls.Add(navigatorControl);
 
             var rotationOverlayControl = new ContentControl(
                 UI,
@@ -102,6 +105,15 @@ namespace Aurora.Sample.Editor
             };
             editorModelLabel.Content.As<TextContent>().Color = Color.DarkGray;
             UI.Controls.Add(editorModelLabel);
+        }      
+
+        public void ClearScene(bool resetCamera)
+        {
+            Scene.Nodes.Clear();
+            if (resetCamera)
+            {
+                ResetCamera();
+            }
         }
 
         #endregion
@@ -195,6 +207,13 @@ namespace Aurora.Sample.Editor
             Scene.Nodes.Add(referenceGridNode);            
         }
 
+        private void NavigatorControl_NodeTransformed(object sender, NodeTransformedArgs args)
+        {
+            NodeTransformed?.Invoke(this, args);
+        }
+
+        public event Action<object, NodeTransformedArgs> NodeTransformed;
+
         public void ChangeViewportColor(Color newViewportColor)
         {
             viewportColor = newViewportColor;
@@ -202,9 +221,114 @@ namespace Aurora.Sample.Editor
 
         public EditorMode EditorMode { get; set; }
 
+        public EditorTransformPlane TransformPlane { get; set; }
+
         public void ResetCamera()
         {
             Scene.CameraNode.Camera.ViewMatrix = GetDefaultViewMatrix();
         }
+    }
+
+    public class ProjectViewModel
+    {
+        public SceneViewModel Scene { get; } = new SceneViewModel();
+        public string Filename { get; set; }
+        public bool IsDirty { get; set; }
+
+        public void AddNode(GameObjectSceneNode gameObjectNode, string gameObjectResourceFilename)
+        {
+            var sceneNodeViewModel = new SceneNodeViewModel();
+            sceneNodeViewModel.Name = gameObjectNode.Name;
+            sceneNodeViewModel.Matrix = gameObjectNode.Transform.ToMatrix().ToArray();
+            sceneNodeViewModel.Flags = gameObjectNode.Flags;
+            sceneNodeViewModel.Visible = gameObjectNode.Visible;           
+            if(gameObjectNode.GameObject.Renderer is ModelRenderer)
+            {
+                sceneNodeViewModel.GameObjectType = GameObjectType.GeometricModel;
+                sceneNodeViewModel.GameObjectDescription = new GameObjectDescription()
+                {
+                    Filename = gameObjectResourceFilename,
+                    EffectType = gameObjectNode.GameObject.Renderer.As<ModelRenderer>()
+                                               .Model
+                                               .Effect
+                                               .GetType()
+                                               .FullName,
+                    ModelType = gameObjectNode.GameObject.Renderer.As<ModelRenderer>()
+                                               .Model
+                                               .GetType()
+                                               .FullName,
+                };            
+            }
+            sceneNodeViewModel.DataModel = gameObjectNode;
+
+            if(gameObjectNode.Parent != null)
+            {
+                var parentSceneNodeViewModel = Scene.FindSceneNodeViewModel(n => n.DataModel == gameObjectNode.Parent);
+                if( parentSceneNodeViewModel == null)
+                {
+                    throw new InvalidOperationException("Expected project scene node not found.");
+                }
+                parentSceneNodeViewModel.Children.Add(sceneNodeViewModel);
+            }
+            else
+            {
+                Scene.Children.Add(sceneNodeViewModel);
+            }
+        }       
+    }
+
+    public class SceneViewModel
+    {
+        public List<SceneNodeViewModel> Children { get; } = new List<SceneNodeViewModel>();
+
+        public SceneNodeViewModel FindSceneNodeViewModel(Func<SceneNodeViewModel, bool> condition)
+        {
+            return FindSceneNodeViewModel(Children, condition);      
+        }
+
+        private static SceneNodeViewModel FindSceneNodeViewModel(List<SceneNodeViewModel> children, Func<SceneNodeViewModel, bool> condition)
+        {
+            foreach(var child in children)
+            {
+                if(condition(child))
+                {
+                    return child;
+                }
+                
+                var descendant = FindSceneNodeViewModel(child.Children, condition);
+                
+                if( descendant != null)
+                {
+                    return descendant;
+                }    
+            }
+
+            return null;
+        }
+    }
+
+    public class SceneNodeViewModel
+    {
+        public string Name { get; set; }
+        public float[] Matrix { get; set; }
+        public ulong Flags { get; set; }
+        public bool Visible { get; set; }
+        public GameObjectType GameObjectType { get; set; }
+        public GameObjectDescription GameObjectDescription { get; set; }
+        [JsonIgnore]
+        public SceneNode DataModel { get; set; }
+        public List<SceneNodeViewModel> Children { get; } = new List<SceneNodeViewModel>();
+    }
+
+    public class GameObjectDescription
+    {
+        public string Filename { get; set; }
+        public string EffectType { get; set; }
+        public string ModelType { get; set; }
+    }
+
+    public enum GameObjectType
+    {
+        GeometricModel
     }
 }

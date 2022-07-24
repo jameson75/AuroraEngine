@@ -7,6 +7,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
     public class NavigatorControlBehavior : UIControlBehavior
     {
         private EditorMode? lastEditorMode;
+        private EditorTransformPlane? lastTransformPlane;
 
         public override void Update(UIControl control)
         {
@@ -14,6 +15,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
             var gameApp = (EditorGameApp)GetGameApp(control);
             var navigatorControl = (NavigatorControl)control;
             UpdateNavigatorMode(gameApp, navigatorControl);
+            UpdateScenePickerMode(gameApp, navigatorControl);
         }
 
         private void UpdateNavigatorMode(EditorGameApp gameApp, NavigatorControl navigatorControl)
@@ -46,6 +48,29 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
         {
             var hasChanged = lastEditorMode != gameApp.EditorMode;
             lastEditorMode = gameApp.EditorMode;
+            return hasChanged;
+        }
+
+        private void UpdateScenePickerMode(EditorGameApp gameApp, NavigatorControl navigatorControl)
+        {
+            if (HasTransformPlaneChange(gameApp))
+            {
+                switch (gameApp.TransformPlane)
+                {
+                    case EditorTransformPlane.XZ:
+                        navigatorControl.TransformPlane = TranslationPlane.XZ;
+                        break;
+                    case EditorTransformPlane.XY:
+                        navigatorControl.TransformPlane = TranslationPlane.XY;
+                        break; 
+                }               
+            }
+        }
+
+        private bool HasTransformPlaneChange(EditorGameApp gameApp)
+        {
+            var hasChanged = lastTransformPlane != gameApp.TransformPlane;
+            lastTransformPlane = gameApp.TransformPlane;
             return hasChanged;
         }
     }

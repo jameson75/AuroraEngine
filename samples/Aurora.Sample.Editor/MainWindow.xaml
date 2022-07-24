@@ -19,9 +19,11 @@
         <DockPanel Grid.ColumnSpan="2">
             <Menu DockPanel.Dock="Top" >
                 <MenuItem Header="_File">
-                    <MenuItem Header="_Open" Click="Menu_File_Open_Click"/>
+                    <MenuItem Header="_Open" Click="Menu_File_Open_Click"/>                    
+                    <MenuItem Header="_Save" Click="Menu_File_Save_Click"/>
                     <MenuItem Header="_Close"/>
-                    <MenuItem Header="_Save"/>
+                    <Separator/>
+                    <MenuItem Header="_Import" Click="Menu_File_Import_Click" />
                 </MenuItem>
                 <MenuItem Header="_Edit">                    
                 </MenuItem>
@@ -47,6 +49,11 @@
                     <Button ToolTip="Select Scene Object" Click="ToolBar_SelectSceneObject_Click">
                         <Image Source="Resources\Icons\arrow-in.ico"/>
                     </Button>
+                    <Separator/>
+                    <Button ToolTip="Transform Object in XZ Plane" Click="ToolBar_SelectTransformPlaneXZ_Click" Content="XZ" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">                        
+                    </Button>
+                    <Button ToolTip="Transform Object in XY Plane" Click="ToolBar_SelectTransformPlaneXY_Click" Content="XY" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>                    
                 </ToolBar>
             </ToolBarTray>
         </DockPanel>
