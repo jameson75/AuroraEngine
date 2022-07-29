@@ -3,7 +3,6 @@ using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.UI.Components;
 using SharpDX;
-using System;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -20,22 +19,38 @@ namespace CipherPark.Aurora.Core.UI.Controls
         private SceneModifierService sceneModifierService;
 
         public NavigatorControl(IUIRoot visualRoot) : base(visualRoot)
-        {
-            mouseNavigatorService = new MouseNavigatorService(visualRoot.Game);
-            sceneModifierService = new SceneModifierService(visualRoot.Game);
-            sceneModifierService.NodeTransformed += SceneModifierService_NodeTransformed;
+        {          
+            
         }
 
+        /*
         public MouseNavigatorService.NavigationMode NavigationMode { get => mouseNavigatorService.Mode; set => mouseNavigatorService.Mode = value; }    
         public bool IsInPickingMode { get => sceneModifierService.IsActive; set => sceneModifierService.IsActive = value; }
         public TranslationPlane TransformPlane { get => sceneModifierService.TranslationPlane; set => sceneModifierService.TranslationPlane = value; }
+        */
+
+        public void ClearCachedServices()
+        {
+            mouseNavigatorService = null;
+            sceneModifierService = null;
+        }
 
         protected override void OnUpdate(GameTime gameTime)
         {            
-            IInputService inputServices = Game.Services.GetService<IInputService>();
-            InputState inputState = inputServices.GetInputState();           
+            IInputService inputService = Game.Services.GetService<IInputService>();
+            InputState inputState = inputService.GetInputState();
 
-            if (IsMouseInViewport(inputState) || this.Capture)
+            if (mouseNavigatorService == null)
+            {
+                mouseNavigatorService = Game.Services.GetService<MouseNavigatorService>();
+            }
+
+            if (sceneModifierService == null)
+            {
+                sceneModifierService = Game.Services.GetService<SceneModifierService>();
+            }
+
+            if ((inputService.IsMouseInViewport(inputState) && Game.IsViewportWindowActive) || this.Capture)
             {
                 InputState.MouseButton[] pressedMouseButtons = inputState.GetMouseButtonsPressed();
                 for (int i = 0; i < pressedMouseButtons.Length; i++)
@@ -84,21 +99,6 @@ namespace CipherPark.Aurora.Core.UI.Controls
             bool leftButtonDown = mouseButtonsDown.Contains(InputState.MouseButton.Left);
             mouseNavigatorService.NotifyMouseMove(leftButtonDown, location);
             sceneModifierService.NotifyMouseMove(leftButtonDown, location);
-        }
-
-        private bool IsMouseInViewport(InputState state)
-        {
-            var location = state.GetMouseLocation();
-            var renderTargetSize = Game.RenderTargetView.GetTexture2DSize();
-            return location.X >= 0 && location.X <= renderTargetSize.Width &&
-                   location.Y >= 0 && location.Y <= renderTargetSize.Height;
-        }
-
-        private void SceneModifierService_NodeTransformed(object sender, NodeTransformedArgs args)
-        {
-            NodeTransformed?.Invoke(this, args);
-        }
-
-        public event Action<object, NodeTransformedArgs> NodeTransformed;
+        } 
     }
 }

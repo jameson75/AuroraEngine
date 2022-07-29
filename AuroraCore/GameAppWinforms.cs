@@ -60,35 +60,35 @@ namespace CipherPark.Aurora.Core
         {
             _services = new ServiceTable();
             _gameTime = new GameTime();
-        }        
+        }
 
-        protected GameTime GameTime { get { return _gameTime; } } 
+        protected GameTime GameTime { get { return _gameTime; } }
 
         public void Run(Form form)
         {
             _form = form;
-            
+
             form.FormClosing += form_FormClosing;
             form.SizeChanged += form_SizeChanged;
-            
-            InitializeDirectXResources(form);           
+
+            InitializeDirectXResources(form);
 
             Initialize();
 
             LoadContent();
 
-            RenderLoop.Run(form, delegate()
+            RenderLoop.Run(form, delegate ()
             {
                 Update();
                 Draw();
                 if (_closeFormOnUpdate)
-                    form.Close();                  
-            });                    
+                    form.Close();
+            });
         }
 
         public void ToggleFullScreen()
         {
-            SwapChain.IsFullScreen = !SwapChain.IsFullScreen;                  
+            SwapChain.IsFullScreen = !SwapChain.IsFullScreen;
         }
 
         public event Action BuffersResizing;
@@ -139,7 +139,7 @@ namespace CipherPark.Aurora.Core
         }
 
         private void InitializeDirectXResources(Form form)
-        {           
+        {
             _deviceHwnd = form.Handle;
 
             //Initialize Direct3D11 Resources.
@@ -152,7 +152,7 @@ namespace CipherPark.Aurora.Core
                 OutputHandle = form.Handle,
                 SampleDescription = new SampleDescription(1, 0),
                 SwapEffect = SwapEffect.Discard,
-                Usage = Usage.RenderTargetOutput | Usage.ShaderInput,                
+                Usage = Usage.RenderTargetOutput | Usage.ShaderInput,
             };
 
             SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.Debug, chainDesc, out _graphicsDevice, out _swapChain);
@@ -162,7 +162,7 @@ namespace CipherPark.Aurora.Core
             var factory = _swapChain.GetParent<Factory>();
             factory.MakeWindowAssociation(form.Handle, WindowAssociationFlags.IgnoreAll);
 
-            CreateResourcesFromSwapChain(form);            
+            CreateResourcesFromSwapChain(form);
 
             //Initialize XAudio2 Resources.
             //-----------------------------
@@ -231,7 +231,7 @@ namespace CipherPark.Aurora.Core
             dsvd.Flags = DepthStencilViewFlags.None;
             dsvd.Format = BestSupportedDepthStencilFormat(_graphicsDevice, false);
             _depthStencilView = new DepthStencilView(_graphicsDevice, _depthStencilBuffer, dsvd);
-            _graphicsDeviceContext.Rasterizer.SetViewports(new[] { (RawViewportF) new ViewportF(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f) });
+            _graphicsDeviceContext.Rasterizer.SetViewports(new[] { (RawViewportF)new ViewportF(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f) });
             _graphicsDeviceContext.OutputMerger.SetTargets(DepthStencil, RenderTargetView);
 
             DepthStencilStateDescription depthStencilStateDesc = DepthStencilStateDescription.Default();
@@ -247,10 +247,10 @@ namespace CipherPark.Aurora.Core
                 _renderTargetView.Dispose();
                 _renderTargetShaderResource.Dispose();
                 _depthStencilBuffer.Dispose();
-                _depthStencilView.Dispose();                                
+                _depthStencilView.Dispose();
                 //_graphicsDeviceContext.ClearState();
                 OnBuffersResizing();
-                _swapChain.ResizeBuffers(0, _form.ClientSize.Width, _form.ClientSize.Height, Format.Unknown, SwapChainFlags.None);                
+                _swapChain.ResizeBuffers(0, _form.ClientSize.Width, _form.ClientSize.Height, Format.Unknown, SwapChainFlags.None);
                 CreateResourcesFromSwapChain(_form);
                 OnBuffersResized();
             }
@@ -264,10 +264,10 @@ namespace CipherPark.Aurora.Core
 
         private void form_SizeChanged(object sender, EventArgs e)
         {
-           
-            if(_form.ClientSize.Width != 0 && _form.ClientSize.Height != 0)
+
+            if (_form.ClientSize.Width != 0 && _form.ClientSize.Height != 0)
                 ResizeGraphicsBuffers();
-        }       
+        }
 
         #region IGameApp Members
 
@@ -309,6 +309,11 @@ namespace CipherPark.Aurora.Core
         public IntPtr DeviceHwnd
         {
             get { return _deviceHwnd; }
+        }
+
+        public bool IsViewportWindowActive
+        {
+            get { return Form.ActiveForm == _form; }
         }
 
         public RenderTargetView RenderTargetView

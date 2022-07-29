@@ -93,9 +93,8 @@ namespace Aurora.Sample.ContentBuilder
         }
 
         private void InitializeVisualization()
-        {
-            var hWnd = new WindowInteropHelper(this).Handle;
-            game.Initialize(hWnd);
+        {            
+            game.Initialize(this);
         }
 
         private void InitializeRendering()

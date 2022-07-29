@@ -29,7 +29,14 @@ namespace CipherPark.Aurora.Core.Services
         /// <summary>
         /// Updates the input state.
         /// </summary>
-        void UpdateState();  
+        void UpdateState();
+
+        /// <summary>
+        /// Determines if the mouse coordinates are within the game's view port.
+        /// </summary>
+        /// <param name="inputState"></param>
+        /// <returns></returns>
+        bool IsMouseInViewport(InputState inputState);
     }
 
     /// <summary>
@@ -38,23 +45,25 @@ namespace CipherPark.Aurora.Core.Services
     public sealed class InputService : IInputService
     {
         #region Fields
-        InputState _ism = null;
-        BufferedInputState _cim = null;
+        InputState ism = null;
+        BufferedInputState cim = null;
+        IGameApp game = null;
         #endregion
 
         #region Constructors
         public InputService(IGameApp game)
         {
-            _ism = new InputState(game);
-            _cim = new BufferedInputState(_ism);
-            Create(_ism, _cim);
+            ism = new InputState(game);
+            cim = new BufferedInputState(ism);
+            this.game = game;
+            Create(ism, cim);
         }
 
         public InputService(IGameApp game, IMouseCoordsTransfomer mouseCoordsTransfomer)
         {
-            _ism = new InputState(game, mouseCoordsTransfomer);
-            _cim = new BufferedInputState(_ism);
-            Create(_ism, _cim);
+            ism = new InputState(game, mouseCoordsTransfomer);
+            cim = new BufferedInputState(ism);
+            Create(ism, cim);
         }
         #endregion
 
@@ -65,7 +74,7 @@ namespace CipherPark.Aurora.Core.Services
         /// <returns>The game's input state manager.</returns>
         public InputState GetInputState()
         {
-            return _ism;
+            return ism;
         }
 
         /// <summary>
@@ -74,7 +83,7 @@ namespace CipherPark.Aurora.Core.Services
         /// <returns></returns>
         public BufferedInputState GetBufferedInputState()
         {
-            return _cim;
+            return cim;
         }
 
         /// <summary>
@@ -82,8 +91,8 @@ namespace CipherPark.Aurora.Core.Services
         /// </summary>
         public void UpdateState()
         {
-            _ism.UpdateState();
-            _cim.UpdateState();
+            ism.UpdateState();
+            cim.UpdateState();
         }
         #endregion
 
@@ -95,8 +104,16 @@ namespace CipherPark.Aurora.Core.Services
         /// <param name="fm">The game's control focus manager.</param>
         private void Create(InputState ism, BufferedInputState cim)
         {
-            _ism = ism;
-            _cim = cim;
+            this.ism = ism;
+            this.cim = cim;
+        }
+
+        public bool IsMouseInViewport(InputState state)
+        {
+            var location = state.GetMouseLocation();
+            var renderTargetSize = game.RenderTargetView.GetTexture2DSize();
+            return location.X >= 0 && location.X <= renderTargetSize.Width &&
+                   location.Y >= 0 && location.Y <= renderTargetSize.Height;
         }
     }
 }

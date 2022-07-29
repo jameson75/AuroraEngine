@@ -12,16 +12,13 @@ using System.Windows;
 using Aurora.Sample.Editor.Services;
 using Aurora.Sample.Editor.Scene;
 using Aurora.Sample.Editor.Scene.UI.Behavior;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Aurora.Sample.Editor
 {
-    public class EditorGameApp : GameAppWPF, IContainActiveScene
+    public class EditorGameApp : GameAppWPF, IContainActiveScene, IEditorGameApp
     {
         private readonly UIElement imageHost;
-        private Color viewportColor = Color.Black;
-        private EditorMode editorMode = EditorMode.RotateCamera;
+        private Color viewportColor = Color.Black;        
 
         public UITree UI { get; private set; }
         public SceneGraph Scene { get; private set; }
@@ -36,9 +33,15 @@ namespace Aurora.Sample.Editor
 
         protected override void OnInitializing()
         {
+            var sceneModifierService = new SceneModifierService(this);
+
             //Register game app services.                            
             Services.RegisterService(new InputService(this, new MouseCoordsTransfomerWPF(imageHost))); //Required For Graphics UI
-        }        
+            Services.RegisterService(new MouseNavigatorService(this));
+            Services.RegisterService(sceneModifierService);
+
+            sceneModifierService.NodeTransformed += SceneModifierService_NodeTransformed;  
+        }
 
         protected override void OnInitialized()
         {
@@ -55,7 +58,7 @@ namespace Aurora.Sample.Editor
                     ViewMatrix = GetDefaultViewMatrix(),
                     ProjectionMatrix = CalculateProjection(),
                 });
-            
+
             AddReferenceGrid();
         }
 
@@ -68,7 +71,7 @@ namespace Aurora.Sample.Editor
             {
                 Behavior = new NavigatorControlBehavior(),
             };
-            navigatorControl.NodeTransformed += NavigatorControl_NodeTransformed;
+            
             UI.Controls.Add(navigatorControl);
 
             var rotationOverlayControl = new ContentControl(
@@ -82,7 +85,7 @@ namespace Aurora.Sample.Editor
                 Size = new Size2F(MouseNavigatorService.RotationEllipseDiameter, MouseNavigatorService.RotationEllipseDiameter),
                 HorizontalAlignment = CipherPark.Aurora.Core.UI.Controls.HorizontalAlignment.Center,
                 VerticalAlignment = CipherPark.Aurora.Core.UI.Controls.VerticalAlignment.Center,
-                Behavior = new RotationOverlayControlBehavior(),               
+                Behavior = new RotationOverlayControlBehavior(),
             };
 
             Panel navigationOverlayPanel = new Panel(UI)
@@ -95,17 +98,24 @@ namespace Aurora.Sample.Editor
             UI.Controls.Add(navigationOverlayPanel);
 
             ContentControl editorModelLabel = new ContentControl(UI, new TextContent()
-                {
-                    PredefinedBlend = PredefinedBlend.Opacity,
-                    BlendFactor = new Color4(.5f, .5f, .5f , .5f),
-                })
-            {                
+            {
+                PredefinedBlend = PredefinedBlend.Opacity,
+                BlendFactor = new Color4(.5f, .5f, .5f, .5f),
+            })
+            {
                 Size = new Size2F(100, 18),
                 Behavior = new EditorModeLabelBehavior(),
             };
             editorModelLabel.Content.As<TextContent>().Color = Color.DarkGray;
             UI.Controls.Add(editorModelLabel);
-        }      
+
+
+            ContentControl coordinatesLabel = new ContentControl(UI, new TextContent());
+            coordinatesLabel.Size = new Size2F(550, 18);
+            coordinatesLabel.Position = new Vector2(0, 40);
+            coordinatesLabel.Behavior = new CoordinatesLabelBehavior();
+            UI.Controls.Add(coordinatesLabel);
+        }
 
         public void ClearScene(bool resetCamera)
         {
@@ -140,7 +150,7 @@ namespace Aurora.Sample.Editor
                 GraphicsDevice.ImmediateContext.Flush();
             }
             else
-            {                
+            {
                 App.Current.MainWindow.Close();
             }
         }
@@ -152,7 +162,7 @@ namespace Aurora.Sample.Editor
                 Scene.Draw();
                 UI.Draw();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString(), "A rendering error occured", MessageBoxButton.OK, MessageBoxImage.Error);
                 System.Diagnostics.Debug.WriteLine(ex.Message);
@@ -160,7 +170,7 @@ namespace Aurora.Sample.Editor
             }
 
             return true;
-        }       
+        }
 
         private Matrix CalculateProjection()
         {
@@ -202,12 +212,12 @@ namespace Aurora.Sample.Editor
             /*
             referenceGridNode.Transform = new CipherPark.Aurora.Core.Animation.Transform(Matrix.Translation(100, 100, 100));
             Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(new Vector3(100, 101, 100), new Vector3(100, 100, 100), Vector3.UnitZ);
-            */            
+            */
             Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(new Vector3(0, 101, 0), new Vector3(0, 0, 0), Vector3.UnitZ);
-            Scene.Nodes.Add(referenceGridNode);            
+            Scene.Nodes.Add(referenceGridNode);
         }
 
-        private void NavigatorControl_NodeTransformed(object sender, NodeTransformedArgs args)
+        private void SceneModifierService_NodeTransformed(object sender, NodeTransformedArgs args)
         {
             NodeTransformed?.Invoke(this, args);
         }
@@ -227,108 +237,5 @@ namespace Aurora.Sample.Editor
         {
             Scene.CameraNode.Camera.ViewMatrix = GetDefaultViewMatrix();
         }
-    }
-
-    public class ProjectViewModel
-    {
-        public SceneViewModel Scene { get; } = new SceneViewModel();
-        public string Filename { get; set; }
-        public bool IsDirty { get; set; }
-
-        public void AddNode(GameObjectSceneNode gameObjectNode, string gameObjectResourceFilename)
-        {
-            var sceneNodeViewModel = new SceneNodeViewModel();
-            sceneNodeViewModel.Name = gameObjectNode.Name;
-            sceneNodeViewModel.Matrix = gameObjectNode.Transform.ToMatrix().ToArray();
-            sceneNodeViewModel.Flags = gameObjectNode.Flags;
-            sceneNodeViewModel.Visible = gameObjectNode.Visible;           
-            if(gameObjectNode.GameObject.Renderer is ModelRenderer)
-            {
-                sceneNodeViewModel.GameObjectType = GameObjectType.GeometricModel;
-                sceneNodeViewModel.GameObjectDescription = new GameObjectDescription()
-                {
-                    Filename = gameObjectResourceFilename,
-                    EffectType = gameObjectNode.GameObject.Renderer.As<ModelRenderer>()
-                                               .Model
-                                               .Effect
-                                               .GetType()
-                                               .FullName,
-                    ModelType = gameObjectNode.GameObject.Renderer.As<ModelRenderer>()
-                                               .Model
-                                               .GetType()
-                                               .FullName,
-                };            
-            }
-            sceneNodeViewModel.DataModel = gameObjectNode;
-
-            if(gameObjectNode.Parent != null)
-            {
-                var parentSceneNodeViewModel = Scene.FindSceneNodeViewModel(n => n.DataModel == gameObjectNode.Parent);
-                if( parentSceneNodeViewModel == null)
-                {
-                    throw new InvalidOperationException("Expected project scene node not found.");
-                }
-                parentSceneNodeViewModel.Children.Add(sceneNodeViewModel);
-            }
-            else
-            {
-                Scene.Children.Add(sceneNodeViewModel);
-            }
-        }       
-    }
-
-    public class SceneViewModel
-    {
-        public List<SceneNodeViewModel> Children { get; } = new List<SceneNodeViewModel>();
-
-        public SceneNodeViewModel FindSceneNodeViewModel(Func<SceneNodeViewModel, bool> condition)
-        {
-            return FindSceneNodeViewModel(Children, condition);      
-        }
-
-        private static SceneNodeViewModel FindSceneNodeViewModel(List<SceneNodeViewModel> children, Func<SceneNodeViewModel, bool> condition)
-        {
-            foreach(var child in children)
-            {
-                if(condition(child))
-                {
-                    return child;
-                }
-                
-                var descendant = FindSceneNodeViewModel(child.Children, condition);
-                
-                if( descendant != null)
-                {
-                    return descendant;
-                }    
-            }
-
-            return null;
-        }
-    }
-
-    public class SceneNodeViewModel
-    {
-        public string Name { get; set; }
-        public float[] Matrix { get; set; }
-        public ulong Flags { get; set; }
-        public bool Visible { get; set; }
-        public GameObjectType GameObjectType { get; set; }
-        public GameObjectDescription GameObjectDescription { get; set; }
-        [JsonIgnore]
-        public SceneNode DataModel { get; set; }
-        public List<SceneNodeViewModel> Children { get; } = new List<SceneNodeViewModel>();
-    }
-
-    public class GameObjectDescription
-    {
-        public string Filename { get; set; }
-        public string EffectType { get; set; }
-        public string ModelType { get; set; }
-    }
-
-    public enum GameObjectType
-    {
-        GeometricModel
-    }
+    }    
 }

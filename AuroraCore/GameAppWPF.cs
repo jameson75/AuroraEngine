@@ -9,6 +9,8 @@ using DXDevice = SharpDX.Direct3D11.Device;
 using DXGIResource = SharpDX.DXGI.Resource;
 using DXResource = SharpDX.Direct3D11.Resource;
 using CipherPark.Aurora.Core.Services;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace CipherPark.Aurora.Core
 {   
@@ -28,14 +30,16 @@ namespace CipherPark.Aurora.Core
         private IntPtr _deviceHwnd = IntPtr.Zero;
         private int _width = 0;
         private int _height = 0;
-      
-        private bool IsInitialized { get; set; }
+        private Window _window = null;
+        
         
         private bool isInitializing = false;
 
         public GameTime GameTime { get; } = new GameTime();        
 
         public IntPtr DeviceHwnd { get { return _deviceHwnd; } }
+
+        public bool IsViewportWindowActive { get { return _window.IsActive; } }
 
         public DeviceContext GraphicsDeviceContext { get { return _graphicsDevice.ImmediateContext; } }
 
@@ -68,10 +72,12 @@ namespace CipherPark.Aurora.Core
             
         }
 
-        public void Initialize(IntPtr hWnd)
+        public void Initialize(Window window)
         {
             //NOTE: Any initialization code that depends on render targets being created
             //should be placed in ContinueInitialize();
+
+            _window = window;
 
             //We only initialize the directX3D device and XAudio at this point.
             //We don't create render targets until the very first call to Render. 
@@ -79,7 +85,7 @@ namespace CipherPark.Aurora.Core
             //access to via Render().
             InitializeDirectXDevice();
             //Cache device window
-            _deviceHwnd = hWnd;           
+            _deviceHwnd = new WindowInteropHelper(window).Handle;           
             //Set a flag to indicate that we need to continue intializing.
             isInitializing = true;
             //Register game app services.
