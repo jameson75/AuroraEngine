@@ -2,10 +2,12 @@
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
+using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
 using Newtonsoft.Json;
 using SharpDX;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -13,10 +15,10 @@ namespace Aurora.Sample.Editor
 {
     public class MainWindowController
     {
-        private EditorGameApp game;
+        private IEditorGameApp game;
         private ProjectViewModel dom = new ProjectViewModel();
 
-        public MainWindowController(EditorGameApp game)
+        public MainWindowController(IEditorGameApp game)
         {
             this.game = game;
             game.NodeTransformed += Game_NodeTransformed;
@@ -60,7 +62,8 @@ namespace Aurora.Sample.Editor
                     {
                         SaveProject(filePath);                        
                     }
-                }                
+                }
+                dom.IsDirty = false;
             }
         }
 
@@ -83,7 +86,7 @@ namespace Aurora.Sample.Editor
         public string PresentOpenProjectDialog()
         {
             var dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.DefaultExt = ".aurora";https://social.msdn.microsoft.com/Forums/vstudio/en-US/d3f223ac-7fca-486e-8939-adb46e9bf6c9/how-can-i-get-yesno-from-a-messagebox-in-wpf?forum=wpf
+            dialog.DefaultExt = ".aurora";
             dialog.Filter = "Aurora Project (.aurora)|*.aurora";
             return dialog.ShowDialog() == true ? dialog.FileName : null;
         }
@@ -127,24 +130,6 @@ namespace Aurora.Sample.Editor
 
         public void ImportModel(string filePath)
         {
-            /*
-            BlinnPhongEffect2 effect = new BlinnPhongEffect2(game, SurfaceVertexType.InstancePositionNormalColor);                        
-            effect.AmbientColor = SharpDX.Color.White;
-            effect.Lighting = new Light[]
-            {
-                    new PointLight
-                    {
-                        Diffuse = SharpDX.Color.White,
-                        Transform = new CipherPark.Aurora.Core.Animation.Transform(new Vector3(500, 500, 500))
-                    },
-                    new PointLight
-                    {
-                        Diffuse = SharpDX.Color.White,
-                        Transform = new CipherPark.Aurora.Core.Animation.Transform(new Vector3(-500, -500, -500))
-                    }
-            };
-            */
-
             FlatEffect effect = new FlatEffect(game, SurfaceVertexType.PositionColor);
             var model = ContentImporter.ImportX(game, filePath, effect, XFileChannels.Mesh | XFileChannels.DefaultMaterialColor , XFileImportOptions.IgnoreMissingColors);
             var node = new GameObjectSceneNode(game)
@@ -232,5 +217,108 @@ namespace Aurora.Sample.Editor
                 dom.IsDirty = true;
             }
         }
+    }
+
+    public class ProjectViewModel
+    {
+        public SceneViewModel Scene { get; } = new SceneViewModel();
+        public string Filename { get; set; }
+        public bool IsDirty { get; set; }
+
+        public void AddNode(GameObjectSceneNode gameObjectNode, string gameObjectResourceFilename)
+        {
+            var sceneNodeViewModel = new SceneNodeViewModel();
+            sceneNodeViewModel.Name = gameObjectNode.Name;
+            sceneNodeViewModel.Matrix = gameObjectNode.Transform.ToMatrix().ToArray();
+            sceneNodeViewModel.Flags = gameObjectNode.Flags;
+            sceneNodeViewModel.Visible = gameObjectNode.Visible;
+            if (gameObjectNode.GameObject.Renderer is ModelRenderer)
+            {
+                sceneNodeViewModel.GameObjectType = GameObjectType.GeometricModel;
+                sceneNodeViewModel.GameObjectDescription = new GameObjectDescription()
+                {
+                    Filename = gameObjectResourceFilename,
+                    EffectType = gameObjectNode.GameObject.Renderer.As<ModelRenderer>()
+                                               .Model
+                                               .Effect
+                                               .GetType()
+                                               .FullName,
+                    ModelType = gameObjectNode.GameObject.Renderer.As<ModelRenderer>()
+                                               .Model
+                                               .GetType()
+                                               .FullName,
+                };
+            }
+            sceneNodeViewModel.DataModel = gameObjectNode;
+
+            if (gameObjectNode.Parent != null)
+            {
+                var parentSceneNodeViewModel = Scene.FindSceneNodeViewModel(n => n.DataModel == gameObjectNode.Parent);
+                if (parentSceneNodeViewModel == null)
+                {
+                    throw new InvalidOperationException("Expected project scene node not found.");
+                }
+                parentSceneNodeViewModel.Children.Add(sceneNodeViewModel);
+            }
+            else
+            {
+                Scene.Children.Add(sceneNodeViewModel);
+            }
+        }
+    }
+
+    public class SceneViewModel
+    {
+        public List<SceneNodeViewModel> Children { get; } = new List<SceneNodeViewModel>();
+
+        public SceneNodeViewModel FindSceneNodeViewModel(Func<SceneNodeViewModel, bool> condition)
+        {
+            return FindSceneNodeViewModel(Children, condition);
+        }
+
+        private static SceneNodeViewModel FindSceneNodeViewModel(List<SceneNodeViewModel> children, Func<SceneNodeViewModel, bool> condition)
+        {
+            foreach (var child in children)
+            {
+                if (condition(child))
+                {
+                    return child;
+                }
+
+                var descendant = FindSceneNodeViewModel(child.Children, condition);
+
+                if (descendant != null)
+                {
+                    return descendant;
+                }
+            }
+
+            return null;
+        }
+    }
+
+    public class SceneNodeViewModel
+    {
+        public string Name { get; set; }
+        public float[] Matrix { get; set; }
+        public ulong Flags { get; set; }
+        public bool Visible { get; set; }
+        public GameObjectType GameObjectType { get; set; }
+        public GameObjectDescription GameObjectDescription { get; set; }
+        [JsonIgnore]
+        public SceneNode DataModel { get; set; }
+        public List<SceneNodeViewModel> Children { get; } = new List<SceneNodeViewModel>();
+    }
+
+    public class GameObjectDescription
+    {
+        public string Filename { get; set; }
+        public string EffectType { get; set; }
+        public string ModelType { get; set; }
+    }
+
+    public enum GameObjectType
+    {
+        GeometricModel
     }
 }

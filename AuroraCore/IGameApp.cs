@@ -44,6 +44,8 @@ namespace CipherPark.Aurora.Core
 
         IntPtr DeviceHwnd { get; }
 
+        bool IsViewportWindowActive { get; }
+
         event Action BuffersResizing;
 
         event Action BuffersResized;

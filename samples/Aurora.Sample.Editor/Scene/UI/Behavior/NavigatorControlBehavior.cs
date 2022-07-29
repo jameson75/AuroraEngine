@@ -12,17 +12,18 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
         public override void Update(UIControl control)
         {
             base.Update(control);
-            var gameApp = (EditorGameApp)GetGameApp(control);
-            var navigatorControl = (NavigatorControl)control;
-            UpdateNavigatorMode(gameApp, navigatorControl);
-            UpdateScenePickerMode(gameApp, navigatorControl);
+            var gameApp = (IEditorGameApp)GetGameApp(control);            
+            UpdateSceneManagemetServices(gameApp);            
         }
 
-        private void UpdateNavigatorMode(EditorGameApp gameApp, NavigatorControl navigatorControl)
+        private void UpdateSceneManagemetServices(IEditorGameApp gameApp)
         {
+            var mouseNavigatorService = gameApp.Services.GetService<MouseNavigatorService>();
+            var sceneModifierService = gameApp.Services.GetService<SceneModifierService>();
+
             if (HasEditorModeChanged(gameApp))
             {
-                var activatePickingMode = false;
+                var activateScenePicker = false;
                 var navigationMode = MouseNavigatorService.NavigationMode.None;
                 switch (gameApp.EditorMode)
                 {
@@ -36,38 +37,35 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
                         navigationMode = MouseNavigatorService.NavigationMode.Pan;
                         break;
                     case EditorMode.SelectSceneObject:
-                        activatePickingMode = true;
+                        activateScenePicker = true;
                         break;
                 }
-                navigatorControl.NavigationMode = navigationMode;
-                navigatorControl.IsInPickingMode = activatePickingMode;
+                mouseNavigatorService.Mode = navigationMode;
+                sceneModifierService.IsActive = activateScenePicker;                
+            }
+
+            if (HasTransformPlaneChange(gameApp))
+            {
+                switch (gameApp.TransformPlane)
+                {
+                    case EditorTransformPlane.XZ:
+                        sceneModifierService.TranslationPlane = TranslationPlane.XZ;
+                        break;
+                    case EditorTransformPlane.XY:
+                        sceneModifierService.TranslationPlane = TranslationPlane.XY;
+                        break;
+                }
             }
         }
 
-        private bool HasEditorModeChanged(EditorGameApp gameApp)
+        private bool HasEditorModeChanged(IEditorGameApp gameApp)
         {
             var hasChanged = lastEditorMode != gameApp.EditorMode;
             lastEditorMode = gameApp.EditorMode;
             return hasChanged;
         }
 
-        private void UpdateScenePickerMode(EditorGameApp gameApp, NavigatorControl navigatorControl)
-        {
-            if (HasTransformPlaneChange(gameApp))
-            {
-                switch (gameApp.TransformPlane)
-                {
-                    case EditorTransformPlane.XZ:
-                        navigatorControl.TransformPlane = TranslationPlane.XZ;
-                        break;
-                    case EditorTransformPlane.XY:
-                        navigatorControl.TransformPlane = TranslationPlane.XY;
-                        break; 
-                }               
-            }
-        }
-
-        private bool HasTransformPlaneChange(EditorGameApp gameApp)
+        private bool HasTransformPlaneChange(IEditorGameApp gameApp)
         {
             var hasChanged = lastTransformPlane != gameApp.TransformPlane;
             lastTransformPlane = gameApp.TransformPlane;

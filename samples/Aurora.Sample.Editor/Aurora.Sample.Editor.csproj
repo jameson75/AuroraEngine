@@ -47,11 +47,17 @@
     <Reference Include="SharpDX.Direct3D11, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SharpDX.Direct3D11.4.2.0\lib\net45\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX.DirectInput, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SharpDX.DirectInput.4.2.0\lib\net45\SharpDX.DirectInput.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX.DXGI, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SharpDX.DXGI.4.2.0\lib\net45\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Mathematics, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SharpDX.Mathematics.4.2.0\lib\net45\SharpDX.Mathematics.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SharpDX.XAudio2.4.2.0\lib\net45\SharpDX.XAudio2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -73,23 +79,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="EditorMode.cs" />
-    <Compile Include="EditorTransformPlane.cs" />
-    <Compile Include="MainWindowController.cs" />
     <Compile Include="SampleGameAppTheme.cs" />
-    <Compile Include="Scene\IEditableContext.cs" />
-    <Compile Include="Scene\ReferenceGrid.cs" />
-    <Compile Include="Scene\ReferenceGridEditContext.cs" />
-    <Compile Include="Scene\ReferenceGridRenderer.cs" />
+    <Compile Include="Scene\UI\Behavior\CoordinatesLabelBehavior.cs" />
     <Compile Include="Scene\UI\Behavior\EditorModeLabelBehavior.cs" />
-    <Compile Include="Scene\UI\Behavior\RotationOverlayControlBehavior.cs" />
     <Compile Include="Scene\UI\Behavior\NavigatorControlBehavior.cs" />
+    <Compile Include="Scene\UI\Behavior\RotationOverlayControlBehavior.cs" />
     <Compile Include="Scene\UI\Extensions.cs" />
-    <Compile Include="Services\MouseCoordsTransfomerWPF.cs" />
-    <Compile Include="Windows\SettingsDialog.xaml.cs">
-      <DependentUpon>SettingsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\ViewportColor.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -105,10 +100,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Windows\SettingsDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -138,6 +129,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Aurora.Core.Editor\Aurora.Core.Editor.csproj">
+      <Project>{fca357d8-5d47-425c-b290-d804dccec468}</Project>
+      <Name>Aurora.Core.Editor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\AuroraCore\Aurora.Core.csproj">
       <Project>{ac4ad65f-13f6-452f-bc30-dc1a784fb660}</Project>
       <Name>Aurora.Core</Name>
@@ -172,6 +167,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -11,12 +11,12 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
         public override void Update(UIControl control)
         {
             base.Update(control);
-            var gameApp = (EditorGameApp)GetGameApp(control);
+            var gameApp = (IEditorGameApp)GetGameApp(control);
             var contentControl = (ContentControl)control;
             UpdateDisplayText(gameApp, contentControl);
         }
 
-        private void UpdateDisplayText(EditorGameApp gameApp, ContentControl contentControl)
+        private void UpdateDisplayText(IEditorGameApp gameApp, ContentControl contentControl)
         {
             if (HasEditorModeChanged(gameApp))
             {
@@ -40,7 +40,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
             }
         }
 
-        private bool HasEditorModeChanged(EditorGameApp gameApp)
+        private bool HasEditorModeChanged(IEditorGameApp gameApp)
         {
             var hasChanged = lastEditorMode != gameApp.EditorMode;
             lastEditorMode = gameApp.EditorMode;
