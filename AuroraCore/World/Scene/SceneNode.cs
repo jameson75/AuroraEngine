@@ -142,6 +142,17 @@ namespace CipherPark.Aurora.Core.World.Scene
 
         public void Dispose()
         {
+            Dispose(false);
+        }
+
+        public void Dispose(bool disposeChildren)
+        {
+            if (disposeChildren)
+            {
+                foreach (var child in Children)
+                    child.Dispose(true);
+            }
+
             OnDispose();
         }
 

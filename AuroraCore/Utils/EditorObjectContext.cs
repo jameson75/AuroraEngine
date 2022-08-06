@@ -3,9 +3,12 @@
 namespace CipherPark.Aurora.Core.Services
 {
     public class EditorObjectContext
-    {        
-        public bool IsModifier { get; set; }
-        public bool IsTraversingPlane { get; set; }       
-        public GameObjectSceneNode ModifierTargetNode { get; set; }      
+    { 
+        public GameObjectSceneNode ModifierTargetNode { get; set; }       
+        public bool IsModifierRoot { get; set; }
+        public bool IsTraversingPlane { get; set; }        
+        public bool IsReferenceGrid { get; set; }
+        public bool IsSelectionModifier { get; set; }
+        public bool IsShadowModifier { get; set; }
     }
 }

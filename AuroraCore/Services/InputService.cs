@@ -63,6 +63,7 @@ namespace CipherPark.Aurora.Core.Services
         {
             ism = new InputState(game, mouseCoordsTransfomer);
             cim = new BufferedInputState(ism);
+            this.game = game;
             Create(ism, cim);
         }
         #endregion

@@ -174,20 +174,15 @@ namespace CipherPark.Aurora.Core.Content
         }
         */
 
-        public static Vector3[] CreateQuadPoints(RectangleF dimension, bool includeCenterPoint = false)
+        public static Vector3[] CreateQuadPoints(RectangleF dimension)
         {
-            Vector3[] results = new Vector3[5] 
+            return new Vector3[4] 
             {
                 new Vector3(dimension.Left, 0, dimension.Top),
                 new Vector3(dimension.Right, 0, dimension.Top),
                 new Vector3(dimension.Right, 0, dimension.Bottom),
                 new Vector3(dimension.Left, 0, dimension.Bottom),
-                new Vector3(dimension.Left + (dimension.Width / 2.0f), 0, dimension.Top + (dimension.Height / 2.0f))
             };
-            if (!includeCenterPoint)
-                return results.Take(4).ToArray();
-            else
-                return results;
         }
 
         public static Vector2[] CreateQuadTextureCoords()

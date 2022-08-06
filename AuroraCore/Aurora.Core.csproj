@@ -124,13 +124,8 @@
     <Compile Include="GameAppWPF.cs" />
     <Compile Include="Services\CastExtensions.cs" />
     <Compile Include="Utils\EditorObjectContext.cs" />
-    <Compile Include="Utils\GameObjectExtensions.cs" />
-    <Compile Include="World\Renderers\GameObjectModifierRenderer.cs" />
     <Compile Include="Services\ICommandTerminalService.cs" />
-    <Compile Include="Services\MouseNavigatorService.cs" />
-    <Compile Include="Services\MouseTrackingService.cs" />
     <Compile Include="Services\ActiveSceneService.cs" />
-    <Compile Include="Services\SceneModifierService.cs" />
     <Compile Include="Utils\PickExtensions.cs" />
     <Compile Include="Utils\PickInfo.cs" />
     <Compile Include="Utils\SceneExtensions.cs" />
@@ -253,7 +248,6 @@
     <Compile Include="UI\Controls\Menu.cs" />
     <Compile Include="UI\Controls\MenuItem.cs" />
     <Compile Include="UI\Controls\Panel.cs" />
-    <Compile Include="UI\Controls\NavigatorControl.cs" />
     <Compile Include="UI\Controls\Slider.cs" />
     <Compile Include="UI\Controls\TextBox.cs" />
     <Compile Include="UI\Controls\TextContent.cs" />
