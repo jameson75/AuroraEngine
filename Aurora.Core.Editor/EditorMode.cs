@@ -1,4 +1,4 @@
-﻿namespace Aurora.Sample.Editor
+﻿namespace Aurora.Core.Editor
 {
     public enum EditorMode
     {

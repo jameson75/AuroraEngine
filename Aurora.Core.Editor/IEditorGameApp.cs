@@ -5,7 +5,7 @@ using CipherPark.Aurora.Core.World.Scene;
 using SharpDX;
 using System;
 
-namespace Aurora.Sample.Editor
+namespace Aurora.Core.Editor
 {
     public interface IEditorGameApp : IGameApp
     {

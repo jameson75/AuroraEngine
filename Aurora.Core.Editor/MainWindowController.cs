@@ -9,24 +9,28 @@ using Newtonsoft.Json;
 using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 
-namespace Aurora.Sample.Editor
+namespace Aurora.Core.Editor
 {
     public class MainWindowController
     {
-        private IEditorGameApp game;
-        private ProjectViewModel dom = new ProjectViewModel();
+        private IEditorGameApp game;        
 
         public MainWindowController(IEditorGameApp game)
         {
             this.game = game;
             game.NodeTransformed += Game_NodeTransformed;
-        }        
+            ViewModel = new MainWindowViewModel();            
+        }
+
+        public MainWindowViewModel ViewModel { get; }
 
         public void UIOpenProject()
         {
-            if (IsDomDirty)
+            if (ViewModel.IsProjectDirty)
             {
                 UISaveProjectBeforeClosing();
             }
@@ -49,21 +53,25 @@ namespace Aurora.Sample.Editor
 
         public void UISaveProject()
         {
-            if (IsDomDirty)
+            if (ViewModel.IsProjectDirty)
             {
-                if (dom.Filename != null)
+                if (ViewModel.ProjectFileName != null)
                 {
-                    SaveProject(dom.Filename);
+                    SaveProject(ViewModel.ProjectFileName);
                 }
                 else
                 {
-                    var filePath = PresentSaveProjectDialog();
-                    if (filePath != null)
-                    {
-                        SaveProject(filePath);                        
-                    }
-                }
-                dom.IsDirty = false;
+                    UISaveAsProject();
+                }               
+            }
+        }
+
+        public void UISaveAsProject()
+        {
+            var filePath = PresentSaveProjectDialog();
+            if (filePath != null)
+            {
+                SaveProject(filePath);
             }
         }
 
@@ -106,26 +114,33 @@ namespace Aurora.Sample.Editor
             dialog.Filter = "Aurora Project (.aurora)|*.aurora";
             return dialog.ShowDialog() == true ? dialog.FileName : null;            
         }
-
-        public bool IsDomDirty => dom?.IsDirty ?? false;
+        
+        public void NewProject()
+        {
+            ViewModel.Project = new ProjectViewModel()
+            {
+                Scene = new SceneViewModel(),
+            };
+        }
 
         public void OpenProject(string filePath)
         {
             var json = System.IO.File.ReadAllText(filePath);
-            dom = JsonConvert.DeserializeObject<ProjectViewModel>(json);
-            dom.Filename = filePath;
+            ViewModel.Project = JsonConvert.DeserializeObject<ProjectViewModel>(json);
+            ViewModel.ProjectFileName = filePath;
             //game.ClearScene(true);
-            BuildSceneGraphFromDomChildren(dom.Scene.Children);           
+            BuildSceneGraphFromDomChildren(ViewModel.Project.Scene.Nodes);        
         }        
 
         public void SaveProject(string filePath)
         {
-            var json = JsonConvert.SerializeObject(dom);
+            var json = JsonConvert.SerializeObject(ViewModel.Project);
             System.IO.File.WriteAllText(filePath, json);
-            if (dom.Filename != filePath)
+            if (ViewModel.ProjectFileName != filePath)
             {
-                dom.Filename = filePath;
+                ViewModel.ProjectFileName = filePath;
             }
+            ViewModel.IsProjectDirty = false;
         }
 
         public void ImportModel(string filePath)
@@ -144,8 +159,8 @@ namespace Aurora.Sample.Editor
             };
 
             game.Scene.Nodes.Add(node);
-            dom.AddNode(node, filePath);
-            dom.IsDirty = true;
+            ViewModel.Project.AddSceneNode(node, filePath);
+            ViewModel.IsProjectDirty = true;
         }
 
         public void EnterEditorMode(EditorMode mode)
@@ -163,7 +178,7 @@ namespace Aurora.Sample.Editor
             game.TransformPlane = transformPlane;
         }
 
-        private void BuildSceneGraphFromDomChildren(List<SceneNodeViewModel> children)
+        private void BuildSceneGraphFromDomChildren(IEnumerable<SceneNodeViewModel> children)
         {
             var parentLookup = new Dictionary<SceneNodeViewModel, SceneNode>();
             foreach (var child in children)
@@ -195,7 +210,7 @@ namespace Aurora.Sample.Editor
 
                 var model = ContentImporter.ImportX(
                     game,
-                    domNode.GameObjectDescription.Filename,
+                    domNode.GameObjectDescription.FileName,
                     effect,
                     XFileChannels.Mesh | XFileChannels.DefaultMaterialColor, XFileImportOptions.IgnoreMissingColors);
 
@@ -210,25 +225,33 @@ namespace Aurora.Sample.Editor
 
         private void Game_NodeTransformed(object sender, CipherPark.Aurora.Core.Services.NodeTransformedArgs args)
         {
-            var domNode = dom.Scene.FindSceneNodeViewModel(n => n.DataModel == args.TransfromedNode);
+            var domNode = ViewModel.Project.Scene.FindSceneNodeViewModel(n => n.DataModel == args.TransfromedNode);
             if( domNode != null)
             {
                 domNode.Matrix = args.TransfromedNode.Transform.ToMatrix().ToArray();
-                dom.IsDirty = true;
+                ViewModel.IsProjectDirty = true;
             }
         }
     }
 
-    public class ProjectViewModel
+    public class ProjectViewModel : ViewModelBase
     {
-        public SceneViewModel Scene { get; } = new SceneViewModel();
-        public string Filename { get; set; }
-        public bool IsDirty { get; set; }
+        private SceneViewModel scene;
 
-        public void AddNode(GameObjectSceneNode gameObjectNode, string gameObjectResourceFilename)
+        public SceneViewModel Scene
+        {
+            get => scene;
+            set
+            {
+                scene = value;
+                OnPropertyChanged(nameof(Scene));                
+            }
+        }
+
+        public void AddSceneNode(GameObjectSceneNode gameObjectNode, string gameObjectResourceFileName)
         {
             var sceneNodeViewModel = new SceneNodeViewModel();
-            sceneNodeViewModel.Name = gameObjectNode.Name;
+            sceneNodeViewModel.Name = gameObjectNode.Name ?? System.IO.Path.GetFileNameWithoutExtension(gameObjectResourceFileName);
             sceneNodeViewModel.Matrix = gameObjectNode.Transform.ToMatrix().ToArray();
             sceneNodeViewModel.Flags = gameObjectNode.Flags;
             sceneNodeViewModel.Visible = gameObjectNode.Visible;
@@ -237,16 +260,16 @@ namespace Aurora.Sample.Editor
                 sceneNodeViewModel.GameObjectType = GameObjectType.GeometricModel;
                 sceneNodeViewModel.GameObjectDescription = new GameObjectDescription()
                 {
-                    Filename = gameObjectResourceFilename,
+                    FileName = gameObjectResourceFileName,
                     EffectType = gameObjectNode.GameObject.Renderer.As<ModelRenderer>()
                                                .Model
                                                .Effect
                                                .GetType()
-                                               .FullName,
+                                               .Name,
                     ModelType = gameObjectNode.GameObject.Renderer.As<ModelRenderer>()
                                                .Model
                                                .GetType()
-                                               .FullName,
+                                               .Name,
                 };
             }
             sceneNodeViewModel.DataModel = gameObjectNode;
@@ -262,21 +285,22 @@ namespace Aurora.Sample.Editor
             }
             else
             {
-                Scene.Children.Add(sceneNodeViewModel);
+                Scene.Nodes.Add(sceneNodeViewModel);
             }
         }
     }
 
-    public class SceneViewModel
+    public class SceneViewModel : ViewModelBase
     {
-        public List<SceneNodeViewModel> Children { get; } = new List<SceneNodeViewModel>();
+        [JsonProperty("Children")]
+        public ObservableCollection<SceneNodeViewModel> Nodes { get; } = new ObservableCollection<SceneNodeViewModel>();
 
         public SceneNodeViewModel FindSceneNodeViewModel(Func<SceneNodeViewModel, bool> condition)
         {
-            return FindSceneNodeViewModel(Children, condition);
+            return FindSceneNodeViewModel(Nodes, condition);
         }
 
-        private static SceneNodeViewModel FindSceneNodeViewModel(List<SceneNodeViewModel> children, Func<SceneNodeViewModel, bool> condition)
+        private static SceneNodeViewModel FindSceneNodeViewModel(IEnumerable<SceneNodeViewModel> children, Func<SceneNodeViewModel, bool> condition)
         {
             foreach (var child in children)
             {
@@ -297,9 +321,19 @@ namespace Aurora.Sample.Editor
         }
     }
 
-    public class SceneNodeViewModel
+    public class SceneNodeViewModel : ViewModelBase
     {
-        public string Name { get; set; }
+        private string name;
+
+        public string Name
+        {
+            get => name;
+            set
+            {
+                name = value;
+                OnPropertyChanged(nameof(Name));
+            }
+        }
         public float[] Matrix { get; set; }
         public ulong Flags { get; set; }
         public bool Visible { get; set; }
@@ -307,12 +341,12 @@ namespace Aurora.Sample.Editor
         public GameObjectDescription GameObjectDescription { get; set; }
         [JsonIgnore]
         public SceneNode DataModel { get; set; }
-        public List<SceneNodeViewModel> Children { get; } = new List<SceneNodeViewModel>();
+        public ObservableCollection<SceneNodeViewModel> Children { get; } = new ObservableCollection<SceneNodeViewModel>();
     }
 
     public class GameObjectDescription
     {
-        public string Filename { get; set; }
+        public string FileName { get; set; }
         public string EffectType { get; set; }
         public string ModelType { get; set; }
     }
@@ -320,5 +354,63 @@ namespace Aurora.Sample.Editor
     public enum GameObjectType
     {
         GeometricModel
+    }
+    
+    public class MainWindowViewModel : ViewModelBase
+    {
+        private ProjectViewModel project;
+        private bool isProjectDirty;
+        private string projectFileName;
+        private SceneNodeViewModel selectedNode;
+
+        public ProjectViewModel Project
+        {
+            get => project;
+            set
+            {
+                project = value;
+                OnPropertyChanged(nameof(Project));                
+            }
+        }
+
+        public bool IsProjectDirty
+        {
+            get => isProjectDirty;
+            set
+            {
+                isProjectDirty = value;
+                OnPropertyChanged(nameof(IsProjectDirty));                
+            }
+        }
+
+        public string ProjectFileName
+        {
+            get => projectFileName;
+            set
+            {
+                projectFileName = value;
+                OnPropertyChanged(nameof(ProjectFileName));                
+            }
+        }
+
+        public SceneNodeViewModel SelectedNode
+        {
+            get => selectedNode;
+            set
+            {
+                selectedNode = value;
+                OnPropertyChanged(nameof(SelectedNode));
+            }
+        }            
+    }
+
+    public class ViewModelBase : INotifyPropertyChanged
+    {
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;        
     }
 }

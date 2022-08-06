@@ -65,8 +65,13 @@
   <ItemGroup>
     <Compile Include="EditorMode.cs" />
     <Compile Include="EditorTransformPlane.cs" />
+    <Compile Include="GameObjectShadowRenderer.cs" />
+    <Compile Include="GameObjectExtensions.cs" />
+    <Compile Include="GameObjectCrosshairsRenderer.cs" />
+    <Compile Include="GameObjectSelectionRenderer.cs" />
     <Compile Include="IEditorGameApp.cs" />
     <Compile Include="MainWindowController.cs" />
+    <Compile Include="NavigatorControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -82,9 +87,11 @@
     </Compile>
     <Compile Include="Scene\IEditableContext.cs" />
     <Compile Include="Scene\ReferenceGrid.cs" />
-    <Compile Include="Scene\ReferenceGridEditContext.cs" />
     <Compile Include="Scene\ReferenceGridRenderer.cs" />
     <Compile Include="Services\MouseCoordsTransfomerWPF.cs" />
+    <Compile Include="Services\MouseNavigatorService.cs" />
+    <Compile Include="Services\MouseTrackingService.cs" />
+    <Compile Include="Services\SceneModifierService.cs" />
     <Compile Include="ViewportColor.cs" />
     <Compile Include="Windows\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
