@@ -1,6 +1,7 @@
 ﻿using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.UI.Components;
 using CipherPark.Aurora.Core.UI.Controls;
+using Aurora.Core.Editor;
 
 namespace Aurora.Sample.Editor.Scene.UI.Behavior
 {
@@ -52,7 +53,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
                         sceneModifierService.TranslationPlane = TranslationPlane.XZ;
                         break;
                     case EditorTransformPlane.XY:
-                        sceneModifierService.TranslationPlane = TranslationPlane.XY;
+                        sceneModifierService.TranslationPlane = TranslationPlane.Y;
                         break;
                 }
             }

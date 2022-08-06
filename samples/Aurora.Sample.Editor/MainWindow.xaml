@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Aurora.Sample.Editor"
+        xmlns:core="clr-namespace:Aurora.Core.Editor;assembly=Aurora.Core.Editor"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         Closing="Window_Closing">
@@ -21,6 +22,7 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="_Open" Click="Menu_File_Open_Click"/>                    
                     <MenuItem Header="_Save" Click="Menu_File_Save_Click"/>
+                    <MenuItem Header="_SaveAs" Click="Menu_File_SaveAs_Click"/>
                     <MenuItem Header="_Close"/>
                     <Separator/>
                     <MenuItem Header="_Import" Click="Menu_File_Import_Click" />
@@ -52,7 +54,7 @@
                     <Separator/>
                     <Button ToolTip="Transform Object in XZ Plane" Click="ToolBar_SelectTransformPlaneXZ_Click" Content="XZ" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">                        
                     </Button>
-                    <Button ToolTip="Transform Object in XY Plane" Click="ToolBar_SelectTransformPlaneXY_Click" Content="XY" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    <Button ToolTip="Transform Object in Y Plane" Click="ToolBar_SelectTransformPlaneY_Click" Content="Y" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
                     </Button>                    
                 </ToolBar>
             </ToolBarTray>
@@ -62,7 +64,38 @@
         </ContentControl>
         <TabControl Grid.Row="1" Grid.Column="1">
             <TabItem Header="General">
-                <Label Content="Content goes here..." />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="300" />
+                        <RowDefinition Height="*" />                        
+                    </Grid.RowDefinitions>
+                    <TreeView x:Name="sceneTreeView" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Path=Project.Scene.Nodes}" SelectedItemChanged="SceneTreeView_SelectedItemChanged">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type core:SceneNodeViewModel}">
+                                <TreeViewItem Header="{Binding Path=Name}"/>                                
+                            </HierarchicalDataTemplate>                           
+                        </TreeView.Resources>
+                    </TreeView>
+                    <StackPanel Grid.Row="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Width="80">Name</Label>
+                            <TextBox Width="200" Text="{Binding Path=SelectedNode.Name, Mode=TwoWay}"></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Width="80">File</Label>
+                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObjectDescription.FileName}" ToolTip="{Binding SelectedNode.GameObjectDescription.FileName}"></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Width="80">Model Type</Label>
+                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObjectDescription.ModelType}"></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Width="80">Effect</Label>
+                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObjectDescription.EffectType}"></TextBox>
+                        </StackPanel>                        
+                    </StackPanel>
+                </Grid>
             </TabItem>
             <TabItem Header="Security" />
             <TabItem Header="Details" />

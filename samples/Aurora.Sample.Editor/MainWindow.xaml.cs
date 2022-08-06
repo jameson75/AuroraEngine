@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Aurora.Core.Editor;
 using Microsoft.Wpf.Interop.DirectX;
 
 namespace Aurora.Sample.Editor
@@ -14,7 +15,7 @@ namespace Aurora.Sample.Editor
         private D3D11Image interopImage;
         private EditorGameApp game;
         private TimeSpan lastRender;
-        private MainWindowController controller;
+        private MainWindowController controller;       
 
         public MainWindow()
         {           
@@ -23,9 +24,13 @@ namespace Aurora.Sample.Editor
             InitializeControllers();
         }
 
+        public SceneViewModel Scene { get; } = new SceneViewModel();
+
         private void InitializeControllers()
         {
             controller = new MainWindowController(game);
+            DataContext = controller.ViewModel;            
+            controller.NewProject(); //TODO: Remove implicitly created new project.            
         }
 
         public void InitializeGameHosting()
@@ -134,6 +139,11 @@ namespace Aurora.Sample.Editor
             controller.UISaveProject();
         }
 
+        private void Menu_File_SaveAs_Click(object sender, RoutedEventArgs e)
+        {
+            controller.UISaveAsProject();
+        }
+
         private void Menu_File_Import_Click(object sender, RoutedEventArgs e)
         {
             controller.UIImportModel();
@@ -176,10 +186,15 @@ namespace Aurora.Sample.Editor
             controller.SetEditorTransformPlane(EditorTransformPlane.XZ);
         }
 
-        private void ToolBar_SelectTransformPlaneXY_Click(object sender, RoutedEventArgs e)
+        private void ToolBar_SelectTransformPlaneY_Click(object sender, RoutedEventArgs e)
         {
             controller.SetEditorTransformPlane(EditorTransformPlane.XY);
         }
         #endregion
+
+        private void SceneTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            controller.ViewModel.SelectedNode = (SceneNodeViewModel)e.NewValue;
+        }
     }
 }

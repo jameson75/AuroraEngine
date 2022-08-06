@@ -1,8 +1,4 @@
-﻿using System;
-using System.Text;
-using SharpDX;
-using CipherPark.Aurora.Core.Animation;
-using CipherPark.Aurora.Core.UI.Controls;
+﻿using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.UI.Components;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.Services;
@@ -27,7 +23,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
                     gameApp,
                     mouseLocation.X,
                     mouseLocation.Y,
-                    n => n.GameObject.GetContext<ReferenceGridEditContext>() != null)
+                    n => n.GameObject.IsReferenceGridObject())
                     .GetClosest(camera.Location);
 
                 //NOTE: We expect the control to be a content control with text content.
@@ -36,7 +32,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
                 if (pickInfo != null)
                 {
                     var p = pickInfo.IntersectionPoint;
-                    string caption = $"X:{p.X} Y:{p.Y} Z:{p.Z}";
+                    string caption = $"X:{p.X:F2} Y:{p.Y:F2} Z:{p.Z:F2}";
                     controlContent.Text = caption;
                 }
 

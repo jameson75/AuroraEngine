@@ -12,6 +12,7 @@ using System.Windows;
 using Aurora.Sample.Editor.Services;
 using Aurora.Sample.Editor.Scene;
 using Aurora.Sample.Editor.Scene.UI.Behavior;
+using Aurora.Core.Editor;
 
 namespace Aurora.Sample.Editor
 {
@@ -64,6 +65,8 @@ namespace Aurora.Sample.Editor
 
         private void InitializeUI()
         {
+            const int LabelWidth = 200;
+
             UI = new UITree(this);
             UI.Theme = new SampleGameAppTheme(this);
 
@@ -103,17 +106,22 @@ namespace Aurora.Sample.Editor
                 BlendFactor = new Color4(.5f, .5f, .5f, .5f),
             })
             {
-                Size = new Size2F(100, 18),
+                Size = new Size2F(LabelWidth, 18),
                 Behavior = new EditorModeLabelBehavior(),
             };
             editorModelLabel.Content.As<TextContent>().Color = Color.DarkGray;
             UI.Controls.Add(editorModelLabel);
 
 
-            ContentControl coordinatesLabel = new ContentControl(UI, new TextContent());
-            coordinatesLabel.Size = new Size2F(550, 18);
-            coordinatesLabel.Position = new Vector2(0, 40);
+            ContentControl coordinatesLabel = new ContentControl(UI, new TextContent()
+            {
+                PredefinedBlend = PredefinedBlend.Opacity,
+                BlendFactor = new Color4(.5f, .5f, .5f, .5f),
+            });
+            coordinatesLabel.Size = new Size2F(LabelWidth, 18);
+            coordinatesLabel.Position = new Vector2(0, 20);
             coordinatesLabel.Behavior = new CoordinatesLabelBehavior();
+            coordinatesLabel.Content.As<TextContent>().Color = Color.DarkGray;
             UI.Controls.Add(coordinatesLabel);
         }
 
@@ -208,6 +216,7 @@ namespace Aurora.Sample.Editor
             referenceGridNode.GameObject.AddContext(new EditorObjectContext
             {
                 IsTraversingPlane = true,
+                IsReferenceGrid = true,
             });
             /*
             referenceGridNode.Transform = new CipherPark.Aurora.Core.Animation.Transform(Matrix.Translation(100, 100, 100));
