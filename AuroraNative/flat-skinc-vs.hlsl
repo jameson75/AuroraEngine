@@ -11,7 +11,7 @@ struct VSINPUT
 {
 	float4 Position : SV_POSITION;	
 	float4 Normal : NORMAL;
-	float2 UV : TEXCOORD0;
+	float4 Color : COLOR;
 	uint4  Indices  : BLENDINDICES0;
     float4 Weights  : BLENDWEIGHT0;
 };
@@ -39,6 +39,6 @@ VSOUTPUT blinn_VS(VSINPUT IN)
 	Skin(IN, MAX_BONES_PER_VERTEX);   
     float4 Po = IN.Position;   
     OUT.HPosition = mul(Po,WvpXf);
-	OUT.UVUV = float4(IN.UV.xy, 0, 0);
+	OUT.UVUV = IN.Color;
     return OUT;
 }

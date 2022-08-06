@@ -17,10 +17,11 @@ struct PSINPUT
 float4 flat_PS(PSINPUT IN) : SV_TARGET
 {	
 	float4 diffuseColor = 0;
+	//TODO: determine whether this if statement results in branching and, if so, optimize.
 	if (EnableVertexColor)
 		diffuseColor = float4(IN.UVUV.xyz, 1);
 	else
-		diffuseColor = DiffuseTexture.Sample(DiffuseSampler, IN.UVUV.xy).rgba;
+		diffuseColor = DiffuseTexture.Sample(DiffuseSampler, IN.UVUV.xy).rgba;	
 	return diffuseColor;
 }
 

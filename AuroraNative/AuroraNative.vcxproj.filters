@@ -301,8 +301,6 @@
     <FxCompile Include="position_color-sp-vs.hlsl" />
     <FxCompile Include="position_color-sp-ps.hlsl" />
     <FxCompile Include="flat-ps.hlsl" />
-    <FxCompile Include="flat-skint-vs.hlsl" />
-    <FxCompile Include="flat-skinc-vs.hlsl" />
     <FxCompile Include="flat-pc-vs.hlsl" />
     <FxCompile Include="flat-i-pt-vs.hlsl" />
     <FxCompile Include="flat-i-pc-vs.hlsl" />
@@ -310,6 +308,8 @@
     <FxCompile Include="blinnphong2-p-pnt-vs.hlsl">
       <Filter>Shader Files\BlinnPhong</Filter>
     </FxCompile>
+    <FxCompile Include="flat-skinc-vs.hlsl" />
+    <FxCompile Include="flat-skinct-vs.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="postglowfs-inc.hlsli">

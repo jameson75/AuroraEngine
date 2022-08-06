@@ -1,10 +1,14 @@
 #include "flat-vs.hlsli"
+cbuffer Constants
+{
+	float4 GlobalColor;
+};
 
 struct VSINPUT 
 {
 	float4 Position : SV_POSITION;	
 	float4 Color : COLOR;
-	float4x4 LocalXf : MATRIX;	
+	float4x4 LocalXf : MATRIX;
 };
 
 VSOUTPUT flat_VS(VSINPUT IN)
