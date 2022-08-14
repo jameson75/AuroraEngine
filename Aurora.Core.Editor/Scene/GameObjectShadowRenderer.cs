@@ -7,7 +7,6 @@ using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.World.Scene;
-using System;
 using SharpDX.Direct3D11;
 
 namespace CipherPark.Aurora.Core.Services
@@ -112,7 +111,6 @@ namespace CipherPark.Aurora.Core.Services
                 Mesh = mesh,
             };            
         }
-
 
         private void RestoreBackfaceCulling()
         {

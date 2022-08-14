@@ -63,15 +63,36 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EditorMode.cs" />
-    <Compile Include="EditorTransformPlane.cs" />
-    <Compile Include="GameObjectShadowRenderer.cs" />
-    <Compile Include="GameObjectExtensions.cs" />
-    <Compile Include="GameObjectCrosshairsRenderer.cs" />
-    <Compile Include="GameObjectSelectionRenderer.cs" />
+    <Compile Include="Dom\DomSerializer.cs" />
+    <Compile Include="Dom\GameObjectDescription.cs" />
+    <Compile Include="Dom\Project.cs" />
+    <Compile Include="Dom\Scene.cs" />
+    <Compile Include="Dom\SceneNode.cs" />
+    <Compile Include="Environment\GameObjectMeta.cs" />
+    <Compile Include="Util\DataMapper.cs" />
+    <Compile Include="Util\ModelTypeNames.cs" />
+    <Compile Include="Views\Models\BlinnPhongEffectViewModel.cs" />
+    <Compile Include="Views\Models\EffectViewModel.cs" />
+    <Compile Include="Views\Models\FlatEffectViewModel.cs" />
+    <Compile Include="Views\Models\GameObjectDescriptionViewModel.cs" />
+    <Compile Include="Environment\GameObjectType.cs" />
+    <Compile Include="Views\Models\LightViewModel.cs" />
+    <Compile Include="Environment\EffectNames.cs" />
+    <Compile Include="Views\Models\LookupViewModel.cs" />
+    <Compile Include="Views\Models\MainWindowViewModel.cs" />
+    <Compile Include="Views\Models\ProjectViewModel.cs" />
+    <Compile Include="Views\Models\SceneNodeViewModel.cs" />
+    <Compile Include="Views\Models\SceneViewModel.cs" />
+    <Compile Include="Views\Models\ViewModelBase.cs" />
+    <Compile Include="Environment\EditorMode.cs" />
+    <Compile Include="Environment\EditorTransformPlane.cs" />
+    <Compile Include="Scene\GameObjectShadowRenderer.cs" />
+    <Compile Include="Scene\GameObjectExtensions.cs" />
+    <Compile Include="Scene\GameObjectCrosshairsRenderer.cs" />
+    <Compile Include="Scene\GameObjectSelectionRenderer.cs" />
     <Compile Include="IEditorGameApp.cs" />
-    <Compile Include="MainWindowController.cs" />
-    <Compile Include="NavigatorControl.cs" />
+    <Compile Include="Controllers\MainWindowController.cs" />
+    <Compile Include="Scene\NavigatorControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -92,8 +113,8 @@
     <Compile Include="Services\MouseNavigatorService.cs" />
     <Compile Include="Services\MouseTrackingService.cs" />
     <Compile Include="Services\SceneModifierService.cs" />
-    <Compile Include="ViewportColor.cs" />
-    <Compile Include="Windows\SettingsDialog.xaml.cs">
+    <Compile Include="Environment\ViewportColor.cs" />
+    <Compile Include="Views\Windows\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -113,10 +134,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Windows\SettingsDialog.xaml">
+    <Page Include="Views\Windows\SettingsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
