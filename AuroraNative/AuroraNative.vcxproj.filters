@@ -310,6 +310,7 @@
     </FxCompile>
     <FxCompile Include="flat-skinc-vs.hlsl" />
     <FxCompile Include="flat-skinct-vs.hlsl" />
+    <FxCompile Include="flat-pnc-vs.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="postglowfs-inc.hlsli">
