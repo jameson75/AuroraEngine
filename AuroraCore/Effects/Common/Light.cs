@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpDX;
+﻿using SharpDX;
 using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,7 +12,7 @@ namespace CipherPark.Aurora.Core.Effects
 {
     public abstract class Light
     {
-        public Color Diffuse { get; set; }        
+        public Color Diffuse { get; set; }
     }
 
     public class PointLight : Light, ITransformable 

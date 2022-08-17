@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using SharpDX;
 using SharpDX.Direct3D11;
 
@@ -73,6 +71,9 @@ namespace CipherPark.Aurora.Core.Effects
                     break;
                 case SurfaceVertexType.InstancePositionColor:
                     _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\flat-i-pc-vs.cso", out _vertexShader);
+                    break;
+                case SurfaceVertexType.PositionNormalColor:
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\flat-pnc-vs.cso", out _vertexShader);
                     break;
                 default:
                     throw new InvalidOperationException($"Unsupported surface vertex type {svt} specified");

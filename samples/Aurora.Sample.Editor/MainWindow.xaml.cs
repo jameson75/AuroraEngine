@@ -20,20 +20,17 @@ namespace Aurora.Sample.Editor
         public MainWindow()
         {           
             InitializeComponent();
-            InitializeGameHosting();
-            InitializeControllers();
-        }
+            InitializeGraphicsHost();            
+        }        
 
-        public SceneViewModel Scene { get; } = new SceneViewModel();
-
-        private void InitializeControllers()
+        private void InitializeMVVM()
         {
             controller = new MainWindowController(game);
             DataContext = controller.ViewModel;            
             controller.NewProject(); //TODO: Remove implicitly created new project.            
         }
 
-        public void InitializeGameHosting()
+        public void InitializeGraphicsHost()
         {
             game = new EditorGameApp(host);
             interopImage = new D3D11Image();
@@ -66,6 +63,7 @@ namespace Aurora.Sample.Editor
             InitializeVisualization();
             InitializeRendering();
             InitializeUpdates();
+            InitializeMVVM();
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)

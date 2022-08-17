@@ -1,7 +1,11 @@
 cbuffer Constants
 {
-	float4x4 WvpXf;
-	float4 GlobalColor;	
+	float4x4 WvpXf;	
+};
+
+cbuffer Constants
+{
+	float4 GlobalColor;
 };
 
 struct VSINPUT 

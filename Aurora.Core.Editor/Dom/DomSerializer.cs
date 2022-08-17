@@ -37,42 +37,47 @@ namespace Aurora.Core.Editor.Dom
         }
 
         private static void RestoreSceneNode(SceneNode sceneNode, IList<GameSceneNode> destinationDataModels, IList<SceneNodeViewModel> destinationViewModels, IEditorGameApp app)
-        {          
-            var dataModel = new GameObjectSceneNode(app)
+        {
+            if (sceneNode.NodeType == NodeType.GameObject)
             {
-                Name = sceneNode.Name,
-                Transform = new Transform(new Matrix(sceneNode.Matrix)),
-                Flags = sceneNode.Flags,
-                Visible = sceneNode.Visible,
-                GameObject = CreateGameObject(app, sceneNode),
-            };
-            destinationDataModels.Add(dataModel);
+                var dataModel = new GameObjectSceneNode(app)
+                {
+                    Name = sceneNode.Name,
+                    Transform = new Transform(new Matrix(sceneNode.Matrix)),
+                    Flags = sceneNode.Flags,
+                    Visible = sceneNode.Visible,
+                    GameObject = CreateGameObject(app, sceneNode.GameObject),
+                };                
+                destinationDataModels.Add(dataModel);
 
-            var viewModel = new SceneNodeViewModel(dataModel);
-            destinationViewModels.Add(viewModel);
+                var viewModel = new SceneNodeViewModel(dataModel);
+                destinationViewModels.Add(viewModel);
 
-            foreach (var childSceneNode in sceneNode.Children)
-            {
-                RestoreSceneNode(childSceneNode, dataModel.Children, destinationViewModels, app);
-            }            
+                foreach (var childSceneNode in sceneNode.Children)
+                {
+                    RestoreSceneNode(childSceneNode, dataModel.Children, destinationViewModels, app);
+                }
+            }
         }
 
-        private static GameObject CreateGameObject(IEditorGameApp game, SceneNode sceneNode)
+        private static CipherPark.Aurora.Core.World.GameObject CreateGameObject(IEditorGameApp game, GameObject gameObject)
         {
-            if (sceneNode.GameObjectType == GameObjectType.GeometricModel)
+            if (gameObject.GameObjectType == GameObjectType.GameModel)
             {
-                SurfaceEffect effect = CreateEffect(game, sceneNode.GameObjectDescription.EffectName);
+                SurfaceEffect effect = CreateEffect(game, gameObject.EffectName);
 
                 var model = ContentImporter.ImportX(
                     game,
-                    sceneNode.GameObjectDescription.Filename,
+                    gameObject.ModelFileName,
                     effect,
                     XFileChannels.Mesh | XFileChannels.DefaultMaterialColor | XFileChannels.DeclNormals, XFileImportOptions.IgnoreMissingColors);
 
-                return new GameObject(game)
+                var dataModel = new CipherPark.Aurora.Core.World.GameObject(game)
                 {
                     Renderer = new ModelRenderer(model),
                 };
+                dataModel.AddContext(new GameObjectMeta { ModelFileName = gameObject.ModelFileName });
+                return dataModel;
             }
 
             return null;
@@ -83,10 +88,9 @@ namespace Aurora.Core.Editor.Dom
             switch (effectName)
             {
                 case EffectNames.BlinnPhong:
-                    return new BlinnPhongEffect2(app, SurfaceVertexType.PositionNormalColor);
-                
-                case EffectNames.FlatEffect:
-                    return new FlatEffect(app, SurfaceVertexType.PositionNormalColor);
+                    var effect = new BlinnPhongEffect2(app, SurfaceVertexType.PositionNormalColor);
+                    effect.AmbientColor = Color.White;
+                    return effect;
                 
                 default:
                     throw new InvalidOperationException($"Unsupported effectName {effectName}");
@@ -115,32 +119,36 @@ namespace Aurora.Core.Editor.Dom
             var scene = new Scene();
             foreach(var gameSceneNode in viewModel.DataModel.Nodes)
             {
-                BuildSceneNode(gameSceneNode, scene.Nodes);
+                BuildSceneNodeTree(gameSceneNode, scene.Nodes);
             }
             return scene;
         }
 
-        private static void BuildSceneNode(GameSceneNode gameSceneNode, IList<SceneNode> domNodes)
+        private static void BuildSceneNodeTree(GameSceneNode gameSceneNode, IList<SceneNode> domNodes)
         {
-            var domNode = new SceneNode()
+            var gameSceneNodeType = DataLookup.GetNodeType(gameSceneNode);
+            if (gameSceneNodeType == NodeType.GameObject)
             {
-                Name = gameSceneNode.Name,
-                Matrix = gameSceneNode.Transform.ToMatrix().ToArray(),
-                Flags = gameSceneNode.Flags,
-                Visible = gameSceneNode.Visible,
-                GameObjectType = CreateGameObjectType(gameSceneNode),
-                GameObjectDescription = CreateGameObjectDescription(gameSceneNode),
-            };
+                var domNode = new SceneNode()
+                {
+                    Name = gameSceneNode.Name,
+                    Matrix = gameSceneNode.Transform.ToMatrix().ToArray(),
+                    Flags = gameSceneNode.Flags,
+                    Visible = gameSceneNode.Visible,
+                    NodeType = gameSceneNodeType,
+                    GameObject = CreateGameObjectDescription(gameSceneNode),
+                };
 
-            domNodes.Add(domNode);
+                domNodes.Add(domNode);
 
-            foreach(var gameSceneChildNode in gameSceneNode.Children)
-            {
-                BuildSceneNode(gameSceneChildNode, domNode.Children);
+                foreach (var gameSceneChildNode in gameSceneNode.Children)
+                {
+                    BuildSceneNodeTree(gameSceneChildNode, domNode.Children);
+                }
             }
         }
 
-        private static GameObjectDescription CreateGameObjectDescription(GameSceneNode gameSceneNode)
+        private static GameObject CreateGameObjectDescription(GameSceneNode gameSceneNode)
         {
             var gameModel = gameSceneNode.As<GameObjectSceneNode>()
                             ?.GameObject
@@ -149,21 +157,19 @@ namespace Aurora.Core.Editor.Dom
 
             if (gameModel != null)
             {
-                return new GameObjectDescription()
+                return new GameObject()
                 {
-                    EffectName = DataMapper.GetEffectName(gameModel.Effect),
-                    Filename = gameSceneNode.As<GameObjectSceneNode>()
+                    GameObjectType = DataLookup.GetGameObjectType(gameSceneNode.As<GameObjectSceneNode>()?.GameObject),
+                    EffectName = DataLookup.GetEffectName(gameModel.Effect),
+                    ModelFileName = gameSceneNode.As<GameObjectSceneNode>()
                                             ?.GameObject
                                             .GetContext<GameObjectMeta>()
-                                            ?.Filename,
+                                            ?.ModelFileName,
                 };
             }
 
             return null;
         }
-
-        private static GameObjectType CreateGameObjectType(GameSceneNode gameSceneNode)
-            => DataMapper.GetGameObjectType(gameSceneNode.As<GameObjectSceneNode>()?.GameObject);        
 
         #endregion
     }

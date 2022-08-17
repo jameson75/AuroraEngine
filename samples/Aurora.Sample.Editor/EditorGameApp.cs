@@ -34,14 +34,10 @@ namespace Aurora.Sample.Editor
 
         protected override void OnInitializing()
         {
-            var sceneModifierService = new SceneModifierService(this);
-
             //Register game app services.                            
             Services.RegisterService(new InputService(this, new MouseCoordsTransfomerWPF(imageHost))); //Required For Graphics UI
             Services.RegisterService(new MouseNavigatorService(this));
-            Services.RegisterService(sceneModifierService);
-
-            sceneModifierService.NodeTransformed += SceneModifierService_NodeTransformed;  
+            Services.RegisterService(new SceneModifierService(this));
         }
 
         protected override void OnInitialized()
@@ -224,14 +220,7 @@ namespace Aurora.Sample.Editor
             */
             Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(new Vector3(0, 101, 0), new Vector3(0, 0, 0), Vector3.UnitZ);
             Scene.Nodes.Add(referenceGridNode);
-        }
-
-        private void SceneModifierService_NodeTransformed(object sender, NodeTransformedArgs args)
-        {
-            NodeTransformed?.Invoke(this, args);
-        }
-
-        public event Action<object, NodeTransformedArgs> NodeTransformed;
+        }              
 
         public void ChangeViewportColor(Color newViewportColor)
         {

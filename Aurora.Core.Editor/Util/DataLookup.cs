@@ -1,11 +1,13 @@
 ﻿using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.Services;
 using Aurora.Core.Editor.Environment;
 
 namespace Aurora.Core.Editor.Util
 {
-    public class DataMapper
+    public class DataLookup
     {
         public static GameObjectType GetGameObjectType(GameObject gameObject)
         {
@@ -16,7 +18,7 @@ namespace Aurora.Core.Editor.Util
 
             else if( gameObject.Renderer is ModelRenderer)
             {
-                return GameObjectType.GeometricModel;
+                return GameObjectType.GameModel;
             }
 
             return GameObjectType.Unknown;
@@ -27,11 +29,6 @@ namespace Aurora.Core.Editor.Util
             if (dataModel is BlinnPhongEffect2)
             {
                 return EffectNames.BlinnPhong;
-            }
-
-            else if (dataModel is FlatEffect)
-            {
-                return EffectNames.FlatEffect;
             }
 
             return EffectNames.Unknown;
@@ -65,6 +62,26 @@ namespace Aurora.Core.Editor.Util
             }
 
             return System.IO.Path.GetFileNameWithoutExtension(filename);
+        }
+
+        public static NodeType GetNodeType(SceneNode dataModel)
+        {
+            if( dataModel is CameraSceneNode)
+            {
+                return NodeType.Camera;
+            }
+
+            else if( dataModel is GameObjectSceneNode)
+            {
+                if( dataModel.IsDesignerNode())
+                {
+                    return NodeType.Designer;
+                }
+
+                return NodeType.GameObject;
+            }
+
+            return NodeType.Unknown;
         }
     }
 }

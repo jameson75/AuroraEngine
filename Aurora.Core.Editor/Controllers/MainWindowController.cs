@@ -5,7 +5,7 @@ using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
-using Newtonsoft.Json;
+using SharpDX;
 using System.Windows;
 
 namespace Aurora.Core.Editor
@@ -19,7 +19,6 @@ namespace Aurora.Core.Editor
             this.game = game;
             
             ViewModel = new MainWindowViewModel();
-
         }
 
         public MainWindowViewModel ViewModel { get; }
@@ -119,7 +118,7 @@ namespace Aurora.Core.Editor
 
         public void OpenProject(string filePath)
         {
-            DomSerializer.LoadProject(game, filePath);
+            ViewModel.Project = DomSerializer.LoadProject(game, filePath);
         }
 
         public void SaveProject(string filePath)
@@ -135,16 +134,18 @@ namespace Aurora.Core.Editor
         public void ImportModel(string filePath)
         {
             var app = game;
-            var effect = new FlatEffect(app, SurfaceVertexType.PositionNormalColor);
-            var model = ContentImporter.ImportX(app, filePath, effect, XFileChannels.Mesh | XFileChannels.DefaultMaterialColor, XFileImportOptions.IgnoreMissingColors);
+            var effect = new BlinnPhongEffect2(app, SurfaceVertexType.PositionNormalColor);
+            effect.AmbientColor = Color.White;
+
+            var model = ContentImporter.ImportX(app, filePath, effect, XFileChannels.Mesh | XFileChannels.DefaultMaterialColor | XFileChannels.DeclNormals, XFileImportOptions.IgnoreMissingColors);
 
             var gameSceneNode = new GameObjectSceneNode(app)
             {
-                GameObject = new GameObject(app, new[]
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(app, new[]
                 {
                     new GameObjectMeta()
                     {
-                        Filename = filePath,
+                        ModelFileName = filePath,
                     }
                 })
                 {

@@ -19,7 +19,7 @@ namespace Aurora.Sample.ContentImporter
     {
         private IInputService _inputService;
         private XAudio2StreamingManager _backgroundMusic; 
-        private Model msMarvelModel;
+        private Model _model;
        
         public ContentImporterApp()
         {           
@@ -42,6 +42,7 @@ namespace Aurora.Sample.ContentImporter
         protected override void LoadContent()
         {
             LoadMsMarvelContent();
+            //LoadSpaceShipContent();
 
             LoadBackgroundMusicContent();
 
@@ -63,7 +64,7 @@ namespace Aurora.Sample.ContentImporter
             GraphicsDeviceContext.ClearRenderTargetView(RenderTargetView, SharpDX.Color.Black);
             GraphicsDeviceContext.ClearDepthStencilView(DepthStencil, DepthStencilClearFlags.Depth, 1.0f, 0);
 
-            msMarvelModel?.Draw();
+            _model?.Draw();
 
             SwapChain.Present(0, SharpDX.DXGI.PresentFlags.None);                
             base.Draw();
@@ -71,8 +72,8 @@ namespace Aurora.Sample.ContentImporter
 
         protected override void UnloadContent()
         {
-            msMarvelModel.Dispose();
-            msMarvelModel = null;
+            _model.Dispose();
+            _model = null;
 
             _backgroundMusic?.Stop();
             _backgroundMusic?.Dispose();
@@ -89,8 +90,8 @@ namespace Aurora.Sample.ContentImporter
 
         private void ContentImporterApp_ViewportSizeChanged()
         {
-            if (msMarvelModel != null)
-                msMarvelModel.Effect.Projection = CalculateProjection();
+            if (_model != null)
+                _model.Effect.Projection = CalculateProjection();
         }        
 
         private void LoadMsMarvelContent()
@@ -116,7 +117,25 @@ namespace Aurora.Sample.ContentImporter
             var eyeLevel = 100;
             model.Effect.View = Matrix.LookAtLH(new Vector3(0, eyeLevel, -200), new Vector3(0, eyeLevel, 0), Vector3.UnitY);
             model.Effect.Projection = CalculateProjection();
-            msMarvelModel = model;
+            _model = model;
+        }
+
+        private void LoadSpaceShipContent()
+        {
+            var modelEffect = new BlinnPhongEffect2(this, SurfaceVertexType.PositionNormalColor);
+            modelEffect.AmbientColor = Color.White;
+            var modelFilePath = @"Assets\Models\guardian2.X";
+            var model = CipherPark.Aurora.Core.Content.ContentImporter.ImportX(
+                this,
+                modelFilePath,
+                modelEffect,
+                XFileChannels.DefaultMaterialColor | XFileChannels.Mesh | XFileChannels.DeclNormals,
+                XFileImportOptions.IgnoreMissingColors);
+            model.Effect.World = Matrix.Identity;
+            var eyeLevel = 100;
+            model.Effect.View = Matrix.LookAtLH(new Vector3(0, eyeLevel, -200), new Vector3(0, 0, 0), Vector3.UnitY);
+            model.Effect.Projection = CalculateProjection();
+            _model = model;
         }
 
         private void LoadBackgroundMusicContent()
@@ -124,7 +143,6 @@ namespace Aurora.Sample.ContentImporter
             _backgroundMusic = CipherPark.Aurora.Core.Content.ContentImporter.LoadStreamingVoice(
                 AudioDevice,
                 @"Assets\Music\LetsMakeIt.wma");
-
             _backgroundMusic.Start();
         }
     }

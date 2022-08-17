@@ -83,16 +83,20 @@
                             <TextBox Width="200" Text="{Binding Path=SelectedNode.Name, Mode=TwoWay}"></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <Label Width="80">File</Label>
-                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObjectDescription.FileName}" ToolTip="{Binding SelectedNode.GameObjectDescription.FileName}"></TextBox>
+                            <Label Width="80">Object Type</Label>
+                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObject.GameObjectType, Mode=OneWay}"></TextBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Width="80">Model File</Label>
+                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObject.ModelFileName, Mode=OneWay}" ToolTip="{Binding SelectedNode.GameObject.ModelFileName}"></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Width="80">Model Type</Label>
-                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObjectDescription.ModelType}"></TextBox>
+                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObject.ModelType, Mode=OneWay}"></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <Label Width="80">Effect</Label>
-                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObjectDescription.EffectType}"></TextBox>
+                            <Label Width="80">Model Effect</Label>
+                            <ComboBox Width="200" ItemsSource="{Binding Path=Lookup.EffectNames}" SelectedValue="{Binding Path=SelectedNode.GameObject.EffectName, Mode=TwoWay}"/>
                         </StackPanel>                        
                     </StackPanel>
                 </Grid>

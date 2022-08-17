@@ -1,44 +1,42 @@
-﻿using CipherPark.Aurora.Core.Effects;
+﻿using Aurora.Core.Editor.Util;
+using CipherPark.Aurora.Core.Effects;
+using SharpDX;
 
 namespace Aurora.Core.Editor
 {
     public class BlinnPhongEffectViewModel : EffectViewModel
     {
-        private float ambientColor;
-        private float specularPower;
-        private float eccentricity;
-
-        public BlinnPhongEffectViewModel(SurfaceEffect dataModel)
+        public BlinnPhongEffectViewModel(BlinnPhongEffect2 dataModel)
             : base(dataModel)
         {
         }
 
-        public float AmbientColor
+        public int AmbientColor
         {
-            get => ambientColor;
+            get => DataModel.As<BlinnPhongEffect2>().AmbientColor.ToRgba();
             set
             {
-                ambientColor = value;
+                DataModel.As<BlinnPhongEffect2>().AmbientColor = Color.FromRgba(value);
                 OnPropertyChanged(nameof(AmbientColor));
             }
         }
 
         public float SpecularPower
         {
-            get => specularPower;
+            get => DataModel.As<BlinnPhongEffect2>().SpecularPower;
             set
             {
-                specularPower = value;
+                DataModel.As<BlinnPhongEffect2>().SpecularPower = value;
                 OnPropertyChanged(nameof(SpecularPower));
             }
         }
 
         public float Eccentricity
         {
-            get => eccentricity;
+            get => DataModel.As<BlinnPhongEffect2>().Eccentricity;
             set
             {
-                eccentricity = value;
+                DataModel.As<BlinnPhongEffect2>().Eccentricity = value;
                 OnPropertyChanged(nameof(Eccentricity));
             }
         }

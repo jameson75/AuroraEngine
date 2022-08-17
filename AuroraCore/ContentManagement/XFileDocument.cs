@@ -316,7 +316,7 @@ namespace CipherPark.Aurora.Core.Content
                     Type = (VertexElementType)ReadNextInt(reader).Value,
                     Method = (VertexElementMethod)ReadNextInt(reader).Value,
                     Usage = (VertexElementUsage)ReadNextInt(reader).Value,
-                    UsageIndex = (VertexElementUsage)ReadNextInt(reader).Value
+                    UsageIndex = ReadNextInt(reader).Value,
                 };
             }
             declData.NData = ReadNextInt(reader).Value;
@@ -1413,7 +1413,7 @@ namespace CipherPark.Aurora.Core.Content
         public VertexElementType Type { get; set; }
         public VertexElementMethod Method { get; set; }
         public VertexElementUsage Usage { get; set; }
-        public VertexElementUsage UsageIndex { get; set; }
+        public int UsageIndex { get; set; }
     }
 
     public struct XFileTimedFloatKey

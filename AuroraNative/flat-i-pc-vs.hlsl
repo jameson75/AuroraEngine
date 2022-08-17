@@ -18,5 +18,9 @@ VSOUTPUT flat_VS(VSINPUT IN)
     float4 Po = IN.Position;   
     OUT.HPosition = mul(Po, _WvpXf);
 	OUT.UVUV = IN.Color;
+	[flatten] if (GlobalColor.w != 0)
+	{
+		OUT.UVUV = GlobalColor;
+	}
     return OUT;
 }

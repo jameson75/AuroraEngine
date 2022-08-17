@@ -41,7 +41,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
         /// <summary>
         /// 
         /// </summary>
-        public abstract BoundingBox BoundingBox { get; }
+        public abstract BoundingBox BoundingBox { get; }        
 
         /// <summary>
         /// 

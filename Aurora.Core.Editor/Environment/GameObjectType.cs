@@ -3,6 +3,6 @@
     public enum GameObjectType
     {
         Unknown,
-        GeometricModel
+        GameModel
     }
 }

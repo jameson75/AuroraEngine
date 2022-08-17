@@ -260,8 +260,11 @@ namespace CipherPark.Aurora.Core.Content
                 normals = xMesh.DeclData.GetNormals();
                 if (normals == null)
                 {
-                    if (!options.HasFlag(XFileImportOptions.IgnoreMissingNormals))
+                    if (!options.HasFlag(XFileImportOptions.IgnoreMissingNormals) &&
+                        !options.HasFlag(XFileImportOptions.GenerateMissingNormals))
                         throw new InvalidOperationException("Expected normal data was not present.");
+                    else if (options.HasFlag(XFileImportOptions.GenerateMissingNormals))
+                        normals = GenerateNormals(xMesh);
                     else
                         normals = xMesh.Vertices.Select(v=> Vector3.Zero).ToArray();
                 }
@@ -410,7 +413,13 @@ namespace CipherPark.Aurora.Core.Content
             }
 
             result.Effect = effect;
+            
             return result;
+        }
+
+        private static Vector3[] GenerateNormals(XFileMeshObject xMesh)
+        {
+            throw new NotSupportedException("Normal generation not yet supported");
         }
 
         private static List<KeyframeAnimationController> BuildAnimationRig(XFileAnimationSetObject xAnimationSet, List<Frame> targetFrames)
@@ -674,7 +683,8 @@ namespace CipherPark.Aurora.Core.Content
         IgnoreMissingTexCoords =    0x0001,
         IgnoreMissingNormals =      0x0002,
         IgnoreMissingColors =       0x0004,
-        EnableInstancing =          0x0008
+        EnableInstancing =          0x0008,
+        GenerateMissingNormals =    0x0010,
     }
 
     [StructLayout(LayoutKind.Sequential)]

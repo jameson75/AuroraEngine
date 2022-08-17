@@ -2,6 +2,6 @@
 {
     public class GameObjectMeta
     {
-        public string Filename { get; set; }
+        public string ModelFileName { get; set; }
     }
 }

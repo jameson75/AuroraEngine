@@ -9,20 +9,19 @@ namespace Aurora.Core.Editor
 {
     public class SceneNodeViewModel : ViewModelBase<SceneNode>
     {
-
         public SceneNodeViewModel(SceneNode dataModel)
             : base(dataModel)
         {
             if (dataModel is GameObjectSceneNode)
             {
-                GameObjectDescription = new GameObjectDescriptionViewModel(dataModel.As<GameObjectSceneNode>().GameObject);
+                GameObject = new GameObjectViewModel(dataModel.As<GameObjectSceneNode>().GameObject);
             }
         }
         
         public string Name
         {
             get => DataModel.Name ?? 
-                DataMapper.GetNameFromFilename(DataModel.As<GameObjectSceneNode>()?.GameObject.GetContext<GameObjectMeta>()?.Filename);
+                DataLookup.GetNameFromFilename(DataModel.As<GameObjectSceneNode>()?.GameObject.GetContext<GameObjectMeta>()?.ModelFileName);
             set
             {
                 DataModel.Name = value;
@@ -71,12 +70,12 @@ namespace Aurora.Core.Editor
             get => DataModel.Transform.Translation.ToArray();
         }
 
-        public GameObjectType GameObjectType
+        public NodeType NodeType
         {
-            get => DataMapper.GetGameObjectType(DataModel.As<GameObjectSceneNode>()?.GameObject);
-        }
+            get => DataLookup.GetNodeType(DataModel);
+        }       
 
-        public GameObjectDescriptionViewModel GameObjectDescription
+        public GameObjectViewModel GameObject
         {
             get;
         }
