@@ -8,6 +8,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         Closing="Window_Closing">
+    <Window.Resources>
+        
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
@@ -68,6 +71,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50" />
                         <RowDefinition Height="300" />
+                        <RowDefinition Height="300" />
                         <RowDefinition Height="*" />                        
                     </Grid.RowDefinitions>
                     <TreeView x:Name="sceneTreeView" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Path=Project.Scene.Nodes}" SelectedItemChanged="SceneTreeView_SelectedItemChanged">
@@ -97,12 +101,45 @@
                         <StackPanel Orientation="Horizontal">
                             <Label Width="80">Model Effect</Label>
                             <ComboBox Width="200" ItemsSource="{Binding Path=Lookup.EffectNames}" SelectedValue="{Binding Path=SelectedNode.GameObject.EffectName, Mode=TwoWay}"/>
-                        </StackPanel>                        
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Grid.Row="3">                        
+                        <ContentPresenter Content="{Binding}">
+                            <ContentPresenter.Resources>
+                                <DataTemplate x:Key="BlinnPhongTemplate">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Ambient</Label>
+                                            <TextBox Width="200" Text="{Binding Path=SelectedNode.GameObject.SelectedEffect.AmbientColor, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Specular</Label>
+                                            <TextBox Width="200" Text="{Binding Path=SelectedNode.GameObject.SelectedEffect.SpecularPower, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Eccentricity</Label>
+                                            <TextBox Width="200" Text="{Binding Path=SelectedNode.GameObject.SelectedEffect.Eccentricity, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                                <DataTemplate x:Key="Default">
+                                    <!-- Empty Template -->
+                                </DataTemplate>
+                            </ContentPresenter.Resources>
+                            <ContentPresenter.Style>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Default}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=SelectedNode.GameObject.EffectName}" Value="Blinn Phong">
+                                            <Setter Property="ContentTemplate" Value="{StaticResource BlinnPhongTemplate}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentPresenter.Style>                            
+                        </ContentPresenter>                        
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Security" />
-            <TabItem Header="Details" />
         </TabControl>
-    </Grid>
+    </Grid>    
 </Window>
