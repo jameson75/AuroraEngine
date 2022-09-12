@@ -66,6 +66,14 @@ namespace CipherPark.Aurora.Core.World
             }
         }
 
+        public Vector3 Up
+        {
+            get
+            {
+                return Camera.ViewMatrixToTransform(this.ViewMatrix).ToMatrix().Down;
+            }
+        }
+
         public Matrix ProjectionMatrix { get; set; }
 
         public PostEffectChain PostEffectChain { get { return _postEffectChain; } }

@@ -5,7 +5,7 @@ using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.Animation;
 using System.Linq;
-using System.Collections.Generic;
+using Aurora.Core.Editor.Util;
 
 namespace CipherPark.Aurora.Core.Services
 {
@@ -64,6 +64,28 @@ namespace CipherPark.Aurora.Core.Services
             }
         }
 
+        public void UpdatePick(GameObjectSceneNode pickedNode)
+        {
+            if (pickedNode == currentPickedNode)
+            {
+                return;
+            }
+
+            if (currentPickedNode != null)
+            {
+                ClearPick();
+            }
+
+            if (pickedNode != null)
+            {
+                AttachModifierNodes(pickedNode);
+            }
+
+            currentPickedNode = pickedNode;
+
+            OnPickedNodeChanged(pickedNode);
+        }
+
         private void BeginMouseTracking(Point location)
         {
             isMouseTracking = true;
@@ -85,7 +107,7 @@ namespace CipherPark.Aurora.Core.Services
                     BeginMouseTracking(location);
                 }
                 
-                UpdatePick();
+                MousePickNode();
             }
         }
 
@@ -160,7 +182,7 @@ namespace CipherPark.Aurora.Core.Services
             mouseMoveFrom = location;
         }        
 
-        private void UpdatePick()
+        private void MousePickNode()
         {
             var cameraNode = gameApp.GetActiveScene().CameraNode;
             var camera = cameraNode.Camera;
@@ -175,17 +197,7 @@ namespace CipherPark.Aurora.Core.Services
 
             if (pickedNode != currentPickedNode)
             {
-                if (currentPickedNode != null)
-                {
-                    ClearPick();
-                }
-
-                if (pickedNode != null)
-                {
-                    AttachModifierNodes(pickedNode);
-                }
-
-                currentPickedNode = pickedNode;
+                UpdatePick(pickedNode);                
             }
         }
 
@@ -225,7 +237,7 @@ namespace CipherPark.Aurora.Core.Services
                 },               
             });
 
-            //Add cross hair node to modifier root node...
+            //Add shadow modifier
             currentModifierRoot.Children.Add(new GameObjectSceneNode(gameApp)
             {
                 GameObject = new GameObject(gameApp, new object[]
@@ -257,17 +269,34 @@ namespace CipherPark.Aurora.Core.Services
             NodeTransformed?.Invoke(this, new NodeTransformedArgs(transformedNode));
         }
 
+        private void OnPickedNodeChanged(GameObjectSceneNode pickedNode)
+        {
+            PickedNodeChanged?.Invoke(this, new PickedNodeChangedArgs(pickedNode));
+        }
+
         public event Action<object, NodeTransformedArgs> NodeTransformed;
+
+        public event Action<object, PickedNodeChangedArgs> PickedNodeChanged;
     }
 
     public class NodeTransformedArgs : EventArgs
     {
-        public NodeTransformedArgs(SceneNode transformedNode)
+        public NodeTransformedArgs(GameObjectSceneNode transformedNode)
         {
             TransfromedNode = transformedNode;
         }
 
-        public SceneNode TransfromedNode { get; }
+        public GameObjectSceneNode TransfromedNode { get; }
+    }
+
+    public class PickedNodeChangedArgs : EventArgs
+    {
+        public PickedNodeChangedArgs(GameObjectSceneNode pickedNode)
+        {
+            PickedNode = pickedNode;
+        }
+
+        public GameObjectSceneNode PickedNode { get; }
     }
 
     public enum TranslationPlane

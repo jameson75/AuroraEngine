@@ -19,7 +19,8 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
         {
             if (HasEditorModeChanged(gameApp))
             {
-                control.Visible = gameApp.EditorMode == EditorMode.RotateCamera;                      
+                control.Visible = gameApp.EditorMode == EditorMode.RotateCamera ||
+                                  gameApp.EditorMode == EditorMode.TraverseCamera;
             }
         }
 

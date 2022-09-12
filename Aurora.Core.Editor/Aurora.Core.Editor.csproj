@@ -64,23 +64,30 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dom\ContentHelper.cs" />
     <Compile Include="Dom\DomSerializer.cs" />
     <Compile Include="Dom\GameObject.cs" />
     <Compile Include="Dom\Project.cs" />
     <Compile Include="Dom\Scene.cs" />
     <Compile Include="Dom\SceneNode.cs" />
     <Compile Include="Environment\GameObjectMeta.cs" />
-    <Compile Include="Environment\NodeType.cs" />
-    <Compile Include="Util\DataLookup.cs" />
+    <Compile Include="Dom\NodeType.cs" />
+    <Compile Include="Environment\ReferenceGridMode.cs" />
+    <Compile Include="Scene\InvalidOperation.cs" />
+    <Compile Include="Util\DataMap.cs" />
     <Compile Include="Util\ModelTypeNames.cs" />
     <Compile Include="Util\CoreExtensions.cs" />
+    <Compile Include="Views\Converters\DXColorToMediaColorConverter.cs" />
+    <Compile Include="Views\Converters\DXQuaternionToStringConverter.cs" />
+    <Compile Include="Views\Converters\DXVector3ToStringConveter.cs" />
+    <Compile Include="Views\Converters\DXColorToStringConveter.cs" />
     <Compile Include="Views\Models\BlinnPhongEffectViewModel.cs" />
     <Compile Include="Views\Models\EffectViewModel.cs" />
     <Compile Include="Views\Models\FlatEffectViewModel.cs" />
     <Compile Include="Views\Models\GameObjectViewModel.cs" />
-    <Compile Include="Environment\GameObjectType.cs" />
+    <Compile Include="Dom\GameObjectType.cs" />
     <Compile Include="Views\Models\LightViewModel.cs" />
-    <Compile Include="Environment\EffectNames.cs" />
+    <Compile Include="Dom\EffectNames.cs" />
     <Compile Include="Views\Models\LookupViewModel.cs" />
     <Compile Include="Views\Models\MainWindowViewModel.cs" />
     <Compile Include="Views\Models\ProjectViewModel.cs" />
@@ -91,7 +98,6 @@
     <Compile Include="Environment\EditorTransformPlane.cs" />
     <Compile Include="Scene\GameObjectShadowRenderer.cs" />
     <Compile Include="Scene\GameObjectExtensions.cs" />
-    <Compile Include="Scene\GameObjectCrosshairsRenderer.cs" />
     <Compile Include="Scene\GameObjectSelectionRenderer.cs" />
     <Compile Include="IEditorGameApp.cs" />
     <Compile Include="Controllers\MainWindowController.cs" />

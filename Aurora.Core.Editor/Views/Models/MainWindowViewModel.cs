@@ -2,8 +2,7 @@
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private ProjectViewModel project;        
-        private SceneNodeViewModel selectedNode;
+        private ProjectViewModel project;
         private bool isProjectDirty;
         private string projectFileName;
 
@@ -38,15 +37,5 @@
                 OnPropertyChanged(nameof(ProjectFileName));                
             }
         }
-
-        public SceneNodeViewModel SelectedNode
-        {
-            get => selectedNode;
-            set
-            {
-                selectedNode = value;
-                OnPropertyChanged(nameof(SelectedNode));
-            }
-        }            
     }
 }

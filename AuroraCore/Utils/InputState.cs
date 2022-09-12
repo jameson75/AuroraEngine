@@ -357,7 +357,7 @@ namespace CipherPark.Aurora.Core.Utils
 
         public bool IsKeyUp(Key key)
         { 
-             if(keyboardStateWindow == null)
+             if (keyboardStateWindow == null)
                 return false;
              else 
                  return keyboardStateWindow.NewState.IsKeyUp(key);
@@ -365,7 +365,7 @@ namespace CipherPark.Aurora.Core.Utils
 
         public bool IsKeyDown(Key key)
         {
-              if(keyboardStateWindow == null)
+              if (keyboardStateWindow == null)
                   return false;
               else
                   return keyboardStateWindow.NewState.IsKeyDown(key);

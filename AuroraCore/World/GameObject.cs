@@ -136,7 +136,7 @@ namespace CipherPark.Aurora.Core.World
         /// <returns></returns>
         private T FindContextByContract<T>() where T : class
         {
-            return (T)_contextualContent.FirstOrDefault(c => c.Key.IsAssignableFrom(typeof(T))).Value;
+            return (T)_contextualContent.FirstOrDefault(c => typeof(T).IsAssignableFrom(c.Key)).Value;
         }
     }
 }

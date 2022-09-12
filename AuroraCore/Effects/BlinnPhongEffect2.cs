@@ -133,8 +133,17 @@ namespace CipherPark.Aurora.Core.Effects
         {
             //Setup Dynamic Lighting if specified.
             //------------------------------------
-            if (Lighting != null)
+            if (UseSceneLighting)
+            {
+                SetupLights(Game.GetActiveScene()
+                                .SelectLights()
+                                .Take(MaxLights)
+                                .ToArray());
+            }
+            else
+            {
                 SetupLights(Lighting);
+            }
 
             //Setup Constants
             //---------------
@@ -198,10 +207,10 @@ namespace CipherPark.Aurora.Core.Effects
 
         private void SetupLights(Light[] lights)
         {
-            FirstActiveLightsCount = lights.Length;
+            FirstActiveLightsCount = lights?.Length ?? 0;
             for (int i = 0; i < MaxLights; i++)
             {
-                if (i < lights.Length)
+                if (i < FirstActiveLightsCount)
                 {
                     _lampColorArray[i] = lights[i].Diffuse;
                     if (lights[i] is PointLight)
@@ -364,6 +373,7 @@ namespace CipherPark.Aurora.Core.Effects
         }
 
         public bool EnableBackFace { get; set; }
+        public bool UseSceneLighting { get; set; }
 
         protected override void OnDispose()
         {

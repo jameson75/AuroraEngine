@@ -1,8 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Aurora.Core.Editor;
+using Aurora.Core.Editor.Util;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Services;
+using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.World.Scene;
 using Microsoft.Wpf.Interop.DirectX;
 
 namespace Aurora.Sample.Editor
@@ -15,7 +23,8 @@ namespace Aurora.Sample.Editor
         private D3D11Image interopImage;
         private EditorGameApp game;
         private TimeSpan lastRender;
-        private MainWindowController controller;       
+        private MainWindowController controller;
+        private SelectedNodeTwoWayBinding selectedNodeTwoWayBinding;
 
         public MainWindow()
         {           
@@ -26,8 +35,9 @@ namespace Aurora.Sample.Editor
         private void InitializeMVVM()
         {
             controller = new MainWindowController(game);
-            DataContext = controller.ViewModel;            
-            controller.NewProject(); //TODO: Remove implicitly created new project.            
+            DataContext = controller.ViewModel;
+            selectedNodeTwoWayBinding = new SelectedNodeTwoWayBinding(sceneTreeView, controller.ViewModel);            
+            controller.NewProject(); //TODO: Remove implicitly created new project            
         }
 
         public void InitializeGraphicsHost()
@@ -68,16 +78,16 @@ namespace Aurora.Sample.Editor
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
         {
-            RenderingEventArgs args = (RenderingEventArgs)e;
+            RenderingEventArgs args = (RenderingEventArgs)e;    
+
             // It's possible for Rendering to call back twice in the same frame 
             // so only render when we haven't already rendered in this frame.
             if (lastRender != args.RenderingTime)
             {
+                OnUpdate();
                 interopImage.RequestRender();
                 lastRender = args.RenderingTime;
-            }
-            //TODO: Uncomment this only after we've confirmed that navigation speed is constant, irrespective of frame rate.
-            this.OnUpdate(); 
+            }            
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -101,7 +111,7 @@ namespace Aurora.Sample.Editor
 
         private void InitializeUpdates()
         {
-            //TODO: Remove this method and peform OnUpdate() in CompositionTarget_Rendering handler
+            //TODO: Remove this method and peform OnUpdate() in OnRender handler
             //only after we've confirmed that navigation speed will be constant, irrespective of frame rate,
             //when calling OnUpdate() from that handler.
             System.Windows.Threading.Dispatcher.CurrentDispatcher.Hooks.DispatcherInactive += delegate
@@ -122,7 +132,7 @@ namespace Aurora.Sample.Editor
         }
 
         private void OnRender(IntPtr surface, bool isNewSurface)
-        {
+        {           
             game.Render(surface, isNewSurface);
         }
 
@@ -150,6 +160,11 @@ namespace Aurora.Sample.Editor
         private void Menu_Project_Settings_Click(object sender, RoutedEventArgs e)
         {
             controller.UIChangeSettings();
+        }
+
+        private void Menu_Scene_AddLight_Click(object sender, RoutedEventArgs e)
+        {
+            controller.UIAddLight();
         }
         #endregion
 
@@ -186,13 +201,133 @@ namespace Aurora.Sample.Editor
 
         private void ToolBar_SelectTransformPlaneY_Click(object sender, RoutedEventArgs e)
         {
-            controller.SetEditorTransformPlane(EditorTransformPlane.XY);
+            controller.SetEditorTransformPlane(EditorTransformPlane.Y);
         }
-        #endregion
+        #endregion       
 
-        private void SceneTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void Menu_Scene_MoveReferenceGrid(object sender, RoutedEventArgs e)
         {
-            controller.ViewModel.SelectedNode = (SceneNodeViewModel)e.NewValue;
+            var guardianNode = this.game.Scene.Select(n => n.Name?.Contains("Gardian") == true).FirstOrDefault();
+            if (guardianNode != null)
+            {
+                var referenceObjectRoot = this.game.Scene.SelectReferenceObjectRoot();
+                var referenceGridNode = referenceObjectRoot.Select(n => n.GetGameObject()?.IsReferenceGridObject() == true).First().As<GameObjectSceneNode>();
+                 
+                var oldEye = game.Scene.CameraNode.WorldPosition();
+                var oldLookAtRay = new SharpDX.Ray(game.Scene.CameraNode.WorldPosition(), SharpDX.Vector3.Normalize(game.Scene.CameraNode.Camera.Forward));               
+                referenceGridNode.GetWorldBoundingBox().Intersects(ref oldLookAtRay, out SharpDX.Vector3 oldLookAt);
+
+                var offset = Vector3Helper.YAxis(guardianNode.WorldPosition().Y - referenceGridNode.WorldPosition().Y);
+                var newEye = oldEye + offset;
+                var newLookAt = oldLookAt + offset;              
+
+                referenceGridNode.TranslateTo(Vector3Helper.YAxis(guardianNode.WorldPosition().Y));
+                                
+                game.Scene.CameraNode.Camera.ViewMatrix = SharpDX.Matrix.LookAtLH(
+                    newEye,
+                    newLookAt,
+                    SharpDX.Vector3.Up);
+
+                game.Services.GetService<MouseNavigatorService>().ResetTracking();
+            }
+        }
+
+        public class SelectedNodeTwoWayBinding
+        {            
+            private readonly TreeView treeView;
+            private readonly MainWindowViewModel mainWindowViewModel;
+            private ProjectViewModel projectViewModel;
+            private SceneViewModel sceneViewModel;
+            private bool updatingViewModel;           
+
+            public SelectedNodeTwoWayBinding(TreeView treeView, MainWindowViewModel mainWindowViewModel)
+            {
+                this.treeView = treeView;
+                this.mainWindowViewModel = mainWindowViewModel;
+                mainWindowViewModel.PropertyChanged += MainViewModel_PropertyChanged;              
+                treeView.SelectedItemChanged += TreeView_SelectedItemChanged;
+                UpdateListenersForProjectViewModel();
+            }
+
+            private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(MainWindowViewModel.Project))
+                {
+                    UpdateListenersForProjectViewModel();
+                }
+            }
+
+            private void ProjectViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(ProjectViewModel.Scene))
+                {
+                    UpdateListenersForSceneViewModel();
+                }
+            }
+
+            private void SceneViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(SceneViewModel.SelectedNode))
+                {
+                    if (!updatingViewModel)
+                    {
+                        if (sceneViewModel.SelectedNode == null)
+                        {
+                            if (treeView.SelectedItem != null)
+                            {
+                                treeView.ItemContainerGenerator.ContainerFromItem(treeView.SelectedItem);
+                            }
+                        }
+                        else
+                        {
+                            TreeViewItem tvi = treeView.ItemContainerGenerator.ContainerFromItem(sceneViewModel.SelectedNode) as TreeViewItem;
+                            if (tvi != null)
+                            {
+                                tvi.IsSelected = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+            {
+                updatingViewModel = true;
+                sceneViewModel.SelectedNode = (SceneNodeViewModel)e.NewValue;
+                updatingViewModel = false;
+            }
+
+            private void UpdateListenersForProjectViewModel()
+            {
+                if (projectViewModel != null)
+                {
+                    projectViewModel.PropertyChanged -= ProjectViewModel_PropertyChanged;
+                    projectViewModel = null;
+                }
+
+                if (mainWindowViewModel.Project != null)
+                {
+                    projectViewModel = mainWindowViewModel.Project;
+                    projectViewModel.PropertyChanged += ProjectViewModel_PropertyChanged;
+                }
+                
+                UpdateListenersForSceneViewModel();
+            }
+
+            private void UpdateListenersForSceneViewModel()
+            {
+                if (sceneViewModel != null)
+                {
+                    sceneViewModel.PropertyChanged -= SceneViewModel_PropertyChanged;
+                    sceneViewModel = null;
+                }
+
+                if (mainWindowViewModel.Project?.Scene != null)
+                {
+                    sceneViewModel = mainWindowViewModel.Project.Scene;
+                    sceneViewModel.PropertyChanged += SceneViewModel_PropertyChanged;
+                }
+            }
         }
     }
 }

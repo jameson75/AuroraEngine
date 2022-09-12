@@ -12,7 +12,7 @@ namespace Aurora.Core.Editor
         
         public string Name
         {
-            get => DataLookup.GetEffectName(DataModel);
+            get => DataMap.GetEffectDisplayName(DataModel);
         }       
     }
 }

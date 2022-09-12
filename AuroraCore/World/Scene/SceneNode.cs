@@ -219,6 +219,11 @@ namespace CipherPark.Aurora.Core.World.Scene
     {   
         public SceneNodes()
         { }    
+
+        public SceneNodes(IEnumerable<SceneNode> nodes)
+        {
+            AddRange(nodes);
+        }
        
         public void AddRange(IEnumerable<SceneNode> nodes)
         {

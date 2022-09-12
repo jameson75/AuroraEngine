@@ -286,10 +286,20 @@ namespace CipherPark.Aurora.Core.Animation
         {
             transformable.Transform = new Transform(transformable.Transform.Rotation, transformable.Transform.Translation + delta);
         }
+        
+        public static void TranslateTo(this ITransformable transformable, Vector3 position)
+        {
+            transformable.Transform = new Transform(transformable.Transform.Rotation, position);
+        }
 
         public static void Rotate(this ITransformable transformable, Quaternion delta)
         {
             transformable.Transform = new Transform(delta * transformable.Transform.Rotation, transformable.Transform.Translation);
+        }
+
+        public static void RotateTo(this ITransformable transformable, Quaternion orientation)
+        {
+            transformable.Transform = new Transform(orientation, transformable.Transform.Translation);
         }
     }
 }

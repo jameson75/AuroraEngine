@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using CipherPark.Aurora.Core;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Content;
@@ -39,12 +40,12 @@ namespace Aurora.Sample.Editor.Scene
         {
             if (!isInitialized)
             {
-                float totalWidth = referenceGrid.XLength;
-                float totalHeight = referenceGrid.YLength;
-                int widthSegments = referenceGrid.XSegmemts;
-                int heightSegments = referenceGrid.YSegments;
-                int widthSectors = referenceGrid.XSectors;
-                int heightSectors = referenceGrid.YSectors;
+                float totalWidth = referenceGrid.Width;
+                float totalHeight = referenceGrid.Height;
+                int widthSegments = referenceGrid.WidthSegments;
+                int heightSegments = referenceGrid.HeightSegments;
+                int widthSectors = referenceGrid.WidthSectors;
+                int heightSectors = referenceGrid.HeightSectors;               
                 var totalWidthSegments = widthSegments * widthSectors;
                 var totalHeightSegments = heightSegments * heightSectors;
 
@@ -56,24 +57,54 @@ namespace Aurora.Sample.Editor.Scene
                 var halfWidth = totalWidth / 2;
                 var halfHeight = totalHeight / 2;
 
-                var currentHeight = -halfHeight;                
+                var currentHeight = 0f;                
                 for(int i = 0; i <= totalWidthSegments; i++)
                 {
                     var k = i * 2;
                     var segmentColor = (i % widthSegments != 0) ? gridColor : Color.WhiteSmoke.ToVector4();
-                    vertices[k] = new VertexPositionColor(new Vector3(-halfWidth, 0, currentHeight), segmentColor);
-                    vertices[k + 1] = new VertexPositionColor(new Vector3(halfWidth, 0, currentHeight), segmentColor);
+                    switch (referenceGrid.Orientation)
+                    {
+                        case ReferenceGridOrientation.Z:
+                            vertices[k] = new VertexPositionColor(new Vector3(-halfWidth, currentHeight, 0), segmentColor);
+                            vertices[k + 1] = new VertexPositionColor(new Vector3(halfWidth, currentHeight, 0), segmentColor);
+                            break;                        
+                        case ReferenceGridOrientation.X:
+                            vertices[k] = new VertexPositionColor(new Vector3(0, currentHeight, -halfWidth), segmentColor);
+                            vertices[k + 1] = new VertexPositionColor(new Vector3(0, currentHeight, halfWidth), segmentColor);
+                            break;                       
+                        case ReferenceGridOrientation.Y:
+                            vertices[k] = new VertexPositionColor(new Vector3(-halfWidth, 0, currentHeight - halfHeight), segmentColor);
+                            vertices[k + 1] = new VertexPositionColor(new Vector3(halfWidth, 0, currentHeight - halfHeight), segmentColor);
+                            break;
+                        default:
+                            throw new InvalidOperationException("Unsupported orientation");
+                    }
                     currentHeight += segmentHeight;
                 }
 
                 var currentWidth = -halfWidth;
-                var kOffset = (totalWidthSegments + 1) * 2;                
+                var kOffset = (totalWidthSegments + 1) * 2;
                 for (int i = 0; i <= totalHeightSegments; i++)
                 {
                     var k = kOffset + (i * 2);
                     var segmentColor = (i % heightSegments != 0) ? gridColor : Color.WhiteSmoke.ToVector4();
-                    vertices[k] = new VertexPositionColor(new Vector3(currentWidth, 0, -halfHeight), segmentColor);
-                    vertices[k + 1] = new VertexPositionColor(new Vector3(currentWidth, 0, halfHeight), segmentColor);
+                    switch (referenceGrid.Orientation)
+                    {
+                        case ReferenceGridOrientation.Z:
+                            vertices[k] = new VertexPositionColor(new Vector3(currentWidth, 0, 0), segmentColor);
+                            vertices[k + 1] = new VertexPositionColor(new Vector3(currentWidth, totalHeight, 0), segmentColor);
+                            break;
+                        case ReferenceGridOrientation.X:
+                            vertices[k] = new VertexPositionColor(new Vector3(0, 0, currentWidth), segmentColor);
+                            vertices[k + 1] = new VertexPositionColor(new Vector3(0, totalHeight, currentWidth), segmentColor);
+                            break;
+                        case ReferenceGridOrientation.Y:
+                            vertices[k] = new VertexPositionColor(new Vector3(currentWidth, 0, -halfHeight), segmentColor);
+                            vertices[k + 1] = new VertexPositionColor(new Vector3(currentWidth, 0, halfHeight), segmentColor);
+                            break;
+                        default:
+                            throw new InvalidOperationException("Unsupported orientation");
+                    }                    
                     currentWidth += segmentWidth;
                 }
 
@@ -109,4 +140,12 @@ namespace Aurora.Sample.Editor.Scene
             return modelRenderer.Model.BoundingBox;
         }
     }
+
+    public enum ReferenceGridOrientation
+    {
+        Y,
+        X,
+        Z
+    }
+
 }

@@ -1,10 +1,8 @@
 ﻿using Aurora.Core.Editor.Environment;
 using Aurora.Core.Editor.Util;
 using CipherPark.Aurora.Core.Animation;
-using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
-using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
 using Newtonsoft.Json;
 using SharpDX;
@@ -23,7 +21,6 @@ namespace Aurora.Core.Editor.Dom
             var json = System.IO.File.ReadAllText(filePath);
             var project = JsonConvert.DeserializeObject<Project>(json);
             ProjectViewModel viewModel = new ProjectViewModel(app);
-            //app.ResetScene();
             RestoreScene(project.Scene, viewModel.Scene, app);
             return viewModel;
         }
@@ -32,11 +29,11 @@ namespace Aurora.Core.Editor.Dom
         {
             foreach (var sceneNode in scene.Nodes)
             {
-                RestoreSceneNode(sceneNode, app.Scene.Nodes, viewModel.Nodes, app);
+                RestoreSceneNodeTree(sceneNode, app.Scene.Nodes, viewModel.Nodes, app);
             }
         }
 
-        private static void RestoreSceneNode(SceneNode sceneNode, IList<GameSceneNode> destinationDataModels, IList<SceneNodeViewModel> destinationViewModels, IEditorGameApp app)
+        private static void RestoreSceneNodeTree(SceneNode sceneNode, IList<GameSceneNode> destinationDataModels, IList<SceneNodeViewModel> destinationViewModels, IEditorGameApp app)
         {
             if (sceneNode.NodeType == NodeType.GameObject)
             {
@@ -48,14 +45,16 @@ namespace Aurora.Core.Editor.Dom
                     Visible = sceneNode.Visible,
                     GameObject = CreateGameObject(app, sceneNode.GameObject),
                 };                
-                destinationDataModels.Add(dataModel);
+
 
                 var viewModel = new SceneNodeViewModel(dataModel);
+                
+                destinationDataModels.Add(dataModel);
                 destinationViewModels.Add(viewModel);
 
                 foreach (var childSceneNode in sceneNode.Children)
                 {
-                    RestoreSceneNode(childSceneNode, dataModel.Children, destinationViewModels, app);
+                    RestoreSceneNodeTree(childSceneNode, dataModel.Children, destinationViewModels, app);
                 }
             }
         }
@@ -64,36 +63,79 @@ namespace Aurora.Core.Editor.Dom
         {
             if (gameObject.GameObjectType == GameObjectType.GameModel)
             {
-                SurfaceEffect effect = CreateEffect(game, gameObject.EffectName);
+                SurfaceEffect effect = CreateGameEffect(game, gameObject.ModelEffect);
+                var dataModel = ContentHelper.ImportGameObject(gameObject.ResourceFilename, effect);
+                return dataModel;
+            }
 
-                var model = ContentImporter.ImportX(
-                    game,
-                    gameObject.ModelFileName,
-                    effect,
-                    XFileChannels.Mesh | XFileChannels.DefaultMaterialColor | XFileChannels.DeclNormals, XFileImportOptions.IgnoreMissingColors);
-
-                var dataModel = new CipherPark.Aurora.Core.World.GameObject(game)
-                {
-                    Renderer = new ModelRenderer(model),
-                };
-                dataModel.AddContext(new GameObjectMeta { ModelFileName = gameObject.ModelFileName });
+            else if (gameObject.GameObjectType == GameObjectType.Light)
+            {
+                var dataModel = new CipherPark.Aurora.Core.World.GameObject(game, new[] { CreateGameLight(gameObject.Light) });
                 return dataModel;
             }
 
             return null;
         }
 
-        private static SurfaceEffect CreateEffect(IEditorGameApp app, string effectName)
+        private static CipherPark.Aurora.Core.Effects.Light CreateGameLight(Light light)
         {
-            switch (effectName)
+            switch (light.Type)
+            {
+                case LightType.Point:
+                    return new PointLight()
+                    {
+                        Diffuse = Color.FromRgba(light.Diffuse),
+                        Transform = new Transform(new Matrix()),
+                    };
+                case LightType.Directional:
+                    return new DirectionalLight()
+                    {
+                        Diffuse = Color.FromRgba(light.Diffuse),
+                        Direction = new Vector3(light.Direction),
+                    };
+                default:
+                    throw new InvalidOperationException("Unsupported light type.");
+            }
+        }
+
+        private static SurfaceEffect CreateGameEffect(IEditorGameApp app, ModelEffect modelEffect)
+        {
+            switch (modelEffect.EffectName)
             {
                 case EffectNames.BlinnPhong:
                     var effect = new BlinnPhongEffect2(app, SurfaceVertexType.PositionNormalColor);
-                    effect.AmbientColor = Color.White;
+                    if (modelEffect != null)
+                    {                        
+                        effect.AmbientColor = Color.FromRgba(modelEffect.AmbientColor);
+                        effect.SpecularPower = modelEffect.SpecularPower;
+                        effect.Eccentricity = modelEffect.Eccentricity;
+                        effect.EnableBackFace = modelEffect.EnableBackFace;
+                        effect.UseSceneLighting = modelEffect.UseSceneLighting;
+                    }                  
                     return effect;
-                
                 default:
-                    throw new InvalidOperationException($"Unsupported effectName {effectName}");
+                    throw new InvalidOperationException($"Unsupported effectName {modelEffect.EffectName}");
+            }
+        }
+
+        private static CipherPark.Aurora.Core.Effects.Light CreateGameLight(LightType lightType, Light light)
+        {
+            switch (lightType)
+            {
+                case LightType.Point:
+                    return new PointLight()
+                    {
+                        Diffuse = Color.FromRgba(light.Diffuse),
+                        Transform = new Transform(new Matrix(light.Matrix)),
+                    };
+                case LightType.Directional:
+                    return new DirectionalLight
+                    {
+                        Diffuse = Color.FromRgba(light.Diffuse),
+                        Direction = new Vector3(light.Direction),
+                    };
+                default:
+                    throw new InvalidOperationException($"Unspported light type {lightType}");
             }
         }
         #endregion
@@ -117,7 +159,7 @@ namespace Aurora.Core.Editor.Dom
         private static Scene BuildSceneDom(SceneViewModel viewModel)
         {
             var scene = new Scene();
-            foreach(var gameSceneNode in viewModel.DataModel.Nodes)
+            foreach (var gameSceneNode in viewModel.DataModel.Nodes)
             {
                 BuildSceneNodeTree(gameSceneNode, scene.Nodes);
             }
@@ -126,7 +168,7 @@ namespace Aurora.Core.Editor.Dom
 
         private static void BuildSceneNodeTree(GameSceneNode gameSceneNode, IList<SceneNode> domNodes)
         {
-            var gameSceneNodeType = DataLookup.GetNodeType(gameSceneNode);
+            var gameSceneNodeType = DataMap.GetDomNodeType(gameSceneNode);
             if (gameSceneNodeType == NodeType.GameObject)
             {
                 var domNode = new SceneNode()
@@ -136,7 +178,7 @@ namespace Aurora.Core.Editor.Dom
                     Flags = gameSceneNode.Flags,
                     Visible = gameSceneNode.Visible,
                     NodeType = gameSceneNodeType,
-                    GameObject = CreateGameObjectDescription(gameSceneNode),
+                    GameObject = CreateDomGameObject(gameSceneNode),
                 };
 
                 domNodes.Add(domNode);
@@ -148,23 +190,72 @@ namespace Aurora.Core.Editor.Dom
             }
         }
 
-        private static GameObject CreateGameObjectDescription(GameSceneNode gameSceneNode)
+        private static GameObject CreateDomGameObject(GameSceneNode gameSceneNode)
         {
-            var gameModel = gameSceneNode.As<GameObjectSceneNode>()
-                            ?.GameObject
-                            .Renderer.As<ModelRenderer>()
-                            ?.Model;
-
+            var gameObject = gameSceneNode.GetGameObject();
+            
+            var gameModel = gameObject.GetGameModel();
             if (gameModel != null)
             {
                 return new GameObject()
                 {
-                    GameObjectType = DataLookup.GetGameObjectType(gameSceneNode.As<GameObjectSceneNode>()?.GameObject),
-                    EffectName = DataLookup.GetEffectName(gameModel.Effect),
-                    ModelFileName = gameSceneNode.As<GameObjectSceneNode>()
-                                            ?.GameObject
-                                            .GetContext<GameObjectMeta>()
-                                            ?.ModelFileName,
+                    GameObjectType = DataMap.GetDomGameObjectType(gameObject),
+                    ResourceFilename = gameObject.GetResourceFilename(),
+                    ModelEffect = CreateDomModelEffect(gameModel.Effect),                    
+                };
+            }
+
+            var light = gameObject.GetLighting();
+            if (light != null)
+            {
+                return new GameObject()
+                {
+                    GameObjectType = DataMap.GetDomGameObjectType(gameSceneNode.As<GameObjectSceneNode>()?.GameObject),                    
+                    Light = CreateDomLight(light),
+                };
+            }
+
+            return null;
+        }
+
+        private static ModelEffect CreateDomModelEffect(SurfaceEffect gameEffect)
+        {
+            if (gameEffect is BlinnPhongEffect2)
+            {
+                var blinnPhongEffect = gameEffect.As<BlinnPhongEffect2>();
+                return new ModelEffect
+                {
+                    EffectName = DataMap.GetEffectDisplayName(blinnPhongEffect),
+                    AmbientColor = blinnPhongEffect.AmbientColor.ToRgba(),
+                    EnableBackFace = blinnPhongEffect.EnableBackFace,
+                    SpecularPower = blinnPhongEffect.SpecularPower,
+                    Eccentricity = blinnPhongEffect.Eccentricity,
+                    UseSceneLighting = blinnPhongEffect.UseSceneLighting,
+                };
+            }
+
+            return null;
+        }
+        
+        private static Light CreateDomLight(CipherPark.Aurora.Core.Effects.Light gameLight)
+        {
+            if (gameLight is PointLight)
+            {
+                return new Light()
+                {
+                    Type = LightType.Point,
+                    Diffuse = gameLight.Diffuse.ToRgba(),
+                    Matrix = ((PointLight)gameLight).Transform.ToMatrix().ToArray(),
+                };
+            }
+
+            else if (gameLight is DirectionalLight)
+            {
+                return new Light()
+                {
+                    Type = LightType.Directional,
+                    Diffuse = gameLight.Diffuse.ToRgba(),
+                    Direction = ((DirectionalLight)gameLight).Direction.ToArray(),
                 };
             }
 
@@ -172,5 +263,30 @@ namespace Aurora.Core.Editor.Dom
         }
 
         #endregion
+    }
+
+    public class ModelEffect
+    {
+        public string EffectName { get; set; }
+        public int AmbientColor { get; set; }
+        public float SpecularPower { get; set; }
+        public float Eccentricity { get; set; }
+        public bool EnableBackFace { get; set; }
+        public bool UseSceneLighting { get; set; }
+    }
+
+    public class Light
+    {
+        public LightType Type { get; set; }
+        public int Diffuse { get; set; }
+        public float[] Matrix { get; set; }
+        public float[] Direction { get; set; }
+    }
+
+    public enum LightType
+    {
+        Unknown,
+        Point,
+        Directional
     }
 }

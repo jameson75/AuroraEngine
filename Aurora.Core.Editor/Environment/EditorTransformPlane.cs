@@ -2,7 +2,7 @@
 {
     public enum EditorTransformPlane
     {
-        XY,
+        Y,
         XZ
     }
 }

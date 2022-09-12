@@ -5,11 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Aurora.Sample.Editor"
         xmlns:core="clr-namespace:Aurora.Core.Editor;assembly=Aurora.Core.Editor"
+        xmlns:coreconverter="clr-namespace:Aurora.Core.Editor.Views.Converters;assembly=Aurora.Core.Editor"
+        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         Closing="Window_Closing">
     <Window.Resources>
-        
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ColorPicker;component/Styles/DefaultColorPickerStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <coreconverter:DXColorToStringConverter x:Key="ColorStringConverter"/>
+            <coreconverter:DXColorToMediaColorConverter x:Key="ColorPickerConverter"/>
+            <coreconverter:DXVector3ToStringConverter x:Key="Vector3StringConverter"/>
+            <coreconverter:DXQuaternionToStringConverter x:Key="QuaternionStringConverter"/>
+        </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -34,6 +44,10 @@
                 </MenuItem>
                 <MenuItem Header="_Project">
                     <MenuItem Header="_Settings" Click="Menu_Project_Settings_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Scene">
+                    <MenuItem Header="Add Light" Click="Menu_Scene_AddLight_Click"/>
+                    <MenuItem Header="Move Reference Grid" Click="Menu_Scene_MoveReferenceGrid"/>
                 </MenuItem>
             </Menu>
             <ToolBarTray Height="30" DockPanel.Dock="Bottom">
@@ -71,54 +85,154 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50" />
                         <RowDefinition Height="300" />
-                        <RowDefinition Height="300" />
                         <RowDefinition Height="*" />                        
                     </Grid.RowDefinitions>
-                    <TreeView x:Name="sceneTreeView" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Path=Project.Scene.Nodes}" SelectedItemChanged="SceneTreeView_SelectedItemChanged">
+                    <TreeView x:Name="sceneTreeView" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Path=Project.Scene.Nodes}">
                         <TreeView.Resources>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type core:SceneNodeViewModel}">
+                            <DataTemplate DataType="{x:Type core:SceneNodeViewModel}">
                                 <TreeViewItem Header="{Binding Path=Name}"/>                                
-                            </HierarchicalDataTemplate>                           
+                            </DataTemplate>                           
                         </TreeView.Resources>
                     </TreeView>
-                    <StackPanel Grid.Row="2">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Width="80">Name</Label>
-                            <TextBox Width="200" Text="{Binding Path=SelectedNode.Name, Mode=TwoWay}"></TextBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Width="80">Object Type</Label>
-                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObject.GameObjectType, Mode=OneWay}"></TextBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Width="80">Model File</Label>
-                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObject.ModelFileName, Mode=OneWay}" ToolTip="{Binding SelectedNode.GameObject.ModelFileName}"></TextBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Width="80">Model Type</Label>
-                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=SelectedNode.GameObject.ModelType, Mode=OneWay}"></TextBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Width="80">Model Effect</Label>
-                            <ComboBox Width="200" ItemsSource="{Binding Path=Lookup.EffectNames}" SelectedValue="{Binding Path=SelectedNode.GameObject.EffectName, Mode=TwoWay}"/>
-                        </StackPanel>
-                    </StackPanel>
-                    <StackPanel Grid.Row="3">                        
+                    <StackPanel Grid.Row="2">                       
                         <ContentPresenter Content="{Binding}">
                             <ContentPresenter.Resources>
+                                <DataTemplate x:Key="GameModelTemplate">                                    
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Name</Label>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.Name, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Position</Label>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.Position, Mode=TwoWay, Converter={StaticResource Vector3StringConverter}}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Orientation</Label>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.Orientation, Mode=TwoWay, Converter={StaticResource QuaternionStringConverter}}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Object Type</Label>
+                                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.GameObjectType, Mode=OneWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Model File</Label>
+                                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.ModelFileName, Mode=OneWay}" ToolTip="{Binding Path=Project.Scene.SelectedNode.GameObject.ModelFileName}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Model Type</Label>
+                                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.ModelType, Mode=OneWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Model Stats</Label>
+                                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.ModelStatistics, Mode=OneWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Model Effect</Label>
+                                            <ComboBox Width="200" ItemsSource="{Binding Path=Lookup.EffectNames}" SelectedValue="{Binding Path=Project.Scene.SelectedNode.GameObject.EffectName, Mode=TwoWay}"/>
+                                        </StackPanel>                                        
+                                    </StackPanel>
+                                </DataTemplate>
+                                <DataTemplate x:Key="LightTemplate">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Name</Label>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.Name, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Position</Label>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.Position, Mode=TwoWay, Converter={StaticResource Vector3StringConverter}}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Object Type</Label>
+                                            <TextBox IsReadOnly="True" Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.GameObjectType, Mode=OneWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Diffuse</Label>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.LightDiffuse, Mode=TwoWay, Converter={StaticResource ColorStringConverter}}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <colorpicker:PortableColorPicker SelectedColor="{Binding Path=Project.Scene.SelectedNode.GameObject.LightDiffuse, Mode=TwoWay, Converter={StaticResource ColorPickerConverter}}"  Width="80" Height="20"/>
+                                        </StackPanel>
+                                        <ContentPresenter Content="{Binding}">
+                                            <ContentPresenter.Resources>
+                                                <DataTemplate x:Key="DirectionalLightTemplate">
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Label Width="80">Direction</Label>
+                                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.LightDirection, Mode=TwoWay, Converter={StaticResource Vector3StringConverter}}"></TextBox>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                                <DataTemplate x:Key="PointLightTemplate">
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Label Width="80">Direction</Label>
+                                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.LightPosition, Mode=OneWay, Converter={StaticResource Vector3StringConverter}}"></TextBox>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                                <DataTemplate x:Key="Default">
+                                                    <StackPanel>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ContentPresenter.Resources>
+                                            <ContentPresenter.Style>
+                                                <Style TargetType="ContentPresenter">
+                                                    <Setter Property="ContentTemplate" Value="{StaticResource Default}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=Project.Scene.SelectedNode.GameObject.LightType}" Value="Directional">
+                                                            <Setter Property="ContentTemplate" Value="{StaticResource DirectionalLightTemplate}"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Path=Project.Scene.SelectedNode.GameObject.LightType}" Value="Point">
+                                                            <Setter Property="ContentTemplate" Value="{StaticResource PointLightTemplate}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ContentPresenter.Style>
+                                        </ContentPresenter>
+                                    </StackPanel>
+                                </DataTemplate>
+                                <DataTemplate x:Key="Default">
+                                    <!-- Empty Template -->
+                                </DataTemplate>
+                            </ContentPresenter.Resources>
+                            <ContentPresenter.Style>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Default}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Project.Scene.SelectedNode.GameObject.GameObjectType}" Value="GameModel">
+                                            <Setter Property="ContentTemplate" Value="{StaticResource GameModelTemplate}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=Project.Scene.SelectedNode.GameObject.GameObjectType}" Value="Light">
+                                            <Setter Property="ContentTemplate" Value="{StaticResource LightTemplate}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentPresenter.Style>
+                        </ContentPresenter>
+                        <ContentPresenter Content="{Binding}">
+                            <ContentPresenter.Resources>                                
                                 <DataTemplate x:Key="BlinnPhongTemplate">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <Label Width="80">Ambient</Label>
-                                            <TextBox Width="200" Text="{Binding Path=SelectedNode.GameObject.SelectedEffect.AmbientColor, Mode=TwoWay}"></TextBox>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.SelectedEffect.AmbientColor, Mode=TwoWay, Converter={StaticResource ColorStringConverter}}"></TextBox>
                                         </StackPanel>
+                                        <StackPanel>
+                                            <colorpicker:PortableColorPicker SelectedColor="{Binding Path=Project.SelectedNode.SelectedNode.GameObject.SelectedEffect.AmbientColor, Mode=TwoWay, Converter={StaticResource ColorPickerConverter}}"  Width="80" Height="20"/>
+                                        </StackPanel>                                        
                                         <StackPanel Orientation="Horizontal">
                                             <Label Width="80">Specular</Label>
-                                            <TextBox Width="200" Text="{Binding Path=SelectedNode.GameObject.SelectedEffect.SpecularPower, Mode=TwoWay}"></TextBox>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.SelectedEffect.SpecularPower, Mode=TwoWay}"></TextBox>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <Label Width="80">Eccentricity</Label>
-                                            <TextBox Width="200" Text="{Binding Path=SelectedNode.GameObject.SelectedEffect.Eccentricity, Mode=TwoWay}"></TextBox>
+                                            <TextBox Width="200" Text="{Binding Path=Project.Scene.SelectedNode.GameObject.SelectedEffect.Eccentricity, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Width="80">Use Lighting</Label>
+                                            <CheckBox Width="200" IsChecked="{Binding Path=Project.Scene.SelectedNode.GameObject.SelectedEffect.UseSceneLighting, Mode=TwoWay}"></CheckBox>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -130,7 +244,7 @@
                                 <Style TargetType="ContentPresenter">
                                     <Setter Property="ContentTemplate" Value="{StaticResource Default}"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Path=SelectedNode.GameObject.EffectName}" Value="Blinn Phong">
+                                        <DataTrigger Binding="{Binding Path=Project.Scene.SelectedNode.GameObject.EffectName}" Value="Blinn Phong">
                                             <Setter Property="ContentTemplate" Value="{StaticResource BlinnPhongTemplate}"/>
                                         </DataTrigger>
                                     </Style.Triggers>

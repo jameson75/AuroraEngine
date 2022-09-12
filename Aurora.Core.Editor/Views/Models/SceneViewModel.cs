@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World.Scene;
@@ -6,11 +7,13 @@ using CipherPark.Aurora.Core.World.Scene;
 namespace Aurora.Core.Editor
 {
     public class SceneViewModel : ViewModelBase<SceneGraph>
-    {        
+    {
+        private SceneNodeViewModel selectedNode;
+
         public SceneViewModel(SceneGraph dataModel)
             : base(dataModel)
         {
-            ListenForSceneNotifications();
+            
         }
 
         public ObservableCollection<SceneNodeViewModel> Nodes { get; } = new ObservableCollection<SceneNodeViewModel>();
@@ -22,21 +25,34 @@ namespace Aurora.Core.Editor
             Nodes.Add(sceneNode);            
         }
 
-        private void ListenForSceneNotifications()
+        public SceneNodeViewModel SelectedNode
+        {
+            get => selectedNode;
+            set
+            {
+                selectedNode = value;
+                OnPropertyChanged(nameof(SelectedNode));
+                UpdatePickedNodeInScene(value);
+            }
+        }
+
+        private void UpdatePickedNodeInScene(SceneNodeViewModel value)
         {
             var sceneModifierService = DataModel.Game.Services.GetService<SceneModifierService>();
             if (sceneModifierService != null)
             {
-                sceneModifierService.NodeTransformed += SceneModifierService_NodeTransformed;
-            }
-        }
-       
-        private void SceneModifierService_NodeTransformed(object sender, NodeTransformedArgs args)
-        {
-            var sceneNode = Nodes.FirstOrDefault(n => n.DataModel == args.TransfromedNode);
-            if (sceneNode != null)
-            {
-                sceneNode.Matrix = args.TransfromedNode.Transform.ToMatrix().ToArray();                
+                if (value == null)
+                {
+                    sceneModifierService.UpdatePick(null);
+                }
+                else
+                {
+                    var gameObjectNode = value.DataModel.As<GameObjectSceneNode>();
+                    if (gameObjectNode != null)
+                    {
+                        sceneModifierService.UpdatePick(gameObjectNode);
+                    }
+                }
             }
         }
     }    

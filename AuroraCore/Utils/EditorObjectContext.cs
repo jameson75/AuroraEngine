@@ -10,5 +10,6 @@ namespace CipherPark.Aurora.Core.Services
         public bool IsReferenceGrid { get; set; }
         public bool IsSelectionModifier { get; set; }
         public bool IsShadowModifier { get; set; }
+        public bool IsReferenceObjectRoot { get; set; }
     }
 }

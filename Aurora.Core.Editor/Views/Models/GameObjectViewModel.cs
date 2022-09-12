@@ -1,11 +1,11 @@
 ﻿using Aurora.Core.Editor.Environment;
 using Aurora.Core.Editor.Util;
+using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World;
 using SharpDX;
 using System;
-using System.Collections.Generic;
 
 namespace Aurora.Core.Editor
 {
@@ -23,13 +23,23 @@ namespace Aurora.Core.Editor
         {
             get
             {
-                return DataModel.GetContext<GameObjectMeta>()?.ModelFileName;
+                return DataModel.GetContext<GameObjectMeta>()?.ResourceFilename;
             }
         }
 
         public string ModelType
         {
-            get => DataLookup.GetGameModelTypeName(DataModel.GetGameModel());
+            get => DataMap.GetModelDisplayName(DataModel.GetGameModel());
+        }
+
+        public string ModelStatistics
+        {
+            get => GenerateStatistics();
+        }
+
+        public bool ModelHasMesh
+        {
+            get => DataModel.GetGameModel().GetMesh() != null;
         }
 
         public string EffectName
@@ -49,7 +59,66 @@ namespace Aurora.Core.Editor
 
         public GameObjectType GameObjectType
         {
-            get => DataLookup.GetGameObjectType(DataModel);
+            get => DataMap.GetDomGameObjectType(DataModel);
+        }
+
+        public Color LightDiffuse
+        {
+            get => DataModel.GetLighting().Diffuse;
+            set
+            {
+                DataModel.GetLighting().Diffuse = value;;
+                OnPropertyChanged(nameof(LightDiffuse));
+            }
+        }
+
+        public Vector3 LightDirection
+        {
+            get => DataModel.GetLighting().As<DirectionalLight>().Direction;
+            set
+            {
+                DataModel.GetLighting().As<DirectionalLight>().Direction = value;
+                OnPropertyChanged(nameof(LightDirection));               
+            }
+        }
+
+        public Vector3 LightPosition
+        {
+            get => DataModel.GetLighting().As<PointLight>().WorldPosition();           
+        }
+
+        public Dom.LightType LightType
+        {
+            get => DataMap.GetDomLightType(DataModel.GetLighting());
+        }
+
+        private string GenerateStatistics()
+        {
+            var mesh = DataModel.GetGameModel()
+                                .GetMesh();
+
+            if (mesh != null)
+            {
+                if (mesh.Description.Topology == SharpDX.Direct3D.PrimitiveTopology.TriangleList)
+                {
+                    var count = mesh.Description.IndexCount > 0 ?
+                        mesh.Description.IndexCount / 3 :
+                        mesh.Description.VertexCount / 3;
+
+                    return $"{count} Triangles";
+                }
+
+                if (mesh.Description.Topology == SharpDX.Direct3D.PrimitiveTopology.LineList)
+                {
+                    var count = mesh.Description.IndexCount > 0 ?
+                        mesh.Description.IndexCount / 2 :
+                        mesh.Description.VertexCount / 2;
+
+                    return $"{count} Lines";
+                }
+            }
+
+            return "N/A";
         }
 
         private void UpdateSelectedEffectByName(string effectName)

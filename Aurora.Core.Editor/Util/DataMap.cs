@@ -2,14 +2,13 @@
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.World.Scene;
-using CipherPark.Aurora.Core.Services;
 using Aurora.Core.Editor.Environment;
 
 namespace Aurora.Core.Editor.Util
 {
-    public class DataLookup
+    public class DataMap
     {
-        public static GameObjectType GetGameObjectType(GameObject gameObject)
+        public static GameObjectType GetDomGameObjectType(GameObject gameObject)
         {
             if (gameObject == null)
             {
@@ -21,10 +20,15 @@ namespace Aurora.Core.Editor.Util
                 return GameObjectType.GameModel;
             }
 
+            else if (gameObject.GetContext<Light>() != null)
+            {
+                return GameObjectType.Light;
+            }
+
             return GameObjectType.Unknown;
         }
 
-        public static string GetEffectName(SurfaceEffect dataModel)
+        public static string GetEffectDisplayName(SurfaceEffect dataModel)
         {
             if (dataModel is BlinnPhongEffect2)
             {
@@ -34,7 +38,7 @@ namespace Aurora.Core.Editor.Util
             return EffectNames.Unknown;
         }       
 
-        public static string GetGameModelTypeName(Model gameModel)
+        public static string GetModelDisplayName(Model gameModel)
         {
             if (gameModel is StaticMeshModel)
             {
@@ -54,7 +58,7 @@ namespace Aurora.Core.Editor.Util
             return ModelTypeNames.Unknown;
         }
         
-        public static string GetNameFromFilename(string filename)
+        public static string GetModelDisplayNameFromFilename(string filename)
         {
             if (filename == null)
             {
@@ -64,24 +68,39 @@ namespace Aurora.Core.Editor.Util
             return System.IO.Path.GetFileNameWithoutExtension(filename);
         }
 
-        public static NodeType GetNodeType(SceneNode dataModel)
+        public static Dom.NodeType GetDomNodeType(SceneNode dataModel)
         {
             if( dataModel is CameraSceneNode)
             {
-                return NodeType.Camera;
+                return Dom.NodeType.Camera;
             }
 
             else if( dataModel is GameObjectSceneNode)
             {
-                if( dataModel.IsDesignerNode())
+                if( dataModel.IsEditorNode())
                 {
-                    return NodeType.Designer;
+                    return Dom.NodeType.Designer;
                 }
 
-                return NodeType.GameObject;
+                return Dom.NodeType.GameObject;
             }
 
-            return NodeType.Unknown;
+            return Dom.NodeType.Unknown;
         }
-    }
+
+        internal static Dom.LightType GetDomLightType(Light light)
+        {
+            if (light is PointLight)
+            {
+                return Dom.LightType.Point;
+            }
+
+            else if (light is DirectionalLight)
+            {
+                return Dom.LightType.Directional;
+            }
+
+            return Dom.LightType.Unknown;
+        }
+    }   
 }

@@ -1,9 +1,7 @@
 ﻿using CipherPark.Aurora.Core;
-using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.UI.Components;
 using CipherPark.Aurora.Core.World.Scene;
 using SharpDX;
-using System;
 
 namespace Aurora.Core.Editor
 {
@@ -12,10 +10,11 @@ namespace Aurora.Core.Editor
         EditorMode EditorMode { get; set; }
         SceneGraph Scene { get; }
         EditorTransformPlane TransformPlane { get; set; }
-        UITree UI { get; }       
+        UITree UI { get; }
+        ReferenceGridMode ReferenceGridMode { get; set; }
 
         void ChangeViewportColor(Color newViewportColor);
         void ClearScene(bool resetCamera);
-        void ResetCamera();
+        void ResetCamera();       
     }
 }

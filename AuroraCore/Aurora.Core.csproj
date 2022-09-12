@@ -275,7 +275,6 @@
     <Compile Include="World\Systems\Emitter.cs" />
     <Compile Include="World\Geometry\ISprite.cs" />
     <Compile Include="World\Scene\CameraSceneNode.cs" />
-    <Compile Include="World\Geometry\ReferenceGrid.cs" />
     <Compile Include="World\Geometry\Triangle.cs" />
     <Compile Include="World\Geometry\Mesh.cs" />
     <Compile Include="World\Geometry\VertexTypes.cs" />

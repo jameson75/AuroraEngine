@@ -11,12 +11,12 @@ namespace Aurora.Core.Editor
         {
         }
 
-        public int AmbientColor
+        public Color AmbientColor
         {
-            get => DataModel.As<BlinnPhongEffect2>().AmbientColor.ToRgba();
+            get => DataModel.As<BlinnPhongEffect2>().AmbientColor;
             set
             {
-                DataModel.As<BlinnPhongEffect2>().AmbientColor = Color.FromRgba(value);
+                DataModel.As<BlinnPhongEffect2>().AmbientColor = value;
                 OnPropertyChanged(nameof(AmbientColor));
             }
         }
@@ -38,6 +38,16 @@ namespace Aurora.Core.Editor
             {
                 DataModel.As<BlinnPhongEffect2>().Eccentricity = value;
                 OnPropertyChanged(nameof(Eccentricity));
+            }
+        }
+
+        public bool UseSceneLighting
+        {
+            get => DataModel.As<BlinnPhongEffect2>().UseSceneLighting;
+            set
+            {
+                DataModel.As<BlinnPhongEffect2>().UseSceneLighting = value;
+                OnPropertyChanged(nameof(UseSceneLighting));
             }
         }
     }

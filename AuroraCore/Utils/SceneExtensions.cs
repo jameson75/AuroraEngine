@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CipherPark.Aurora.Core.Effects;
+using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World.Scene;
 
 namespace CipherPark.Aurora.Core.Utils
@@ -27,6 +29,16 @@ namespace CipherPark.Aurora.Core.Utils
             }
 
             return results;
+        }
+
+        public static IEnumerable<Light> SelectLights(this SceneGraph graph)
+        {
+            return graph.Select(
+                x => x.As<GameObjectSceneNode>()?
+                      .GameObject
+                      .GetContext<Light>() != null)
+                      .Select(x => x.As<GameObjectSceneNode>().GameObject.GetContext<Light>())
+                      .ToList();
         }
     }
 }

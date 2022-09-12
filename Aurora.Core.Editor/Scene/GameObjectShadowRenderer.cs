@@ -1,23 +1,30 @@
-﻿using SharpDX;
-using CipherPark.Aurora.Core.Animation;
+﻿using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.World;
-using System.Linq;
-using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.World.Geometry;
-using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.World.Scene;
+using SharpDX;
 using SharpDX.Direct3D11;
+using Aurora.Core.Editor.Util;
+using CipherPark.Aurora.Core.Content;
+using CipherPark.Aurora.Core.Effects;
+using System.Linq;
+using Aurora.Sample.Editor.Scene;
 
 namespace CipherPark.Aurora.Core.Services
 {
+    //TODO: Replace this class with a shadow effect class and shader.
+
     public class GameObjectShadowRenderer : IRenderer
     {
         private IGameApp gameApp;
         private GameObjectSceneNode targetGameNode;
-        private Model model;
-        private bool isInitialized = false;
+        private Vector3[] meshPoints_ws;
+        private short[] meshIndices;
+        private Mesh dynamicMesh;
+        private SurfaceEffect meshEffect;
         private RasterizerState cachedRasterizerState;
+        private bool isInitialized = false;
 
         public GameObjectShadowRenderer(IGameApp gameApp, GameObjectSceneNode targetGameNode)
         {
@@ -28,88 +35,89 @@ namespace CipherPark.Aurora.Core.Services
         public IGameApp GameApp { get => gameApp; }
 
         public void Dispose()
-        {           
-            model?.Dispose();
+        {
+            dynamicMesh?.Dispose();
         }
 
         public void Draw(ITransformable container)
         {
-            OnetimeInitialize();
-            var cameraNode = gameApp.GetActiveScene()
-                                    .CameraNode;
-            
-            var referenceGrid = gameApp.GetActiveScene()
-                                       .Select(n => n.As<GameObjectSceneNode>()?.GameObject.IsReferenceGridObject() ?? false)
-                                       .FirstOrDefault()
-                                       ?.As<GameObjectSceneNode>();
+            //TODO: Move this method to Update() once we fix the guarantee of Update() being called before Draw().
+            OnTimeInitialize();
 
-            if (referenceGrid != null)
+            CalcMeshData();
+
+            var referenceObjectRoot = gameApp.GetActiveScene()
+                                             .SelectReferenceObjectRoot();
+
+            if (referenceObjectRoot != null)
             {
-                var targetNodeWorldPosition = targetGameNode.WorldPosition();
-                var shadowWorldPosition = new Vector3(targetNodeWorldPosition.X, referenceGrid.WorldPosition().Y, targetNodeWorldPosition.Z);
-                model.Effect.World = Matrix.Translation(shadowWorldPosition);
-                model.Effect.View = cameraNode.RiggedViewMatrix;
-                model.Effect.Projection = cameraNode.ProjectionMatrix;
-                DisableBackfaceCulling();
-                model.Draw();
-                RestoreBackfaceCulling();
-            }            
-        }        
+                foreach (var referenceObjectNode in referenceObjectRoot.GameObjectChildren())
+                {
+                    if (referenceObjectNode.GetGameObject().IsReferenceGridObject() == true)
+                    {
+                        var referenceGrid = referenceObjectNode.GetGameObject().GetReferenceGrid();
+                        ProjectShadowToReferenceGrid(referenceObjectNode, referenceGrid);
+                    }
+                }
+            }
+        }
 
         public void Update(GameTime gameTime)
         {
-            OnetimeInitialize();          
+
         }
 
-        private void OnetimeInitialize()
+        public void OnTimeInitialize()
         {
             if (!isInitialized)
             {
-                model = BuildShadowModel();
+                CreateMesh();
                 isInitialized = true;
             }
         }
 
-        private Model BuildShadowModel()
-        {            
+        private void CalcMeshData()
+        {
             const float Padding = 0.5f;
-            BoundingBox renderBox = targetGameNode.GameObject
-                                                  .GetBoundingBox()
-                                                  .GetValueOrDefault()
-                                                  .Inflate(Padding);
+            BoundingBoxOA renderBox_ws = targetGameNode.GetWorldBoundingBox();
 
-            var points = new Vector3[4]
+            renderBox_ws.Inflate(Padding, Padding, Padding);
+
+            meshPoints_ws = renderBox_ws.GetCorners();
+        }
+
+        private void CreateMesh()
+        {
+            const int MeshPointsMaxLength = 8;
+
+            meshIndices = new short[]
             {
-                new Vector3(renderBox.Minimum.X, 0, renderBox.Minimum.Z),
-                new Vector3(renderBox.Minimum.X, 0, renderBox.Maximum.Z),
-                new Vector3(renderBox.Maximum.X, 0, renderBox.Maximum.Z),
-                new Vector3(renderBox.Maximum.X, 0, renderBox.Minimum.Z),
+               7, 4, 5, //Front 1
+               5, 6, 7, //Front 2
+               3, 2, 1, //Back 1
+               1, 0, 3, //Back 2
+               4, 0, 1, //Top 1
+               1, 5, 4, //Top 2
+               7, 6, 2, //Bottom 1
+               2, 3, 7, //Bottom 2
+               6, 5, 1, //Right 1
+               1, 2, 6, //Right 2
+               7, 3, 0, //Left 1
+               0, 4, 7, //Left 2
             };
 
-            var indices = new short[6] { 0, 1, 2, 2, 3, 0 };           
+            meshEffect = new FlatEffect(GameApp, SurfaceVertexType.PositionColor);
 
-            VertexPositionColor[] vertices = points.Select(p => new VertexPositionColor()
-            {
-                Position = new Vector4(p, 1.0f),
-                Color = Color.Orange.ToVector4(),
-            }).ToArray();          
-
-            var effect = new FlatEffect(GameApp, SurfaceVertexType.PositionColor);
-
-            var mesh = ContentBuilder.BuildMesh(GameApp.GraphicsDevice,
-                                            effect.GetVertexShaderByteCode(),
-                                            vertices,
-                                            indices,
+            dynamicMesh = ContentBuilder.BuildDynamicMesh(GameApp.GraphicsDevice,
+                                            meshEffect.GetVertexShaderByteCode(),
+                                            (VertexPositionColor[])null,
+                                            MeshPointsMaxLength,
+                                            meshIndices,
+                                            meshIndices.Length,
                                             VertexPositionColor.InputElements,
                                             VertexPositionColor.ElementSize,
-                                            BoundingBox.FromPoints(points),
+                                            new BoundingBox(),
                                             SharpDX.Direct3D.PrimitiveTopology.TriangleList);
-
-            return new StaticMeshModel(GameApp)
-            {
-                Effect = effect,
-                Mesh = mesh,
-            };            
         }
 
         private void RestoreBackfaceCulling()
@@ -124,5 +132,36 @@ namespace CipherPark.Aurora.Core.Services
             newRasterizerStateDesc.CullMode = CullMode.None;
             gameApp.GraphicsDeviceContext.Rasterizer.State = new RasterizerState(gameApp.GraphicsDevice, newRasterizerStateDesc);                        
         }
+
+        private void ProjectShadowToReferenceGrid(GameObjectSceneNode referenceObjectNode, ReferenceGrid referenceGrid)
+        {
+            Plane plane_ws = new Plane(-referenceObjectNode.WorldPosition(),
+                                       referenceObjectNode.LocalToWorldNormal(referenceGrid.Normal));
+            var projectedMeshPoints_ws = ProjectPoints(plane_ws, meshPoints_ws);
+            var vertices = projectedMeshPoints_ws.Select(p => new VertexPositionColor
+            {
+                Position = new Vector4(p, 1),
+                Color = Color.Orange.ToVector4(),
+            }).ToArray();
+            dynamicMesh.UpdateVertexStream(vertices);
+            RenderWorldSpaceDynamicMesh();
+        }
+
+        private void RenderWorldSpaceDynamicMesh()
+        {
+            var cameraNode = gameApp.GetActiveScene()
+                                    .CameraNode;
+            meshEffect.World = Matrix.Identity;
+            meshEffect.View = cameraNode.RiggedViewMatrix;
+            meshEffect.Projection = cameraNode.ProjectionMatrix;            
+            DisableBackfaceCulling();
+            meshEffect.Apply();
+            dynamicMesh.Draw();
+            meshEffect.Restore();
+            RestoreBackfaceCulling();
+        }
+
+        private static Vector3[] ProjectPoints(Plane plane, Vector3[] points)
+            => points.Select(x => plane.ProjectPoint(x).Value).ToArray();
     }
 }

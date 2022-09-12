@@ -79,12 +79,12 @@ namespace Aurora.Sample.ContentBuilder
             // It's possible for Rendering to call back twice in the same frame 
             // so only render when we haven't already rendered in this frame.
             if (lastRender != args.RenderingTime)
-            {
+            { 
+                //TODO: Uncomment this only after we've confirmed that navigation speed is constant, irrespective of frame rate.
+                //this.OnUpdate(); 
                 interopImage.RequestRender();
                 lastRender = args.RenderingTime;
-            }
-            //TODO: Uncomment this only after we've confirmed that navigation speed is constant, irrespective of frame rate.
-            //this.OnUpdate(); 
+            }           
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

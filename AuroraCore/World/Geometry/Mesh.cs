@@ -92,7 +92,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
             get { return _instanceBuffer != null; }
         }
         
-        public void UpdateVertexStream<T>(T[] data, int offset = 0) where T : struct
+        public void UpdateVertexStream<T>(T[] data) where T : struct
         {   
             var isDynamic = (_vertexBuffer.Description.CpuAccessFlags & CpuAccessFlags.Write) != 0;
             
@@ -118,7 +118,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
             _description.VertexCount = data.Length;        
         }    
 
-        public void UpdateIndexStream(short[] indices, int offset = 0)
+        public void UpdateIndexStream(short[] indices)
         {
             var isDynamic = (_indexBuffer.Description.CpuAccessFlags & CpuAccessFlags.Write) != 0;
 
@@ -145,7 +145,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
             _description.IndexCount = indices.Length;
         }
 
-        public void UpdateInstanceStream<T>(T[] data, int offset = 0) where T : struct
+        public void UpdateInstanceStream<T>(T[] data) where T : struct
         {
             var isDynamic = (_instanceBuffer.Description.CpuAccessFlags & CpuAccessFlags.Write) != 0;
 

@@ -52,7 +52,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
                     case EditorTransformPlane.XZ:
                         sceneModifierService.TranslationPlane = TranslationPlane.XZ;
                         break;
-                    case EditorTransformPlane.XY:
+                    case EditorTransformPlane.Y:
                         sceneModifierService.TranslationPlane = TranslationPlane.Y;
                         break;
                 }

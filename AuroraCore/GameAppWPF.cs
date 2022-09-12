@@ -93,11 +93,12 @@ namespace CipherPark.Aurora.Core
         }
 
         public void Update()
-        {
-            //Update game time.
-            GameTime.Update();           
-
-            OnUpdate();            
+        {            
+            if (!isInitializing)
+            {
+                GameTime.Update();
+                OnUpdate();      
+            }      
         }
 
         public void Render(IntPtr pResource, bool isNewSurface)

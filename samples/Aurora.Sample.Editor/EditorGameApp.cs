@@ -5,6 +5,7 @@ using CipherPark.Aurora.Core.UI.Components;
 using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.Utils;
 using SharpDX;
 using SharpDX.Direct3D11;
 using System;
@@ -13,6 +14,9 @@ using Aurora.Sample.Editor.Services;
 using Aurora.Sample.Editor.Scene;
 using Aurora.Sample.Editor.Scene.UI.Behavior;
 using Aurora.Core.Editor;
+using System.Linq;
+using CipherPark.Aurora.Core.Animation;
+using Aurora.Core.Editor.Util;
 
 namespace Aurora.Sample.Editor
 {
@@ -57,6 +61,7 @@ namespace Aurora.Sample.Editor
                 });
 
             AddReferenceGrid();
+            PointCameraToReferenceGrid();
         }
 
         private void InitializeUI()
@@ -108,7 +113,6 @@ namespace Aurora.Sample.Editor
             editorModelLabel.Content.As<TextContent>().Color = Color.DarkGray;
             UI.Controls.Add(editorModelLabel);
 
-
             ContentControl coordinatesLabel = new ContentControl(UI, new TextContent()
             {
                 PredefinedBlend = PredefinedBlend.Opacity,
@@ -123,7 +127,7 @@ namespace Aurora.Sample.Editor
 
         public void ClearScene(bool resetCamera)
         {
-            Scene.Nodes.Clear();
+            Scene.Nodes.Clear(n => !n.IsEditorNode());
             if (resetCamera)
             {
                 ResetCamera();
@@ -195,31 +199,54 @@ namespace Aurora.Sample.Editor
 
         private void AddReferenceGrid()
         {
+            var referenceObjectRoot = new GameObjectSceneNode(this)
+            {
+                Name = "Reference Object Root",
+                GameObject = new GameObject(this, new[]
+                {
+                    new EditorObjectContext
+                    {
+                        IsReferenceObjectRoot = true,
+                    }
+                }),
+            };
+
+            var referenceGridNode = CreateReferenceGridNode();
+            
+            referenceObjectRoot.Children.Add(referenceGridNode);
+            
+            Scene.Nodes.Add(referenceObjectRoot);
+        }
+
+        private GameObjectSceneNode CreateReferenceGridNode()
+        {
+            var referenceGrid = new ReferenceGrid(5000, 10, 10, 5000, 10, 10);
+
             var referenceGridNode = new GameObjectSceneNode(this)
             {
                 Name = "Reference Grid Node",
                 GameObject = new GameObject(this)
                 {
-                    Renderer = new ReferenceGridRenderer(this, new Scene.ReferenceGrid(
-                        5000,
-                        10,
-                        10,
-                        5000,
-                        10,
-                        10)),
+                    Renderer = new ReferenceGridRenderer(this, referenceGrid),
                 }
             };
+
             referenceGridNode.GameObject.AddContext(new EditorObjectContext
             {
                 IsTraversingPlane = true,
                 IsReferenceGrid = true,
             });
-            /*
-            referenceGridNode.Transform = new CipherPark.Aurora.Core.Animation.Transform(Matrix.Translation(100, 100, 100));
-            Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(new Vector3(100, 101, 100), new Vector3(100, 100, 100), Vector3.UnitZ);
-            */
-            Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(new Vector3(0, 101, 0), new Vector3(0, 0, 0), Vector3.UnitZ);
-            Scene.Nodes.Add(referenceGridNode);
+
+            referenceGridNode.GameObject.AddContext(referenceGrid);
+
+           return referenceGridNode;
+        }
+
+        private void PointCameraToReferenceGrid()
+        {
+            var referenceGridNode = Scene.Select(n => n.Name == "Reference Grid Node").First();
+            var referenceGridPosition = referenceGridNode.WorldPosition();
+            Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(referenceGridPosition + new Vector3(0, 100, 0), referenceGridPosition, Vector3.UnitZ);           
         }              
 
         public void ChangeViewportColor(Color newViewportColor)
@@ -231,9 +258,12 @@ namespace Aurora.Sample.Editor
 
         public EditorTransformPlane TransformPlane { get; set; }
 
+        public ReferenceGridMode ReferenceGridMode { get; set; }
+
         public void ResetCamera()
         {
-            Scene.CameraNode.Camera.ViewMatrix = GetDefaultViewMatrix();
-        }
+            PointCameraToReferenceGrid();
+            Services.GetService<MouseNavigatorService>().ResetTracking();
+        }      
     }    
 }

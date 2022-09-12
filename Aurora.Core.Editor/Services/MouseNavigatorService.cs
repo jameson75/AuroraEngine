@@ -3,6 +3,7 @@ using System.Linq;
 using SharpDX;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Utils;
+using Aurora.Core.Editor.Util;
 
 namespace CipherPark.Aurora.Core.Services
 {
@@ -76,7 +77,7 @@ namespace CipherPark.Aurora.Core.Services
             var camera = cameraNode.Camera;
             var mode = Mode;            
             Vector2 mouseOffset = -Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
-            Vector3 platformLocation = new Vector3(0, 0, 0);
+            Vector3 platformLocation = Game.GetActiveScene().Select(n => n.GetGameObject()?.IsReferenceGridObject() == true).First().WorldPosition();
             Matrix platformTranslation = Matrix.Translation(platformLocation);            
 
             switch (mode)
@@ -192,7 +193,7 @@ namespace CipherPark.Aurora.Core.Services
             }            
         }
 
-        internal void NotifyReset()
+        public void ResetTracking()
         {
             accumTraverseVector = Vector3.Zero;            
         }

@@ -3,6 +3,7 @@
     public enum GameObjectType
     {
         Unknown,
-        GameModel
+        GameModel,
+        Light
     }
 }

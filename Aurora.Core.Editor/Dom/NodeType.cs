@@ -1,4 +1,4 @@
-﻿namespace Aurora.Core.Editor
+﻿namespace Aurora.Core.Editor.Dom
 {
     public enum NodeType
     {

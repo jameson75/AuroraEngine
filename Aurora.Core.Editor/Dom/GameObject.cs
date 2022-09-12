@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Aurora.Core.Editor.Util;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Aurora.Core.Editor.Dom
@@ -7,7 +8,8 @@ namespace Aurora.Core.Editor.Dom
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public GameObjectType GameObjectType { get; set; }
-        public string ModelFileName { get; set; }
-        public string EffectName { get; set; }
+        public string ResourceFilename { get; set; }       
+        public ModelEffect ModelEffect { get; set; }        
+        public Light Light { get; set; }
     }
 }

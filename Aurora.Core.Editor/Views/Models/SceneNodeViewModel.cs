@@ -21,7 +21,7 @@ namespace Aurora.Core.Editor
         public string Name
         {
             get => DataModel.Name ?? 
-                DataLookup.GetNameFromFilename(DataModel.As<GameObjectSceneNode>()?.GameObject.GetContext<GameObjectMeta>()?.ModelFileName);
+                DataMap.GetModelDisplayNameFromFilename(DataModel.As<GameObjectSceneNode>()?.GameObject.GetContext<GameObjectMeta>()?.ResourceFilename);
             set
             {
                 DataModel.Name = value;
@@ -32,18 +32,7 @@ namespace Aurora.Core.Editor
         public bool HasExplicitName
         {
             get => !string.IsNullOrWhiteSpace(DataModel.Name);
-        }
-
-        public float[] Matrix
-        {
-            get => DataModel.Transform.ToMatrix().ToArray();
-            set
-            {
-                DataModel.Transform = new Transform(new Matrix(value));
-                OnPropertyChanged(nameof(Matrix));
-                OnPropertyChanged(nameof(Location));
-            }
-        }
+        }        
 
         public ulong Flags
         {
@@ -53,8 +42,8 @@ namespace Aurora.Core.Editor
                 DataModel.Flags = value;
                 OnPropertyChanged(nameof(Flags));
             }
-        }
-        
+        }       
+
         public bool Visible 
         {
             get => DataModel.Visible;
@@ -65,19 +54,40 @@ namespace Aurora.Core.Editor
             }
         }
 
-        public float[] Location
+        public Vector3 Position
         {
-            get => DataModel.Transform.Translation.ToArray();
+            get => DataModel.Transform.Translation;
+            set
+            {
+                DataModel.Transform = new Transform(DataModel.Transform.Rotation, value);
+                OnPropertyChanged(nameof(Position));
+            }
         }
 
-        public NodeType NodeType
+        public Quaternion Orientation
         {
-            get => DataLookup.GetNodeType(DataModel);
+            get => DataModel.Transform.Rotation;
+            set
+            {
+                DataModel.Transform = new Transform(value, DataModel.Transform.Translation);
+                OnPropertyChanged(nameof(Orientation));
+            }
+        }
+
+        public Dom.NodeType NodeType
+        {
+            get => DataMap.GetDomNodeType(DataModel);
         }       
 
         public GameObjectViewModel GameObject
         {
             get;
+        }
+
+        public void NotifyTransform()
+        {
+            OnPropertyChanged(nameof(Position));
+            OnPropertyChanged(nameof(Orientation));
         }
     }
 }
