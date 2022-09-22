@@ -11,12 +11,20 @@ if "%packageEnvironment%" == "prod" set source=https://api.nuget.org/v3/index.js
 if "%packageEnvironment%" == "dev" set source=%localNugetDir%
 if "%source%" == "" goto BadPackageEnviornmentError
 
-echo Packing...
-nuget pack -OutputDirectory ..\dist\packages -NonInteractive -Version %version%
+echo Packing Aurora Engine...
+nuget pack Package.AuroraEngine.nuspec -OutputDirectory ..\dist\packages -NonInteractive -Version %version%
 if errorlevel 1 goto NugetError
 
-echo Pushing...
-nuget push ..\dist\packages\CipherPark.AuroraEngine.%version%.nupkg %Nuget__AuroraEngineKey% -Source %source%
+echo Packing Aurora Editor...
+nuget pack Package.AuroraEditor.nuspec -OutputDirectory ..\dist\packages -NonInteractive -Version %version%
+if errorlevel 1 goto NugetError
+
+echo Pushing Aurora Engine...
+nuget push ..\dist\packages\CipherPark.AuroraEngine.%version%.nupkg %Nuget__AuroraEngineKey% -Source https://api.nuget.org/v3/index.json
+if errorlevel 1 goto NugetError
+
+echo Pushing Aurora Editor...
+nuget push ..\dist\packages\CipherPark.AuroraEditor.%version%.nupkg %Nuget__AuroraEngineKey% -Source https://api.nuget.org/v3/index.json
 if errorlevel 1 goto NugetError
 
 exit 0

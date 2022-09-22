@@ -2,15 +2,15 @@
 <package >
   <metadata>
     <id>CipherPark.AuroraEngine</id>
-    <version>0.0.0</version>
+    <version>0.0.6</version>
     <authors>Eugene Adams</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>    
     <projectUrl>http://github.com/jameson75/AuroraEngine</projectUrl>
-    <description>Homebrew game engine</description>
+    <description>Aurora Game Engine</description>
     <releaseNotes>Alpha Release</releaseNotes>
     <copyright>Copyright © 2021-2022</copyright>
-    <tags>Game Engine 3D DirectX .NET SharpDX Homebrew C#</tags>
+    <tags>Game Engine 3D DirectX .NET SharpDX Aurora Homebrew C#</tags>
 	<dependencies>   
 		<group targetFramework=".NETFramework4.5">
 			<dependency id="SharpDX" version="4.2.0" />

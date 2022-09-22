@@ -154,7 +154,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
 
             if (data.Length > GetInstanceBufferSizeInElements())
             {
-                if (data.Length > _description.IndexBufferMaxElements)
+                if (data.Length > _description.InstanceBufferMaxElements)
                     throw new InvalidOperationException("Data offset is greater than the maximum size of the instance buffer.");
 
                 ResizeBuffer(ref _instanceBuffer,
