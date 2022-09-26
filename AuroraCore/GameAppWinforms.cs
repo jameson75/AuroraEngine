@@ -311,7 +311,7 @@ namespace CipherPark.Aurora.Core
             get { return _deviceHwnd; }
         }
 
-        public bool IsViewportWindowActive
+        public virtual bool IsViewportWindowActive
         {
             get { return Form.ActiveForm == _form; }
         }

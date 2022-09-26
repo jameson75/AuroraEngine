@@ -14,13 +14,14 @@ namespace CipherPark.Aurora.Core.Services
         private IGameApp gameApp;
         private bool isMouseTracking;
         private Point mouseMoveFrom;
-        private GameObjectSceneNode currentModifierRoot;
+        private GameObjectSceneNode currentAdornmentRoot;
         private GameObjectSceneNode currentPickedNode;
         private bool isActive;
 
-        public SceneModifierService(IGameApp gameApp)
+        public SceneModifierService(IGameApp gameApp, bool changeActivationOnDoubleTap)
         {
             this.gameApp = gameApp;
+            ChangeActivationOnDoubleTap = changeActivationOnDoubleTap;
         }
 
         public bool IsActive
@@ -36,9 +37,13 @@ namespace CipherPark.Aurora.Core.Services
             }
         }
 
-        public TransformMode TransformMode { get; set; }
+        public bool ChangeActivationOnDoubleTap { get; set; }
 
-        public TranslationPlane TranslationPlane { get; set; }
+        public ModifierMode ModifierMode { get; set; }
+
+        public TransformSpace SelectedObjectTransformSpace { get; set; }
+
+        public GameObjectSceneNode PickedNode { get => currentPickedNode; }
 
         public void NotifyMouseDown(Point location)
         {
@@ -53,6 +58,24 @@ namespace CipherPark.Aurora.Core.Services
         public void NotifyMouseMove(bool buttonDown, Point location)
         {
             OnMouseMove(buttonDown, location);
+        }
+
+        internal void NotifyMouseDoubleTap(Point location)
+        {
+            var pickedNode = MousePickNode(location.X, location.Y);
+            if (!IsActive && pickedNode != null)
+            {
+                IsActive = true;
+                UpdatePick(pickedNode);
+                OnActivatedFromDoubleTap(true);
+            }
+
+            if (IsActive && pickedNode == null)
+            {
+                IsActive = false;
+                UpdatePick(null);
+                OnActivatedFromDoubleTap(false);
+            }
         }
 
         public void ClearPick()
@@ -78,7 +101,7 @@ namespace CipherPark.Aurora.Core.Services
 
             if (pickedNode != null)
             {
-                AttachModifierNodes(pickedNode);
+                AttachAdornmentNodes(pickedNode);
             }
 
             currentPickedNode = pickedNode;
@@ -107,7 +130,12 @@ namespace CipherPark.Aurora.Core.Services
                     BeginMouseTracking(location);
                 }
                 
-                MousePickNode();
+                var pickedNode = MousePickNode(mouseMoveFrom.X, mouseMoveFrom.Y);
+
+                if (pickedNode != currentPickedNode)
+                {
+                    UpdatePick(pickedNode);
+                }
             }
         }
 
@@ -141,12 +169,12 @@ namespace CipherPark.Aurora.Core.Services
 
                 if (pickFromInfo != null && pickToInfo != null)
                 {
-                    switch (TransformMode)
+                    switch (ModifierMode)
                     {
-                        case TransformMode.Translate:
-                            switch (TranslationPlane)
+                        case ModifierMode.TransformObject:
+                            switch (SelectedObjectTransformSpace)
                             {
-                                case TranslationPlane.XZ:
+                                case TransformSpace.ViewSpaceTranslateXZ:
                                     var pickedNodeWorldAlignedYPlane = new Plane(pickedNodeWorldPosition, Vector3.Up);
                                     bool fromRayIntersectsPlane = pickFromInfo.Ray.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 fromIntersectionPoint);
                                     bool toRayIntersectsPlane = pickToInfo.Ray.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 toIntersectionPoint);
@@ -158,7 +186,7 @@ namespace CipherPark.Aurora.Core.Services
                                         OnNodeTransformed(currentPickedNode);
                                     }
                                     break;
-                                case TranslationPlane.Y:
+                                case TransformSpace.ViewSpaceTranslateY:
                                     var cameraAlignedZPlaneNormal = Vector3.Normalize(cameraNode.WorldPosition() - pickedNodeWorldPosition);
                                     var xAxis = Vector3.Normalize(Vector3.Cross(cameraAlignedZPlaneNormal, Vector3.Up));
                                     var objectAlignedCameraSpaceZPlaneNormal = Vector3.Normalize(Vector3.Cross(Vector3.Up, xAxis));
@@ -180,56 +208,51 @@ namespace CipherPark.Aurora.Core.Services
             }            
 
             mouseMoveFrom = location;
-        }        
+        }       
 
-        private void MousePickNode()
+        private GameObjectSceneNode MousePickNode(int mouseX, int mouseY)
         {
             var cameraNode = gameApp.GetActiveScene().CameraNode;
             var camera = cameraNode.Camera;
 
-            var pickedNode = ScenePicker.PickNodes(
+            return ScenePicker.PickNodes(
                         gameApp,
-                        mouseMoveFrom.X,
-                        mouseMoveFrom.Y,
-                        n => n.GameObject.IsEditorObject() == false)
+                        mouseX,
+                        mouseY,
+                        n => n.GameObject.IsPickable())
                         .GetClosest(camera.Location)
                         ?.Node;
-
-            if (pickedNode != currentPickedNode)
-            {
-                UpdatePick(pickedNode);                
-            }
         }
 
-        private void AttachModifierNodes(GameObjectSceneNode targetNode)
+        private void AttachAdornmentNodes(GameObjectSceneNode targetNode)
         {
-            if (currentModifierRoot != null)
+            if (currentAdornmentRoot != null)
             {
                 throw new InvalidOperationException("Modifier root node already exists.");
             }            
             
             //Add modifier root node to target node...
-            currentModifierRoot = new GameObjectSceneNode(gameApp)
+            currentAdornmentRoot = new GameObjectSceneNode(gameApp)
             {
                 GameObject = new GameObject(gameApp, new object[] {  
                     new EditorObjectContext
                     {
-                        IsModifierRoot = true,
-                        ModifierTargetNode = targetNode,
+                        IsAdornmentRoot = true,
+                        TargetNode = targetNode,
                     }
                 })
             };
-            targetNode.Children.Add(currentModifierRoot);
+            targetNode.Children.Add(currentAdornmentRoot);
 
             //Add selection node to modifier root node...
-            currentModifierRoot.Children.Add(new GameObjectSceneNode(gameApp)
+            currentAdornmentRoot.Children.Add(new GameObjectSceneNode(gameApp)
             {
                 GameObject = new GameObject(gameApp, new object[] 
                 {
                     new EditorObjectContext
                     {
-                        IsSelectionModifier = true,
-                        ModifierTargetNode = targetNode,
+                        IsSelectionAdornment = true,
+                        TargetNode = targetNode,
                     }
                 })
                 {
@@ -238,14 +261,14 @@ namespace CipherPark.Aurora.Core.Services
             });
 
             //Add shadow modifier
-            currentModifierRoot.Children.Add(new GameObjectSceneNode(gameApp)
+            currentAdornmentRoot.Children.Add(new GameObjectSceneNode(gameApp)
             {
                 GameObject = new GameObject(gameApp, new object[]
                 {
                     new EditorObjectContext
                     {
-                        IsShadowModifier = true,
-                        ModifierTargetNode = targetNode,
+                        IsShadowAdronment = true,
+                        TargetNode = targetNode,
                     }
                 })
                 {
@@ -256,11 +279,11 @@ namespace CipherPark.Aurora.Core.Services
 
         private void RemoveModifierNodes(GameObjectSceneNode targetNode)            
         {
-            if (currentModifierRoot != null)
+            if (currentAdornmentRoot != null)
             {
-                targetNode.Children.Remove(currentModifierRoot);
-                currentModifierRoot.Dispose(true);                
-                currentModifierRoot = null;              
+                targetNode.Children.Remove(currentAdornmentRoot);
+                currentAdornmentRoot.Dispose(true);                
+                currentAdornmentRoot = null;              
             }
         }
 
@@ -274,9 +297,16 @@ namespace CipherPark.Aurora.Core.Services
             PickedNodeChanged?.Invoke(this, new PickedNodeChangedArgs(pickedNode));
         }
 
+        private void OnActivatedFromDoubleTap(bool activated)
+        {
+            ActivatedOnDoubleTap?.Invoke(this, new ActivatedOnDoubleTapArgs(activated));
+        }
+
         public event Action<object, NodeTransformedArgs> NodeTransformed;
 
         public event Action<object, PickedNodeChangedArgs> PickedNodeChanged;
+
+        public event Action<object, ActivatedOnDoubleTapArgs> ActivatedOnDoubleTap;
     }
 
     public class NodeTransformedArgs : EventArgs
@@ -299,15 +329,26 @@ namespace CipherPark.Aurora.Core.Services
         public GameObjectSceneNode PickedNode { get; }
     }
 
-    public enum TranslationPlane
-    {        
-        XZ,
-        Y
+    public class ActivatedOnDoubleTapArgs : EventArgs
+    {
+        public ActivatedOnDoubleTapArgs(bool activated)
+        {
+            Activated = activated;
+        }
+
+        public bool Activated { get; }
     }
 
-    public enum TransformMode
+    public enum TransformSpace
     {
-        Translate,
+        None,
+        ViewSpaceTranslateXZ,
+        ViewSpaceTranslateY
+    }
+
+    public enum ModifierMode
+    {
+        TransformObject,
         Rotate,
         Scale
     }

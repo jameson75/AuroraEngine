@@ -9,9 +9,8 @@ namespace Aurora.Core.Editor
     {
         EditorMode EditorMode { get; set; }
         SceneGraph Scene { get; }
-        EditorTransformPlane TransformPlane { get; set; }
+        EditorTransformMode EditorTransformMode { get; set; }
         UITree UI { get; }
-        ReferenceGridMode ReferenceGridMode { get; set; }
 
         void ChangeViewportColor(Color newViewportColor);
         void ClearScene(bool resetCamera);

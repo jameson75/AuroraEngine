@@ -8,6 +8,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
     public class EditorModeLabelBehavior : UIControlBehavior
     {
         private EditorMode? lastEditorMode;
+        private EditorTransformMode? lastTransformMode;
 
         public override void Update(UIControl control)
         {
@@ -19,7 +20,7 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
 
         private void UpdateDisplayText(IEditorGameApp gameApp, ContentControl contentControl)
         {
-            if (HasEditorModeChanged(gameApp))
+            if (HasEditorStateChanged(gameApp))
             {
                 switch(gameApp.EditorMode)
                 {
@@ -28,12 +29,21 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
                         break;
                     case EditorMode.TraverseCamera:
                         contentControl.SetText("Traverse Camera");
-                        break;
-                    case EditorMode.PanCamera:
-                        contentControl.SetText("Pan Camera");
-                        break;
+                        break;                 
                     case EditorMode.SelectSceneObject:
-                        contentControl.SetText("Select Scene Object");
+                        string caption = "Select Scene Object";
+                        switch (gameApp.EditorTransformMode)
+                        {
+                            case EditorTransformMode.ViewSpaceTranslateY:
+                                contentControl.SetText($"{caption} (V-Y)");
+                                break;
+                            case EditorTransformMode.ViewSpaceTranslateXZ:
+                                contentControl.SetText($"{caption} (V-XZ)");
+                                break;
+                            default:
+                                contentControl.SetText(caption);
+                                break;
+                        }
                         break;
                     default:
                         throw new InvalidOperationException($"Unexpected editor mode {gameApp.EditorMode}");
@@ -41,10 +51,12 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
             }
         }
 
-        private bool HasEditorModeChanged(IEditorGameApp gameApp)
+        private bool HasEditorStateChanged(IEditorGameApp gameApp)
         {
-            var hasChanged = lastEditorMode != gameApp.EditorMode;
+            var hasChanged = lastEditorMode != gameApp.EditorMode ||
+                             lastTransformMode != gameApp.EditorTransformMode;
             lastEditorMode = gameApp.EditorMode;
+            lastTransformMode = gameApp.EditorTransformMode;
             return hasChanged;
         }
     }

@@ -3,9 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Aurora.Sample.Editor"
-        xmlns:core="clr-namespace:Aurora.Core.Editor;assembly=Aurora.Core.Editor"
-        xmlns:coreconverter="clr-namespace:Aurora.Core.Editor.Views.Converters;assembly=Aurora.Core.Editor"
+        xmlns:core="clr-namespace:Aurora.Core.Editor;assembly=AuroraCore.Editor"
+        xmlns:coreconverter="clr-namespace:Aurora.Core.Editor.Views.Converters;assembly=AuroraCore.Editor"
         xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
@@ -19,6 +18,10 @@
             <coreconverter:DXColorToMediaColorConverter x:Key="ColorPickerConverter"/>
             <coreconverter:DXVector3ToStringConverter x:Key="Vector3StringConverter"/>
             <coreconverter:DXQuaternionToStringConverter x:Key="QuaternionStringConverter"/>
+            <ContextMenu x:Key="sceneContextMenu" Opened="ContextMenu_Opened" Closed="ContextMenu_Closed">
+                <MenuItem Header="Mark Location" Click="ContextMenu_MarkLocation_Click" />
+                <MenuItem Header="Clear Location Markers" Click="ContextMenu_ClearLocationMarkers_Click" />
+            </ContextMenu>            
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -31,7 +34,7 @@
             <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
         <DockPanel Grid.ColumnSpan="2">
-            <Menu DockPanel.Dock="Top" >
+            <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
                     <MenuItem Header="_Open" Click="Menu_File_Open_Click"/>                    
                     <MenuItem Header="_Save" Click="Menu_File_Save_Click"/>
@@ -56,24 +59,20 @@
                         <Image Source="Resources\Icons\rotate-ccw.ico"/>
                     </Button>
                     <Button ToolTip="Traverse Camera" Click="ToolBar_TraverseCamera_Click">
-                        <Image Source="Resources\Icons\arrow-move.ico"/>
-                    </Button>
-                    <Button ToolTip="Pan Camera" Click="ToolBar_PanCamera_Click">
                         <Image Source="Resources\Icons\Hand.ico"/>
                     </Button>
                     <Button ToolTip="Reset Camera" Click="ToolBar_ResetCamera_Click">
                         <Image Source="Resources\Icons\arrow-curve-180.ico"/>
                     </Button>
                     <Separator/>
-                    <Button ToolTip="Select Scene Object" Click="ToolBar_SelectSceneObject_Click">
-                        <Image Source="Resources\Icons\arrow-in.ico"/>
+                    <Button ToolTip="Select Object" Click="ToolBar_SelectObject_Click">
+                        <Image Source="Resources\Icons\transform_scale.ico"/>
                     </Button>
-                    <Separator/>
-                    <Button ToolTip="Transform Object in XZ Plane" Click="ToolBar_SelectTransformPlaneXZ_Click" Content="XZ" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">                        
+                    <Button ToolTip="Transform selected object in view space XZ plane" Click="ToolBar_SelectTransformPlaneXZ_Click" Content="V:XZ" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">                        
                     </Button>
-                    <Button ToolTip="Transform Object in Y Plane" Click="ToolBar_SelectTransformPlaneY_Click" Content="Y" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
-                    </Button>                    
-                </ToolBar>
+                    <Button ToolTip="Transform selected object in view space Y plane" Click="ToolBar_SelectTransformPlaneY_Click" Content="V:Y" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>
+                </ToolBar>                
             </ToolBarTray>
         </DockPanel>
         <ContentControl x:Name="host" BorderThickness="0" Grid.Row="1">

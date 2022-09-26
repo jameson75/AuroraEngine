@@ -88,9 +88,9 @@
     <Compile Include="SampleGameAppTheme.cs" />
     <Compile Include="Scene\UI\Behavior\CoordinatesLabelBehavior.cs" />
     <Compile Include="Scene\UI\Behavior\EditorModeLabelBehavior.cs" />
-    <Compile Include="Scene\UI\Behavior\NavigatorControlBehavior.cs" />
     <Compile Include="Scene\UI\Behavior\RotationOverlayControlBehavior.cs" />
     <Compile Include="Scene\UI\Extensions.cs" />
+    <Compile Include="SelectedNodeTwoWayBinding.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -135,16 +135,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Aurora.Core.Editor\Aurora.Core.Editor.csproj">
-      <Project>{fca357d8-5d47-425c-b290-d804dccec468}</Project>
-      <Name>Aurora.Core.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\AuroraCore\Aurora.Core.csproj">
-      <Project>{ac4ad65f-13f6-452f-bc30-dc1a784fb660}</Project>
-      <Name>Aurora.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Assets\UI\cross_hair.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -175,6 +165,16 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Aurora.Core.Editor\Aurora.Core.Editor.csproj">
+      <Project>{fca357d8-5d47-425c-b290-d804dccec468}</Project>
+      <Name>Aurora.Core.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AuroraCore\Aurora.Core.csproj">
+      <Project>{ac4ad65f-13f6-452f-bc30-dc1a784fb660}</Project>
+      <Name>Aurora.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

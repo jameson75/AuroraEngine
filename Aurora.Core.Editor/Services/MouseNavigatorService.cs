@@ -34,9 +34,11 @@ namespace CipherPark.Aurora.Core.Services
 
         public IGameApp Game => gameApp;       
 
-        public NavigationMode Mode { get; set; } = NavigationMode.None;
+        public NavigationMode Mode { get; set; } = NavigationMode.PlatformRotate;
 
         public bool IsMouseTracking { get => isMouseTracking; }
+
+        public bool IsModeInversionOn { get; set; }
 
         public void NotifyMouseDown(Point location)
         {            
@@ -75,13 +77,14 @@ namespace CipherPark.Aurora.Core.Services
         { 
             var cameraNode = Game.GetActiveScene().CameraNode;
             var camera = cameraNode.Camera;
-            var mode = Mode;            
+            var mode = IsModeInversionOn ? InvertMode(Mode) : Mode;            
             Vector2 mouseOffset = -Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
             Vector3 platformLocation = Game.GetActiveScene().Select(n => n.GetGameObject()?.IsReferenceGridObject() == true).First().WorldPosition();
             Matrix platformTranslation = Matrix.Translation(platformLocation);            
 
             switch (mode)
             {
+                /*
                 case NavigationMode.Pan:
                     if (buttonDown && isMouseTracking)
                     {
@@ -96,6 +99,7 @@ namespace CipherPark.Aurora.Core.Services
                         accumTraverseVector += traverseVector;
                     }
                     break;
+                */
                 case NavigationMode.PlatformRotate:
                     if (buttonDown && isMouseTracking)
                     {
@@ -187,8 +191,6 @@ namespace CipherPark.Aurora.Core.Services
                             }
                         }
                     }
-                    break;                
-                case NavigationMode.None:                    
                     break;
             }            
         }
@@ -200,12 +202,29 @@ namespace CipherPark.Aurora.Core.Services
 
         private Vector3 accumTraverseVector = Vector3.Zero;
 
-        public enum NavigationMode
+        private static NavigationMode InvertMode(NavigationMode mode)
         {
-            None,
+            if (mode == NavigationMode.PlatformRotate)
+            {
+                return NavigationMode.PlaformTraverse;
+            }
+            else if (mode == NavigationMode.PlaformTraverse)
+            {
+                return NavigationMode.PlatformRotate;
+            }
+            else if (mode == NavigationMode.InActive)
+            {
+                return NavigationMode.InActive;
+            }
+
+            throw new InvalidOperationException("Unexpected navigation mode");
+        }
+
+        public enum NavigationMode
+        {            
             PlatformRotate,           
             PlaformTraverse,
-            Pan
+            InActive
         }
     }   
 }

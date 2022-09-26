@@ -39,7 +39,7 @@ namespace CipherPark.Aurora.Core
 
         public IntPtr DeviceHwnd { get { return _deviceHwnd; } }
 
-        public bool IsViewportWindowActive { get { return _window.IsActive; } }
+        public virtual bool IsViewportWindowActive { get { return _window.IsActive; } }
 
         public DeviceContext GraphicsDeviceContext { get { return _graphicsDevice.ImmediateContext; } }
 

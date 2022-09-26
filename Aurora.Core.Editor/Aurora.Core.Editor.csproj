@@ -65,6 +65,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\SceneModifierTwoWayDataBinding.cs" />
     <Compile Include="Dom\ContentHelper.cs" />
     <Compile Include="Dom\DomSerializer.cs" />
     <Compile Include="Dom\GameObject.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="Views\Models\SceneViewModel.cs" />
     <Compile Include="Views\Models\ViewModelBase.cs" />
     <Compile Include="Environment\EditorMode.cs" />
-    <Compile Include="Environment\EditorTransformPlane.cs" />
+    <Compile Include="Environment\EditorTransformMode.cs" />
     <Compile Include="Scene\GameObjectShadowRenderer.cs" />
     <Compile Include="Scene\GameObjectExtensions.cs" />
     <Compile Include="Scene\GameObjectSelectionRenderer.cs" />

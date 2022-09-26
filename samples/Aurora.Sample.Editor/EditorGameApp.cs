@@ -23,8 +23,10 @@ namespace Aurora.Sample.Editor
     public class EditorGameApp : GameAppWPF, IContainActiveScene, IEditorGameApp
     {
         private readonly UIElement imageHost;
-        private Color viewportColor = Color.Black;        
-
+        private Color viewportColor = Color.Black;
+        private EditorMode editorMode;
+        private EditorTransformMode editorTransformMode;
+        
         public UITree UI { get; private set; }
         public SceneGraph Scene { get; private set; }
 
@@ -41,13 +43,15 @@ namespace Aurora.Sample.Editor
             //Register game app services.                            
             Services.RegisterService(new InputService(this, new MouseCoordsTransfomerWPF(imageHost))); //Required For Graphics UI
             Services.RegisterService(new MouseNavigatorService(this));
-            Services.RegisterService(new SceneModifierService(this));
+            Services.RegisterService(new SceneModifierService(this, true));
+            Services.RegisterService(new SceneAdornmentService());
         }
 
         protected override void OnInitialized()
         {
             InitializeUI();
             InitializeScene();
+            InitializeEventHandling();
         }
 
         private void InitializeScene()
@@ -71,10 +75,7 @@ namespace Aurora.Sample.Editor
             UI = new UITree(this);
             UI.Theme = new SampleGameAppTheme(this);
 
-            var navigatorControl = new NavigatorControl(UI)
-            {
-                Behavior = new NavigatorControlBehavior(),
-            };
+            var navigatorControl = new NavigatorControl(UI);            
             
             UI.Controls.Add(navigatorControl);
 
@@ -123,6 +124,23 @@ namespace Aurora.Sample.Editor
             coordinatesLabel.Behavior = new CoordinatesLabelBehavior();
             coordinatesLabel.Content.As<TextContent>().Color = Color.DarkGray;
             UI.Controls.Add(coordinatesLabel);
+        }
+
+        private void InitializeEventHandling()
+        {
+            Services.GetService<SceneModifierService>().ActivatedOnDoubleTap += SceneModifierService_ActivatedOnDoubleTap;
+        }
+
+        private void SceneModifierService_ActivatedOnDoubleTap(object sender, ActivatedOnDoubleTapArgs args)
+        {
+            if (args.Activated)
+            {
+                EditorMode = EditorMode.SelectSceneObject;
+            }
+            else
+            {
+                EditorMode = EditorMode.RotateCamera;
+            }
         }
 
         public void ClearScene(bool resetCamera)
@@ -254,16 +272,63 @@ namespace Aurora.Sample.Editor
             viewportColor = newViewportColor;
         }
 
-        public EditorMode EditorMode { get; set; }
+        public EditorMode EditorMode
+        {
+            get => editorMode;
+            set
+            {
+                var mouseNavigatorService = Services.GetService<MouseNavigatorService>();
+                var sceneModifierService = Services.GetService<SceneModifierService>();
+                var activateScenePicker = false;
+                var navigationMode = MouseNavigatorService.NavigationMode.InActive;
+                switch (value)
+                {
+                    case EditorMode.RotateCamera:
+                        navigationMode = MouseNavigatorService.NavigationMode.PlatformRotate;
+                        break;
+                    case EditorMode.TraverseCamera:
+                        navigationMode = MouseNavigatorService.NavigationMode.PlaformTraverse;                        
+                        break;
+                    case EditorMode.SelectSceneObject:
+                        activateScenePicker = true;
+                        break;
+                }
+                mouseNavigatorService.Mode = navigationMode;
+                sceneModifierService.IsActive = activateScenePicker;
+                editorMode = value;
+            }
+        }
 
-        public EditorTransformPlane TransformPlane { get; set; }
-
-        public ReferenceGridMode ReferenceGridMode { get; set; }
-
+        public EditorTransformMode EditorTransformMode 
+        { 
+            get => editorTransformMode;
+            set
+            {
+                var sceneModifierService = Services.GetService<SceneModifierService>();
+                switch (value)
+                {
+                    case EditorTransformMode.None:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.None;
+                        break;
+                    case EditorTransformMode.ViewSpaceTranslateXZ:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.ViewSpaceTranslateXZ;
+                        break;
+                    case EditorTransformMode.ViewSpaceTranslateY:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.ViewSpaceTranslateY;
+                        break;
+                }
+                editorTransformMode = value;
+            }
+        }
+      
         public void ResetCamera()
         {
             PointCameraToReferenceGrid();
             Services.GetService<MouseNavigatorService>().ResetTracking();
-        }      
+        }
+
+        public bool IsViewportFeedbackSuspended { get; set; }
+
+        public override bool IsViewportWindowActive => base.IsViewportWindowActive && !IsViewportFeedbackSuspended;       
     }    
 }

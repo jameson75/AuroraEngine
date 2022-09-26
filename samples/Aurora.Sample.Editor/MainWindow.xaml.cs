@@ -1,8 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Aurora.Core.Editor;
@@ -29,7 +29,7 @@ namespace Aurora.Sample.Editor
         public MainWindow()
         {           
             InitializeComponent();
-            InitializeGraphicsHost();            
+            InitializeGraphicsHost();           
         }        
 
         private void InitializeMVVM()
@@ -40,12 +40,19 @@ namespace Aurora.Sample.Editor
             controller.NewProject(); //TODO: Remove implicitly created new project            
         }
 
-        public void InitializeGraphicsHost()
+        private void InitializeGraphicsHost()
         {
             game = new EditorGameApp(host);
             interopImage = new D3D11Image();
             host.Loaded += Host_Loaded;
-            host.SizeChanged += Host_SizeChanged;
+            host.SizeChanged += Host_SizeChanged; 
+            host.MouseRightButtonDown += Host_MouseRightButtonDown;
+            host.MouseDoubleClick += Host_MouseDoubleClick; ;
+        }
+
+        private void Host_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            controller.NotifyVisualizationOfDoubleClick(e.GetPosition(host));
         }
 
         private void Host_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -136,6 +143,26 @@ namespace Aurora.Sample.Editor
             game.Render(surface, isNewSurface);
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                controller.NotifyKeyboardShiftKeyEvent(true);
+            }
+
+            base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+            {
+                controller.NotifyKeyboardShiftKeyEvent(false);
+            }
+
+            base.OnKeyUp(e);
+        }
+
         #region Menu Handlers
         private void Menu_File_Open_Click(object sender, RoutedEventArgs e)
         {
@@ -177,31 +204,29 @@ namespace Aurora.Sample.Editor
         private void ToolBar_TraverseCamera_Click(object sender, RoutedEventArgs e)
         {
             controller.EnterEditorMode(EditorMode.TraverseCamera);
-        }
-
-        private void ToolBar_PanCamera_Click(object sender, RoutedEventArgs e)
-        {
-            controller.EnterEditorMode(EditorMode.PanCamera);
-        }
-
-        private void ToolBar_SelectSceneObject_Click(object sender, RoutedEventArgs e)
-        {
-            controller.EnterEditorMode(EditorMode.SelectSceneObject);
-        }
+        }       
 
         private void ToolBar_ResetCamera_Click(object sender, RoutedEventArgs e)
-        {
+        {           
             controller.ResetEditorCamera();
         }
-        
+
+        private void ToolBar_SelectObject_Click(object sender, RoutedEventArgs e)
+        {
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.None);
+        }
+
         private void ToolBar_SelectTransformPlaneXZ_Click(object sender, RoutedEventArgs e)
         {
-            controller.SetEditorTransformPlane(EditorTransformPlane.XZ);
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.ViewSpaceTranslateXZ);
         }
 
         private void ToolBar_SelectTransformPlaneY_Click(object sender, RoutedEventArgs e)
         {
-            controller.SetEditorTransformPlane(EditorTransformPlane.Y);
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.ViewSpaceTranslateY);
         }
         #endregion       
 
@@ -228,106 +253,39 @@ namespace Aurora.Sample.Editor
                     newLookAt,
                     SharpDX.Vector3.Up);
 
-                game.Services.GetService<MouseNavigatorService>().ResetTracking();
+                //game.Services.GetService<MouseNavigatorService>().ResetTracking();
             }
         }
 
-        public class SelectedNodeTwoWayBinding
-        {            
-            private readonly TreeView treeView;
-            private readonly MainWindowViewModel mainWindowViewModel;
-            private ProjectViewModel projectViewModel;
-            private SceneViewModel sceneViewModel;
-            private bool updatingViewModel;           
-
-            public SelectedNodeTwoWayBinding(TreeView treeView, MainWindowViewModel mainWindowViewModel)
-            {
-                this.treeView = treeView;
-                this.mainWindowViewModel = mainWindowViewModel;
-                mainWindowViewModel.PropertyChanged += MainViewModel_PropertyChanged;              
-                treeView.SelectedItemChanged += TreeView_SelectedItemChanged;
-                UpdateListenersForProjectViewModel();
-            }
-
-            private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName == nameof(MainWindowViewModel.Project))
-                {
-                    UpdateListenersForProjectViewModel();
-                }
-            }
-
-            private void ProjectViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName == nameof(ProjectViewModel.Scene))
-                {
-                    UpdateListenersForSceneViewModel();
-                }
-            }
-
-            private void SceneViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName == nameof(SceneViewModel.SelectedNode))
-                {
-                    if (!updatingViewModel)
-                    {
-                        if (sceneViewModel.SelectedNode == null)
-                        {
-                            if (treeView.SelectedItem != null)
-                            {
-                                treeView.ItemContainerGenerator.ContainerFromItem(treeView.SelectedItem);
-                            }
-                        }
-                        else
-                        {
-                            TreeViewItem tvi = treeView.ItemContainerGenerator.ContainerFromItem(sceneViewModel.SelectedNode) as TreeViewItem;
-                            if (tvi != null)
-                            {
-                                tvi.IsSelected = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-            {
-                updatingViewModel = true;
-                sceneViewModel.SelectedNode = (SceneNodeViewModel)e.NewValue;
-                updatingViewModel = false;
-            }
-
-            private void UpdateListenersForProjectViewModel()
-            {
-                if (projectViewModel != null)
-                {
-                    projectViewModel.PropertyChanged -= ProjectViewModel_PropertyChanged;
-                    projectViewModel = null;
-                }
-
-                if (mainWindowViewModel.Project != null)
-                {
-                    projectViewModel = mainWindowViewModel.Project;
-                    projectViewModel.PropertyChanged += ProjectViewModel_PropertyChanged;
-                }
-                
-                UpdateListenersForSceneViewModel();
-            }
-
-            private void UpdateListenersForSceneViewModel()
-            {
-                if (sceneViewModel != null)
-                {
-                    sceneViewModel.PropertyChanged -= SceneViewModel_PropertyChanged;
-                    sceneViewModel = null;
-                }
-
-                if (mainWindowViewModel.Project?.Scene != null)
-                {
-                    sceneViewModel = mainWindowViewModel.Project.Scene;
-                    sceneViewModel.PropertyChanged += SceneViewModel_PropertyChanged;
-                }
-            }
+        private void Host_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            ContextMenu menu = this.FindResource("sceneContextMenu") as ContextMenu;
+            menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;            
+            menu.IsOpen = true;
         }
+
+        #region Context Menu Handlers
+        private void ContextMenu_MarkLocation_Click(object sender, RoutedEventArgs e)
+        {
+            controller.MarkSelectedNodeLocation();
+        }
+
+        private void ContextMenu_ClearLocationMarkers_Click(object sender, RoutedEventArgs e)
+        {
+            controller.ClearAllLocationMarkers();
+        }
+          
+
+        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+        {
+            game.IsViewportFeedbackSuspended = true;
+        }
+
+        private void ContextMenu_Closed(object sender, RoutedEventArgs e)
+        {
+            game.IsViewportFeedbackSuspended = false;
+        }
+
+        #endregion      
     }
 }

@@ -44,7 +44,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
             if (Container == null)
                 throw new InvalidOperationException("No container for this content was specified.");
             
-            base.Draw(); 
+            base.Draw(); //draw background color.
            
             Vector2 contentSurfacePosition = Container.PositionToSurface(Container.Position);
 

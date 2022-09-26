@@ -3,8 +3,7 @@
     public enum EditorMode
     {
         RotateCamera,
-        TraverseCamera,
-        PanCamera,
+        TraverseCamera,        
         SelectSceneObject
     }
 }

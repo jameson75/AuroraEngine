@@ -3,6 +3,7 @@ using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.UI.Components;
 using SharpDX;
+using System;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -14,10 +15,10 @@ using SharpDX;
 namespace CipherPark.Aurora.Core.UI.Controls
 {   
     public class NavigatorControl : UIControl
-    {          
+    {        
         private MouseNavigatorService mouseNavigatorService;
         private SceneModifierService sceneModifierService;
-
+        
         public NavigatorControl(IUIRoot visualRoot) : base(visualRoot)
         {          
             
@@ -53,8 +54,8 @@ namespace CipherPark.Aurora.Core.UI.Controls
             if ((inputService.IsMouseInViewport(inputState) && Game.IsViewportWindowActive) || this.Capture)
             {
                 InputState.MouseButton[] pressedMouseButtons = inputState.GetMouseButtonsPressed();
-                for (int i = 0; i < pressedMouseButtons.Length; i++)
-                    OnMouseDown(pressedMouseButtons[i], inputState.GetMouseLocation());
+                for (int i = 0; i < pressedMouseButtons.Length; i++)                
+                    OnMouseDown(pressedMouseButtons[i], inputState.GetMouseLocation());                
 
                 InputState.MouseButton[] downMouseButtons = inputState.GetMouseButtonsDown();
                 if (inputState.GetPreviousMouseLocation() != inputState.GetMouseLocation())
@@ -99,6 +100,6 @@ namespace CipherPark.Aurora.Core.UI.Controls
             bool leftButtonDown = mouseButtonsDown.Contains(InputState.MouseButton.Left);
             mouseNavigatorService.NotifyMouseMove(leftButtonDown, location);
             sceneModifierService.NotifyMouseMove(leftButtonDown, location);
-        } 
+        }
     }
 }

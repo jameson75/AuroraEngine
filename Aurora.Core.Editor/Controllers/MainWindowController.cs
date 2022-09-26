@@ -1,12 +1,17 @@
 ﻿using Aurora.Core.Editor.Dom;
+using Aurora.Core.Editor.Util;
+using Aurora.Sample.Editor.Scene;
 using Aurora.Sample.Editor.Windows;
+using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.World;
+using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.World.Scene;
 using SharpDX;
-using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
@@ -62,7 +67,7 @@ namespace Aurora.Core.Editor
                     UISaveAsProject();
                 }
             }
-        }
+        }       
 
         public void UISaveAsProject()
         {
@@ -156,11 +161,19 @@ namespace Aurora.Core.Editor
                 GameObject = ContentHelper.ImportGameObject(filePath, effect),
             };
 
+            //TODO: Consider updating scene graph inside the view model's AddSceneNode method (instead of doing it below).
+
             app.Scene.Nodes.Add(gameSceneNode);
 
             ViewModel.Project.Scene.AddSceneNode(gameSceneNode);
 
             ViewModel.IsProjectDirty = true;
+        }
+
+        public void NotifyKeyboardShiftKeyEvent(bool keyDown)
+        {
+            var navigationService = game.Services.GetService<MouseNavigatorService>();
+            navigationService.IsModeInversionOn = keyDown;            
         }
 
         public void EnterEditorMode(EditorMode mode)
@@ -173,20 +186,9 @@ namespace Aurora.Core.Editor
             game.ResetCamera();
         }
 
-        public void SetEditorTransformPlane(EditorTransformPlane transformPlane)
+        public void SetEditorTransformMode(EditorTransformMode transformMode)
         {
-            game.TransformPlane = transformPlane;
-            switch (transformPlane)
-            {
-                case EditorTransformPlane.XZ:
-                    game.ReferenceGridMode = ReferenceGridMode.Flat;
-                    break;
-                case EditorTransformPlane.Y:
-                    game.ReferenceGridMode = ReferenceGridMode.Box;
-                    break;
-                default:
-                    throw new ArgumentException("Unsupported editor transform plane");
-            };
+            game.EditorTransformMode = transformMode;            
         }
 
         public void AddLight()
@@ -207,127 +209,142 @@ namespace Aurora.Core.Editor
             ViewModel.Project.Scene.AddSceneNode(gameSceneNode);
 
             ViewModel.IsProjectDirty = true;
+        }       
+
+        public void MarkSelectedNodeLocation()
+        {
+            var selectedNode = ViewModel.Project.Scene
+                                        .SelectedNode?
+                                        .DataModel
+                                        .As<GameObjectSceneNode>();
+            if (selectedNode != null)
+            {
+                var sceneAdornmentService = game.Services.GetService<SceneAdornmentService>();
+                sceneAdornmentService.MarkLocation(selectedNode);
+            }
+        }
+
+        public void ClearAllLocationMarkers()
+        {
+            var sceneAdornmentService = game.Services.GetService<SceneAdornmentService>();
+            sceneAdornmentService.RemoveAllMarkers();
+        }
+
+        public void NotifyVisualizationOfDoubleClick(System.Windows.Point mousePoint)
+        {
+            var sceneModifierService = game.Services.GetService<SceneModifierService>();
+            sceneModifierService.NotifyMouseDoubleTap(new SharpDX.Point((int)mousePoint.X, (int)mousePoint.Y));
         }
     }
 
-    public class SceneModifierTwoWayDataBinding
-    {
-        private readonly MainWindowViewModel mainWindowViewModel;
-        private readonly SceneModifierService sceneModifierService;
-        private ProjectViewModel projectViewModel;
-        private SceneViewModel sceneViewModel;
+    public class SceneAdornmentService
+    {        
+        private readonly List<GameObjectSceneNode> markers;
 
-        public SceneModifierTwoWayDataBinding(MainWindowViewModel mainWindowViewModel, SceneModifierService sceneModifierService)
+        public SceneAdornmentService()
         {
-            this.mainWindowViewModel = mainWindowViewModel;
-            this.sceneModifierService = sceneModifierService;
-            mainWindowViewModel.PropertyChanged += MainViewModel_PropertyChanged;
-            UpdateListenersForProjectViewModel();
-            ListenForSceneModificationNotifications();
+            markers = new List<GameObjectSceneNode>();
         }
 
-        private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(MainWindowViewModel.Project))
-            {
-                UpdateListenersForProjectViewModel();
-            }
-        }
-
-        private void ProjectViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(ProjectViewModel.Scene))
-            {
-                UpdateListenersForSceneViewModel();
-            }
-        }
-
-        private void SceneViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(SceneViewModel.SelectedNode))
-            {
-                UpdatePickedNodeInScene(sceneViewModel.SelectedNode);
-            }
-        }
-
-        private void ListenForSceneModificationNotifications()
+        public void MarkLocation(GameObjectSceneNode targetNode)
         {           
-            sceneModifierService.NodeTransformed += SceneModifierService_NodeTransformed;
-            sceneModifierService.PickedNodeChanged += SceneModifierService_PickedNodeChanged;        
-        }
+            var referenceObjectRoot = targetNode.Scene
+                                                .SelectReferenceObjectRoot();
 
-        private void SceneModifierService_NodeTransformed(object sender, NodeTransformedArgs args)
-        {
-            var sceneNode = sceneViewModel.Nodes.FirstOrDefault(n => n.DataModel == args.TransfromedNode);
-            if (sceneNode != null)
+            if (referenceObjectRoot != null)
             {
-                sceneNode.NotifyTransform();
-            }
-        }
-
-        private void SceneModifierService_PickedNodeChanged(object sender, PickedNodeChangedArgs args)
-        {
-            if (args.PickedNode == null)
-            {
-                sceneViewModel.SelectedNode = null;
-            }
-
-            else
-            {
-                var sceneNode = sceneViewModel.Nodes.FirstOrDefault(n => n.DataModel == args.PickedNode);
-                if (sceneNode != null)
+                foreach (var referenceObjectNode in referenceObjectRoot.GameObjectChildren())
                 {
-                    sceneViewModel.SelectedNode = sceneNode;
+                    if (referenceObjectNode.GetGameObject().IsReferenceGridObject() == true)
+                    {
+                        var referenceGrid = referenceObjectNode.GetGameObject().GetReferenceGrid();
+                        
+                        var markerNode = new GameObjectSceneNode(targetNode.Game)
+                        {
+                            GameObject = new CipherPark.Aurora.Core.World.GameObject(targetNode.Game, new object[]
+                            {
+                                new EditorObjectContext
+                                {
+                                    IsShadowAdronment = true,
+                                    TargetNode = targetNode,
+                                }
+                            })
+                            {
+                                Renderer = new ModelRenderer(CreateMarkerModel(targetNode, referenceObjectNode, referenceGrid))
+                            },
+                        };
+
+                        referenceObjectNode.Children.Add(markerNode);
+                        markers.Add(markerNode);
+                    }
                 }
-            }
+            }            
         }
 
-        private void UpdatePickedNodeInScene(SceneNodeViewModel value)
-        {           
-            if (value == null)
-            {
-                sceneModifierService.UpdatePick(null);
-            }
-            else
-            {
-                var gameObjectNode = value.DataModel.As<GameObjectSceneNode>();
-                if (gameObjectNode != null)
-                {
-                    sceneModifierService.UpdatePick(gameObjectNode);
-                }
-            }
-        }
-
-        private void UpdateListenersForProjectViewModel()
+        public void RemoveAllMarkers()
         {
-            if (projectViewModel != null)
+            foreach (var node in markers)
             {
-                projectViewModel.PropertyChanged -= ProjectViewModel_PropertyChanged;
-                projectViewModel = null;
+                node.Orphan();
             }
 
-            if (mainWindowViewModel.Project != null)
-            {
-                projectViewModel = mainWindowViewModel.Project;
-                projectViewModel.PropertyChanged += ProjectViewModel_PropertyChanged;
-            }
-
-            UpdateListenersForSceneViewModel();
+            markers.Clear();
         }
 
-        private void UpdateListenersForSceneViewModel()
+        private static Model CreateMarkerModel(GameObjectSceneNode targetNode, GameObjectSceneNode referenceObjectNode, ReferenceGrid referenceGrid)
         {
-            if (sceneViewModel != null)
+            const float Padding = 0.5f;
+            var renderBox_ws = targetNode.GetWorldBoundingBox();
+            renderBox_ws.Inflate(Padding, Padding, Padding);
+            var meshPoints_ws = renderBox_ws.GetCorners();
+            var plane_ws = new Plane(-referenceObjectNode.WorldPosition(),
+                                      referenceObjectNode.LocalToWorldNormal(referenceGrid.Normal));
+            var projectedMeshPoints_ws = ProjectPoints(plane_ws, meshPoints_ws);
+            var projectedMeshPoints_rgs = projectedMeshPoints_ws.Select(x => referenceObjectNode.WorldToLocalCoordinate(x))
+                                                                .ToArray();
+            var meshVerts = projectedMeshPoints_rgs.Select(p => new VertexPositionColor
             {
-                sceneViewModel.PropertyChanged -= SceneViewModel_PropertyChanged;
-                sceneViewModel = null;
-            }
+                Position = new Vector4(p, 1),
+                Color = Color.LightCyan.ToVector4(),
+            }).ToArray();
 
-            if (mainWindowViewModel.Project?.Scene != null)
+            var meshIndices = new short[]
             {
-                sceneViewModel = mainWindowViewModel.Project.Scene;
-                sceneViewModel.PropertyChanged += SceneViewModel_PropertyChanged;
-            }
+               7, 4, 5, //Front 1
+               5, 6, 7, //Front 2
+               3, 2, 1, //Back 1
+               1, 0, 3, //Back 2
+               4, 0, 1, //Top 1
+               1, 5, 4, //Top 2
+               7, 6, 2, //Bottom 1
+               2, 3, 7, //Bottom 2
+               6, 5, 1, //Right 1
+               1, 2, 6, //Right 2
+               7, 3, 0, //Left 1
+               0, 4, 7, //Left 2
+            };
+
+            var gameApp = referenceObjectNode.Game;
+
+            var meshEffect = new FlatEffect(gameApp, SurfaceVertexType.PositionColor);
+
+            var mesh = ContentBuilder.BuildMesh(gameApp.GraphicsDevice,
+                                            meshEffect.GetVertexShaderByteCode(),
+                                            meshVerts,
+                                            meshIndices,                                            
+                                            VertexPositionColor.InputElements,
+                                            VertexPositionColor.ElementSize,
+                                            new BoundingBox(),
+                                            SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+
+            return new StaticMeshModel(gameApp)
+            {
+                Effect = meshEffect,
+                Mesh = mesh,
+            };
         }
+
+        private static Vector3[] ProjectPoints(Plane plane, Vector3[] points)
+           => points.Select(x => plane.ProjectPoint(x).Value).ToArray();
     }
 }

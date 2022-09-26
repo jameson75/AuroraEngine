@@ -21,6 +21,9 @@ namespace Aurora.Core.Editor.Util
 
     public static class GameObjectExtension
     {
+        public static bool IsGameModel(this GameObject gameObject)
+            => gameObject.GetContext<Model>() != null;
+
         public static Model GetGameModel(this GameObject gameObject)
             => gameObject.GetContext<Model>();
 
@@ -40,7 +43,11 @@ namespace Aurora.Core.Editor.Util
             => gameObject.GetContext<EditorObjectContext>()?.IsReferenceGrid ?? false;
 
         public static ReferenceGrid GetReferenceGrid(this GameObject gameObject)
-            => gameObject.GetContext<ReferenceGrid>();       
+            => gameObject.GetContext<ReferenceGrid>();
+
+        public static bool IsPickable(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>() == null ||
+               gameObject.GetContext<EditorObjectContext>().IsInteractive;
     }
 
     public static class SceneNodeExtension
@@ -55,7 +62,10 @@ namespace Aurora.Core.Editor.Util
             => sceneNode.GameObject.GetBoundingBox().GetValueOrDefault();
 
         public static BoundingBoxOA GetWorldBoundingBox(this GameObjectSceneNode sceneNode)
-            => sceneNode.LocalToWorldBoundingBox(sceneNode.GameObject.GetBoundingBox().GetValueOrDefault());      
+            => sceneNode.LocalToWorldBoundingBox(sceneNode.GameObject.GetBoundingBox().GetValueOrDefault());
+
+        public static void Orphan(this SceneNode sceneNode)
+            => sceneNode.Parent?.Children.Remove(sceneNode);
     }
 
     public static class CastExtensions
