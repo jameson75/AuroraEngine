@@ -74,10 +74,9 @@ namespace Aurora.Sample.Editor
 
             UI = new UITree(this);
             UI.Theme = new SampleGameAppTheme(this);
-
-            var navigatorControl = new NavigatorControl(UI);            
             
-            UI.Controls.Add(navigatorControl);
+            var navigatorControl = new NavigatorControl(UI);
+            UI.Controls.Add(navigatorControl);            
 
             var rotationOverlayControl = new ContentControl(
                 UI,
@@ -320,7 +319,12 @@ namespace Aurora.Sample.Editor
                 editorTransformMode = value;
             }
         }
-      
+
+        internal void CreateNewActionRig(System.Windows.Point point)
+        {
+            throw new NotImplementedException();
+        }
+
         public void ResetCamera()
         {
             PointCameraToReferenceGrid();
@@ -330,5 +334,20 @@ namespace Aurora.Sample.Editor
         public bool IsViewportFeedbackSuspended { get; set; }
 
         public override bool IsViewportWindowActive => base.IsViewportWindowActive && !IsViewportFeedbackSuspended;       
+
+        public Vector3 GetDropLocation(SharpDX.Point mouseLocation)
+        {            
+            var cameraNode = this.GetActiveScene().CameraNode;
+            var camera = cameraNode.Camera;
+            var pickInfo = ScenePicker.PickNodes(
+                this,
+                mouseLocation.X,
+                mouseLocation.Y,
+                n => n.GameObject.IsReferenceGridObject())
+                .GetClosest(camera.Location);
+            return pickInfo != null ?
+                pickInfo.IntersectionPoint :
+                Vector3.Zero;
+        }
     }    
 }

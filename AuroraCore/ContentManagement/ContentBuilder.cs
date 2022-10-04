@@ -288,6 +288,16 @@ namespace CipherPark.Aurora.Core.Content
             return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension);
         }
 
+        public static Mesh BuildColoredWireBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        {
+            VertexPositionColor[] verts = new VertexPositionColor[8];
+            short[] indices = CreateWireBoxIndices();
+            Vector3[] positions = CreateBoxPoints(dimension);
+            for (int i = 0; i < positions.Length; i++)
+                verts[i] = new VertexPositionColor(positions[i], color.ToVector4());
+            return BuildMesh<VertexPositionColor>(device, shaderByteCode, verts, indices, VertexPositionColor.InputElements, VertexPositionColor.ElementSize, dimension, PrimitiveTopology.LineList);
+        }
+
         public static Mesh BuildLitBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
         {
             VertexPositionNormalColor[] verts = new VertexPositionNormalColor[8];
@@ -297,6 +307,17 @@ namespace CipherPark.Aurora.Core.Content
             for (int i = 0; i < positions.Length; i++)
                 verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
             return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension);
+        }
+
+        public static Mesh BuildLitWireBox(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        {
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[8];
+            short[] indices = CreateWireBoxIndices();
+            Vector3[] positions = CreateBoxPoints(dimension);
+            Vector3[] normals = GenerateNormals(positions, indices);
+            for (int i = 0; i < positions.Length; i++)
+                verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
+            return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension, PrimitiveTopology.LineList);
         }
 
         public static Mesh BuildLitBoxNI(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
@@ -395,13 +416,30 @@ namespace CipherPark.Aurora.Core.Content
 
         public static short[] CreateBoxIndices()
         {
-            return new short[36] { 0, 1, 2, 2, 3, 0, //TOP
+            return new short[36] { 0, 1, 2, 2, 3, 0,  //TOP
                                     5, 4, 7, 7, 6, 5, //BOTTOM
                                     0, 3, 7, 7, 4, 0, //LEFT                                             
                                     2, 1, 5, 5, 6, 2, //RIGHT
                                     3, 2, 6, 6, 7, 3, //FRONT
                                     1, 0, 4, 4, 5, 1, //BACK                                             
-                                };
+                                 };
+        }
+
+        public static short[] CreateWireBoxIndices()
+        {
+            return new short[24] { 0, 1,
+                                   1, 2,
+                                   2, 3,
+                                   3, 0,
+                                   4, 5,
+                                   5, 6,
+                                   6, 7,
+                                   7, 4,
+                                   0, 4,
+                                   1, 5,
+                                   2, 6,
+                                   3, 7,
+                                 };
         }
 
         public static short[] CreateBoxTextureIndices()
@@ -1048,6 +1086,77 @@ namespace CipherPark.Aurora.Core.Content
             }
 
             return indices.Select(e => (short)e).ToArray();
+        }
+        #endregion
+
+        #region Camera
+        public static Mesh BuildLitWireCamera(Device device, byte[] shaderByteCode, BoundingBox dimension, Color color)
+        {
+            VertexPositionNormalColor[] verts = new VertexPositionNormalColor[16];
+            short[] indices = CreateWireCameraIndices();
+            Vector3[] positions = CreateCameraPoints(dimension);
+            Vector3[] normals = GenerateNormals(positions, indices);
+            for (int i = 0; i < positions.Length; i++)
+                verts[i] = new VertexPositionNormalColor(positions[i], normals[i], color.ToVector4());
+            return BuildMesh<VertexPositionNormalColor>(device, shaderByteCode, verts, indices, VertexPositionNormalColor.InputElements, VertexPositionNormalColor.ElementSize, dimension, PrimitiveTopology.LineList);
+        }
+
+        public static Vector3[] CreateCameraPoints(BoundingBox dimension)
+        {
+            Vector3[] mainBody = dimension.GetCorners()
+                .Take(4)
+                .Select(v => new Vector3(v.X, v.Y, v.Z - 0.3f * dimension.GetLengthZ()))
+                .Concat(dimension.GetCorners().Skip(4))
+                .ToArray();                
+
+            Vector3[] apertureCorners = dimension.GetCorners()
+                .Take(4)
+                .Concat(dimension.GetCorners()
+                                .Skip(4)
+                                .Select(v => new Vector3(v.X, v.Y, v.Z + 0.7f * dimension.GetLengthZ())))
+                .ToArray();
+
+            var xOffset = dimension.GetLengthX() / 5;
+            var yOffset = dimension.GetLengthY() / 5;
+
+            apertureCorners[4] = new Vector3(apertureCorners[4].X + xOffset, apertureCorners[4].Y - yOffset, apertureCorners[4].Z);
+            apertureCorners[5] = new Vector3(apertureCorners[5].X - xOffset, apertureCorners[5].Y - yOffset, apertureCorners[5].Z);
+            apertureCorners[6] = new Vector3(apertureCorners[6].X - xOffset, apertureCorners[6].Y + yOffset, apertureCorners[6].Z);
+            apertureCorners[7] = new Vector3(apertureCorners[7].X + xOffset, apertureCorners[7].Y + yOffset, apertureCorners[7].Z);
+
+            Vector3[] cameraCorners = mainBody.Concat(apertureCorners).ToArray();
+
+            int[] mappedIndices = new int[16] { 0, 1, 5, 4, 3, 2, 6, 7, 8, 9, 13, 12, 11, 10, 14, 15};
+            return mappedIndices.Select((m) => cameraCorners[m]).ToArray();
+        }
+
+        public static short[] CreateWireCameraIndices()
+        {
+            return new short[48] { 0, 1,
+                                   1, 2,
+                                   2, 3,
+                                   3, 0,
+                                   4, 5,
+                                   5, 6,
+                                   6, 7,
+                                   7, 4,
+                                   0, 4,
+                                   1, 5,
+                                   2, 6,
+                                   3, 7,
+                                   8, 9,
+                                   9, 10,
+                                   10, 11,
+                                   11, 8,
+                                   12, 13,
+                                   13, 14,
+                                   14, 15,
+                                   15, 12,
+                                   8, 12,
+                                   9, 13,
+                                   10, 14,
+                                   11, 15,
+                                 };
         }
         #endregion
 

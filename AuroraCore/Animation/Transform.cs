@@ -292,6 +292,13 @@ namespace CipherPark.Aurora.Core.Animation
             transformable.Transform = new Transform(transformable.Transform.Rotation, position);
         }
 
+        public static void TranslateTo(this ITransformable transformable, ITransformable referenceFrame, Vector3 position)
+        {
+            transformable.TranslateTo(
+                transformable.WorldToParentCoordinate(
+                    referenceFrame.LocalToWorldCoordinate(position)));            
+        }
+
         public static void Rotate(this ITransformable transformable, Quaternion delta)
         {
             transformable.Transform = new Transform(delta * transformable.Transform.Rotation, transformable.Transform.Translation);
@@ -300,6 +307,26 @@ namespace CipherPark.Aurora.Core.Animation
         public static void RotateTo(this ITransformable transformable, Quaternion orientation)
         {
             transformable.Transform = new Transform(orientation, transformable.Transform.Translation);
+        }
+
+        public static void PointZAtTarget(this ITransformable transformable, Vector3 worldUp, Vector3 targetWorldCoordinate)
+        {
+            var location = transformable.WorldPosition();
+            var target = targetWorldCoordinate;
+            var up = worldUp;            
+            Vector3 xaxis, yaxis, zaxis;
+
+            Vector3.Subtract(ref target, ref location, out zaxis); zaxis.Normalize();
+            Vector3.Cross(ref up, ref zaxis, out xaxis); xaxis.Normalize();
+            Vector3.Cross(ref zaxis, ref xaxis, out yaxis);
+
+            var result = Matrix.Identity;
+            result.Up = yaxis;
+            result.Right = xaxis;
+            result.Forward = -zaxis;
+            result.TranslationVector = location;
+            var newWorldTransform = new Transform(result);
+            transformable.Transform = transformable.WorldToParent(newWorldTransform);
         }
     }
 }

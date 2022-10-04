@@ -158,16 +158,12 @@ namespace CipherPark.Aurora.Core.Services
                                         mouseMoveFrom.X,
                                         mouseMoveFrom.Y,
                                         n => n == currentPickedNode).FirstOrDefault();
-
-                var pickToInfo = ScenePicker.PickNodes(
-                                        gameApp,
-                                        location.X,
-                                        location.Y,
-                                        n => n == currentPickedNode).FirstOrDefault();
+               
+                var pickToRay = ScenePicker.GetPickRay(gameApp, location.X, location.Y);
 
                 var pickedNodeWorldPosition = currentPickedNode.WorldPosition();
 
-                if (pickFromInfo != null && pickToInfo != null)
+                if (pickFromInfo != null)
                 {
                     switch (ModifierMode)
                     {
@@ -177,11 +173,11 @@ namespace CipherPark.Aurora.Core.Services
                                 case TransformSpace.ViewSpaceTranslateXZ:
                                     var pickedNodeWorldAlignedYPlane = new Plane(pickedNodeWorldPosition, Vector3.Up);
                                     bool fromRayIntersectsPlane = pickFromInfo.Ray.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 fromIntersectionPoint);
-                                    bool toRayIntersectsPlane = pickToInfo.Ray.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 toIntersectionPoint);
+                                    var toRayIntersectsPlane = pickToRay.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 toIntersectionPoint);
                                     if (fromRayIntersectsPlane && toRayIntersectsPlane)
                                     {
-                                        var nodeTranslationVector = currentPickedNode.WorldToLocalCoordinate(toIntersectionPoint) -
-                                                                    currentPickedNode.WorldToLocalCoordinate(fromIntersectionPoint);
+                                        var nodeTranslationVector = currentPickedNode.WorldToParentCoordinate(toIntersectionPoint) -
+                                                                    currentPickedNode.WorldToParentCoordinate(fromIntersectionPoint);
                                         currentPickedNode.Translate(nodeTranslationVector);
                                         OnNodeTransformed(currentPickedNode);
                                     }
@@ -192,11 +188,11 @@ namespace CipherPark.Aurora.Core.Services
                                     var objectAlignedCameraSpaceZPlaneNormal = Vector3.Normalize(Vector3.Cross(Vector3.Up, xAxis));
                                     var pickedNodeCameraAlignedZPlane = new Plane(pickedNodeWorldPosition, objectAlignedCameraSpaceZPlaneNormal);
                                     fromRayIntersectsPlane = pickFromInfo.Ray.Intersects(ref pickedNodeCameraAlignedZPlane, out fromIntersectionPoint);
-                                    toRayIntersectsPlane = pickToInfo.Ray.Intersects(ref pickedNodeCameraAlignedZPlane, out toIntersectionPoint);
+                                    toRayIntersectsPlane = pickToRay.Intersects(ref pickedNodeCameraAlignedZPlane, out toIntersectionPoint);
                                     if (fromRayIntersectsPlane && toRayIntersectsPlane)
                                     {
-                                        var nodeTranslationVector = currentPickedNode.WorldToLocalCoordinate(toIntersectionPoint) -
-                                                                    currentPickedNode.WorldToLocalCoordinate(fromIntersectionPoint);
+                                        var nodeTranslationVector = currentPickedNode.WorldToParentCoordinate(toIntersectionPoint) -
+                                                                    currentPickedNode.WorldToParentCoordinate(fromIntersectionPoint);
                                         currentPickedNode.Translate(new Vector3(0, nodeTranslationVector.Y, 0));
                                         OnNodeTransformed(currentPickedNode);
                                     }

@@ -1,24 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpDX;
-using SharpDX.Direct3D11;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using CipherPark.Aurora.Core.Utils;
-using CipherPark.Aurora.Core.Systems;
 using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
 ////////////////////////////////////////////////////////////////////////////////
-
 
 namespace CipherPark.Aurora.Core.World
 {

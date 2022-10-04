@@ -12,6 +12,7 @@ using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.World.Scene;
 using Microsoft.Wpf.Interop.DirectX;
+using SharpDX;
 
 namespace Aurora.Sample.Editor
 {
@@ -25,6 +26,7 @@ namespace Aurora.Sample.Editor
         private TimeSpan lastRender;
         private MainWindowController controller;
         private SelectedNodeTwoWayBinding selectedNodeTwoWayBinding;
+        private System.Windows.Point mouseLocationWhenContextMenuOpened;
 
         public MainWindow()
         {           
@@ -242,11 +244,11 @@ namespace Aurora.Sample.Editor
                 var oldLookAtRay = new SharpDX.Ray(game.Scene.CameraNode.WorldPosition(), SharpDX.Vector3.Normalize(game.Scene.CameraNode.Camera.Forward));               
                 referenceGridNode.GetWorldBoundingBox().Intersects(ref oldLookAtRay, out SharpDX.Vector3 oldLookAt);
 
-                var offset = Vector3Helper.YAxis(guardianNode.WorldPosition().Y - referenceGridNode.WorldPosition().Y);
+                var offset = Vector3.Zero.AddY(guardianNode.WorldPosition().Y - referenceGridNode.WorldPosition().Y);
                 var newEye = oldEye + offset;
                 var newLookAt = oldLookAt + offset;              
 
-                referenceGridNode.TranslateTo(Vector3Helper.YAxis(guardianNode.WorldPosition().Y));
+                referenceGridNode.TranslateTo(Vector3.Zero.AddY(guardianNode.WorldPosition().Y));
                                 
                 game.Scene.CameraNode.Camera.ViewMatrix = SharpDX.Matrix.LookAtLH(
                     newEye,
@@ -262,6 +264,7 @@ namespace Aurora.Sample.Editor
             ContextMenu menu = this.FindResource("sceneContextMenu") as ContextMenu;
             menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;            
             menu.IsOpen = true;
+            mouseLocationWhenContextMenuOpened = Mouse.GetPosition(host);
         }
 
         #region Context Menu Handlers
@@ -274,7 +277,6 @@ namespace Aurora.Sample.Editor
         {
             controller.ClearAllLocationMarkers();
         }
-          
 
         private void ContextMenu_Opened(object sender, RoutedEventArgs e)
         {
@@ -286,6 +288,16 @@ namespace Aurora.Sample.Editor
             game.IsViewportFeedbackSuspended = false;
         }
 
-        #endregion      
+        #endregion
+
+        private void ContextMenu_NewActionRig_Click(object sender, RoutedEventArgs e)
+        {
+            controller.CreateNewActionRig(mouseLocationWhenContextMenuOpened);
+        }
+
+        private void ContextMenu_NewNavigation_Path(object sender, RoutedEventArgs e)
+        {
+            controller.CreateNewNavigationPath(mouseLocationWhenContextMenuOpened);
+        }
     }
 }

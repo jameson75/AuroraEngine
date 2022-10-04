@@ -14,6 +14,7 @@ namespace Aurora.Core.Editor
 
         void ChangeViewportColor(Color newViewportColor);
         void ClearScene(bool resetCamera);
-        void ResetCamera();       
+        void ResetCamera();
+        Vector3 GetDropLocation(Point point);
     }
 }

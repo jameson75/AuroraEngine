@@ -21,6 +21,9 @@
             <ContextMenu x:Key="sceneContextMenu" Opened="ContextMenu_Opened" Closed="ContextMenu_Closed">
                 <MenuItem Header="Mark Location" Click="ContextMenu_MarkLocation_Click" />
                 <MenuItem Header="Clear Location Markers" Click="ContextMenu_ClearLocationMarkers_Click" />
+                <Separator/>
+                <MenuItem Header="New Action Rig" Click="ContextMenu_NewActionRig_Click"/>
+                <MenuItem Header="New Navigation Path" Click="ContextMenu_NewNavigation_Path"/>
             </ContextMenu>            
         </ResourceDictionary>
     </Window.Resources>

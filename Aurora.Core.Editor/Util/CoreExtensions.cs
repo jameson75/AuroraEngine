@@ -120,15 +120,18 @@ namespace Aurora.Core.Editor.Util
                             .Select(n => n.As<GameObjectSceneNode>());
     }
 
-    public static class Vector3Helper
+    public static class Vector3Extensions
     {
-        public static Vector3 XAxis(float x)
-            => new Vector3(x, 0, 0);
+        public static Vector3 AddX(this Vector3 v, float x)
+            => new Vector3(v.X + x, v.Y, v.Z);
 
-        public static Vector3 YAxis(float y)
-            => new Vector3(0, y, 0);
+        public static Vector3 AddY(this Vector3 v, float y)
+            => new Vector3(v.X, v.Y + y, v.Z);
 
-        public static Vector3 ZAxis(float z)
-            => new Vector3(0, 0, z);
+        public static Vector3 AddZ(this Vector3 v, float z)
+            => new Vector3(v.X, v.Y, v.Z + z);
+
+        public static Vector3 Add(this Vector3 v, float x, float y, float z)
+            => new Vector3(v.X + x, v.Y + y, v.Z + z);
     }
 }

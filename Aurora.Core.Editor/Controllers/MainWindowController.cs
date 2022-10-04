@@ -235,6 +235,159 @@ namespace Aurora.Core.Editor
             var sceneModifierService = game.Services.GetService<SceneModifierService>();
             sceneModifierService.NotifyMouseDoubleTap(new SharpDX.Point((int)mousePoint.X, (int)mousePoint.Y));
         }
+
+        public void CreateNewActionRig(System.Windows.Point mouseLocation)
+        {
+            var dropLocation = game.GetDropLocation(new SharpDX.Point((int)mouseLocation.X, (int)mouseLocation.Y));
+            var effect = new BlinnPhongEffect2(game, SurfaceVertexType.PositionNormalColor);
+            effect.AmbientColor = Color.Red;
+            
+            var boxMesh = ContentBuilder.BuildLitWireBox(
+                game.GraphicsDevice,
+                effect.GetVertexShaderByteCode(),
+                new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)),
+                Color.Red);
+            var cameraMesh = ContentBuilder.BuildLitWireCamera(
+                game.GraphicsDevice,
+                effect.GetVertexShaderByteCode(),
+                new BoundingBox(new Vector3(-5, -5, -10), new Vector3(5, 5, 10)),
+                Color.Red);
+            
+            var actionGameNode = new GameObjectSceneNode(game)
+            {
+                Name = "Action Node",
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(game)
+                {
+                    Renderer = new ModelRenderer(game)
+                    {
+                        Model = new StaticMeshModel(game)
+                        {
+                            Effect = effect,
+                            Mesh = boxMesh,
+                        }
+                    }
+                }
+            };
+            var cameraGameNode = new GameObjectSceneNode(game)
+            {
+                Name = "Game Camera",
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(game)
+                {
+                    Renderer = new ModelRenderer(game)
+                    {
+                        Model = new StaticMeshModel(game)
+                        {
+                            Effect = effect,
+                            Mesh = cameraMesh,
+                        }
+                    }
+                }
+            };
+
+            actionGameNode.TranslateTo(dropLocation.Add(0, 5, 0));
+            game.Scene.Nodes.Add(actionGameNode);
+            ViewModel.Project.Scene.AddSceneNode(actionGameNode);
+            
+            actionGameNode.Children.Add(cameraGameNode);
+            cameraGameNode.TranslateTo(new Vector3(0, 300, 0));
+            cameraGameNode.PointZAtTarget(Vector3.BackwardLH, actionGameNode.WorldPosition());
+            ViewModel.Project.Scene.AddSceneNode(cameraGameNode);
+
+            ViewModel.IsProjectDirty = true;
+        }
+
+        public void CreateNewNavigationPath(System.Windows.Point mouseLocation)
+        {
+            var dropLocation = game.GetDropLocation(new SharpDX.Point((int)mouseLocation.X, (int)mouseLocation.Y));
+            var navigationPath = new NavigationPath();
+
+            var pathRootNode = new GameObjectSceneNode(game)
+            {
+                Name = "Path Root Node",
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(game)
+                {
+                    Renderer = new NavigationPathRenderer(game)
+                    {
+                        NavigationPath = navigationPath,
+                    }
+                }
+            };
+
+            game.Scene.Nodes.Add(pathRootNode);
+
+            var effect = new BlinnPhongEffect2(game, SurfaceVertexType.PositionNormalColor);
+            effect.AmbientColor = Color.CornflowerBlue;
+
+            var pathNodeDropLocations = new[]
+            {
+                dropLocation,
+                dropLocation.AddZ(300),
+                dropLocation.AddZ(600)
+            }; 
+
+            for (int i = 0; i < pathNodeDropLocations.Length; i++)
+            {
+                var boxMesh = ContentBuilder.BuildLitWireBox(
+                    game.GraphicsDevice,
+                    effect.GetVertexShaderByteCode(),
+                    new BoundingBox(new Vector3(-4, -4, -4), new Vector3(4, 4, 4)),
+                    Color.CornflowerBlue);
+                
+                var pathNode = new GameObjectSceneNode(game)
+                {
+                    Name = "Path Node",
+                    GameObject = new CipherPark.Aurora.Core.World.GameObject(game)
+                    {
+                        Renderer = new ModelRenderer(game)
+                        {
+                            Model = new StaticMeshModel(game)
+                            {
+                                Effect = effect,
+                                Mesh = boxMesh,
+                            }
+                        }
+                    }
+                };
+
+                pathNode.TranslateTo(pathNodeDropLocations[i].Add(0, 4, 0));
+                pathRootNode.Children.Add(pathNode);
+                navigationPath.Nodes.Add(pathNode);
+            }
+
+            ViewModel.IsProjectDirty = true;
+        }
+    }
+
+    public class NavigationPath
+    {
+        public IList<ITransformable> Nodes { get; } = new List<ITransformable>();
+    }
+
+    public class NavigationPathRenderer : IRenderer
+    {
+        private IEditorGameApp game;
+
+        public NavigationPathRenderer(IEditorGameApp game)
+        {
+            this.game = game;
+        }
+
+        public NavigationPath NavigationPath { get; internal set; }
+
+        public void Dispose()
+        {
+            
+        }
+
+        public void Draw(ITransformable container)
+        {
+            
+        }
+
+        public void Update(CipherPark.Aurora.Core.GameTime gameTime)
+        {
+            
+        }
     }
 
     public class SceneAdornmentService
