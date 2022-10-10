@@ -95,6 +95,16 @@ namespace CipherPark.Aurora.Core.Animation
         {
             return new Transform(t.Rotation, v - t.Translation);
         }
+
+        public static bool operator == (Transform t1, Transform t2)
+        {
+            return t1.Rotation == t2.Rotation && t1.Translation == t2.Translation;
+        }
+
+        public static bool operator !=(Transform t1, Transform t2)
+        {
+            return t1.Rotation != t2.Rotation || t1.Translation != t2.Translation;
+        }
     }
 
     /// <summary>

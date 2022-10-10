@@ -233,6 +233,17 @@ namespace CipherPark.Aurora.Core.Content
             return BuildInstancedMesh<BillboardInstanceVertex, Matrix>(device, shaderByteCode, verts, indices, BillboardInstanceVertex.InputElements, BillboardInstanceVertex.ElementSize, instanceData, BillboardInstanceVertex.InstanceSize ); 
         }
 
+        public static short[] CreateLineListIndices(int listLength)
+        {
+            var list = new List<short>();
+            for(short i = 0; i < listLength; i++)
+            {
+                list.Add(i);
+                list.Add((short)(i + 1));
+            }
+            return list.ToArray();
+        }
+
         public static Mesh BuildViewportQuad(Device device, byte[] shaderByteCode)
         {
             //NOTE: Screen coords

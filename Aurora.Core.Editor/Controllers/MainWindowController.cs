@@ -2,6 +2,7 @@
 using Aurora.Core.Editor.Util;
 using Aurora.Sample.Editor.Scene;
 using Aurora.Sample.Editor.Windows;
+using CipherPark.Aurora.Core;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
@@ -310,7 +311,7 @@ namespace Aurora.Core.Editor
                     {
                         NavigationPath = navigationPath,
                     }
-                }
+                }               
             };
 
             game.Scene.Nodes.Add(pathRootNode);
@@ -356,7 +357,7 @@ namespace Aurora.Core.Editor
 
             ViewModel.IsProjectDirty = true;
         }
-    }
+    }   
 
     public class NavigationPath
     {
@@ -365,28 +366,111 @@ namespace Aurora.Core.Editor
 
     public class NavigationPathRenderer : IRenderer
     {
-        private IEditorGameApp game;
+        private readonly IEditorGameApp game;
+        private List<Transform> navigationPathSnapshot;
+        private Mesh pathMesh;
+        private SurfaceEffect pathMeshEffect;
 
         public NavigationPathRenderer(IEditorGameApp game)
         {
             this.game = game;
+            navigationPathSnapshot = new List<Transform>();
         }
 
-        public NavigationPath NavigationPath { get; internal set; }
+        public NavigationPath NavigationPath { get; set; }
 
         public void Dispose()
         {
-            
+            if (pathMesh != null)
+            {
+                pathMesh.Dispose();
+            }
+                pathMeshEffect.Dispose();
         }
 
         public void Draw(ITransformable container)
         {
-            
+            if (pathMesh != null)
+            {
+                var cameraNode = game.GetActiveScene()
+                                     .CameraNode;
+                pathMeshEffect.World = Matrix.Identity;
+                pathMeshEffect.View = cameraNode.RiggedViewMatrix;
+                pathMeshEffect.Projection = cameraNode.ProjectionMatrix;
+                pathMeshEffect.Apply();
+                pathMesh.Draw();
+                pathMeshEffect.Restore();
+            }
         }
 
-        public void Update(CipherPark.Aurora.Core.GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
-            
+            if (IsMeshUpdateRequired())
+            {
+                UpdateMesh();
+            }
+        }
+
+        private bool IsMeshUpdateRequired()
+        {
+            if (NavigationPath == null)
+            {
+                return navigationPathSnapshot != null;
+            }
+
+            if (navigationPathSnapshot == null)
+            {
+                return true;
+            }
+
+            if (NavigationPath.Nodes.Count != navigationPathSnapshot.Count)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < NavigationPath.Nodes.Count; i++)
+            {
+                if (NavigationPath.Nodes[i].Transform != navigationPathSnapshot[i])
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void UpdateMesh()
+        {
+            if (NavigationPath == null)
+            {
+                navigationPathSnapshot = null;
+            }
+
+            else
+            {
+                var verts = NavigationPath.Nodes.Select(x =>
+                   new VertexPositionColor
+                   {
+                       Color = Color.Yellow.ToVector4(),
+                       Position = new Vector4(x.Transform.Translation, 1),
+                   }).ToArray();
+
+                var indicies = ContentBuilder.CreateLineListIndices(verts.Length);
+
+                pathMeshEffect = new FlatEffect(game, SurfaceVertexType.PositionColor);
+
+                pathMesh = ContentBuilder.BuildMesh(
+                    game.GraphicsDevice,
+                    pathMeshEffect.GetVertexShaderByteCode(),
+                    verts,
+                    indicies,
+                    VertexPositionColor.InputElements,
+                    VertexPositionColor.ElementSize,
+                    BoundingBoxExtension.Empty,
+                    SharpDX.Direct3D.PrimitiveTopology.LineList);
+
+                navigationPathSnapshot = NavigationPath.Nodes.Select(x => x.Transform).ToList();
+            }
         }
     }
 
