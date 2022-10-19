@@ -292,6 +292,11 @@ namespace CipherPark.Aurora.Core.Animation
             return transformable.WorldTransform().Translation;
         }
 
+        public static Vector3 Position(this ITransformable transformable)
+        {
+            return transformable.Transform.Translation;
+        }
+
         public static void Translate(this ITransformable transformable, Vector3 delta)
         {
             transformable.Transform = new Transform(transformable.Transform.Rotation, transformable.Transform.Translation + delta);
@@ -309,13 +314,15 @@ namespace CipherPark.Aurora.Core.Animation
                     referenceFrame.LocalToWorldCoordinate(position)));            
         }
 
-        public static void Rotate(this ITransformable transformable, Quaternion delta)
+        public static void Rotate(this ITransformable transformable, Vector3 axis, float delta)
         {
-            transformable.Transform = new Transform(delta * transformable.Transform.Rotation, transformable.Transform.Translation);
+            var qDelta = Quaternion.RotationAxis(axis, delta);
+            transformable.Transform = new Transform(qDelta * transformable.Transform.Rotation, transformable.Transform.Translation);
         }
 
-        public static void RotateTo(this ITransformable transformable, Quaternion orientation)
+        public static void RotateTo(this ITransformable transformable, Vector3 axis, float angle)
         {
+            var orientation = Quaternion.RotationAxis(axis, angle);
             transformable.Transform = new Transform(orientation, transformable.Transform.Translation);
         }
 
@@ -337,6 +344,11 @@ namespace CipherPark.Aurora.Core.Animation
             result.TranslationVector = location;
             var newWorldTransform = new Transform(result);
             transformable.Transform = transformable.WorldToParent(newWorldTransform);
+        }
+
+        public static void PointZAtTarget(this ITransformable transformable, Vector3 targetWorldCoordinate)
+        {
+            PointZAtTarget(transformable, transformable.WorldTransform().ToMatrix().Up, targetWorldCoordinate);
         }
     }
 }

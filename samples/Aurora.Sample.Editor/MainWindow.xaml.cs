@@ -295,9 +295,24 @@ namespace Aurora.Sample.Editor
             controller.CreateNewActionRig(mouseLocationWhenContextMenuOpened);
         }
 
-        private void ContextMenu_NewNavigation_Path(object sender, RoutedEventArgs e)
+        private void ContextMenu_NewNavigationPath_Click(object sender, RoutedEventArgs e)
         {
             controller.CreateNewNavigationPath(mouseLocationWhenContextMenuOpened);
+        }
+
+        private void ContentMenu_ExtrudeNavigationPath_Click(object sender, RoutedEventArgs e)
+        {
+            controller.ExtrudeNavigationPath();
+        }
+
+        private void ContextMenu_BisectNavigationSegment_Click(object sender, RoutedEventArgs e)
+        {
+            controller.BisectNavigationPath();
+        }
+
+        private void ContentMenu_JustExecute_Click(object sender, RoutedEventArgs e)
+        {
+            controller.JustExecute();
         }
     }
 }

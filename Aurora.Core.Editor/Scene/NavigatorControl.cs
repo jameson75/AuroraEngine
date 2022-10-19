@@ -23,13 +23,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
         {          
             
         }
-
-        /*
-        public MouseNavigatorService.NavigationMode NavigationMode { get => mouseNavigatorService.Mode; set => mouseNavigatorService.Mode = value; }    
-        public bool IsInPickingMode { get => sceneModifierService.IsActive; set => sceneModifierService.IsActive = value; }
-        public TranslationPlane TransformPlane { get => sceneModifierService.TranslationPlane; set => sceneModifierService.TranslationPlane = value; }
-        */
-
+        
         public void ClearCachedServices()
         {
             mouseNavigatorService = null;

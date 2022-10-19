@@ -4,7 +4,6 @@ using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.Animation;
-using System.Linq;
 using Aurora.Core.Editor.Util;
 
 namespace CipherPark.Aurora.Core.Services
@@ -150,56 +149,87 @@ namespace CipherPark.Aurora.Core.Services
         private void OnMouseMove(bool buttonDown, Point location)
         {
             if (IsActive && buttonDown && currentPickedNode != null)
-            {
-                var cameraNode = gameApp.GetActiveScene().CameraNode;
+            {              
+                var cameraNode = gameApp.GetActiveScene().CameraNode;             
 
-                var pickFromInfo = ScenePicker.PickNodes(
-                                        gameApp,
-                                        mouseMoveFrom.X,
-                                        mouseMoveFrom.Y,
-                                        n => n == currentPickedNode).FirstOrDefault();
-               
+                var pickFromRay = ScenePicker.GetPickRay(gameApp, mouseMoveFrom.X, mouseMoveFrom.Y);
+                
                 var pickToRay = ScenePicker.GetPickRay(gameApp, location.X, location.Y);
 
                 var pickedNodeWorldPosition = currentPickedNode.WorldPosition();
-
-                if (pickFromInfo != null)
+                
+                switch (ModifierMode)
                 {
-                    switch (ModifierMode)
-                    {
-                        case ModifierMode.TransformObject:
-                            switch (SelectedObjectTransformSpace)
-                            {
-                                case TransformSpace.ViewSpaceTranslateXZ:
-                                    var pickedNodeWorldAlignedYPlane = new Plane(pickedNodeWorldPosition, Vector3.Up);
-                                    bool fromRayIntersectsPlane = pickFromInfo.Ray.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 fromIntersectionPoint);
-                                    var toRayIntersectsPlane = pickToRay.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 toIntersectionPoint);
-                                    if (fromRayIntersectsPlane && toRayIntersectsPlane)
-                                    {
-                                        var nodeTranslationVector = currentPickedNode.WorldToParentCoordinate(toIntersectionPoint) -
-                                                                    currentPickedNode.WorldToParentCoordinate(fromIntersectionPoint);
-                                        currentPickedNode.Translate(nodeTranslationVector);
-                                        OnNodeTransformed(currentPickedNode);
-                                    }
-                                    break;
-                                case TransformSpace.ViewSpaceTranslateY:
-                                    var cameraAlignedZPlaneNormal = Vector3.Normalize(cameraNode.WorldPosition() - pickedNodeWorldPosition);
-                                    var xAxis = Vector3.Normalize(Vector3.Cross(cameraAlignedZPlaneNormal, Vector3.Up));
-                                    var objectAlignedCameraSpaceZPlaneNormal = Vector3.Normalize(Vector3.Cross(Vector3.Up, xAxis));
-                                    var pickedNodeCameraAlignedZPlane = new Plane(pickedNodeWorldPosition, objectAlignedCameraSpaceZPlaneNormal);
-                                    fromRayIntersectsPlane = pickFromInfo.Ray.Intersects(ref pickedNodeCameraAlignedZPlane, out fromIntersectionPoint);
-                                    toRayIntersectsPlane = pickToRay.Intersects(ref pickedNodeCameraAlignedZPlane, out toIntersectionPoint);
-                                    if (fromRayIntersectsPlane && toRayIntersectsPlane)
-                                    {
-                                        var nodeTranslationVector = currentPickedNode.WorldToParentCoordinate(toIntersectionPoint) -
-                                                                    currentPickedNode.WorldToParentCoordinate(fromIntersectionPoint);
-                                        currentPickedNode.Translate(new Vector3(0, nodeTranslationVector.Y, 0));
-                                        OnNodeTransformed(currentPickedNode);
-                                    }
-                                    break;
-                            }
-                            break;
-                    }
+                    case ModifierMode.TransformObject:
+                        
+                        var rotationDelta = Math.Max(location.X - mouseMoveFrom.X, location.Y - mouseMoveFrom.Y);
+
+                        switch (SelectedObjectTransformSpace)
+                        {
+                            case TransformSpace.ViewSpaceTranslateXZ:
+                                var pickedNodeWorldAlignedYPlane = new Plane(pickedNodeWorldPosition, Vector3.Up);
+                                bool fromRayIntersectsPlane = pickFromRay.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 fromIntersectionPoint);
+                                var toRayIntersectsPlane = pickToRay.Intersects(ref pickedNodeWorldAlignedYPlane, out Vector3 toIntersectionPoint);
+                                if (fromRayIntersectsPlane && toRayIntersectsPlane)
+                                {
+                                    var nodeTranslationVector = currentPickedNode.WorldToParentCoordinate(toIntersectionPoint) -
+                                                                currentPickedNode.WorldToParentCoordinate(fromIntersectionPoint);
+                                    currentPickedNode.Translate(nodeTranslationVector);
+                                    OnNodeTransformed(currentPickedNode);
+                                }
+                                if (currentPickedNode.IsSatelliteNode())
+                                {
+                                    //TODO: Keep node pointed at orbit's center.
+                                }
+                                break;
+                            case TransformSpace.ViewSpaceTranslateY:
+                                var cameraAlignedZPlaneNormal = Vector3.Normalize(cameraNode.WorldPosition() - pickedNodeWorldPosition);
+                                var xAxis = Vector3.Normalize(Vector3.Cross(cameraAlignedZPlaneNormal, Vector3.Up));
+                                var objectAlignedCameraSpaceZPlaneNormal = Vector3.Normalize(Vector3.Cross(Vector3.Up, xAxis));
+                                var pickedNodeCameraAlignedZPlane = new Plane(pickedNodeWorldPosition, objectAlignedCameraSpaceZPlaneNormal);
+                                fromRayIntersectsPlane = pickFromRay.Intersects(ref pickedNodeCameraAlignedZPlane, out fromIntersectionPoint);
+                                toRayIntersectsPlane = pickToRay.Intersects(ref pickedNodeCameraAlignedZPlane, out toIntersectionPoint);
+                                if (fromRayIntersectsPlane && toRayIntersectsPlane)
+                                {
+                                    var nodeTranslationVector = currentPickedNode.WorldToParentCoordinate(toIntersectionPoint) -
+                                                                currentPickedNode.WorldToParentCoordinate(fromIntersectionPoint);
+                                    currentPickedNode.Translate(new Vector3(0, nodeTranslationVector.Y, 0));
+                                    OnNodeTransformed(currentPickedNode);
+                                }
+                                if (currentPickedNode.IsSatelliteNode())
+                                {
+                                    //TODO: Keep node pointed at orbit's center.
+                                }
+                                break;
+                            case TransformSpace.ParentSpaceRevolveX:
+                                if (currentPickedNode.IsSatelliteNode())
+                                {
+                                    //TODO: Orbit node about parent's x axis.
+                                }
+                                break;
+                            case TransformSpace.ParentSpaceRevolveY:
+                                if (currentPickedNode.IsSatelliteNode())
+                                {
+                                    //TODO: Orbit node about parent's y axis.
+                                }
+                                break;
+                            case TransformSpace.ParentSpaceRevolveZ:
+                                if (currentPickedNode.IsSatelliteNode())
+                                {
+                                    //TODO: Orbit node about parent's z axis.
+                                }
+                                break;                           
+                            case TransformSpace.LocalSpaceRotateX:
+                                currentPickedNode.Rotate(Vector3.UnitX, rotationDelta);
+                                break;
+                            case TransformSpace.LocalSpaceRotateY:
+                                currentPickedNode.Rotate(Vector3.UnitY, rotationDelta);
+                                break;
+                            case TransformSpace.LocalSpaceRotateZ:
+                                currentPickedNode.Rotate(Vector3.UnitZ, rotationDelta);                                
+                                break;
+                        }
+                        break;        
                 }
             }            
 
@@ -215,7 +245,7 @@ namespace CipherPark.Aurora.Core.Services
                         gameApp,
                         mouseX,
                         mouseY,
-                        n => n.GameObject.IsPickable())
+                        n => n.GameObject.IsPickableObject())
                         .GetClosest(camera.Location)
                         ?.Node;
         }
@@ -339,7 +369,13 @@ namespace CipherPark.Aurora.Core.Services
     {
         None,
         ViewSpaceTranslateXZ,
-        ViewSpaceTranslateY
+        ViewSpaceTranslateY,
+        ParentSpaceRevolveX,
+        ParentSpaceRevolveY,
+        ParentSpaceRevolveZ,
+        LocalSpaceRotateX,
+        LocalSpaceRotateY,
+        LocalSpaceRotateZ
     }
 
     public enum ModifierMode

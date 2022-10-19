@@ -12,6 +12,7 @@ using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.World.Scene;
 using SharpDX;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -248,6 +249,7 @@ namespace Aurora.Core.Editor
                 effect.GetVertexShaderByteCode(),
                 new BoundingBox(new Vector3(-5, -5, -5), new Vector3(5, 5, 5)),
                 Color.Red);
+
             var cameraMesh = ContentBuilder.BuildLitWireCamera(
                 game.GraphicsDevice,
                 effect.GetVertexShaderByteCode(),
@@ -257,7 +259,12 @@ namespace Aurora.Core.Editor
             var actionGameNode = new GameObjectSceneNode(game)
             {
                 Name = "Action Node",
-                GameObject = new CipherPark.Aurora.Core.World.GameObject(game)
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(
+                    game,
+                    new EditorObjectContext
+                    {
+                        IsActionObject = true,
+                    })
                 {
                     Renderer = new ModelRenderer(game)
                     {
@@ -269,10 +276,11 @@ namespace Aurora.Core.Editor
                     }
                 }
             };
+
             var cameraGameNode = new GameObjectSceneNode(game)
             {
                 Name = "Game Camera",
-                GameObject = new CipherPark.Aurora.Core.World.GameObject(game)
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(game, new EditorObjectContext { IsPickable = true, IsSatelliteObject = true })
                 {
                     Renderer = new ModelRenderer(game)
                     {
@@ -305,7 +313,16 @@ namespace Aurora.Core.Editor
             var pathRootNode = new GameObjectSceneNode(game)
             {
                 Name = "Path Root Node",
-                GameObject = new CipherPark.Aurora.Core.World.GameObject(game)
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(
+                    game,
+                    new object[] 
+                    {
+                        new EditorObjectContext()
+                        {
+                            IsPathRootObject = true,
+                        },
+                        navigationPath,
+                    })
                 {
                     Renderer = new NavigationPathRenderer(game)
                     {
@@ -316,9 +333,6 @@ namespace Aurora.Core.Editor
 
             game.Scene.Nodes.Add(pathRootNode);
 
-            var effect = new BlinnPhongEffect2(game, SurfaceVertexType.PositionNormalColor);
-            effect.AmbientColor = Color.CornflowerBlue;
-
             var pathNodeDropLocations = new[]
             {
                 dropLocation,
@@ -328,28 +342,7 @@ namespace Aurora.Core.Editor
 
             for (int i = 0; i < pathNodeDropLocations.Length; i++)
             {
-                var boxMesh = ContentBuilder.BuildLitWireBox(
-                    game.GraphicsDevice,
-                    effect.GetVertexShaderByteCode(),
-                    new BoundingBox(new Vector3(-4, -4, -4), new Vector3(4, 4, 4)),
-                    Color.CornflowerBlue);
-                
-                var pathNode = new GameObjectSceneNode(game)
-                {
-                    Name = "Path Node",
-                    GameObject = new CipherPark.Aurora.Core.World.GameObject(game)
-                    {
-                        Renderer = new ModelRenderer(game)
-                        {
-                            Model = new StaticMeshModel(game)
-                            {
-                                Effect = effect,
-                                Mesh = boxMesh,
-                            }
-                        }
-                    }
-                };
-
+                var pathNode = CreateNavigationPathNode();
                 pathNode.TranslateTo(pathNodeDropLocations[i].Add(0, 4, 0));
                 pathRootNode.Children.Add(pathNode);
                 navigationPath.Nodes.Add(pathNode);
@@ -357,6 +350,156 @@ namespace Aurora.Core.Editor
 
             ViewModel.IsProjectDirty = true;
         }
+
+        public void JustExecute()
+        {
+            var actionNode = game.Scene.Select(x => x.IsActionNode()).FirstOrDefault();
+            var pathRootNode = game.Scene.Select(x => x.IsPathRootNode()).FirstOrDefault();
+            var navigationPathNodes = pathRootNode.GetGameObject().GetNavigationPath().Nodes;
+            var controller = new ActionPathController(actionNode, navigationPathNodes);
+            game.Simulator.Controllers.Add(controller);
+        }
+
+        public void ExtrudeNavigationPath()
+        {
+            var selectedNode = GetSelectedNode();
+
+            if (selectedNode != null && selectedNode.IsPathNode())
+            {
+                var newNode = CreateNavigationPathNode();
+                                
+                const float OffsetLength = 300f;
+
+                var pathRootNode = selectedNode.Parent;
+                var navigationPath = pathRootNode.GetGameObject().GetNavigationPath();
+                var selectedPathNodeIndex = navigationPath.Nodes.IndexOf(selectedNode);
+                var selectedSceneNodeIndex = pathRootNode.Children.IndexOf(selectedNode);
+
+                if (selectedPathNodeIndex == -1)
+                {
+                    throw new InvalidOperation("Node not found in path.");
+                }
+
+                if (selectedSceneNodeIndex == -1)
+                {
+                    throw new InvalidOperation("Node not found in scene.");
+                }
+
+                newNode.Transform = selectedNode.Transform;
+
+                if (navigationPath.Nodes.Count == 1)
+                {
+                    var translation = Vector3.UnitZ * OffsetLength;
+                    newNode.Translate(translation);
+                    navigationPath.Nodes.Add(newNode);
+                    pathRootNode.Children.Add(newNode);                    
+                }
+
+                else
+                {
+                    if (pathRootNode.Children.FirstOrDefault() == selectedNode)
+                    {
+                        var nodeA = navigationPath.Nodes[1];
+                        var nodeB = navigationPath.Nodes[0];
+                        var translationDir = Vector3.Normalize(nodeB.Position() - nodeA.Position());
+                        var translation = translationDir * OffsetLength;
+                        newNode.Translate(translation);
+                        navigationPath.Nodes.Insert(0, newNode);
+                        pathRootNode.Children.Insert(0, newNode);
+                    }
+
+                    else if (pathRootNode.Children.LastOrDefault() == selectedNode)
+                    {
+                        var nodeA = navigationPath.Nodes[navigationPath.Nodes.Count - 2];
+                        var nodeB = navigationPath.Nodes[navigationPath.Nodes.Count - 1];
+                        var translationDir = Vector3.Normalize(nodeB.Position() - nodeA.Position());
+                        var translation = translationDir * OffsetLength;
+                        newNode.Translate(translation);
+                        navigationPath.Nodes.Add(newNode);
+                        pathRootNode.Children.Add(newNode);
+                    }
+                }                
+            }
+        }
+
+        public void BisectNavigationPath()
+        {
+            var selectedNode = GetSelectedNode();
+
+            if (selectedNode != null && selectedNode.IsPathNode())
+            {
+                var newNode = CreateNavigationPathNode();
+
+                var pathRootNode = selectedNode.Parent;
+                var navigationPath = pathRootNode.GetGameObject().GetNavigationPath();
+                var selectedPathNodeIndex = navigationPath.Nodes.IndexOf(selectedNode);
+                var selectedSceneNodeIndex = pathRootNode.Children.IndexOf(selectedNode);
+
+                if (selectedPathNodeIndex == -1)
+                {
+                    throw new InvalidOperation("Node not found in path.");
+                }
+
+                if (selectedSceneNodeIndex == -1)
+                {
+                    throw new InvalidOperation("Node not found in scene.");
+                }
+
+                newNode.Transform = selectedNode.Transform;
+
+                if (selectedPathNodeIndex < navigationPath.Nodes.Count - 1)
+                {
+                    var nodeA = navigationPath.Nodes[selectedPathNodeIndex];
+                    var nodeB = navigationPath.Nodes[selectedPathNodeIndex + 1];
+                    var translation = (nodeB.Position() - nodeA.Position()) * 0.5f;
+                    newNode.Translate(translation);
+                    navigationPath.Nodes.Insert(selectedPathNodeIndex + 1, newNode);
+                    pathRootNode.Children.Insert(selectedSceneNodeIndex + 1, newNode);
+                }
+            }
+        }
+
+        private GameObjectSceneNode CreateNavigationPathNode()
+        {
+            var effect = new BlinnPhongEffect2(game, SurfaceVertexType.PositionNormalColor);
+            effect.AmbientColor = Color.CornflowerBlue;
+
+            var boxMesh = ContentBuilder.BuildLitWireBox(
+                    game.GraphicsDevice,
+                    effect.GetVertexShaderByteCode(),
+                    new BoundingBox(new Vector3(-4, -4, -4), new Vector3(4, 4, 4)),
+                    Color.CornflowerBlue);
+
+            var node = new GameObjectSceneNode(game)
+            {
+                Name = "Path Node",
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(
+                    game,
+                    new[]
+                    {
+                        new EditorObjectContext
+                        {
+                            IsPathObject = true,
+                            IsPickable = true,
+                        }
+                    })
+                {
+                    Renderer = new ModelRenderer(game)
+                    {
+                        Model = new StaticMeshModel(game)
+                        {
+                            Effect = effect,
+                            Mesh = boxMesh,
+                        }
+                    }
+                }
+            };
+
+            return node;
+        }
+
+        private GameObjectSceneNode GetSelectedNode()
+            => game.Services.GetService<SceneModifierService>().PickedNode;        
     }   
 
     public class NavigationPath
@@ -584,4 +727,70 @@ namespace Aurora.Core.Editor
         private static Vector3[] ProjectPoints(Plane plane, Vector3[] points)
            => points.Select(x => plane.ProjectPoint(x).Value).ToArray();
     }
+
+    public class ActionPathController : SimulatorController
+    {
+        private const float animationStep = 3.0f;
+        private int ni = 1;
+        private bool onetimeSetupComplete;
+
+        public ActionPathController(ITransformable navigator, IList<ITransformable> path)
+        {
+            Navigator = navigator;
+            Path = path;
+        }
+
+        public ITransformable Navigator { get; }
+
+        public IList<ITransformable> Path { get; }
+
+        public override void Update(GameTime gameTime)
+        {
+            OnetimeSetupNavigator();
+            
+            if (ni >= Path.Count)
+            {
+                SignalComplete();
+                return;
+            }           
+
+            ITransformable nextNodeAlongPath = Path[ni];
+            Vector3 targetPositionWs = nextNodeAlongPath.WorldPosition();
+            var distanceToTarget = Vector3.Distance(Navigator.WorldPosition(), targetPositionWs);
+            float step = System.Math.Min(animationStep, distanceToTarget);            
+
+            if (step > 0.1)
+            {
+                Vector3 stepDirectionWs = Vector3.Normalize(targetPositionWs - Navigator.WorldPosition());
+                Vector3 stepVectorWs = stepDirectionWs * step;                
+                Navigator.Translate(Navigator.WorldToParentCoordinate(stepVectorWs));                
+            }
+            else
+            {
+                ni++;
+                PointNavigatorToNextNode(true);                
+            }
+        }
+
+        private void PointNavigatorToNextNode(bool animate)
+        {
+            if (ni < Path.Count)
+            {
+                //Navigator.PointZAtTarget(Path[ni].WorldPosition());
+            }
+        }
+
+        private void OnetimeSetupNavigator()
+        {
+            if (!onetimeSetupComplete)
+            {
+                if (Path.Count != 0)
+                {
+                    Navigator.TranslateTo(Path[0], Vector3.Zero);
+                }
+                PointNavigatorToNextNode(false);
+                onetimeSetupComplete = true;
+            }
+        }
+    }    
 }

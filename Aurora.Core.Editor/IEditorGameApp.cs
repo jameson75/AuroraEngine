@@ -1,5 +1,6 @@
 ﻿using CipherPark.Aurora.Core;
 using CipherPark.Aurora.Core.UI.Components;
+using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
 using SharpDX;
 
@@ -9,6 +10,7 @@ namespace Aurora.Core.Editor
     {
         EditorMode EditorMode { get; set; }
         SceneGraph Scene { get; }
+        WorldSimulator Simulator { get; }
         EditorTransformMode EditorTransformMode { get; set; }
         UITree UI { get; }
 

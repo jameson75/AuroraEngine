@@ -21,8 +21,33 @@ namespace Aurora.Core.Editor.Util
 
     public static class GameObjectExtension
     {
-        public static bool IsGameModel(this GameObject gameObject)
+        public static bool IsGameModelObject(this GameObject gameObject)
             => gameObject.GetContext<Model>() != null;
+
+        public static bool IsEditorObject(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>() != null;
+
+        public static bool IsReferenceGridObject(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>()?.IsReferenceGrid ?? false;
+
+        public static bool IsPickableObject(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>() == null ||
+               gameObject.GetContext<EditorObjectContext>().IsPickable;
+
+        public static bool IsPathObject(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>()?.IsPathObject ?? false;
+
+        public static bool IsActionObject(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>()?.IsActionObject ?? false;
+
+        public static bool IsPathRootObject(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>()?.IsPathRootObject ?? false;
+
+        public static bool IsSatelliteObject(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>()?.IsSatelliteObject ?? false;
+
+        public static bool SupportsCameraTraversing(this GameObject gameObject)
+            => gameObject.GetContext<EditorObjectContext>()?.SupportsCameraTraversing ?? false;
 
         public static Model GetGameModel(this GameObject gameObject)
             => gameObject.GetContext<Model>();
@@ -31,42 +56,41 @@ namespace Aurora.Core.Editor.Util
             => gameObject.GetContext<GameObjectMeta>()?.ResourceFilename;
 
         public static Light GetLighting(this GameObject gameObject)
-            => gameObject.GetContext<Light>();
-      
-        public static bool SupportsCameraTraversing(this GameObject gameObject)
-            => gameObject.GetContext<EditorObjectContext>()?.IsTraversingPlane ?? false;        
-
-        public static bool IsEditorObject(this GameObject gameObject)        
-            => gameObject.GetContext<EditorObjectContext>() != null;
-            
-        public static bool IsReferenceGridObject(this GameObject gameObject)
-            => gameObject.GetContext<EditorObjectContext>()?.IsReferenceGrid ?? false;
+            => gameObject.GetContext<Light>();           
 
         public static ReferenceGrid GetReferenceGrid(this GameObject gameObject)
-            => gameObject.GetContext<ReferenceGrid>();
+            => gameObject.GetContext<ReferenceGrid>();      
 
-        public static bool IsPickable(this GameObject gameObject)
-            => gameObject.GetContext<EditorObjectContext>() == null ||
-               gameObject.GetContext<EditorObjectContext>().IsInteractive;
+        public static NavigationPath GetNavigationPath(this GameObject gameObject)
+            => gameObject.GetContext<NavigationPath>();       
     }
 
     public static class SceneNodeExtension
     {
         public static bool IsEditorNode(this SceneNode sceneNode)
-            => sceneNode.As<GameObjectSceneNode>()?.GameObject.GetContext<EditorObjectContext>() != null;
+            => sceneNode.GetGameObject()?.IsEditorObject() ?? false;
+
+        public static bool IsPathNode(this SceneNode sceneNode)
+            => sceneNode.GetGameObject()?.IsPathObject() ?? false; 
+        
+        public static bool IsActionNode(this SceneNode sceneNode)
+            => sceneNode.GetGameObject()?.IsActionObject() ?? false;
+
+        public static bool IsPathRootNode(this SceneNode sceneNode)
+            => sceneNode.GetGameObject()?.IsPathRootObject() ?? false;
+
+        public static bool IsSatelliteNode(this SceneNode sceneNode)
+            => sceneNode.GetGameObject()?.IsSatelliteObject() ?? false;
 
         public static GameObject GetGameObject(this SceneNode sceneNode)
             => sceneNode.As<GameObjectSceneNode>()?.GameObject;
 
-        public static BoundingBox GetBoundingBox(this GameObjectSceneNode sceneNode)
-            => sceneNode.GameObject.GetBoundingBox().GetValueOrDefault();
-
         public static BoundingBoxOA GetWorldBoundingBox(this GameObjectSceneNode sceneNode)
-            => sceneNode.LocalToWorldBoundingBox(sceneNode.GameObject.GetBoundingBox().GetValueOrDefault());
+          => sceneNode.LocalToWorldBoundingBox(sceneNode.GameObject.GetBoundingBox().GetValueOrDefault());
 
         public static void Orphan(this SceneNode sceneNode)
             => sceneNode.Parent?.Children.Remove(sceneNode);
-    }
+     }
 
     public static class CastExtensions
     {

@@ -28,6 +28,10 @@ namespace CipherPark.Aurora.Core.World
             }
         }
 
+        public GameObject(IGameApp game, object contextualContent) : this(game, new [] { contextualContent })
+        {
+        }
+
         public GameObjectSceneNode ContainerNode
         {
             get { return _containerNode; }

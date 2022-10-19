@@ -23,7 +23,12 @@
                 <MenuItem Header="Clear Location Markers" Click="ContextMenu_ClearLocationMarkers_Click" />
                 <Separator/>
                 <MenuItem Header="New Action Rig" Click="ContextMenu_NewActionRig_Click"/>
-                <MenuItem Header="New Navigation Path" Click="ContextMenu_NewNavigation_Path"/>
+                <Separator/>
+                <MenuItem Header="New Navigation Path" Click="ContextMenu_NewNavigationPath_Click"/>
+                <MenuItem Header="Extrude Navigation Path" Click="ContentMenu_ExtrudeNavigationPath_Click"/>
+                <MenuItem Header="Bisect Navigation Segment" Click="ContextMenu_BisectNavigationSegment_Click"/>
+                <Separator/>
+                <MenuItem Header="Just Execute" Click="ContentMenu_JustExecute_Click" />
             </ContextMenu>            
         </ResourceDictionary>
     </Window.Resources>

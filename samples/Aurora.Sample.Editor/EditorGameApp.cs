@@ -29,6 +29,7 @@ namespace Aurora.Sample.Editor
         
         public UITree UI { get; private set; }
         public SceneGraph Scene { get; private set; }
+        public WorldSimulator Simulator { get; private set; }
 
         public EditorGameApp(UIElement imageHost)
         {
@@ -51,6 +52,7 @@ namespace Aurora.Sample.Editor
         {
             InitializeUI();
             InitializeScene();
+            InitializeSimulation();
             InitializeEventHandling();
         }
 
@@ -125,6 +127,11 @@ namespace Aurora.Sample.Editor
             UI.Controls.Add(coordinatesLabel);
         }
 
+        private void InitializeSimulation()
+        {
+            Simulator = new WorldSimulator(this);            
+        }
+
         private void InitializeEventHandling()
         {
             Services.GetService<SceneModifierService>().ActivatedOnDoubleTap += SceneModifierService_ActivatedOnDoubleTap;
@@ -157,6 +164,9 @@ namespace Aurora.Sample.Editor
         {
             //Update the input service (poll directx input devices).
             Services.GetService<IInputService>().UpdateState();
+
+            //Update Simulator
+            Simulator.Update(GameTime);
 
             //Update scene
             Scene.Update(GameTime);
@@ -250,7 +260,7 @@ namespace Aurora.Sample.Editor
 
             referenceGridNode.GameObject.AddContext(new EditorObjectContext
             {
-                IsTraversingPlane = true,
+                SupportsCameraTraversing = true,
                 IsReferenceGrid = true,
             });
 
