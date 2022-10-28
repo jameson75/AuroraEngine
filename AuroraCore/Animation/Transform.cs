@@ -317,14 +317,25 @@ namespace CipherPark.Aurora.Core.Animation
         public static void Rotate(this ITransformable transformable, Vector3 axis, float delta)
         {
             var qDelta = Quaternion.RotationAxis(axis, delta);
-            transformable.Transform = new Transform(qDelta * transformable.Transform.Rotation, transformable.Transform.Translation);
+            Rotate(transformable, qDelta);
+        }
+
+        public static void Rotate(this ITransformable transformable, Quaternion delta)
+        {            
+            transformable.Transform = new Transform(delta * transformable.Transform.Rotation, transformable.Transform.Translation);
         }
 
         public static void RotateTo(this ITransformable transformable, Vector3 axis, float angle)
         {
             var orientation = Quaternion.RotationAxis(axis, angle);
+            RotateTo(transformable, orientation);
+        }
+
+        public static void RotateTo(this ITransformable transformable, Quaternion orientation)
+        {            
             transformable.Transform = new Transform(orientation, transformable.Transform.Translation);
         }
+
 
         public static void PointZAtTarget(this ITransformable transformable, Vector3 worldUp, Vector3 targetWorldCoordinate)
         {

@@ -76,10 +76,27 @@
                     <Button ToolTip="Select Object" Click="ToolBar_SelectObject_Click">
                         <Image Source="Resources\Icons\transform_scale.ico"/>
                     </Button>
-                    <Button ToolTip="Transform selected object in view space XZ plane" Click="ToolBar_SelectTransformPlaneXZ_Click" Content="V:XZ" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">                        
+                    <Button ToolTip="Translate selected object in view space XZ plane" Click="ToolBar_SelectTransformPlaneXZ_Click" Content="V:XZ" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
                     </Button>
-                    <Button ToolTip="Transform selected object in view space Y plane" Click="ToolBar_SelectTransformPlaneY_Click" Content="V:Y" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    <Button ToolTip="Translate selected object in view space Y plane" Click="ToolBar_SelectTransformPlaneY_Click" Content="V:Y" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
                     </Button>
+                    <Separator/>
+                    <Button ToolTip="Orbit selected object about parent x axis" Click="ToolBar_SelectOrbitAboutX_Click" Content="O:X" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>
+                    <Button ToolTip="Orbit selected object about parent y axis" Click="ToolBar_SelectOrbitAboutY_Click" Content="O:Y" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>
+                    <Button ToolTip="Orbit selected object about parent z axis" Click="ToolBar_SelectOrbitAboutZ_Click" Content="O:Z" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>
+                    <Separator/>
+                    <Button ToolTip="Translate selected object orbital distance" Click="ToolBar_SelectTranslateOrbit_Click" Content="OD" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>
+                    <Separator/>
+                    <Button ToolTip="Rotate selected object about x axis" Click="ToolBar_SelectRotateAboutX_Click" Content="R:X" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>
+                    <Button ToolTip="Rotate selected object about y axis" Click="ToolBar_SelectRotateAboutY_Click" Content="R:Y" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>
+                    <Button ToolTip="Rotate selected object about z axis" Click="ToolBar_SelectRotateAboutZ_Click" Content="R:Z" FontSize="16" Foreground="#FF297BAA" FontWeight="Bold">
+                    </Button>                    
                 </ToolBar>                
             </ToolBarTray>
         </DockPanel>

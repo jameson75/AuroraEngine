@@ -325,6 +325,27 @@ namespace Aurora.Sample.Editor
                     case EditorTransformMode.ViewSpaceTranslateY:
                         sceneModifierService.SelectedObjectTransformSpace = TransformSpace.ViewSpaceTranslateY;
                         break;
+                    case EditorTransformMode.ParentSpaceRevolveX:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.ParentSpaceRevolveX;
+                        break;
+                    case EditorTransformMode.ParentSpaceRevolveY:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.ParentSpaceRevolveY;
+                        break;
+                    case EditorTransformMode.ParentSpaceRevolveZ:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.ParentSpaceRevolveZ;
+                        break;
+                    case EditorTransformMode.LocalSpaceRotateX:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.LocalSpaceRotateX;
+                        break;
+                    case EditorTransformMode.LocalSpaceRotateY:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.LocalSpaceRotateY;
+                        break;
+                    case EditorTransformMode.LocalSpaceRotateZ:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.LocalSpaceRotateZ;
+                        break;
+                    case EditorTransformMode.OrbitDistanceTranslate:
+                        sceneModifierService.SelectedObjectTransformSpace = TransformSpace.OrbitDistanceTranslate;
+                        break;
                 }
                 editorTransformMode = value;
             }

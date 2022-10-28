@@ -4,6 +4,13 @@
     {
         None,
         ViewSpaceTranslateY,
-        ViewSpaceTranslateXZ
+        ViewSpaceTranslateXZ,
+        ParentSpaceRevolveX,
+        ParentSpaceRevolveY,
+        ParentSpaceRevolveZ,
+        LocalSpaceRotateX,
+        LocalSpaceRotateY,
+        LocalSpaceRotateZ,
+        OrbitDistanceTranslate
     }
 }

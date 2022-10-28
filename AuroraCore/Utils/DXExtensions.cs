@@ -536,7 +536,7 @@ namespace CipherPark.Aurora.Core.Utils
         public static bool LineIntersectLine(Vector3 pA1, Vector3 pA2, Vector3 pB1, Vector3 pB2, out Vector3 intersection)
         {
             Ray rA = new Ray(pA1, Vector3.Normalize(pA2 - pA1));
-            Ray rB = new Ray(pB1, Vector3.Normalize(pB2 - pB1)); 
+            Ray rB = new Ray(pB1, Vector3.Normalize(pB2 - pB1));
        
             //NOTE: When the two rays are coincident, the sharpdx library returns
             //true, and returns an intersection of Vector3.Zero. 

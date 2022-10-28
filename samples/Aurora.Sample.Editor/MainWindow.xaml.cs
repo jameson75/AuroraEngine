@@ -230,6 +230,48 @@ namespace Aurora.Sample.Editor
             controller.EnterEditorMode(EditorMode.SelectSceneObject);
             controller.SetEditorTransformMode(EditorTransformMode.ViewSpaceTranslateY);
         }
+
+        private void ToolBar_SelectOrbitAboutX_Click(object sender, RoutedEventArgs e)
+        {
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.ParentSpaceRevolveX);
+        }
+
+        private void ToolBar_SelectOrbitAboutY_Click(object sender, RoutedEventArgs e)
+        {
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.ParentSpaceRevolveY);
+        }
+
+        private void ToolBar_SelectOrbitAboutZ_Click(object sender, RoutedEventArgs e)
+        {
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.ParentSpaceRevolveZ);
+        }
+
+        private void ToolBar_SelectRotateAboutX_Click(object sender, RoutedEventArgs e)
+        {
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.LocalSpaceRotateX);
+        }
+
+        private void ToolBar_SelectRotateAboutY_Click(object sender, RoutedEventArgs e)
+        {
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.LocalSpaceRotateY);
+        }
+
+        private void ToolBar_SelectRotateAboutZ_Click(object sender, RoutedEventArgs e)
+        {
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.LocalSpaceRotateZ);
+        }
+
+        private void ToolBar_SelectTranslateOrbit_Click(object sender, RoutedEventArgs e)
+        {
+            controller.EnterEditorMode(EditorMode.SelectSceneObject);
+            controller.SetEditorTransformMode(EditorTransformMode.OrbitDistanceTranslate);
+        }
         #endregion       
 
         private void Menu_Scene_MoveReferenceGrid(object sender, RoutedEventArgs e)
@@ -313,6 +355,6 @@ namespace Aurora.Sample.Editor
         private void ContentMenu_JustExecute_Click(object sender, RoutedEventArgs e)
         {
             controller.JustExecute();
-        }
+        }       
     }
 }

@@ -40,6 +40,27 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
                             case EditorTransformMode.ViewSpaceTranslateXZ:
                                 contentControl.SetText($"{caption} (V-XZ)");
                                 break;
+                            case EditorTransformMode.LocalSpaceRotateX:
+                                contentControl.SetText($"{caption} (R-X)");
+                                break;
+                            case EditorTransformMode.LocalSpaceRotateY:
+                                contentControl.SetText($"{caption} (R-Y)");
+                                break;
+                            case EditorTransformMode.LocalSpaceRotateZ:
+                                contentControl.SetText($"{caption} (R-Z)");
+                                break;
+                            case EditorTransformMode.ParentSpaceRevolveX:
+                                contentControl.SetText($"{caption} (O-X)");
+                                break;
+                            case EditorTransformMode.ParentSpaceRevolveY:
+                                contentControl.SetText($"{caption} (O-Y)");
+                                break;
+                            case EditorTransformMode.ParentSpaceRevolveZ:
+                                contentControl.SetText($"{caption} (O-Z)");
+                                break;
+                            case EditorTransformMode.OrbitDistanceTranslate:
+                                contentControl.SetText($"{caption} (OD)");
+                                break;
                             default:
                                 contentControl.SetText(caption);
                                 break;

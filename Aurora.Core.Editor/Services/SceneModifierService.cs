@@ -161,8 +161,18 @@ namespace CipherPark.Aurora.Core.Services
                 switch (ModifierMode)
                 {
                     case ModifierMode.TransformObject:
-                        
-                        var rotationDelta = Math.Max(location.X - mouseMoveFrom.X, location.Y - mouseMoveFrom.Y);
+
+                        var mouseOffsetXAbs = Math.Abs(location.X - mouseMoveFrom.X);
+                        var mouseOffsetYAbs = Math.Abs(location.Y - mouseMoveFrom.Y);
+                        var rotationDelta = 0f;                        
+                        if (mouseOffsetXAbs > mouseOffsetYAbs)                        
+                        {
+                            rotationDelta = mouseOffsetXAbs * (location.X > mouseMoveFrom.X ? 1 : -1);
+                        }
+                        else
+                        {
+                            rotationDelta = mouseOffsetYAbs * (location.Y > mouseMoveFrom.Y ? 1 : -1);
+                        }
 
                         switch (SelectedObjectTransformSpace)
                         {
@@ -176,10 +186,6 @@ namespace CipherPark.Aurora.Core.Services
                                                                 currentPickedNode.WorldToParentCoordinate(fromIntersectionPoint);
                                     currentPickedNode.Translate(nodeTranslationVector);
                                     OnNodeTransformed(currentPickedNode);
-                                }
-                                if (currentPickedNode.IsSatelliteNode())
-                                {
-                                    //TODO: Keep node pointed at orbit's center.
                                 }
                                 break;
                             case TransformSpace.ViewSpaceTranslateY:
@@ -196,37 +202,59 @@ namespace CipherPark.Aurora.Core.Services
                                     currentPickedNode.Translate(new Vector3(0, nodeTranslationVector.Y, 0));
                                     OnNodeTransformed(currentPickedNode);
                                 }
-                                if (currentPickedNode.IsSatelliteNode())
-                                {
-                                    //TODO: Keep node pointed at orbit's center.
-                                }
                                 break;
                             case TransformSpace.ParentSpaceRevolveX:
                                 if (currentPickedNode.IsSatelliteNode())
-                                {
-                                    //TODO: Orbit node about parent's x axis.
+                                {                                   
+                                    var axis = Vector3.Transform(
+                                        currentPickedNode.WorldToParentNormal(
+                                            currentPickedNode.ParentToWorldNormal(
+                                                Vector3.Normalize(currentPickedNode.Parent.Transform.ToMatrix().Right))),
+                                        currentPickedNode.Transform.Rotation);                                                                                                        
+                                    
+                                    var rotation = Quaternion.RotationAxis(axis, MathUtil.DegreesToRadians(rotationDelta));
+                                    currentPickedNode.Rotate(rotation);
+
+                                    var translation = Vector3.Transform(currentPickedNode.Transform.Translation, rotation);
+                                    currentPickedNode.TranslateTo(translation);                                    
                                 }
                                 break;
                             case TransformSpace.ParentSpaceRevolveY:
                                 if (currentPickedNode.IsSatelliteNode())
                                 {
-                                    //TODO: Orbit node about parent's y axis.
+                                    var axis = currentPickedNode.WorldToParentNormal(
+                                        currentPickedNode.ParentToWorldNormal(
+                                            Vector3.Normalize(currentPickedNode.Parent.Transform.ToMatrix().Up)));
+
+                                    var positionOrientation = Quaternion.RotationAxis(axis, MathUtil.DegreesToRadians(rotationDelta));
+                                    var newPosition = Vector3.Transform(currentPickedNode.Transform.Translation, positionOrientation);
+                                    currentPickedNode.TranslateTo(newPosition);                                    
+                                    var orientationRotation = Quaternion.RotationAxis(axis, MathUtil.DegreesToRadians(rotationDelta));
+                                    currentPickedNode.Rotate(orientationRotation);
                                 }
                                 break;
                             case TransformSpace.ParentSpaceRevolveZ:
                                 if (currentPickedNode.IsSatelliteNode())
                                 {
-                                    //TODO: Orbit node about parent's z axis.
+                                    var axis = Vector3.Normalize(currentPickedNode.Transform.ToMatrix().Forward);
+                                    var rotation = Quaternion.RotationAxis(axis, MathUtil.DegreesToRadians(rotationDelta));
+                                    currentPickedNode.Rotate(rotation);
                                 }
                                 break;                           
-                            case TransformSpace.LocalSpaceRotateX:
-                                currentPickedNode.Rotate(Vector3.UnitX, rotationDelta);
+                            case TransformSpace.LocalSpaceRotateX:                                
+                                currentPickedNode.Rotate(currentPickedNode.Transform.ToMatrix().Right, MathUtil.DegreesToRadians(rotationDelta));
                                 break;
                             case TransformSpace.LocalSpaceRotateY:
-                                currentPickedNode.Rotate(Vector3.UnitY, rotationDelta);
+                                currentPickedNode.Rotate(currentPickedNode.Transform.ToMatrix().Up, MathUtil.DegreesToRadians(rotationDelta));
                                 break;
                             case TransformSpace.LocalSpaceRotateZ:
-                                currentPickedNode.Rotate(Vector3.UnitZ, rotationDelta);                                
+                                currentPickedNode.Rotate(currentPickedNode.Transform.ToMatrix().Forward, MathUtil.DegreesToRadians(rotationDelta));                                
+                                break;
+                            case TransformSpace.OrbitDistanceTranslate:
+                                if (currentPickedNode.IsSatelliteNode())
+                                {
+                                    //TODO: Move orbital distance of node.
+                                }
                                 break;
                         }
                         break;        
@@ -375,7 +403,8 @@ namespace CipherPark.Aurora.Core.Services
         ParentSpaceRevolveZ,
         LocalSpaceRotateX,
         LocalSpaceRotateY,
-        LocalSpaceRotateZ
+        LocalSpaceRotateZ,
+        OrbitDistanceTranslate,
     }
 
     public enum ModifierMode
