@@ -278,6 +278,13 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
+            <TabItem Header="Model">
+                <Grid>
+                    <StackPanel>
+                        <Button Content="New" Click="Model_NewButton_Click" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>    
 </Window>

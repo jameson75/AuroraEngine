@@ -355,6 +355,11 @@ namespace Aurora.Sample.Editor
         private void ContentMenu_JustExecute_Click(object sender, RoutedEventArgs e)
         {
             controller.JustExecute();
-        }       
+        }
+
+        private void Model_NewButton_Click(object sender, RoutedEventArgs e)
+        {
+            controller.NewModel();
+        }
     }
 }
