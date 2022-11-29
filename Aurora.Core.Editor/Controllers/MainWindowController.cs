@@ -26,7 +26,7 @@ namespace Aurora.Core.Editor
 
         public MainWindowController(IEditorGameApp game)
         {
-            this.game = game;            
+            this.game = game;
             ViewModel = new MainWindowViewModel();
             sceneModifierTwoWayBinding = new SceneModifierTwoWayDataBinding(ViewModel, game.Services.GetService<SceneModifierService>());
         }
@@ -69,7 +69,7 @@ namespace Aurora.Core.Editor
                     UISaveAsProject();
                 }
             }
-        }       
+        }
 
         public void UISaveAsProject()
         {
@@ -133,7 +133,7 @@ namespace Aurora.Core.Editor
 
         public void NewProject()
         {
-            ViewModel.Project = new ProjectViewModel(game);            
+            ViewModel.Project = new ProjectViewModel(game);
         }
 
         public void OpenProject(string filePath)
@@ -156,7 +156,7 @@ namespace Aurora.Core.Editor
         {
             var app = game;
             var effect = new BlinnPhongEffect2(app, SurfaceVertexType.PositionNormalColor);
-            effect.AmbientColor = Color.White;            
+            effect.AmbientColor = Color.White;
 
             var gameSceneNode = new GameObjectSceneNode(app)
             {
@@ -175,7 +175,7 @@ namespace Aurora.Core.Editor
         public void NotifyKeyboardShiftKeyEvent(bool keyDown)
         {
             var navigationService = game.Services.GetService<MouseNavigatorService>();
-            navigationService.IsModeInversionOn = keyDown;            
+            navigationService.IsModeInversionOn = keyDown;
         }
 
         public void EnterEditorMode(EditorMode mode)
@@ -190,7 +190,7 @@ namespace Aurora.Core.Editor
 
         public void SetEditorTransformMode(EditorTransformMode transformMode)
         {
-            game.EditorTransformMode = transformMode;            
+            game.EditorTransformMode = transformMode;
         }
 
         public void AddLight()
@@ -198,7 +198,7 @@ namespace Aurora.Core.Editor
             var light = new DirectionalLight();
             light.Diffuse = Color.LightYellow;
             light.Direction = Vector3.Down;
-            
+
             var ordinal = game.Scene.SelectLights().Count() + 1;
             var gameSceneNode = new GameObjectSceneNode(game)
             {
@@ -211,7 +211,7 @@ namespace Aurora.Core.Editor
             ViewModel.Project.Scene.AddSceneNode(gameSceneNode);
 
             ViewModel.IsProjectDirty = true;
-        }       
+        }
 
         public void MarkSelectedNodeLocation()
         {
@@ -243,7 +243,7 @@ namespace Aurora.Core.Editor
             var dropLocation = game.GetDropLocation(new SharpDX.Point((int)mouseLocation.X, (int)mouseLocation.Y));
             var effect = new BlinnPhongEffect2(game, SurfaceVertexType.PositionNormalColor);
             effect.AmbientColor = Color.Red;
-            
+
             var boxMesh = ContentBuilder.BuildLitWireBox(
                 game.GraphicsDevice,
                 effect.GetVertexShaderByteCode(),
@@ -255,7 +255,7 @@ namespace Aurora.Core.Editor
                 effect.GetVertexShaderByteCode(),
                 new BoundingBox(new Vector3(-5, -5, -10), new Vector3(5, 5, 10)),
                 Color.Red);
-            
+
             var actionGameNode = new GameObjectSceneNode(game)
             {
                 Name = "Action Node",
@@ -296,7 +296,7 @@ namespace Aurora.Core.Editor
             actionGameNode.TranslateTo(dropLocation.Add(0, 5, 0));
             game.Scene.Nodes.Add(actionGameNode);
             ViewModel.Project.Scene.AddSceneNode(actionGameNode);
-            
+
             actionGameNode.Children.Add(cameraGameNode);
             cameraGameNode.TranslateTo(new Vector3(0, 300, 0));
             cameraGameNode.PointZAtTarget(Vector3.BackwardLH, actionGameNode.WorldPosition());
@@ -315,7 +315,7 @@ namespace Aurora.Core.Editor
                 Name = "Path Root Node",
                 GameObject = new CipherPark.Aurora.Core.World.GameObject(
                     game,
-                    new object[] 
+                    new object[]
                     {
                         new EditorObjectContext()
                         {
@@ -328,7 +328,7 @@ namespace Aurora.Core.Editor
                     {
                         NavigationPath = navigationPath,
                     }
-                }               
+                }
             };
 
             game.Scene.Nodes.Add(pathRootNode);
@@ -338,7 +338,7 @@ namespace Aurora.Core.Editor
                 dropLocation,
                 dropLocation.AddZ(300),
                 dropLocation.AddZ(600)
-            }; 
+            };
 
             for (int i = 0; i < pathNodeDropLocations.Length; i++)
             {
@@ -367,7 +367,7 @@ namespace Aurora.Core.Editor
             if (selectedNode != null && selectedNode.IsPathNode())
             {
                 var newNode = CreateNavigationPathNode();
-                                
+
                 const float OffsetLength = 300f;
 
                 var pathRootNode = selectedNode.Parent;
@@ -392,7 +392,7 @@ namespace Aurora.Core.Editor
                     var translation = Vector3.UnitZ * OffsetLength;
                     newNode.Translate(translation);
                     navigationPath.Nodes.Add(newNode);
-                    pathRootNode.Children.Add(newNode);                    
+                    pathRootNode.Children.Add(newNode);
                 }
 
                 else
@@ -418,7 +418,7 @@ namespace Aurora.Core.Editor
                         navigationPath.Nodes.Add(newNode);
                         pathRootNode.Children.Add(newNode);
                     }
-                }                
+                }
             }
         }
 
@@ -457,6 +457,34 @@ namespace Aurora.Core.Editor
                     pathRootNode.Children.Insert(selectedSceneNodeIndex + 1, newNode);
                 }
             }
+        }
+
+        public void NewModel()
+        {
+            var model = CharacterBuilder.BuildMainCharacter(game);
+
+            var node = new GameObjectSceneNode(game)
+            {
+                Name = "Test Model",
+                GameObject = new CipherPark.Aurora.Core.World.GameObject(
+                    game,
+                    new[]
+                    {
+                        new EditorObjectContext
+                        {
+                            IsPickable = true,
+                        }
+                    })
+                {
+                    Renderer = new ModelRenderer(game)
+                    {
+                        Model = model,
+                    }
+                }
+            };
+
+            game.Scene.Nodes.Add(node);
+            ViewModel.Project.Scene.AddSceneNode(node);
         }
 
         private GameObjectSceneNode CreateNavigationPathNode()
@@ -499,8 +527,8 @@ namespace Aurora.Core.Editor
         }
 
         private GameObjectSceneNode GetSelectedNode()
-            => game.Services.GetService<SceneModifierService>().PickedNode;        
-    }   
+            => game.Services.GetService<SceneModifierService>().PickedNode;
+    }
 
     public class NavigationPath
     {
@@ -528,7 +556,7 @@ namespace Aurora.Core.Editor
             {
                 pathMesh.Dispose();
             }
-                pathMeshEffect.Dispose();
+            pathMeshEffect.Dispose();
         }
 
         public void Draw(ITransformable container)
@@ -618,7 +646,7 @@ namespace Aurora.Core.Editor
     }
 
     public class SceneAdornmentService
-    {        
+    {
         private readonly List<GameObjectSceneNode> markers;
 
         public SceneAdornmentService()
@@ -627,7 +655,7 @@ namespace Aurora.Core.Editor
         }
 
         public void MarkLocation(GameObjectSceneNode targetNode)
-        {           
+        {
             var referenceObjectRoot = targetNode.Scene
                                                 .SelectReferenceObjectRoot();
 
@@ -638,7 +666,7 @@ namespace Aurora.Core.Editor
                     if (referenceObjectNode.GetGameObject().IsReferenceGridObject() == true)
                     {
                         var referenceGrid = referenceObjectNode.GetGameObject().GetReferenceGrid();
-                        
+
                         var markerNode = new GameObjectSceneNode(targetNode.Game)
                         {
                             GameObject = new CipherPark.Aurora.Core.World.GameObject(targetNode.Game, new object[]
@@ -658,7 +686,7 @@ namespace Aurora.Core.Editor
                         markers.Add(markerNode);
                     }
                 }
-            }            
+            }
         }
 
         public void RemoveAllMarkers()
@@ -711,7 +739,7 @@ namespace Aurora.Core.Editor
             var mesh = ContentBuilder.BuildMesh(gameApp.GraphicsDevice,
                                             meshEffect.GetVertexShaderByteCode(),
                                             meshVerts,
-                                            meshIndices,                                            
+                                            meshIndices,
                                             VertexPositionColor.InputElements,
                                             VertexPositionColor.ElementSize,
                                             new BoundingBox(),
@@ -747,28 +775,28 @@ namespace Aurora.Core.Editor
         public override void Update(GameTime gameTime)
         {
             OnetimeSetupNavigator();
-            
+
             if (ni >= Path.Count)
             {
                 SignalComplete();
                 return;
-            }           
+            }
 
             ITransformable nextNodeAlongPath = Path[ni];
             Vector3 targetPositionWs = nextNodeAlongPath.WorldPosition();
             var distanceToTarget = Vector3.Distance(Navigator.WorldPosition(), targetPositionWs);
-            float step = System.Math.Min(animationStep, distanceToTarget);            
+            float step = System.Math.Min(animationStep, distanceToTarget);
 
             if (step > 0.1)
             {
                 Vector3 stepDirectionWs = Vector3.Normalize(targetPositionWs - Navigator.WorldPosition());
-                Vector3 stepVectorWs = stepDirectionWs * step;                
-                Navigator.Translate(Navigator.WorldToParentCoordinate(stepVectorWs));                
+                Vector3 stepVectorWs = stepDirectionWs * step;
+                Navigator.Translate(Navigator.WorldToParentCoordinate(stepVectorWs));
             }
             else
             {
                 ni++;
-                PointNavigatorToNextNode(true);                
+                PointNavigatorToNextNode(true);
             }
         }
 
@@ -788,9 +816,426 @@ namespace Aurora.Core.Editor
                 {
                     Navigator.TranslateTo(Path[0], Vector3.Zero);
                 }
-                PointNavigatorToNextNode(false);
-                onetimeSetupComplete = true;
+ 
+                 PointNavigatorToNextNode(false);
+                 onetimeSetupComplete = true;
             }
         }
-    }    
+    }
+
+    public class CharacterBuilder
+    {
+        const int VoxelSize = 2;
+
+        public static Model BuildMainCharacter(IGameApp game)
+        {
+            /*
+            const int headWidth = 20;
+            const int headHeight = 20;
+            const int headDepth = 30;
+            var character = CreateBoxFourteen(headWidth, headHeight, headDepth);
+            
+            var normals = character.Geometry.GetIndexMappedNormals();
+            var vertices = character.Geometry.GetIndexMappedPoints().Select((x,i) => new VertexPositionNormalColor(x, normals[i], Color.AliceBlue.ToVector4())).ToArray();            
+            var boundingBox = BoundingBox.FromPoints(character.Geometry.Points);
+
+            var effect = new BlinnPhongEffect2(game, SurfaceVertexType.PositionNormalColor);
+            effect.Lighting = new CipherPark.Aurora.Core.Effects.Light[2]
+            {
+                new DirectionalLight() { Diffuse = Color.White, Direction = Vector3.Down },
+                new DirectionalLight() { Diffuse = Color.White, Direction = Vector3.Left }
+            };
+
+            
+            //var effect = new FlatEffect(game, SurfaceVertexType.PositionColor);           
+
+            var mesh = ContentBuilder.BuildMesh(game.GraphicsDevice,
+                                        effect.GetVertexShaderByteCode(),
+                                        vertices,
+                                        null,
+                                        VertexPositionNormalColor.InputElements,
+                                        VertexPositionNormalColor.ElementSize,
+                                        boundingBox,
+                                        SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+            */
+
+            var voxelBuffer = new VoxelBuffer(20, 20, 20, Enumerable.Repeat(Color.Wheat.ToVector4(), 20 * 20 * 20).ToArray());
+            var voxelGeometry = CreateVoxelGeometry(voxelBuffer);
+            return CreateVoxelModel(voxelGeometry, game);
+
+            /*
+            return new StaticMeshModel(game)
+            {
+                Mesh = mesh,
+                Effect = effect,
+            };
+            */
+        }
+
+        public static Model CreateVoxelModel(VoxelGeometry geometry, IGameApp game)
+        {
+            var points = geometry.FrontQuads.Concat(
+                geometry.BackQuads).Concat(
+                geometry.LeftQuads).Concat(
+                geometry.RightQuads).Concat(
+                geometry.TopQuads).Concat(
+                geometry.BottomQuads)
+                .Select(x => x.ToTriangles())
+                .SelectMany(x => x)
+                .ToArray();
+            var vertices = points.Select((x, i) => new VertexPositionColor(x, Color.Violet.ToVector4())).ToArray();
+            var boundingBox = BoundingBox.FromPoints(points);
+            var effect = new FlatEffect(game, SurfaceVertexType.PositionColor);
+            var mesh = ContentBuilder.BuildMesh(
+                                        effect.Game.GraphicsDevice,
+                                        effect.GetVertexShaderByteCode(),
+                                        vertices,
+                                        null,
+                                        VertexPositionColor.InputElements,
+                                        VertexPositionColor.ElementSize,
+                                        boundingBox,
+                                        SharpDX.Direct3D.PrimitiveTopology.TriangleList);
+            return new StaticMeshModel(game)
+            {
+                Mesh = mesh,
+                Effect = effect,
+            };
+        }
+
+        public static VoxelGeometry CreateVoxelGeometry(VoxelBuffer buffer)
+        {
+            var width_x_height = buffer.Width * buffer.Height;
+            var transparent = Color.Transparent.ToVector4();
+            var half_voxel_size = VoxelSize / 2.0f;
+            var voxelGeometry = new VoxelGeometry();
+
+            for (int k = 0; k < buffer.Depth; k++)
+            {
+                var depthOffset = k * width_x_height;
+                var nextDepthOffset = (k + 1) * width_x_height;
+                var prevDepthOffset = (k - 1) * width_x_height;
+                for(int j = 0; j < buffer.Height; j++)
+                {
+                    var heightOffset = j * buffer.Height;
+                    var nextHeightOffset = (j + 1) * buffer.Height;
+                    var prevHeightOffset = (j - 1) * buffer.Height;
+                    for(int i = 0; i < buffer.Width; i++)
+                    {
+                        var c = i + heightOffset + depthOffset; //current
+                        var l = (i != 0) ? c - 1 : (int?)null; //left neighbor
+                        var r = (i != buffer.Width - 1) ? c + 1 : (int?)null; //right neighbor
+                        var bm = (j != 0) ? i + prevHeightOffset + depthOffset : (int?)null; //bottom neighbor
+                        var t = (j != buffer.Height - 1) ? i + nextHeightOffset + depthOffset : (int?)null; //top neighbor
+                        var f = (k != 0) ? i + heightOffset + prevDepthOffset : (int?)null; //front neighbor
+                        var bk = (k != buffer.Depth - 1) ? i + heightOffset + nextDepthOffset : (int?)null; //back neighbor
+
+                        var cp = new Vector3((-buffer.Width / 2.0f + i) * VoxelSize,
+                                             (-buffer.Height / 2.0f + j) * VoxelSize,
+                                             (-buffer.Depth / 2.0f + k) * VoxelSize);
+                        var p0 = new Vector3(cp.X - half_voxel_size, cp.Y - half_voxel_size, cp.Z - half_voxel_size);
+                        var p1 = new Vector3(cp.X - half_voxel_size, cp.Y + half_voxel_size, cp.Z - half_voxel_size);
+                        var p2 = new Vector3(cp.X + half_voxel_size, cp.Y + half_voxel_size, cp.Z - half_voxel_size);
+                        var p3 = new Vector3(cp.X + half_voxel_size, cp.Y - half_voxel_size, cp.Z - half_voxel_size);
+                        var p4 = new Vector3(cp.X - half_voxel_size, cp.Y + half_voxel_size, cp.Z + half_voxel_size);
+                        var p5 = new Vector3(cp.X - half_voxel_size, cp.Y - half_voxel_size, cp.Z + half_voxel_size);
+                        var p6 = new Vector3(cp.X + half_voxel_size, cp.Y - half_voxel_size, cp.Z + half_voxel_size);
+                        var p7 = new Vector3(cp.X + half_voxel_size, cp.Y + half_voxel_size, cp.Z + half_voxel_size);
+
+                        if (l == null || buffer.Data[l.Value] == transparent)
+                        {
+                            voxelGeometry.LeftQuads.Add(new GeometryQuad(p0, p5, p4, p1));
+                        }
+
+                        if (r == null || buffer.Data[r.Value] == transparent)
+                        {
+                            voxelGeometry.RightQuads.Add(new GeometryQuad(p2, p7, p6, p3));
+                        }
+
+                        if (bm == null || buffer.Data[bm.Value] == transparent)
+                        {
+                            voxelGeometry.BottomQuads.Add(new GeometryQuad(p0, p3, p6, p5));
+                        }
+
+                        if (t == null || buffer.Data[t.Value] == transparent)
+                        {
+                            voxelGeometry.TopQuads.Add(new GeometryQuad(p1, p4, p7, p2));
+                        }
+
+                        if (f == null || buffer.Data[f.Value] == transparent)
+                        {
+                            voxelGeometry.FrontQuads.Add(new GeometryQuad(p0, p1, p2, p3));
+                        }
+
+                        if (bk == null || buffer.Data[bk.Value] == transparent)
+                        {
+                            voxelGeometry.BackQuads.Add(new GeometryQuad(p4, p5, p6, p7));
+                        }
+                    }
+                }
+            }
+            return voxelGeometry;
+        }
+
+        public static CharacterPart CreateBoxFourteen(float width, float height, float depth)
+        {
+            var half_width = width / 2;
+            var half_height = height / 2;
+            var half_depth = depth / 2;            
+
+            //front: 0, 1, 2, 3
+            //back: 4, 5, 6, 7            
+            //min: 0
+            //max: 7
+            //mids: 8 (front), 9 (left), 10 (back), 11 (right), 12 (top), 13 (bottom)
+            var points = new Vector3[14]
+            {
+                new Vector3(-half_width, -half_height, -half_depth),
+                new Vector3(-half_width, half_height, -half_depth),
+                new Vector3(half_width, half_height, -half_depth),
+                new Vector3(half_width, -half_height, -half_depth),
+                new Vector3(-half_width, half_height, half_depth),
+                new Vector3(-half_width, -half_height, half_depth),
+                new Vector3(half_width, -half_height, half_depth),
+                new Vector3(half_width, half_height, half_depth),
+                new Vector3(0, 0, -half_depth),
+                new Vector3(-half_width, 0, 0),
+                new Vector3(0, 0, half_depth),
+                new Vector3(half_width, 0, 0),
+                new Vector3(0, half_height, 0),
+                new Vector3(0, -half_height, 0)
+            };
+
+            var normals = points.Select(Vector3.Normalize).ToArray();
+
+            var indices = new short[72]
+            {
+                //front
+                0, 1, 8,
+                1, 2, 8,
+                2, 3, 8,
+                3, 0, 8,
+
+                //back
+                4, 5, 10,
+                5, 6, 10,
+                6, 7, 10,
+                7, 4, 10,
+
+                //top
+                1, 4, 12,
+                4, 7, 12,
+                7, 2, 12,
+                2, 1, 12,
+
+                //bottom
+                0, 3, 13,
+                3, 6, 13,
+                6, 5, 13,
+                5, 0, 13,
+
+                //left
+                0, 5, 9,
+                5, 4, 9,
+                4, 1, 9,
+                1, 0, 9,
+
+                //right
+                2, 7, 11,
+                7, 6, 11,
+                6, 3, 11,
+                3, 2, 11,
+            };
+
+            var faceNormals = new Vector3[24];
+            for(int i = 0; i < faceNormals.Length; i++)
+            {
+                var k = i * 3;
+                var p0 = points[indices[k]];
+                var p1 = points[indices[k + 1]];
+                var p2 = points[indices[k + 2]];
+                faceNormals[i] = CalculateNormal(p0, p1, p2);
+            }
+            
+            return new CharacterPart
+            {
+                Geometry = new CharacterGeomerty
+                {
+                    Points = points,
+                    Indices = indices,
+                    FaceNormals = faceNormals,
+                }
+            };
+        }
+
+        public static Vector3 CalculateNormal(Vector3 p0, Vector3 p1, Vector3 p2)
+        {
+            return Vector3.Normalize(Vector3.Cross(p1 - p0, p2 - p0));
+        }
+
+        public static Vector3[] CreateBlock(int width, int height, int depth, out short[] indices)
+        {
+            var xLength = width + 1;
+            var yLength = height + 1;
+            var zLength = depth + 1;
+            var block = new Vector3[xLength * yLength * zLength];
+            var iz = -zLength / 2f;
+            var xySize = xLength * yLength;
+
+            for (int i = 0; i < zLength; i++)
+            {
+                var iy = 0f;
+                var depthOffset = xySize * i;
+                for (int j = 0; j < yLength; j++)
+                {
+                    var ix = -xLength / 2f;
+                    var heightOffset = j * xLength;
+                    for (int k = 0; k < xLength; k++)
+                    {
+                        var x = ix;
+                        var y = iy;
+                        var z = iz;
+                        var m = k + depthOffset + heightOffset;
+                        block[m] = new Vector3(x, y, z);
+                        ix+= VoxelSize;
+                    }
+                    iy+= VoxelSize;
+                }
+                iz+= VoxelSize;
+            }            
+
+            const int IndicesPerVoxel = 36;
+            indices = new short[width * height * depth * IndicesPerVoxel];
+            var iv = 0;
+            for (int i = 0; i < depth; i++)
+            {
+                var depthOffset = xySize * i;
+                for (int j = 0; j < height; j++)
+                {
+                    var heightOffset = j * xLength;
+                    for (int k = 0; k < width; k++)
+                    {
+                        //front = p0, p1, p2, p3 (clockwise)
+                        //back = p5, p4, p7, p6 (clockwise)                        
+                        var p0 = k + depthOffset + heightOffset;
+                        var p1 = p0 + xLength;
+                        var p2 = p1 + 1;
+                        var p3 = p0 + 1;
+                        var p4 = p0 + xySize;
+                        var p5 = p4 + 1;
+                        var p6 = p5 + xLength;
+                        var p7 = p4 + xLength;
+
+                        var triangles = new int[IndicesPerVoxel]
+                        {
+                            p0, p1, p2,
+                            p2, p3, p0,
+                            p4, p5, p6,
+                            p6, p7, p4,
+                            p3, p2, p6,
+                            p6, p5, p3,
+                            p4, p7, p1,
+                            p1, p0, p4,
+                            p1, p7, p6,
+                            p6, p2, p1,
+                            p4, p0, p3,
+                            p3, p5, p4
+                        };
+
+                        try
+                        {
+                            Array.Copy(triangles.Select(Convert.ToInt16).ToArray(), 0, indices, iv, IndicesPerVoxel);
+                            iv += IndicesPerVoxel;
+                        }
+                        catch
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+
+            return block;
+        }
+    }
+
+    public class CharacterPart
+    {
+        public CharacterGeomerty Geometry { get; set; }         
+    }
+
+    public class CharacterGeomerty
+    {
+        public Vector3[] Points { get; set; }
+        public short[] Indices { get; set; }
+        public Vector3[] FaceNormals { get; set; }
+        public Vector3[] GetIndexMappedPoints()
+            => Indices.Select(i => Points[i]).ToArray();
+        public Vector3[] GetIndexMappedNormals()
+            => Indices.Select((x, i) => FaceNormals[i / 3]).ToArray();
+    }
+    
+    public class VoxelGeometry
+    {
+        public List<GeometryQuad> FrontQuads { get; } = new List<GeometryQuad>();
+        public List<GeometryQuad> BackQuads { get; } = new List<GeometryQuad>();
+        public List<GeometryQuad> LeftQuads { get; } = new List<GeometryQuad>();
+        public List<GeometryQuad> RightQuads { get; } = new List<GeometryQuad>();
+        public List<GeometryQuad> TopQuads { get; } = new List<GeometryQuad>();
+        public List<GeometryQuad> BottomQuads { get; } = new List<GeometryQuad>();
+    }
+
+    public class GeometryQuad
+    {
+        public GeometryQuad(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+        {
+            A = a;
+            B = b;
+            C = c;
+            D = d;
+        }
+
+        public Vector3 A { get; }
+        public Vector3 B { get; }
+        public Vector3 C { get; }
+        public Vector3 D { get; }
+
+        public Vector3[] ToTriangles()
+            => new[] { A, B, C, C, D, A };
+    }
+
+    public class VoxelBuffer
+    {
+        public VoxelBuffer(int width, int height, int depth, Vector4[] data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            if (data.Length != width * height * depth)
+            {
+                throw new ArgumentException("Data has unexpected length. Should be width x height x depth.", nameof(data));
+            }
+
+            Width = width;
+            Height = height;
+            Depth = depth;
+            Data = data;
+        }
+        public int Width { get; }
+        public int Height { get; }
+        public int Depth { get; }
+        public Vector4[] Data { get; }
+    }
+
+    public static class ExceptionHelper
+    {
+        public static void ThrowIfNull(object argument, string paramName = default)
+        {
+            if(argument == null)
+            {
+                throw new ArgumentNullException(paramName);
+            }    
+        }
+    }
 }
