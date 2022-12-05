@@ -872,6 +872,11 @@ namespace Aurora.Core.Editor
             */
         }
 
+        public static CreateVoxelBuffer(int width, int height, int depth, Color fillColor)
+        {
+            return new VoxelBuffer(width, height, depth, Enumerable.Repeat(Color.Wheat.ToVector4(), width * height * depth).ToArray());
+        }
+
         public static Model CreateVoxelModel(VoxelGeometry geometry, IGameApp game)
         {
             var points = geometry.FrontQuads.Concat(
