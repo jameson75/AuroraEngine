@@ -28,8 +28,20 @@ namespace CipherPark.Aurora.Core.World.Geometry
         {
             get
             {
-                Vector3 min = Meshes.Min(m => m.BoundingBox.Minimum);
-                Vector3 max = Meshes.Max(m => m.BoundingBox.Maximum);
+                Vector3 min = new Vector3
+                {
+                    X = Meshes.Min(m => m.BoundingBox.Minimum.X),
+                    Y = Meshes.Min(m => m.BoundingBox.Minimum.Y),
+                    Z = Meshes.Min(m => m.BoundingBox.Minimum.Z),
+                };
+
+                Vector3 max = new Vector3
+                {
+                    X = Meshes.Max(m => m.BoundingBox.Maximum.X),
+                    Y = Meshes.Max(m => m.BoundingBox.Maximum.Y),
+                    Z = Meshes.Max(m => m.BoundingBox.Maximum.Z),
+                };
+
                 return new BoundingBox(min, max);
             }
         }    
@@ -65,7 +77,7 @@ namespace CipherPark.Aurora.Core.World.Geometry
                 foreach (Mesh mesh in Meshes)
                 {                  
                     Matrix originalWorld = Effect.World;
-                    Frame meshFrame = frameList?.First(f => f.Name == mesh.Name);
+                    Frame meshFrame = frameList?.First(f => f.Name == mesh.Name || (f.MeshNames?.Contains(mesh.Name) == true));
                     Effect.World = meshFrame != null ? Effect.World * meshFrame.WorldTransform().ToMatrix() : Effect.World;
                     mesh.Draw();
                     Effect.World = originalWorld;                

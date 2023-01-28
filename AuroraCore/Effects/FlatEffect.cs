@@ -172,6 +172,11 @@ namespace CipherPark.Aurora.Core.Effects
             return _vertexShaderByteCode;
         }
 
+        public override EffectDataChannels GetDataChannels()
+        {
+            return GetDataChannelsForSurfaceVertexType(_surfaceVertexType);
+        }
+
         private void WriteVertexConstantsSkin()
         {
             //Open Access to Buffer

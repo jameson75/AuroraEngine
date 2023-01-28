@@ -120,6 +120,8 @@ namespace CipherPark.Aurora.Core.World.Geometry
             }
         }
 
+        public string[] MeshNames { get; internal set; }
+
         #endregion
 
         /// <summary>

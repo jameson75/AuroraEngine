@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.World.Geometry;
-using CipherPark.Aurora.Core.Utils;
 using System.IO;
 using CipherPark.Aurora.Core.Content;
+using System.Linq;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -115,6 +109,58 @@ namespace CipherPark.Aurora.Core.Effects
         {
             for (int i = 0; i < Passes.Count; i++)
                 ((SurfaceEffectPass)Passes[i]).Reset();
+        }
+
+        public virtual EffectDataChannels GetDataChannels()
+        {
+            return EffectDataChannels.None;
+        }
+
+        public static EffectDataChannels GetDataChannelsForSurfaceVertexType(SurfaceVertexType surfaceVertexType)
+        {
+            var effectDataChannels = EffectDataChannels.Position;
+            switch (surfaceVertexType)
+            {
+                case SurfaceVertexType.PositionColor:
+                case SurfaceVertexType.InstancePositionColor:
+                    effectDataChannels |= EffectDataChannels.Color;
+                    break;
+                case SurfaceVertexType.PositionNormalColor:
+                case SurfaceVertexType.InstancePositionNormalColor:
+                    effectDataChannels |= EffectDataChannels.Color | EffectDataChannels.Normal;
+                    break;
+                case SurfaceVertexType.PositionNormalTexture:
+                case SurfaceVertexType.InstancePositionNormalTexture:
+                    effectDataChannels |= EffectDataChannels.Normal | EffectDataChannels.Texture;
+                    break;
+                case SurfaceVertexType.PositionTexture:
+                case SurfaceVertexType.InstancePositionTexture:
+                    effectDataChannels |= EffectDataChannels.Texture;
+                    break;
+                case SurfaceVertexType.SkinColor:
+                    effectDataChannels |= EffectDataChannels.Skinning | EffectDataChannels.Color;
+                    break;
+                case SurfaceVertexType.SkinNormalColor:
+                    effectDataChannels |= EffectDataChannels.Skinning | EffectDataChannels.Normal;
+                    break;
+                case SurfaceVertexType.SkinNormalTexture:
+                    effectDataChannels |= EffectDataChannels.Skinning | EffectDataChannels.Normal | EffectDataChannels.Texture;
+                    break;
+                case SurfaceVertexType.SkinTexture:
+                    effectDataChannels |= EffectDataChannels.Skinning | EffectDataChannels.Texture;
+                    break;
+            }
+
+            if (new[] {
+                SurfaceVertexType.InstancePositionColor,
+                SurfaceVertexType.InstancePositionNormalColor,
+                SurfaceVertexType.InstancePositionNormalTexture,
+                SurfaceVertexType.InstancePositionTexture }.Contains(surfaceVertexType))
+            {
+                effectDataChannels |= EffectDataChannels.Instancing;
+            }
+
+            return effectDataChannels;
         }
     }
 }

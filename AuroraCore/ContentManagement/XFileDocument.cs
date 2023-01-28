@@ -16,9 +16,9 @@ using SharpDX;
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.Aurora.Core.Content
-{       
+{
     public abstract class XFileDocument
-    {        
+    {
         private DataObjectCollection dataObjects = new DataObjectCollection();
 
         public XFileHeader Header { get; protected set; }
@@ -29,12 +29,12 @@ namespace CipherPark.Aurora.Core.Content
     public class XFileTextDocument : XFileDocument
     {
         public void Load(Stream dataStream)
-        {          
-            StreamReader reader = new StreamReader(dataStream);          
-            Header = ReadHeader(reader);                   
+        {
+            StreamReader reader = new StreamReader(dataStream);
+            Header = ReadHeader(reader);
             while (!reader.EndOfStream)
             {
-                XFileDataObject nextDataObject = null;   
+                XFileDataObject nextDataObject = null;
                 ReadNextDataObject(reader, out nextDataObject);
                 if (nextDataObject != null)
                     DataObjects.Add(nextDataObject);
@@ -57,7 +57,7 @@ namespace CipherPark.Aurora.Core.Content
         }
 
         private void ReadNextDataObject(TextReader reader, out XFileDataObject dataObject)
-        {            
+        {
             dataObject = null;
             XFileObjectBlock ob = ReadNextDataBlock(reader);
             if (ob != null)
@@ -73,19 +73,19 @@ namespace CipherPark.Aurora.Core.Content
                         break;
                     case XFileMeshObject.TemplateName:
                         dataObject = ParseMeshObject(dataReader, ob.Name);
-                        break;                 
+                        break;
                     case XFileAnimationTicksPerSecondObject.TemplateName:
                         dataObject = ParseAnimationTicksPerSecond(dataReader, ob.Name);
                         break;
                     case XFileAnimationSetObject.TemplateName:
-                        dataObject = ParseAnimationSetObject(dataReader, ob.Name);                      
+                        dataObject = ParseAnimationSetObject(dataReader, ob.Name);
                         break;
-                }                
+                }
             }
-        }                    
+        }
 
         public XFileAnimationTicksPerSecondObject ParseAnimationTicksPerSecond(TextReader reader, string name)
-        {       
+        {
             XFileAnimationTicksPerSecondObject result = new XFileAnimationTicksPerSecondObject();
             result.TicksPerSecond = ReadNextInt(reader).Value;
             return result;
@@ -95,9 +95,9 @@ namespace CipherPark.Aurora.Core.Content
         {
             XFileFrameObject frame = new XFileFrameObject();
             frame.Name = name;
-          
+
             XFileObjectBlock ob = ReadNextDataBlock(reader);
-            while(ob != null)
+            while (ob != null)
             {
                 StringReader dataReader = new StringReader(ob.Data);
                 XFileDataObject childObject = null;
@@ -124,9 +124,9 @@ namespace CipherPark.Aurora.Core.Content
         {
             XFileAnimationSetObject animationSet = new XFileAnimationSetObject();
             animationSet.Name = name;
-        
-            XFileObjectBlock ob = ReadNextDataBlock(reader);           
-            while(ob != null)
+
+            XFileObjectBlock ob = ReadNextDataBlock(reader);
+            while (ob != null)
             {
                 XFileAnimationObject childObject = null;
                 StringReader dataReader = new StringReader(ob.Data);
@@ -147,10 +147,10 @@ namespace CipherPark.Aurora.Core.Content
         {
             XFileAnimationObject animation = new XFileAnimationObject();
             animation.Name = name;
-            animation.FrameRef = ReadNextReference(reader);             
+            animation.FrameRef = ReadNextReference(reader);
             XFileObjectBlock ob = ReadNextDataBlock(reader);
-            
-            while(ob != null)
+
+            while (ob != null)
             {
                 XFileDataObject childObject = null;
                 StringReader dataReader = new StringReader(ob.Data);
@@ -169,7 +169,7 @@ namespace CipherPark.Aurora.Core.Content
         private XFileAnimationKeyObject ParseAnimationKeyObject(TextReader reader, string name)
         {
             XFileAnimationKeyObject animationKey = new XFileAnimationKeyObject();
-            animationKey.Name = name;           
+            animationKey.Name = name;
             animationKey.KeyType = (KeyType)Math.Min(ReadNextInt(reader).Value, 3);
             animationKey.NKeys = ReadNextInt(reader).Value;
             const int tfkOffset = 2;
@@ -209,21 +209,18 @@ namespace CipherPark.Aurora.Core.Content
         }
 
         private XFileMeshObject ParseMeshObject(TextReader reader, string name)
-        {
-            const int nVertexComponents = 3;
+        {           
             //************************************************
             //NOTE: We always assume faces are triangular    *
             //************************************************     
-            const int nFaceComponents = 4;
+            
             XFileMeshObject mesh = new XFileMeshObject();
             mesh.Name = name;
-         
-            mesh.NVertices = ReadNextInt(reader).Value; 
-            int verticesOffset = 1;
+
+            mesh.NVertices = ReadNextInt(reader).Value;            
             mesh.Vertices = new XFileVector[mesh.NVertices];
             for (int i = 0; i < mesh.NVertices; i++)
-            {
-                int j = verticesOffset + i * nVertexComponents;
+            {                
                 mesh.Vertices[i] = new XFileVector()
                 {
                     X = ReadNextFloat(reader).Value,
@@ -231,29 +228,18 @@ namespace CipherPark.Aurora.Core.Content
                     Z = ReadNextFloat(reader).Value
                 };
             }
-            mesh.NFaces = ReadNextInt(reader).Value;
-            int facesOffset = verticesOffset + (mesh.NVertices * nVertexComponents) + 1;
+            mesh.NFaces = ReadNextInt(reader).Value;            
             mesh.Faces = new XFileMeshFaceObject[mesh.NFaces];
 
             for (int i = 0; i < mesh.NFaces; i++)
             {
-                int j = i * nFaceComponents + facesOffset;
-                //NOTE: Assuming triangular faces, we expect this value to always be '3'.
-                int nFaceIndices = ReadNextInt(reader).Value;
-                mesh.Faces[i] = new XFileMeshFaceObject()
-                {
-                    NFaceVertexIndices = nFaceIndices,
-                    FaceVertexIndices = new int[] { 
-                        ReadNextInt(reader).Value,
-                        ReadNextInt(reader).Value,
-                        ReadNextInt(reader).Value }
-                };
+                mesh.Faces[i] = ParseMeshFace(reader);
             }
-            
-            XFileObjectBlock ob = ReadNextDataBlock(reader);           
-            while(ob != null)
+
+            XFileObjectBlock ob = ReadNextDataBlock(reader);
+            while (ob != null)
             {
-                XFileDataObject childObject = null;
+                XFileDataObject childObject;
                 StringReader dataReader = new StringReader(ob.Data);
                 switch (ob.Type)
                 {
@@ -269,6 +255,18 @@ namespace CipherPark.Aurora.Core.Content
                         childObject = ParseSkinWeightsObject(dataReader, ob.Name);
                         mesh.SkinWeightsCollection.Add((XFileSkinWeightsObject)childObject);
                         break;
+                    case XFileTextureCoords.TemplateName:
+                        childObject = ParseMeshTextureCoords(dataReader, ob.Name);
+                        mesh.MeshTextureCoords = (XFileTextureCoords)childObject;
+                        break;
+                    case XFileMeshVertexColors.TemplateName:
+                        childObject = ParseMeshVertexColors(dataReader, ob.Name);
+                        mesh.MeshVertexColors = (XFileMeshVertexColors)childObject;
+                        break;
+                    case XFileMeshNormals.TemplateName:
+                        childObject = ParseMeshNormals(dataReader, ob.Name);
+                        mesh.MeshNormals = (XFileMeshNormals)childObject;
+                        break;
                 }
                 ob = ReadNextDataBlock(reader);
             }
@@ -276,11 +274,24 @@ namespace CipherPark.Aurora.Core.Content
             return mesh;
         }
 
+        private XFileMeshFaceObject ParseMeshFace(TextReader reader)
+        {
+            return new XFileMeshFaceObject()
+            {
+                NFaceVertexIndices = ReadNextInt(reader).Value,
+                //NOTE: Assuming triangular faces, we expect this value to always be '3'.
+                FaceVertexIndices = new int[] {
+                        ReadNextInt(reader).Value,
+                        ReadNextInt(reader).Value,
+                        ReadNextInt(reader).Value }
+            };
+        }
+
         private XFileSkinWeightsObject ParseSkinWeightsObject(TextReader reader, string name)
         {
             XFileSkinWeightsObject skinWeights = new XFileSkinWeightsObject();
             skinWeights.Name = name;
-            skinWeights.TransformNodeName = ReadNextString(reader);          
+            skinWeights.TransformNodeName = ReadNextString(reader);
             skinWeights.NWeights = ReadNextInt(reader).Value;
             skinWeights.VertexIndices = new int[skinWeights.NWeights];
             int vertexIndicesOffset = 1;
@@ -299,12 +310,70 @@ namespace CipherPark.Aurora.Core.Content
             return skinWeights;
         }
 
+        private XFileTextureCoords ParseMeshTextureCoords(TextReader reader, string name)
+        {
+            XFileTextureCoords meshTextureCoords = new XFileTextureCoords();
+            meshTextureCoords.Name = name;
+            meshTextureCoords.NTextureCoords = ReadNextInt(reader).Value;
+            meshTextureCoords.TextureCoords = new Vector2[meshTextureCoords.NTextureCoords];
+            for (int i = 0; i < meshTextureCoords.NTextureCoords; i++)
+            {
+                meshTextureCoords.TextureCoords[i] = new Vector2
+                {
+                    X = ReadNextFloat(reader).Value,
+                    Y = ReadNextFloat(reader).Value,
+                };
+            }
+            return meshTextureCoords;
+        }
+
+        private XFileMeshVertexColors ParseMeshVertexColors(TextReader reader, string name)
+        {
+            XFileMeshVertexColors meshVertexColors = new XFileMeshVertexColors();
+            meshVertexColors.Name = name;
+            meshVertexColors.NVertexColors = ReadNextInt(reader).Value;
+            meshVertexColors.VertexColors = new XFileIndexedColor[meshVertexColors.NVertexColors];
+            for (int i = 0; i < meshVertexColors.NVertexColors; i++)
+            {
+                meshVertexColors.VertexColors[i] = new XFileIndexedColor
+                {
+                    Index = ReadNextInt(reader).Value,
+                    ColorRGBA = ParseColorRGBA(reader),
+                };
+            }
+            return meshVertexColors;
+        }
+
+        public XFileMeshNormals ParseMeshNormals(TextReader reader, string name)
+        {
+            XFileMeshNormals meshNormals = new XFileMeshNormals();
+            meshNormals.Name = name;
+            meshNormals.NNormals = ReadNextInt(reader).Value;
+            meshNormals.Normals = new Vector3[meshNormals.NNormals];
+            for (int i = 0; i < meshNormals.NNormals; i++)
+            {
+                meshNormals.Normals[i] = new Vector3
+                {
+                    X = ReadNextFloat(reader).Value,
+                    Y = ReadNextFloat(reader).Value,
+                    Z = ReadNextFloat(reader).Value,
+                };
+            }
+            meshNormals.NFaceNormals = ReadNextInt(reader).Value;
+            meshNormals.FaceNormals = new XFileMeshFaceObject[meshNormals.NFaceNormals];
+            for (int i = 0; i < meshNormals.NFaceNormals; i++)
+            {
+                meshNormals.FaceNormals[i] = ParseMeshFace(reader);
+            }
+            return meshNormals;
+        }
+
         private XFileDeclDataObject ParseDeclDataObject(TextReader reader, string name)
         {
             const int nComponentsPerVertexElement = 4;
             XFileDeclDataObject declData = new XFileDeclDataObject();
-            declData.Name = name;            
-            declData.NVertexElements = ReadNextInt(reader).Value; 
+            declData.Name = name;
+            declData.NVertexElements = ReadNextInt(reader).Value;
             int vertexElementsOffset = 1;
             declData.VertexElements = new XFileVertexElement[declData.NVertexElements];
             int nTotalVertexElementComponents = declData.NVertexElements * nComponentsPerVertexElement;
@@ -335,22 +404,22 @@ namespace CipherPark.Aurora.Core.Content
             meshMaterialList.Name = name;
             meshMaterialList.NMaterials = ReadNextInt(reader).Value;
             meshMaterialList.NFaceIndices = ReadNextInt(reader).Value;
-            
+
             meshMaterialList.FaceIndices = new int[meshMaterialList.NFaceIndices];
             for (int i = 0; i < meshMaterialList.NFaceIndices; i++)
             {
                 meshMaterialList.FaceIndices[i] = ReadNextInt(reader).Value;
             }
             if (meshMaterialList.NMaterials > 0)
-            { 
+            {
                 if (!IsNextObjectReference(reader))
                 {
                     meshMaterialList.MaterialRefs = new string[meshMaterialList.NMaterials];
                     for (int i = 0; i < meshMaterialList.NMaterials; i++)
-                        meshMaterialList.MaterialRefs[i] = ReadNextReference(reader); 
+                        meshMaterialList.MaterialRefs[i] = ReadNextReference(reader);
                 }
                 else
-                {                                        
+                {
                     meshMaterialList.Materials = new XFileMaterialObject[meshMaterialList.NMaterials];
                     for (int i = 0; i < meshMaterialList.NMaterials; i++)
                     {
@@ -366,11 +435,11 @@ namespace CipherPark.Aurora.Core.Content
         private XFileMaterialObject ParseMaterialObject(TextReader reader, string name)
         {
             XFileMaterialObject material = new XFileMaterialObject();
-            material.Name = name;          
+            material.Name = name;
             material.FaceColor = ParseColorRGBA(reader);
             material.Power = ReadNextFloat(reader).Value;
             material.SpecularColor = ParseColorRGB(reader);
-            material.EmissiveColor = ParseColorRGB(reader);            
+            material.EmissiveColor = ParseColorRGB(reader);
             XFileObjectBlock ob = ReadNextDataBlock(reader);
             if (ob != null)
             {
@@ -381,16 +450,16 @@ namespace CipherPark.Aurora.Core.Content
         }
 
         private XFileMatrix ParseFrameTransformMatrix(TextReader reader)
-        {                      
+        {
             XFileMatrix matrix = new XFileMatrix();
             matrix.m = new float[16];
             for (int i = 0; i < matrix.m.Length; i++)
                 matrix.m[i] = ReadNextFloat(reader).Value;
             return matrix;
-        }   
+        }
 
         private XFileColorRGBA ParseColorRGBA(TextReader reader)
-        {            
+        {
             return new XFileColorRGBA()
             {
                 Red = ReadNextFloat(reader).Value,
@@ -401,7 +470,7 @@ namespace CipherPark.Aurora.Core.Content
         }
 
         private XFileColorRGB ParseColorRGB(TextReader reader)
-        {           
+        {
             return new XFileColorRGB()
             {
                 Red = ReadNextFloat(reader).Value,
@@ -409,11 +478,11 @@ namespace CipherPark.Aurora.Core.Content
                 Blue = ReadNextFloat(reader).Value
             };
         }
-        
+
         private XFileHeader ReadHeader(TextReader reader)
         {
             XFileHeader header = new XFileHeader();
-            
+
             char[] magicNumber = new char[4];
             reader.Read(magicNumber, 0, magicNumber.Length);
             header.MagicNumber = new string(magicNumber);
@@ -457,13 +526,13 @@ namespace CipherPark.Aurora.Core.Content
         private static string ReadNextReference(TextReader reader)
         {
             string referenceName = null;
-            StringBuilder sb = new StringBuilder(); 
+            StringBuilder sb = new StringBuilder();
             XFileReaderState currentState = XFileReaderState.Start;
             while (true)
             {
                 int input = reader.Read();
                 if (input == -1)
-                    break;       
+                    break;
                 switch (currentState)
                 {
                     case XFileReaderState.Start:
@@ -473,7 +542,7 @@ namespace CipherPark.Aurora.Core.Content
                         {
                             sb.Clear(); //clear unwanted characters preceding the reference name.
                             currentState = XFileReaderState.Data;
-                        }                            
+                        }
                         break;
                     case XFileReaderState.Data:
                         if ((char)input == '}')
@@ -489,7 +558,7 @@ namespace CipherPark.Aurora.Core.Content
                 sb.Append((char)input);
             }
             return referenceName;
-        }     
+        }
 
         private static uint? ReadNextUInt(TextReader reader)
         {
@@ -564,8 +633,8 @@ namespace CipherPark.Aurora.Core.Content
             {
                 int input = reader.Read();
                 if (input == -1)
-                    break;                
-                switch(state)
+                    break;
+                switch (state)
                 {
                     case XFileReaderState.Start:
                         if ((char)input == '}')
@@ -600,7 +669,7 @@ namespace CipherPark.Aurora.Core.Content
         /// or the end of the "containing" block.</remarks>
         private static XFileObjectBlock ReadNextDataBlock(TextReader reader)
         {
-            XFileObjectBlock block = new XFileObjectBlock();            
+            XFileObjectBlock block = new XFileObjectBlock();
             int nUnmatchedBraces = 0;
             XFileReaderState currentState = XFileReaderState.Start;
             StringBuilder sb = new StringBuilder();
@@ -611,17 +680,17 @@ namespace CipherPark.Aurora.Core.Content
                     return null;
                 else if ((char)input == '}' && nUnmatchedBraces == 0)
                     return null;
-                switch(currentState)
+                switch (currentState)
                 {
                     case XFileReaderState.Start:
-                        if(char.IsLetterOrDigit((char)input))
+                        if (char.IsLetterOrDigit((char)input))
                         {
                             sb.Clear();
                             currentState = XFileReaderState.Type;
                         }
                         break;
-                    case XFileReaderState.Type:                       
-                        if ((char)input == '{' || char.IsWhiteSpace((char)input))        
+                    case XFileReaderState.Type:
+                        if ((char)input == '{' || char.IsWhiteSpace((char)input))
                         {
                             block.Type = sb.ToString().Trim();
                             sb.Clear();
@@ -632,16 +701,16 @@ namespace CipherPark.Aurora.Core.Content
                             if ((char)input == '{')
                                 nUnmatchedBraces++;
                         }
-                        break;                                             
+                        break;
                     case XFileReaderState.Name:
-                        if ((char)input == '{' || char.IsWhiteSpace((char)input))        
+                        if ((char)input == '{' || char.IsWhiteSpace((char)input))
                         {
                             block.Name = sb.ToString().Trim();
                             sb.Clear();
                             currentState = XFileReaderState.Data;
-                            if ((char)input == '{') 
+                            if ((char)input == '{')
                                 nUnmatchedBraces++;
-                        }                         
+                        }
                         break;
                     case XFileReaderState.Data:
                         if ((char)input == '{')
@@ -657,10 +726,10 @@ namespace CipherPark.Aurora.Core.Content
                             }
                         }
                         break;
-                }                
+                }
                 if (currentState == XFileReaderState.Complete)
                     break;
-                sb.Append((char)input);                
+                sb.Append((char)input);
             }
             return block;
         }
@@ -683,7 +752,7 @@ namespace CipherPark.Aurora.Core.Content
     }
 
     #region Obsolete XFileTextDocument Implementation
-    
+
     //**********************************************************************************
     // THE CODE BELOW WAS MY FIRST ATTEMPT AT CREATING OF AN XFILE TEXT DOCUMENT READER.
     // IT WORKED BUT WAS INCREDIBLY SLOW - THE REGULAR EXPRESSION TOOK WAY TOO LONG -
@@ -909,7 +978,7 @@ namespace CipherPark.Aurora.Core.Content
     //        mesh.NFaces = int.Parse(matches[verticesOffset + (mesh.NVertices * nVertexComponents)].Value);
     //        int facesOffset = verticesOffset + (mesh.NVertices * nVertexComponents) + 1;
     //        mesh.Faces = new XFileMeshFaceObject[mesh.NFaces];
-       
+
     //        for (int i = 0; i < mesh.NFaces; i ++)
     //        {
     //            int j = i * nFaceComponents + facesOffset;
@@ -924,7 +993,7 @@ namespace CipherPark.Aurora.Core.Content
     //                    int.Parse(matches[j + 3].Value) }
     //            };
     //        }
-            
+
     //        MatchCollection collection = Regex.Matches(meshContent, childObjectPattern);            
     //        foreach (Match match in collection)
     //        {
@@ -1059,7 +1128,7 @@ namespace CipherPark.Aurora.Core.Content
     //        material.Power = float.Parse(matches[4].Groups[0].Value);
     //        material.SpecularColor = ParseColorRGB(string.Format("{0};{1};{2};", matches[5].Groups[0].Value, matches[6].Groups[0].Value, matches[7].Groups[0].Value));
     //        material.EmissiveColor = ParseColorRGB(string.Format("{0};{1};{2};", matches[8].Groups[0].Value, matches[9].Groups[0].Value, matches[10].Groups[0].Value));
-            
+
     //        Match match = Regex.Match(materialContent, textureFileNameExpression);
     //        if( match.Success)            
     //            material.TextureFilename = match.Groups["TextureFilename"].Value;
@@ -1177,11 +1246,11 @@ namespace CipherPark.Aurora.Core.Content
     {
         public const string TemplateName = "Frame";
         private List<XFileMeshObject> _meshes = new List<XFileMeshObject>();
-        private List<XFileFrameObject> _childFrames = new List<XFileFrameObject>();     
+        private List<XFileFrameObject> _childFrames = new List<XFileFrameObject>();
 
-        public XFileMatrix FrameTransformMatrix { get; set; }        
+        public XFileMatrix FrameTransformMatrix { get; set; }
         public List<XFileMeshObject> Meshes { get { return _meshes; } }
-        public List<XFileFrameObject> ChildFrames { get { return _childFrames; } }   
+        public List<XFileFrameObject> ChildFrames { get { return _childFrames; } }
     }
 
     public class XFileMeshObject : XFileDataObject
@@ -1194,7 +1263,33 @@ namespace CipherPark.Aurora.Core.Content
         public XFileMeshFaceObject[] Faces { get; set; }
         public XFileMeshMaterialListObject MeshMaterialList { get; set; }
         public XFileDeclDataObject DeclData { get; set; }
-        public List<XFileSkinWeightsObject> SkinWeightsCollection { get { return _skinWeightsCollection; } }        
+        public List<XFileSkinWeightsObject> SkinWeightsCollection { get { return _skinWeightsCollection; } }
+        public XFileTextureCoords MeshTextureCoords { get; set; }
+        public XFileMeshVertexColors MeshVertexColors { get; set; }
+        public XFileMeshNormals MeshNormals { get; set; }
+    }
+
+    public class XFileTextureCoords : XFileDataObject
+    {
+        public const string TemplateName = "MeshTextureCoords";
+        public int NTextureCoords { get; set; }
+        public Vector2[] TextureCoords { get; set; }
+    }
+
+    public class XFileMeshVertexColors : XFileDataObject
+    {
+        public const string TemplateName = "MeshVertexColors";
+        public int NVertexColors { get; set; }
+        public XFileIndexedColor[] VertexColors { get; set; }
+    }
+
+    public class XFileMeshNormals : XFileDataObject
+    {
+        public const string TemplateName = "MeshNormals";
+        public int NNormals { get; set; }
+        public Vector3[] Normals { get; set; }
+        public int NFaceNormals { get; set; }
+        public XFileMeshFaceObject[] FaceNormals { get; set; }
     }
 
     public class XFileMeshFaceObject : XFileDataObject
@@ -1444,6 +1539,12 @@ namespace CipherPark.Aurora.Core.Content
         public float Blue;
     }
 
+    public struct XFileIndexedColor
+    {
+        public int Index;
+        public XFileColorRGBA ColorRGBA;
+    }
+
     public struct XFileMatrix
     {
         public float[] m;
@@ -1469,18 +1570,25 @@ namespace CipherPark.Aurora.Core.Content
             if (instance <= 0)
                 throw new ArgumentException("instance must be greater than zero", nameof(instance));
 
-            int instancesFound = 0;
+            var instances = GetDataObjects<T>();
+
+            if (instances.Length < instance)
+                return null;
+            else
+                return instances[instance - 1];
+        }
+
+        public T[] GetDataObjects<T>() where T : XFileDataObject
+        {
+            var results = new List<T>();
             foreach (XFileDataObject dataObj in this)
             {
                 if (dataObj is T)
                 {
-                    if (instancesFound == instance - 1)
-                        return (T)dataObj;
-                    else
-                        instancesFound++;
+                    results.Add((T)dataObj);
                 }
             }
-            return null;
+            return results.ToArray();
         }
     }
 }

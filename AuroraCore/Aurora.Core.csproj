@@ -109,6 +109,8 @@
     <Compile Include="Animation\SpatialAnimation.cs" />
     <Compile Include="Animation\Vector3Animation.cs" />
     <Compile Include="ContentManagement\TMXDocument.cs" />
+    <Compile Include="ContentManagement\XFileImporter.cs" />
+    <Compile Include="Effects\EffectDataChannels.cs" />
     <Compile Include="Effects\FlatEffect.cs" />
     <Compile Include="Effects\BloomPostEffect.cs" />
     <Compile Include="Effects\Common\Light.cs" />

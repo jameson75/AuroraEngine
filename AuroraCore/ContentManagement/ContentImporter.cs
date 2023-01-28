@@ -210,7 +210,6 @@ namespace CipherPark.Aurora.Core.Content
                  (channels & XFileChannels.MeshTextureCoords2) != 0) || 
                  (channels.HasFlag(XFileChannels.Skinning) && options.HasFlag(XFileImportOptions.EnableInstancing)))
                 throw new NotSupportedException("Conflicting channels specified.");
-
             
 
             //Read X-File Data/DOM
@@ -415,7 +414,7 @@ namespace CipherPark.Aurora.Core.Content
             result.Effect = effect;
             
             return result;
-        }
+        }     
 
         private static Vector3[] GenerateNormals(XFileMeshObject xMesh)
         {
@@ -804,5 +803,13 @@ namespace CipherPark.Aurora.Core.Content
         }
 
         #endregion
+    }
+
+    public enum ModelType
+    {
+        StaticMesh,
+        MultiMesh,
+        SkinnedMesh,
+        Unknown,
     }
 }

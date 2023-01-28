@@ -156,6 +156,7 @@ namespace Aurora.Core.Editor
         {
             var app = game;
             var effect = new BlinnPhongEffect2(app, SurfaceVertexType.PositionNormalColor);
+            //var effect = new BlinnPhongEffect2(app, SurfaceVertexType.SkinNormalTexture);
             effect.AmbientColor = Color.White;
 
             var gameSceneNode = new GameObjectSceneNode(app)

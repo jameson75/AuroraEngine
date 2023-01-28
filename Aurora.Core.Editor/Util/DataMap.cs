@@ -40,9 +40,9 @@ namespace Aurora.Core.Editor.Util
 
         public static string GetModelDisplayName(Model gameModel)
         {
-            if (gameModel is StaticMeshModel)
+            if (gameModel is SkinnedMeshModel)
             {
-                return ModelTypeNames.Static;
+                return ModelTypeNames.Rigged;
             }
 
             else if (gameModel is MultiMeshModel)
@@ -50,9 +50,9 @@ namespace Aurora.Core.Editor.Util
                 return ModelTypeNames.Multi;
             }
 
-            else if (gameModel is SkinnedMeshModel)
+            else if (gameModel is StaticMeshModel)
             {
-                return ModelTypeNames.Rigged;
+                return ModelTypeNames.Static;
             }
 
             return ModelTypeNames.Unknown;

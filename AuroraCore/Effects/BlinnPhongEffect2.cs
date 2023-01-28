@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -77,7 +72,7 @@ namespace CipherPark.Aurora.Core.Effects
 
         public float SpecularPower { get; set; }
 
-        public float Eccentricity { get; set; }       
+        public float Eccentricity { get; set; }
 
         public Matrix[] BoneTransforms { get; set; }
 
@@ -127,7 +122,7 @@ namespace CipherPark.Aurora.Core.Effects
             }
 
             LoadPixelShader("Assets\\Shaders\\blinnphong2-ps.cso", out _pixelShader);
-        }       
+        }
 
         public override void Apply()
         {
@@ -172,12 +167,12 @@ namespace CipherPark.Aurora.Core.Effects
             //---------------------
             GraphicsDevice.ImmediateContext.PixelShader.SetSampler(0, _textureSamplerState);
             GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(0, Texture);
-            
+
             if (AlphaMap != null)
             {
                 GraphicsDevice.ImmediateContext.PixelShader.SetSampler(1, _alphaSamplerState);
                 GraphicsDevice.ImmediateContext.PixelShader.SetShaderResource(1, AlphaMap);
-            }      
+            }
 
             //Configure Rasterizer.
             if (EnableBackFace)
@@ -385,6 +380,11 @@ namespace CipherPark.Aurora.Core.Effects
             _vertexShader?.Dispose();
             _pixelShader?.Dispose();
             base.OnDispose();
+        }
+
+        public override EffectDataChannels GetDataChannels()
+        {
+            return GetDataChannelsForSurfaceVertexType(_surfaceVertexType);
         }
     }
 

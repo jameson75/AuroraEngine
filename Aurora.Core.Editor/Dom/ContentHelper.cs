@@ -9,11 +9,19 @@ namespace Aurora.Core.Editor
     {
         public static GameObject ImportGameObject(string resourceFilename, SurfaceEffect effect)
         {
+            /*
             var model = ContentImporter.ImportX(
                    effect.Game,
                    resourceFilename,
                    effect,
                    XFileChannels.Mesh | XFileChannels.DefaultMaterialColor | XFileChannels.DeclNormals, XFileImportOptions.IgnoreMissingColors);
+            */
+
+            var model = XFileImporter.ImportX(
+                effect.Game,
+                resourceFilename,
+                effect,
+                XFileImportOptions.IgnoreMissingColors | XFileImportOptions.GenerateMissingNormals);
 
             return new GameObject(
                 effect.Game, 
