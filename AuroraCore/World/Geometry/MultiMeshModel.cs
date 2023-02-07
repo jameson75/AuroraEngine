@@ -71,19 +71,19 @@ namespace CipherPark.Aurora.Core.World.Geometry
 
             if (Effect != null)
             {
-                OnApplyingEffect();
-                Effect.Apply();
+                
               
                 foreach (Mesh mesh in Meshes)
                 {                  
                     Matrix originalWorld = Effect.World;
                     Frame meshFrame = frameList?.First(f => f.Name == mesh.Name || (f.MeshNames?.Contains(mesh.Name) == true));
                     Effect.World = meshFrame != null ? Effect.World * meshFrame.WorldTransform().ToMatrix() : Effect.World;
-                    mesh.Draw();
+                    OnApplyingEffect();
+                    Effect.Apply();                   
+                    mesh.Draw(); 
+                    Effect.Restore();
                     Effect.World = originalWorld;                
-                }                
-                
-                Effect.Restore();
+                }               
             }
         }
       

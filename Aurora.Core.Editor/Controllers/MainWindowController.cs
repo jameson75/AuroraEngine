@@ -162,6 +162,7 @@ namespace Aurora.Core.Editor
             var gameSceneNode = new GameObjectSceneNode(app)
             {
                 GameObject = ContentHelper.ImportGameObject(filePath, effect),
+                Transform = new Transform(10),
             };
 
             //TODO: Consider updating scene graph inside the view model's AddSceneNode method (instead of doing it below).
@@ -294,12 +295,12 @@ namespace Aurora.Core.Editor
                 }
             };
 
-            actionGameNode.TranslateTo(dropLocation.Add(0, 5, 0));
+            actionGameNode.Reposition(dropLocation.Add(0, 5, 0));
             game.Scene.Nodes.Add(actionGameNode);
             ViewModel.Project.Scene.AddSceneNode(actionGameNode);
 
             actionGameNode.Children.Add(cameraGameNode);
-            cameraGameNode.TranslateTo(new Vector3(0, 300, 0));
+            cameraGameNode.Reposition(new Vector3(0, 300, 0));
             cameraGameNode.PointZAtTarget(Vector3.BackwardLH, actionGameNode.WorldPosition());
             ViewModel.Project.Scene.AddSceneNode(cameraGameNode);
 
@@ -344,7 +345,7 @@ namespace Aurora.Core.Editor
             for (int i = 0; i < pathNodeDropLocations.Length; i++)
             {
                 var pathNode = CreateNavigationPathNode();
-                pathNode.TranslateTo(pathNodeDropLocations[i].Add(0, 4, 0));
+                pathNode.Reposition(pathNodeDropLocations[i].Add(0, 4, 0));
                 pathRootNode.Children.Add(pathNode);
                 navigationPath.Nodes.Add(pathNode);
             }
@@ -815,7 +816,7 @@ namespace Aurora.Core.Editor
             {
                 if (Path.Count != 0)
                 {
-                    Navigator.TranslateTo(Path[0], Vector3.Zero);
+                    Navigator.Reposition(Path[0], Vector3.Zero);
                 }
  
                  PointNavigatorToNextNode(false);

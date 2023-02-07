@@ -290,7 +290,7 @@ namespace Aurora.Sample.Editor
                 var newEye = oldEye + offset;
                 var newLookAt = oldLookAt + offset;              
 
-                referenceGridNode.TranslateTo(Vector3.Zero.AddY(guardianNode.WorldPosition().Y));
+                referenceGridNode.Reposition(Vector3.Zero.AddY(guardianNode.WorldPosition().Y));
                                 
                 game.Scene.CameraNode.Camera.ViewMatrix = SharpDX.Matrix.LookAtLH(
                     newEye,

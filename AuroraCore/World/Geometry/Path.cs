@@ -223,7 +223,7 @@ namespace CipherPark.Aurora.Core.World
                                                         n2.Transform.Translation,
                                                         pct);
                         Quaternion qRotation = Quaternion.Lerp(n1.Transform.Rotation, n2.Transform.Rotation, pct);
-                        pathNode = new PathNode() { Transform = new Transform(qRotation, vTranslation) };
+                        pathNode = new PathNode() { Transform = new Transform(qRotation, vTranslation, 1) };
                         break;
                     }
                     accumLength += _approximateSegmentLengths[i];

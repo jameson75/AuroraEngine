@@ -245,7 +245,7 @@ namespace CipherPark.Aurora.Core.Content
                 else
                 {
                     if (textureNames != null)
-                        textureNames.AddRange(doc.GetMeshMaterials(xMesh)
+                        textureNames.AddRange(GetMeshMaterials(xMesh, doc)
                                                  .Where(m => m.TextureFilename != null)
                                                  .Select(m => m.TextureFilename));
                 }
@@ -415,6 +415,21 @@ namespace CipherPark.Aurora.Core.Content
             
             return result;
         }     
+
+        private static IEnumerable<XFileMaterialObject> GetMeshMaterials(XFileMeshObject xMesh, XFileTextDocument doc)
+        {
+            List<XFileMaterialObject> materials = new List<XFileMaterialObject>();
+            if (xMesh.MeshMaterialList != null)
+            {
+                if (xMesh.MeshMaterialList.MaterialRefs != null)
+                    for (int i = 0; i < xMesh.MeshMaterialList.MaterialRefs.Count(); i++)
+                        materials.Add(doc.DataObjects.GetDataObject<XFileMaterialObject>(i));
+                if (xMesh.MeshMaterialList.Materials != null)
+                    for (int i = 0; i < xMesh.MeshMaterialList.Materials.Count(); i++)
+                        materials.Add(xMesh.MeshMaterialList.Materials[i]);
+            }
+            return materials;
+        }
 
         private static Vector3[] GenerateNormals(XFileMeshObject xMesh)
         {

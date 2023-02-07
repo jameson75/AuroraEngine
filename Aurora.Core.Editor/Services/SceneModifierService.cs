@@ -216,7 +216,7 @@ namespace CipherPark.Aurora.Core.Services
                                     currentPickedNode.Rotate(rotation);
 
                                     var translation = Vector3.Transform(currentPickedNode.Transform.Translation, rotation);
-                                    currentPickedNode.TranslateTo(translation);                                    
+                                    currentPickedNode.Reposition(translation);                                    
                                 }
                                 break;
                             case TransformSpace.ParentSpaceRevolveY:
@@ -228,7 +228,7 @@ namespace CipherPark.Aurora.Core.Services
 
                                     var positionOrientation = Quaternion.RotationAxis(axis, MathUtil.DegreesToRadians(rotationDelta));
                                     var newPosition = Vector3.Transform(currentPickedNode.Transform.Translation, positionOrientation);
-                                    currentPickedNode.TranslateTo(newPosition);                                    
+                                    currentPickedNode.Reposition(newPosition);                                    
                                     var orientationRotation = Quaternion.RotationAxis(axis, MathUtil.DegreesToRadians(rotationDelta));
                                     currentPickedNode.Rotate(orientationRotation);
                                 }

@@ -106,7 +106,9 @@
     <Compile Include="Animation\Controllers\AnonymousActionController.cs" />
     <Compile Include="Animation\Controllers\ParticleSystemController.cs" />
     <Compile Include="Animation\Controllers\RigidBodyMotionController.cs" />
+    <Compile Include="Animation\ITransformable.cs" />
     <Compile Include="Animation\SpatialAnimation.cs" />
+    <Compile Include="Animation\TransformableExtension.cs" />
     <Compile Include="Animation\Vector3Animation.cs" />
     <Compile Include="ContentManagement\TMXDocument.cs" />
     <Compile Include="ContentManagement\XFileImporter.cs" />

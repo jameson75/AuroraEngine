@@ -85,7 +85,7 @@ namespace CipherPark.Aurora.Core.World
             Quaternion q = Quaternion.RotationMatrix(viewRotation);
             Quaternion cameraRotation = new Quaternion(q.X, q.Y, q.Z, -q.W);
             Vector3 cameraTranslation = -viewTranslation;
-            return new Transform(cameraRotation, cameraTranslation);
+            return new Transform(cameraRotation, cameraTranslation, 1);
         }
 
         public static Matrix TransformToViewMatrix(Transform transform)

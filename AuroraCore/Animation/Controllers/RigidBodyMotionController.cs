@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SharpDX;
-using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.Module;
+﻿using SharpDX;
 using CipherPark.Aurora.Core.Systems;
 using CipherPark.Aurora.Core.World.Geometry;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -89,7 +82,7 @@ namespace CipherPark.Aurora.Core.Animation.Controllers
                 float displacementDistance = cWindowT * Target.BodyMotion.LinearVelocity;
                 Vector3 displacementVector = displacementDistance * Vector3.Normalize(Target.WorldToParentNormal(Target.BodyMotion.Direction));
                 Vector3 newTranslation = Target.Transform.Translation + displacementVector;
-                Target.Transform = new Transform(Target.Transform.Rotation, newTranslation);
+                Target.Transform = new Transform(Target.Transform.Rotation, newTranslation, Target.Transform.Scale);
             }
         }
         #endregion

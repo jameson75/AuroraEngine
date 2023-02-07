@@ -54,7 +54,7 @@ namespace CipherPark.Aurora.Core.World.Collision
         public Transform PreviousWorldTransform(Vector3 displacementVector)
         {
             Transform worldTransform = this.WorldTransform();
-            return new Transform(worldTransform.Rotation, worldTransform.Translation - displacementVector);
+            return new Transform(worldTransform.Rotation, worldTransform.Translation - displacementVector, worldTransform.Scale);
         }
 
         /// <summary>

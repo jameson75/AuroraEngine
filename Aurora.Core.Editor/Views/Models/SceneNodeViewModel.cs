@@ -59,7 +59,7 @@ namespace Aurora.Core.Editor
             get => DataModel.Transform.Translation;
             set
             {
-                DataModel.Transform = new Transform(DataModel.Transform.Rotation, value);
+                DataModel.Transform = new Transform(DataModel.Transform.Rotation, value, DataModel.Transform.Scale);
                 OnPropertyChanged(nameof(Position));
             }
         }
@@ -69,8 +69,18 @@ namespace Aurora.Core.Editor
             get => DataModel.Transform.Rotation;
             set
             {
-                DataModel.Transform = new Transform(value, DataModel.Transform.Translation);
+                DataModel.Transform = new Transform(value, DataModel.Transform.Translation, DataModel.Transform.Scale);
                 OnPropertyChanged(nameof(Orientation));
+            }
+        }
+
+        public float Scale
+        {
+            get => DataModel.Transform.Scale;
+            set
+            {
+                DataModel.Transform = new Transform(DataModel.Transform.Rotation, DataModel.Transform.Translation, value);
+                OnPropertyChanged(nameof(Scale));
             }
         }
 
