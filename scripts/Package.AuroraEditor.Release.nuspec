@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package >
   <metadata>
-    <id>CipherPark.AuroraEngine</id>
-    <version>0.0.6</version>
+    <id>CipherPark.AuroraEditor</id>
     <authors>Eugene Adams</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license type="expression">MIT</license>    
+    <license type="expression">MIT</license>
+	<version>0.0.0</version>
     <projectUrl>http://github.com/jameson75/AuroraEngine</projectUrl>
-    <description>Aurora Game Engine</description>
+    <description>Aurora Game Editor</description>
     <releaseNotes>Alpha Release</releaseNotes>
     <copyright>Copyright © 2021-2022</copyright>
-    <tags>Game Engine 3D DirectX .NET SharpDX Aurora Homebrew C#</tags>
+    <tags>Game Engine 3D DirectX .NET SharpDX Aurora Homebrew C# Editor</tags>
 	<dependencies>   
 		<group targetFramework=".NETFramework4.5">
 			<dependency id="SharpDX" version="4.2.0" />
@@ -24,13 +24,12 @@
 			<dependency id="SharpDX.MediaFoundation" version="4.2.0" />
 			<dependency id="SharpDX.XAudio2" version="4.2.0" />
 			<dependency id="SharpDX.XInput" version="4.2.0" />
+			<dependency id="CipherPark.AuroraEngine" version="0.0.11" />
+			<dependency id="Newtonsoft.Json" version="13.0.1" />
 		</group>
 	</dependencies>	
   </metadata>
- <files>	
-   <file src="..\AuroraCore\bin\Debug\AuroraCore.dll" target="lib\net45" />
-   <file src="..\lib\Exocortex\Exocortex.DSP.v1.dll" target="lib\net45" />
-   <file src="..\AuroraCore\bin\Debug\AuroraNative.dll" target="Build" />
-   <file src="..\scripts\CipherPark.AuroraEngine.targets" target="Build" />
+ <files>
+	<file src="..\Aurora.Core.Editor\bin\Debug\AuroraCore.Editor.dll" target="lib\net45" />
  </files>	
 </package>

@@ -13,7 +13,6 @@ using SharpDX.MediaFoundation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -28,7 +27,7 @@ namespace CipherPark.Aurora.Core.Utils.Toolkit
 
         #region constructor / finalizer
 
-        public XAudio2StreamingManager(XAudio2 audioDevice, IntPtr nativePointer)
+        public XAudio2StreamingManager(IntPtr nativePointer, XAudio2 audioDevice)
         {
             WaveFormatEx formatEx = new WaveFormatEx();           
             UnsafeNativeMethods.GetWaveFormat(nativePointer, ref formatEx);

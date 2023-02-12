@@ -50,6 +50,7 @@ namespace CipherPark.Aurora.Core.Animation
                 else
                     pctStep = pctT;
 
+                float s = MathUtil.Lerp(frameVal0.Scale, frameVal1.Scale, pctStep);
                 Quaternion r = Quaternion.Lerp(frameVal0.Rotation, frameVal1.Rotation, pctStep);
                 Vector3 x = Vector3.Zero;
                 if (SmoothingEnabled)
@@ -67,7 +68,7 @@ namespace CipherPark.Aurora.Core.Animation
                 else
                     x = Vector3.Lerp(frameVal0.Translation, frameVal1.Translation, pctStep);
 
-                return new Transform { Rotation = r, Translation = x };
+                return new Transform { Rotation = r, Translation = x, Scale = s };
             }
         }
     }    

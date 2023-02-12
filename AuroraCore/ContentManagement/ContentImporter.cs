@@ -55,7 +55,7 @@ namespace CipherPark.Aurora.Core.Content
         public static XAudio2StreamingManager LoadStreamingVoice(XAudio2 audioDevice, string resource)
         {            
             IntPtr nativePointer = UnsafeNativeMethods.LoadStreamingAudio(resource);
-            XAudio2StreamingManager manager = new XAudio2StreamingManager(audioDevice, nativePointer);
+            XAudio2StreamingManager manager = new XAudio2StreamingManager(nativePointer, audioDevice);
             return manager;
         }
 

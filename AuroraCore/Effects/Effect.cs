@@ -116,6 +116,11 @@ namespace CipherPark.Aurora.Core.Effects
             return EffectDataChannels.None;
         }
 
+        public virtual SurfaceVertexType GetSurfaceVertexType()
+        {
+            return SurfaceVertexType.None;
+        }
+
         public static EffectDataChannels GetDataChannelsForSurfaceVertexType(SurfaceVertexType surfaceVertexType)
         {
             var effectDataChannels = EffectDataChannels.Position;

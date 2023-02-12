@@ -25,7 +25,7 @@ namespace CipherPark.Aurora.Core.Animation
 
         public Vector3 Translation { get; set; }
 
-        public Matrix ToMatrix() { return Matrix.AffineTransformation(Scale, Rotation, Translation); }
+        public Matrix ToMatrix() { return Matrix.AffineTransformation(Scale, Rotation, Translation); }        
 
         public Transform(Matrix m)
             : this()

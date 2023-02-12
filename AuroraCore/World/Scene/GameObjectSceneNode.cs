@@ -16,11 +16,6 @@
 
                     if (g.ContainerNode == this)                    
                         g.ContainerNode = null;
-
-                    /*
-                    if (g.TransformableParent == this)
-                        g.TransformableParent = null;                    
-                    */
                 }
                 else
                 {
@@ -28,11 +23,6 @@
 
                     if (_gameObject.ContainerNode != this)                    
                         _gameObject.ContainerNode = this;
-
-                    /*
-                    if (_gameObject.TransformableParent != this)
-                        _gameObject.TransformableParent = this;                    
-                    */
                 }
             }
         }        
@@ -43,14 +33,14 @@
 
         public override void Update(GameTime gameTime)
         {
-            base.Update(gameTime);
             GameObject.Update(gameTime);
+            base.Update(gameTime);            
         }
 
         public override void Draw()
         {
-            base.Draw();
             GameObject.Draw();
+            base.Draw();            
         }
 
         protected override void OnDispose()

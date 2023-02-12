@@ -2,13 +2,13 @@
 <package >
   <metadata>
     <id>CipherPark.AuroraEditor</id>
-    <version>0.0.6</version>
     <authors>Eugene Adams</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>    
+	<version>0.0.0</version>
     <projectUrl>http://github.com/jameson75/AuroraEngine</projectUrl>
     <description>Aurora Game Editor</description>
-    <releaseNotes>Alpha Release</releaseNotes>
+    <releaseNotes>Alpha Release (Debug Version)</releaseNotes>
     <copyright>Copyright © 2021-2022</copyright>
     <tags>Game Engine 3D DirectX .NET SharpDX Aurora Homebrew C# Editor</tags>
 	<dependencies>   

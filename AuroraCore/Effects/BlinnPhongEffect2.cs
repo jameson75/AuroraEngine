@@ -386,6 +386,11 @@ namespace CipherPark.Aurora.Core.Effects
         {
             return GetDataChannelsForSurfaceVertexType(_surfaceVertexType);
         }
+
+        public override SurfaceVertexType GetSurfaceVertexType()
+        {
+            return _surfaceVertexType;
+        }
     }
 
     public enum BlinnPhongLampType

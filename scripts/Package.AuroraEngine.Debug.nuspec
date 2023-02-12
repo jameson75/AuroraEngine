@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>CipherPark.AuroraEngine</id>
+    <authors>Eugene Adams</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+	<version>0.0.0</version>
+    <projectUrl>http://github.com/jameson75/AuroraEngine</projectUrl>
+    <description>Aurora Game Engine</description>
+    <releaseNotes>Alpha Release (Debug Version)</releaseNotes>
+    <copyright>Copyright © 2021-2022</copyright>
+    <tags>Game Engine 3D DirectX .NET SharpDX Aurora Homebrew C#</tags>
+	<dependencies>   
+		<group targetFramework=".NETFramework4.5">
+			<dependency id="SharpDX" version="4.2.0" />
+			<dependency id="SharpDX.Desktop" version="4.2.0" />
+			<dependency id="SharpDX.Direct3D11" version="4.2.0" />
+			<dependency id="SharpDX.Direct3D9" version="4.2.0" />
+			<dependency id="SharpDX.DirectInput" version="4.2.0" />
+			<dependency id="SharpDX.DirectSound" version="4.2.0" />
+			<dependency id="SharpDX.DXGI" version="4.2.0" />
+			<dependency id="SharpDX.Mathematics" version="4.2.0" />
+			<dependency id="SharpDX.MediaFoundation" version="4.2.0" />
+			<dependency id="SharpDX.XAudio2" version="4.2.0" />
+			<dependency id="SharpDX.XInput" version="4.2.0" />
+		</group>
+	</dependencies>	
+  </metadata>
+ <files>	
+   <file src="..\AuroraCore\bin\Debug\AuroraCore.dll" target="lib\net45" />
+   <file src="..\lib\Exocortex\Exocortex.DSP.v1.dll" target="lib\net45" />
+   <file src="..\AuroraCore\bin\Debug\AuroraNative.dll" target="Build" />
+   <file src="..\scripts\CipherPark.AuroraEngine.targets" target="Build" />
+   <file src="..\AuroraCore\bin\Debug\AuroraCore.pdb" target="lib\net45" />
+ </files>	
+</package>

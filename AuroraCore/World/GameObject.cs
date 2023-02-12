@@ -89,13 +89,10 @@ namespace CipherPark.Aurora.Core.World
             _contextualContent.Add(type, content);
         }      
 
-        public BodyMotion BodyMotion { get; set; }
-
-        public Action<GameTime> UpdateAction { get; set; }       
+        public BodyMotion BodyMotion { get; set; }          
 
         public void Update(GameTime gameTime)
-        {
-            UpdateAction?.Invoke(gameTime);
+        {            
             Renderer?.Update(gameTime);            
             OnUpdate(gameTime);
         }

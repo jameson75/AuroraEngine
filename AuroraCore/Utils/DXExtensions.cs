@@ -169,6 +169,7 @@ namespace CipherPark.Aurora.Core.Utils
         }        
     }
 
+
     public static class RectangleDimensions
     {
         public static RectangleF FromCenter(float quadWidth, float quadHeight)
