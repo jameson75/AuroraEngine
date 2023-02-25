@@ -155,7 +155,7 @@ namespace CipherPark.Aurora.Core
                 Usage = Usage.RenderTargetOutput | Usage.ShaderInput,
             };
 
-            SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.Debug, chainDesc, out _graphicsDevice, out _swapChain);
+            SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport, chainDesc, out _graphicsDevice, out _swapChain);
             _graphicsDeviceContext = _graphicsDevice.ImmediateContext;
 
             // Ignore all windows events

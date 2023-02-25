@@ -192,7 +192,7 @@ namespace CipherPark.Aurora.Core
             {
                 try
                 {
-                    _graphicsDevice = new DXDevice(driverTypes[driverTypeIndex], DeviceCreationFlags.BgraSupport, featureLevels);
+                    _graphicsDevice = new DXDevice(driverTypes[driverTypeIndex], DeviceCreationFlags.Debug | DeviceCreationFlags.BgraSupport, featureLevels);
                     _driverType = driverTypes[driverTypeIndex];
                 }
                 catch (Exception ex)

@@ -155,7 +155,6 @@
     <Compile Include="Effects\DofEffect.cs" />
     <Compile Include="Effects\Effect.cs" />
     <Compile Include="Effects\PassThruPostEffect.cs" />
-    <Compile Include="Effects\BillboardEffect.cs" />
     <Compile Include="Effects\PostEffect.cs" />
     <Compile Include="Effects\PostEffectChain.cs" />
     <Compile Include="Effects\GlowFSPostEffect.cs" />

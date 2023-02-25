@@ -35,9 +35,7 @@ namespace CipherPark.Aurora.Core.World.Scene
 
         public Model SkyModel { get; set; }
 
-        public List<SpriteBatchContext> SpriteBatchContexts { get { return _spriteBatchContexts; } }
-
-        public List<CameraSceneNode> Cameras { get; } = new List<CameraSceneNode>();
+        public List<SpriteBatchContext> SpriteBatchContexts { get { return _spriteBatchContexts; } }        
 
         public void Update(GameTime gameTime)
         {

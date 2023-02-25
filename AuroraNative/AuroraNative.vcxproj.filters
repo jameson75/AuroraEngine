@@ -25,9 +25,6 @@
     <Filter Include="Shader Files\Skybox">
       <UniqueIdentifier>{3d00757a-12e1-4eff-b6ea-6f6ff2f7d1eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader Files\Billboard">
-      <UniqueIdentifier>{08a880e7-e9bc-4752-80fd-8d7aa29163a6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader Files\MotionBlur">
       <UniqueIdentifier>{ec00d575-64c0-4790-8032-b970e1006230}</UniqueIdentifier>
     </Filter>
@@ -49,9 +46,6 @@
     <Filter Include="Shader Files\BlinnPhong">
       <UniqueIdentifier>{dece85c8-61f7-4edf-815f-c0f59e859985}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader Files\Glitch">
-      <UniqueIdentifier>{55eeaec4-e3ab-4657-a0c4-a67ad55a0eee}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader Files\Shadow">
       <UniqueIdentifier>{b22be882-5e7f-451c-8718-fe494e88017c}</UniqueIdentifier>
     </Filter>
@@ -66,9 +60,6 @@
     </Filter>
     <Filter Include="Shader Files\EdgeDraw">
       <UniqueIdentifier>{2155d413-031b-44a4-986b-8392146e1ad0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Files\Simple">
-      <UniqueIdentifier>{12b60c19-634a-40fd-a6db-76424c397c50}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -178,15 +169,6 @@
     <FxCompile Include="dof_gaussian2_ps.hlsl">
       <Filter>Shader Files\Dof</Filter>
     </FxCompile>
-    <FxCompile Include="billboard-i-vs.hlsl">
-      <Filter>Shader Files\Billboard</Filter>
-    </FxCompile>
-    <FxCompile Include="billboard-ps.hlsl">
-      <Filter>Shader Files\Billboard</Filter>
-    </FxCompile>
-    <FxCompile Include="billboard-vs.hlsl">
-      <Filter>Shader Files\Billboard</Filter>
-    </FxCompile>
     <FxCompile Include="msbloom-combine-ps.hlsl">
       <Filter>Shader Files\Bloom</Filter>
     </FxCompile>
@@ -238,12 +220,6 @@
     <FxCompile Include="glowrtt-glow.hlsl">
       <Filter>Shader Files\GlowRTT</Filter>
     </FxCompile>
-    <FxCompile Include="glitch-lense-ps.hlsl">
-      <Filter>Shader Files\Glitch</Filter>
-    </FxCompile>
-    <FxCompile Include="glitch-noise-ps.hlsl">
-      <Filter>Shader Files\Glitch</Filter>
-    </FxCompile>
     <FxCompile Include="blinnphong2-ps.hlsl">
       <Filter>Shader Files\BlinnPhong</Filter>
     </FxCompile>
@@ -291,12 +267,6 @@
     </FxCompile>
     <FxCompile Include="edgedraw-vs.hlsl">
       <Filter>Shader Files\EdgeDraw</Filter>
-    </FxCompile>
-    <FxCompile Include="position_color-ps.hlsl">
-      <Filter>Shader Files\Simple</Filter>
-    </FxCompile>
-    <FxCompile Include="position_color-vs.hlsl">
-      <Filter>Shader Files\Simple</Filter>
     </FxCompile>
     <FxCompile Include="position_color-sp-vs.hlsl" />
     <FxCompile Include="position_color-sp-ps.hlsl" />

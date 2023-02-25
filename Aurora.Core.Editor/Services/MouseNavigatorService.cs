@@ -83,23 +83,7 @@ namespace CipherPark.Aurora.Core.Services
             Matrix platformTranslation = Matrix.Translation(platformLocation);            
 
             switch (mode)
-            {
-                /*
-                case NavigationMode.Pan:
-                    if (buttonDown && isMouseTracking)
-                    {
-                        //TODO: Unhardcode the translation factor using one derived from the z coordinate (in camera space) of
-                        //the intersection point of the bounding box surrounding the visible scene graph object closest to
-                        //the camera.
-                        float translationFactor = 5.0f;
-                        var traverseVector = cameraNode.LocalToWorldNormal(new Vector3(-mouseOffset.X * translationFactor, mouseOffset.Y * translationFactor, 0));
-                        traverseVector = cameraNode.WorldToParentNormal(traverseVector);
-                        camera.ViewMatrix = Matrix.Translation(traverseVector) * camera.ViewMatrix;
-                        mouseMoveFrom = location;
-                        accumTraverseVector += traverseVector;
-                    }
-                    break;
-                */
+            {                
                 case NavigationMode.PlatformRotate:
                     if (buttonDown && isMouseTracking)
                     {

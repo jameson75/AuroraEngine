@@ -90,7 +90,7 @@ namespace CipherPark.Aurora.Core.Effects
                 Game.GraphicsDevice.ImmediateContext.OutputMerger.BlendState = oldBlendState;            
         }
 
-        public void Dispose()
+        protected override void OnDispose()
         {            
             _samplerState.Dispose();
             _vertexShaderNoFix.Dispose();
