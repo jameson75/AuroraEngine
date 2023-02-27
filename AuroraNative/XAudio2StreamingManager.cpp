@@ -3,7 +3,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -25,6 +24,21 @@ NATIVE_API VOID STDCALL XAudio2StreamingManager_Dispose(LPVOID pXAudioStreamingM
 NATIVE_API BOOL STDCALL XAudio2StreamingManager_IsAtEndOfStream(LPVOID pXAudioStreamingManager)
 {
 	return ((XAudio2StreamingManager*)pXAudioStreamingManager)->IsAtEndOfSource();	
+}
+
+NATIVE_API BOOL STDCALL XAudio2StreamingManager_IsLoopAudioEnabled(LPVOID pXAudioStreamingManager)
+{
+	return ((XAudio2StreamingManager*)pXAudioStreamingManager)->IsLoopAudioEnabled();
+}
+
+NATIVE_API VOID STDCALL XAudio2StreamingManager_SetLoopAudioEnabled(LPVOID pXAudioStreamingManager, bool enabled)
+{
+	((XAudio2StreamingManager*)pXAudioStreamingManager)->SetLoopAudioEnabled(enabled);
+}
+
+NATIVE_API INT64 STDCALL XAudio2StreamingManager_GetSampleTime(LPVOID pXAudioStreamingManager)
+{
+	return ((XAudio2StreamingManager*)pXAudioStreamingManager)->GetSampleTime();
 }
 
 NATIVE_API LPVOID STDCALL XAudio2StreamingManager_GetNextBlock(LPVOID pXAudioStreamingManager, int *blockLength)

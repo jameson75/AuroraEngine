@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Windows;
 using SharpDX.Direct3D11;
@@ -13,7 +9,6 @@ using SharpDX.DirectInput;
 using CipherPark.Aurora.Core.Services;
 using System.Windows.Forms;
 using SharpDX.Mathematics.Interop;
-using SharpDX.Mathematics;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -147,7 +142,7 @@ namespace CipherPark.Aurora.Core
             SwapChainDescription chainDesc = new SwapChainDescription()
             {
                 BufferCount = 1,
-                ModeDescription = new ModeDescription(form.ClientSize.Width, form.ClientSize.Height, new Rational(60, 1), Format.R8G8B8A8_UNorm),
+                ModeDescription = new ModeDescription(form.ClientSize.Width, form.ClientSize.Height, new Rational(60, 1), Format.B8G8R8A8_UNorm),
                 IsWindowed = true,
                 OutputHandle = form.Handle,
                 SampleDescription = new SampleDescription(1, 0),

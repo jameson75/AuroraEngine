@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.IO;
-using SharpDX;
-using SharpDX.Direct3D11;
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
-using SharpDX.MediaFoundation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -48,7 +40,21 @@ namespace CipherPark.Aurora.Core.Utils.Toolkit
 
         #region properties
         
-        public SourceVoice SourceVoice { get { return _sourceVoice; } }
+        public SourceVoice SourceVoice
+        {
+            get => _sourceVoice;
+        }
+
+        public bool LoopAudio
+        {
+            get => UnsafeNativeMethods.IsLoopAudioEnabled(_nativePointer);
+            set => UnsafeNativeMethods.SetLoopAudioEnabled(_nativePointer, value);
+        }
+
+        public long CurrentSampleTime
+        {
+            get => UnsafeNativeMethods.GetSampleTime(_nativePointer);
+        }
         
         #endregion   
         
@@ -121,6 +127,15 @@ namespace CipherPark.Aurora.Core.Utils.Toolkit
 
             [DllImport("AuroraNative.dll", EntryPoint = "XAudio2StreamingManager_IsAtEndOfStream")]
             public static extern bool IsAtEndOfStream(IntPtr nativePointer);
+
+            [DllImport("AuroraNative.dll", EntryPoint = "XAudio2StreamingManager_IsLoopAudioEnabled")]
+            public static extern bool IsLoopAudioEnabled(IntPtr nativePointer);
+
+            [DllImport("AuroraNative.dll", EntryPoint = "XAudio2StreamingManager_SetLoopAudioEnabled")]
+            public static extern void SetLoopAudioEnabled(IntPtr nativePointer, bool enabled);
+
+            [DllImport("AuroraNative.dll", EntryPoint = "XAudio2StreamingManager_GetSampleTime")]
+            public static extern long GetSampleTime(IntPtr nativePointer);
 
             [DllImport("AuroraNative.dll", EntryPoint = "XAudio2StreamingManager_GetNextBlock")]
             public static extern IntPtr GetNextBlock(IntPtr nativePointer, ref int blockLengthRef);
