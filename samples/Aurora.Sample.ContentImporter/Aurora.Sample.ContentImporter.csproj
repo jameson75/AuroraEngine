@@ -73,6 +73,9 @@
     <Content Include="Assets\Music\LetsMakeIt.wma">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="AuroraNative.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -113,11 +116,6 @@
       <Project>{ac4ad65f-13f6-452f-bc30-dc1a784fb660}</Project>
       <Name>Aurora.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="AuroraNative.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Textures\MsMarvel.png">
