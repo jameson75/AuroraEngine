@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Moq;
 using FluentAssertions;
 
-namespace Aurora.Core.UnitTests
+namespace Aurora.Core.Tests.Unit
 {
     public class ServiceTableUnitTests
     {
