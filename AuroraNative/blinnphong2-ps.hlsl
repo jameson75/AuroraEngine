@@ -67,16 +67,15 @@ float4 blinn_PS(PSINPUT IN) : SV_TARGET
 		}
 	}		
 	
-	float3 diffuseColor = 0;
-	if(EnableVertexColor)
-		diffuseColor = IN.UVUV.xyz;
+	float4 diffuseColor = 0;
+	if (EnableVertexColor)
+		diffuseColor = IN.UVUV.rgba;
 	else
-		diffuseColor = DiffuseTexture.Sample(DiffuseSampler,IN.UVUV.xy).rgb;
-    
-	float3 result = specContrib+(diffuseColor*(diffContrib+AmbiColor));
+		diffuseColor = float4(DiffuseTexture.Sample(DiffuseSampler, IN.UVUV.xy)).rgba;
+
+	float3 result = specContrib+(diffuseColor.xyz*(diffContrib+AmbiColor));	
 	
-	float alpha = 1;	
-	return float4(result, alpha);
+	return float4(result, diffuseColor.a);
 }
 
 /* ATTENUATION EQUATIONS

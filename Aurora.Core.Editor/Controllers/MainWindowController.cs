@@ -355,8 +355,8 @@ namespace Aurora.Core.Editor
 
         public void JustExecute()
         {
-            var actionNode = game.Scene.Select(x => x.IsActionNode()).FirstOrDefault();
-            var pathRootNode = game.Scene.Select(x => x.IsPathRootNode()).FirstOrDefault();
+            var actionNode = game.Scene.SelectNodes(x => x.IsActionNode()).FirstOrDefault();
+            var pathRootNode = game.Scene.SelectNodes(x => x.IsPathRootNode()).FirstOrDefault();
             var navigationPathNodes = pathRootNode.GetGameObject().GetNavigationPath().Nodes;
             var controller = new ActionPathController(actionNode, navigationPathNodes);
             game.Simulator.Controllers.Add(controller);

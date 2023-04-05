@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using CipherPark.Aurora.Core.Services;
+using CipherPark.Aurora.Core.Utils.Toolkit;
+using System;
+using System.Collections.Generic;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -26,26 +29,84 @@ namespace CipherPark.Aurora.Core.Sequencer
             _game = game;
         }
 
+        public ISequencerClock Clock { get; set; }
+
         public void Update(GameTime gameTime)
         {
-            if (!_isStarted)
-                Start(gameTime);
+            if (Clock == null)
+            {
+                throw new InvalidOperationException("No clock specified");
+            }
 
-            long elapsedSequencerTime = CalculateElapsedSequencerTime(gameTime);
+            Clock.Update();
+
+            float elapsedSequencerTime = Clock.Time;
             //**************************************************************************
             //NOTE: We use an auxilary sequence to enumerate through, in the event that
             //an executed sequence alters this sequencer's Sequence collection.
             //**************************************************************************
             Sequence auxSequence = new Sequence();
             auxSequence.AddRange(this.Sequence);
-            foreach (SequenceEvent sequenceEvent in auxSequence)
+            foreach (TimedEvent timedEvent in auxSequence)
             {
-                if (sequenceEvent.Time <= elapsedSequencerTime)
+                if (timedEvent.Time <= elapsedSequencerTime)
                 {
-                    sequenceEvent.Execute(gameTime);
-                    Sequence.Remove(sequenceEvent);
+                    timedEvent.Execute(new TimedEventStamp(timedEvent.Time, elapsedSequencerTime));
+                    Sequence.Remove(timedEvent);
                 }
             }
+        } 
+    }
+
+    public class Sequence : List<TimedEvent>
+    { }
+
+    public abstract class TimedEvent
+    {
+        public float Time { get; set; }
+        public abstract void Execute(TimedEventStamp time);
+    }
+
+    public class TimedEventStamp
+    {
+        public TimedEventStamp(float eventTime, float clockTime)
+        {
+            EventTime = eventTime;
+            ClockTime = clockTime;
+        }
+        public float EventTime { get; }
+        public float ClockTime { get; }
+    }
+
+    public interface ISequencerClock
+    {
+        float Time { get; }
+        void Update();
+    }
+
+    public class SequencerGameTimeClock : ISequencerClock
+    {
+        private const float SecondsInAMillisecond = 1000f;
+        private bool _isStarted = false;
+        private long _startTime = 0;
+        private readonly IGameApp gameClockSource;
+
+        public SequencerGameTimeClock(IGameApp clockSource)
+        {
+            gameClockSource = clockSource;
+        }
+        
+        public float Time { get; private set; }
+
+        public void Update()
+        {
+            var gameStateService = gameClockSource.Services.GetService<IGameStateService>();
+            var gameTime = gameStateService.GameTime;
+            
+            if (!_isStarted)
+                Start(gameTime);
+
+            Time = CalculateElapsedGameTime(gameTime);
         }
 
         private void Start(GameTime gameTime)
@@ -54,16 +115,33 @@ namespace CipherPark.Aurora.Core.Sequencer
             _isStarted = true;
         }
 
-        private long CalculateElapsedSequencerTime(GameTime gameTime)
-        { return gameTime.GetTotalSimtime() - _startTime; }
+        private float CalculateElapsedGameTime(GameTime gameTime)
+        { 
+            return ToFractionalSeconds(gameTime.GetTotalSimtime() - _startTime); 
+        }
+
+        private static float ToFractionalSeconds(long time)
+            => time / SecondsInAMillisecond;
     }
 
-    public class Sequence : List<SequenceEvent>
-    { }
-
-    public abstract class SequenceEvent
+    public class SequencerAudioStreamClock : ISequencerClock
     {
-        public long Time { get; set; }
-        public abstract void Execute(GameTime gameTime);
+        private const float SecondsIn100NanoSecond = 10000000f;
+        private readonly XAudio2StreamingManager audioClockSource;
+
+        public SequencerAudioStreamClock(XAudio2StreamingManager clockSource)
+        {
+            audioClockSource = clockSource;
+        }
+
+        public float Time { get; private set; }
+
+        public void Update()
+        {
+            Time = ToFractionalSeconds(audioClockSource.CurrentSampleTime);
+        }
+
+        private static float ToFractionalSeconds(long time)
+            => time / SecondsIn100NanoSecond;
     }
 }

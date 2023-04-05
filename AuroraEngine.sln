@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aurora.Sample.Effects", "sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aurora.Sample.Editor", "samples\Aurora.Sample.Editor\Aurora.Sample.Editor.csproj", "{E3989160-0269-4EEC-BC5C-C8FF4DB2F901}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aurora.Core.UnitTests", "Aurora.Core.UnitTests\Aurora.Core.UnitTests.csproj", "{2FEA1F7C-0A8B-4341-8AD5-ECE7A85044AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aurora.Core.Tests", "Aurora.Core.UnitTests\Aurora.Core.Tests.csproj", "{2FEA1F7C-0A8B-4341-8AD5-ECE7A85044AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aurora.Samples.GameUI", "samples\Aurora.Samples.GameUI\Aurora.Samples.GameUI.csproj", "{1C4BA4A3-E12A-4925-9CB4-85451F026A58}"
 EndProject

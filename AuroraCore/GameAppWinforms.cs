@@ -259,7 +259,6 @@ namespace CipherPark.Aurora.Core
 
         private void form_SizeChanged(object sender, EventArgs e)
         {
-
             if (_form.ClientSize.Width != 0 && _form.ClientSize.Height != 0)
                 ResizeGraphicsBuffers();
         }

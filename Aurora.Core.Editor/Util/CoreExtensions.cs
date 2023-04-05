@@ -71,8 +71,8 @@ namespace Aurora.Core.Editor.Util
             => sceneNode.GetGameObject()?.IsEditorObject() ?? false;
 
         public static bool IsPathNode(this SceneNode sceneNode)
-            => sceneNode.GetGameObject()?.IsPathObject() ?? false; 
-        
+            => sceneNode.GetGameObject()?.IsPathObject() ?? false;
+
         public static bool IsActionNode(this SceneNode sceneNode)
             => sceneNode.GetGameObject()?.IsActionObject() ?? false;
 
@@ -86,11 +86,11 @@ namespace Aurora.Core.Editor.Util
             => sceneNode.As<GameObjectSceneNode>()?.GameObject;
 
         public static BoundingBoxOA GetWorldBoundingBox(this GameObjectSceneNode sceneNode)
-          => sceneNode.LocalToWorldBoundingBox(sceneNode.GameObject.GetBoundingBox().GetValueOrDefault());
+          => sceneNode.ParentToWorldBoundingBox(sceneNode.GameObject.GetBoundingBox().GetValueOrDefault());
 
         public static void Orphan(this SceneNode sceneNode)
             => sceneNode.Parent?.Children.Remove(sceneNode);
-     }
+    }
 
     public static class CastExtensions
     {
@@ -131,7 +131,7 @@ namespace Aurora.Core.Editor.Util
 
         public static GameObjectSceneNode SelectReferenceObjectRoot(this SceneGraph scene)
         {
-            return scene.Select(n => n.Visible &&
+            return scene.SelectNodes(n => n.Visible &&
                                      n.GetGameObject()
                                       .GetContext<EditorObjectContext>()
                                       ?.IsReferenceObjectRoot == true)

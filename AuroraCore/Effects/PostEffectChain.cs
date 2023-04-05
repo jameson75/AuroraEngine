@@ -140,7 +140,7 @@ namespace CipherPark.Aurora.Core.Effects
             _game.GraphicsDeviceContext.OutputMerger.SetTargets(_originalDepthStencilView, _originalRenderView);
 
             //8. It's important to immediate COM Release() any swap chain resource.
-            _originalDepthStencilView.Dispose();
+            _originalDepthStencilView?.Dispose();
             _originalRenderView.Dispose();
         }
 

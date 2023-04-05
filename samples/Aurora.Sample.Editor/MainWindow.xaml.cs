@@ -276,11 +276,11 @@ namespace Aurora.Sample.Editor
 
         private void Menu_Scene_MoveReferenceGrid(object sender, RoutedEventArgs e)
         {
-            var guardianNode = this.game.Scene.Select(n => n.Name?.Contains("Gardian") == true).FirstOrDefault();
+            var guardianNode = this.game.Scene.SelectNodes(n => n.Name?.Contains("Gardian") == true).FirstOrDefault();
             if (guardianNode != null)
             {
                 var referenceObjectRoot = this.game.Scene.SelectReferenceObjectRoot();
-                var referenceGridNode = referenceObjectRoot.Select(n => n.GetGameObject()?.IsReferenceGridObject() == true).First().As<GameObjectSceneNode>();
+                var referenceGridNode = referenceObjectRoot.SelectNodes(n => n.GetGameObject()?.IsReferenceGridObject() == true).First().As<GameObjectSceneNode>();
                  
                 var oldEye = game.Scene.CameraNode.WorldPosition();
                 var oldLookAtRay = new SharpDX.Ray(game.Scene.CameraNode.WorldPosition(), SharpDX.Vector3.Normalize(game.Scene.CameraNode.Camera.Forward));               

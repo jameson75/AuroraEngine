@@ -271,7 +271,7 @@ namespace Aurora.Sample.Editor
 
         private void PointCameraToReferenceGrid()
         {
-            var referenceGridNode = Scene.Select(n => n.Name == "Reference Grid Node").First();
+            var referenceGridNode = Scene.SelectNodes(n => n.Name == "Reference Grid Node").First();
             var referenceGridPosition = referenceGridNode.WorldPosition();
             Scene.CameraNode.Camera.ViewMatrix = Matrix.LookAtLH(referenceGridPosition + new Vector3(0, 100, 0), referenceGridPosition, Vector3.UnitZ);           
         }              

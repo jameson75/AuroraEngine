@@ -79,7 +79,7 @@ namespace CipherPark.Aurora.Core.Services
             var camera = cameraNode.Camera;
             var mode = IsModeInversionOn ? InvertMode(Mode) : Mode;            
             Vector2 mouseOffset = -Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));
-            Vector3 platformLocation = Game.GetActiveScene().Select(n => n.GetGameObject()?.IsReferenceGridObject() == true).First().WorldPosition();
+            Vector3 platformLocation = Game.GetActiveScene().SelectNodes(n => n.GetGameObject()?.IsReferenceGridObject() == true).First().WorldPosition();
             Matrix platformTranslation = Matrix.Translation(platformLocation);            
 
             switch (mode)
