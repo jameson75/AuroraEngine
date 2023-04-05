@@ -528,7 +528,21 @@ namespace CipherPark.Aurora.Core.Utils
 
         public static Vector3 GetOrigin(this Plane p)
         {
+            // TODO: Re-examine the correctness. I may have to use -p.D insted of p.D;
             return p.Normal * p.D;
+        }
+
+        public static Ray GetRay(this Plane p)
+        {
+            return new Ray(p.Normal * -p.D, p.Normal);
+        }
+    }
+
+    public static class RayExtensions
+    {
+        public static Ray Reverse(this Ray ray)
+        {
+            return new Ray(ray.Position, -ray.Direction);
         }
     }
 

@@ -57,7 +57,7 @@ namespace CipherPark.Aurora.Core.World
 
         public IRigidBody RigidBody { get; set; }
 
-        public ColliderCollection Colliders { get; set; }
+        public Collider Collider { get; set; }
 
         public IRenderer Renderer { get; set; }        
 

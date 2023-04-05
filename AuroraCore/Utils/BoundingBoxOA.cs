@@ -1,10 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using SharpDX;
-using CipherPark.Aurora.Core.Animation;
-using CipherPark.Aurora.Core;
-using CipherPark.Aurora.Core.World;
-
 
 namespace CipherPark.Aurora.Core.Utils
 {
@@ -83,7 +78,7 @@ namespace CipherPark.Aurora.Core.Utils
         /// </summary>
         /// <param name="box"></param>
         /// <returns></returns>
-        public ContainmentType Contains(ref BoundingBox box)
+        public ContainmentType Contains(BoundingBox box)
         {
             int nCornersContained = 0;
 
@@ -111,9 +106,9 @@ namespace CipherPark.Aurora.Core.Utils
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public ContainmentType Contains(ref Vector3 point)
+        public ContainmentType Contains(Vector3 point)
         {
-            return Contains(ref point, GetPlanes());
+            return Contains(point, GetPlanes());
         }
 
         /// <summary>
@@ -121,25 +116,111 @@ namespace CipherPark.Aurora.Core.Utils
         /// </summary>
         /// <param name="sphere"></param>
         /// <returns></returns>
-        public ContainmentType Contains(ref BoundingSphere sphere)
+        public ContainmentType Contains(BoundingSphere sphere)
+        {                       
+            var centerContainment = Contains(sphere.Center);
+            if (centerContainment != ContainmentType.Disjoint)
+            {
+                return (GetCorners().Any(c => Vector3.Distance(c, sphere.Center) < sphere.Radius)) ?
+                    ContainmentType.Contains :
+                    ContainmentType.Intersects;
+            }
+
+            BoundingQuadOA[] quads = GetQuads();
+            for (int i = 0; i < quads.Length; i++)
+            {
+                if (quads[i].Intersects(ref sphere))
+                {
+                    return ContainmentType.Intersects;
+                }
+            }
+
+            return ContainmentType.Disjoint;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="planes"></param>
+        /// <returns></returns>
+        private ContainmentType Contains(Vector3 point, Plane[] planes)
         {
-            Plane[] planes = GetPlanes();
+            bool intersectingPlaneFound = false;
+
             for (int i = 0; i < planes.Length; i++)
             {
-                if (sphere.Intersects(ref planes[i]) == PlaneIntersectionType.Intersecting)
-                    return ContainmentType.Intersects;
+                PlaneIntersectionType t = planes[i].Intersects(ref point);
+
+                //If the point is in front of any plane of the bounding box
+                //then it is on the outside of the box. Otherwise, it's either
+                //inside the box or on the surface of the box (intersects the box)>
+                if (t == PlaneIntersectionType.Front)
+                    return ContainmentType.Disjoint;
+
+                else if (t == PlaneIntersectionType.Intersecting)
+                    intersectingPlaneFound = true;
             }
-            return this.Contains(ref sphere.Center, planes);
-        }
+
+            //At this point we know that the point is inside or
+            //the surface of the of the bounding box.
+            return intersectingPlaneFound ? 
+                ContainmentType.Intersects :
+                ContainmentType.Contains;
+        }       
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sphere"></param>
         /// <returns></returns>
-        public bool Intersects(ref BoundingSphere sphere)
+        public bool Intersects(BoundingSphere sphere)
         {
-            return this.Contains(ref sphere) != ContainmentType.Disjoint;
+            return this.Contains(sphere) != ContainmentType.Disjoint;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="box"></param>
+        /// <returns></returns>
+        public bool Intersects(BoundingBoxOA box)
+        {            
+            foreach (var v in GetCorners())
+            {
+                if (box.Contains(v) != ContainmentType.Disjoint)
+                    return true;
+            }
+
+            foreach (var v in box.GetCorners())
+            {
+                if (Contains(v) != ContainmentType.Disjoint)
+                    return true;
+            }
+
+            var thisPlanes = GetPlanes();
+            for(int i = 0; i < thisPlanes.Length; i+=2)
+            {
+                Ray ray1 = thisPlanes[i].GetRay().Reverse();
+                Ray ray2 = thisPlanes[i + 1].GetRay().Reverse();
+                if( box.Intersects(ref ray1, out _) && box.Intersects(ref ray2, out _))
+                {
+                    return true;
+                }
+            }
+
+            var boxPlanes = box.GetPlanes();
+            for (int i = 0; i < boxPlanes.Length; i+=2)
+            {
+                Ray ray1 = boxPlanes[i].GetRay().Reverse();
+                Ray ray2 = boxPlanes[i + 1].GetRay().Reverse();
+                if (Intersects(ref ray1, out _) && Intersects(ref ray2, out _))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -184,50 +265,17 @@ namespace CipherPark.Aurora.Core.Utils
             point = Vector3.Zero;
             for (int i = 0; i < quads.Length; i++)
             {
-                Plane plane = quads[i].GetPlane();
-                //CollisionDebugWriter.IntersectsBoxInfo(i, quads[i], ray);
+                Plane plane = quads[i].GetPlane();            
                 //We discard any planes of this bounding box which are not facing away from the ray's origin.                
                 if (Plane.DotCoordinate(plane, ray.Position) > 0)
                 {
-                    //NOTE: At most, only one plane of the bounding box, that' either facing or coplanar to the ray's origin,
-                    //can be intersected.
-
                     //We return the intersection point of the first plane intersected.
                     if (quads[i].Intersects(ray, out point))
                         return true;
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="planes"></param>
-        /// <returns></returns>
-        private ContainmentType Contains(ref Vector3 point, Plane[] planes)
-        {
-            bool intersectsAPlane = false;
-            for (int i = 0; i < planes.Length; i++)
-            {
-                PlaneIntersectionType t = planes[i].Intersects(ref point);
-
-                //If the point is in front of any plane of the bounding box
-                //then it is on the outside of the box. Otherwise, it's either
-                //inside the box or on the surface of the box (intersects the box)>
-                if (t == PlaneIntersectionType.Front)
-                    return ContainmentType.Disjoint;
-
-                else if (t == PlaneIntersectionType.Intersecting)
-                    intersectsAPlane = true;
-            }
-
-            //At this point we know that the point is either inside or
-            //on the surface (intersects a plane) of the of the bounding box.
-
-            return intersectsAPlane ? ContainmentType.Intersects : ContainmentType.Contains;
-        }
+        }       
 
         /// <summary>
         /// 

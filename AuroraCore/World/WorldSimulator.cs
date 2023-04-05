@@ -33,7 +33,7 @@ namespace CipherPark.Aurora.Core.World
         public WorldSimulator(IGameApp game)
         {
             _game = game;
-            _collisionDetector = new CollisionDetector(game);           
+            _collisionDetector = new CollisionDetector();           
         }
 
         public void Update(GameTime gameTime)

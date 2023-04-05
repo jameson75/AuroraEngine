@@ -2,7 +2,10 @@
 using System.Linq;
 using System.Collections.Generic;
 using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.Utils;
 using System.Collections.Specialized;
+using CipherPark.Aurora.Core.Animation;
+using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -33,7 +36,7 @@ namespace CipherPark.Aurora.Core.World.Scene
         
         public CameraSceneNode CameraNode { get; set; }
 
-        public Model SkyModel { get; set; }
+        public Model SkyModel { get; set; }         
 
         public List<SpriteBatchContext> SpriteBatchContexts { get { return _spriteBatchContexts; } }        
 
@@ -48,26 +51,46 @@ namespace CipherPark.Aurora.Core.World.Scene
         public void Draw()
         {
             OnBeginDraw();                    
-            _DrawSkyModel();
-           
-            foreach (SceneNode node in Nodes)
-                _DrawNodeHierarchy(node);            
-                        
-            CameraNode.Camera.PostEffectChain.InputTexture = Game.RenderTargetShaderResource;
-            CameraNode.Camera.PostEffectChain.OutputView = Game.RenderTargetView;
-            CameraNode.Camera.PostEffectChain.Apply();
+            
+            DrawSkyModel();
+            DrawStandardNodePipline();
+            DrawTransparentNodePipline();
+            ProcessNodePostEffects();
+            DrawSprites();
 
-            _DrawSprites();
             OnEndDraw();            
         }
 
-        private void _DrawSprites()
+        private void DrawStandardNodePipline()
+        {
+            foreach (SceneNode node in Nodes)
+                _DrawStandardNodeHierarchy(node);
+        }
+
+        private void DrawTransparentNodePipline()
+        {
+            var transparencyNodes = Nodes.SelectNodes(n => n.Pipeline == SceneNodePipeline.Transparency);
+            var orderedTransparencyNodes = transparencyNodes.OrderByDescending(n => Vector3.DistanceSquared(CameraNode.WorldPosition(), n.WorldPosition()));
+            foreach (var transparentNode in orderedTransparencyNodes)
+            {
+                transparentNode.Draw();
+            }
+        }
+
+        private void ProcessNodePostEffects()
+        {
+            CameraNode.Camera.PostEffectChain.InputTexture = Game.RenderTargetShaderResource;
+            CameraNode.Camera.PostEffectChain.OutputView = Game.RenderTargetView;
+            CameraNode.Camera.PostEffectChain.Apply();
+        }
+
+        private void DrawSprites()
         {
             foreach (SpriteBatchContext context in _spriteBatchContexts)
                 context.Draw();
         }
 
-        private void _DrawSkyModel()
+        private void DrawSkyModel()
         {
             if (SkyModel != null)
             {               
@@ -84,13 +107,16 @@ namespace CipherPark.Aurora.Core.World.Scene
                 _UpdateNodeHierarchy(gameTime, child);           
         }
 
-        private void _DrawNodeHierarchy(SceneNode node)
+        private void _DrawStandardNodeHierarchy(SceneNode node)
         {
             if (node.Visible)
             {
-                node.Draw();
+                if (node.Pipeline == SceneNodePipeline.Standard)
+                {
+                    node.Draw();
+                }
                 foreach (SceneNode child in node.Children)
-                    _DrawNodeHierarchy(child);
+                    _DrawStandardNodeHierarchy(child);
             }
         }
 
@@ -171,13 +197,9 @@ namespace CipherPark.Aurora.Core.World.Scene
         public event EventHandler EndUpdate;       
     }
 
-    public enum SpatialReference
+    public enum SceneNodePipeline
     {
-        BoundingBoxTop,
-        BoundingBoxBottom,
-        BoundingBoxLeft,
-        BoundingBoxRight,
-        BoundingBoxFront,
-        BoundingBoxBack
+        Standard =     0,
+        Transparency = 1
     }
 }

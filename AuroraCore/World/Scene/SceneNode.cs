@@ -92,7 +92,9 @@ namespace CipherPark.Aurora.Core.World.Scene
 
         public ulong Flags { get; set; }
 
-        public virtual Transform Transform { get; set; }        
+        public virtual Transform Transform { get; set; }
+
+        public SceneNodePipeline Pipeline { get; set; } = SceneNodePipeline.Standard;
 
         public virtual void Draw() { }
 

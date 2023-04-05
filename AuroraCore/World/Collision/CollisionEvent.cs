@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SharpDX;
-using SharpDX.XAudio2;
-using SharpDX.Direct3D11;
-using SharpDX.DirectInput;
-using CipherPark.Aurora.Core;
-using CipherPark.Aurora.Core.World.Scene;
-using CipherPark.Aurora.Core.Animation;
-using CipherPark.Aurora.Core.Services;
-using CipherPark.Aurora.Core.Utils;
+﻿using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -27,23 +15,23 @@ namespace CipherPark.Aurora.Core.World.Collision
     public class CollisionEvent
     {
         /// <summary>
-        /// First object involved in the collision.
+        /// First collider involved in the collision.
         /// </summary>
-        public Collider Object1 { get; set; }
+        public Collider Collider1 { get; set; }
 
         /// <summary>
-        /// Second object involved in the collision.
+        /// Second collider involved in the collision.
         /// </summary>        
-        public Collider Object2 { get; set; }
+        public Collider Collider2 { get; set; } 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public ITransformable TransformableContainer1 { get; set; }
 
         /// <summary>
-        /// The first object's location at the collision.
+        /// 
         /// </summary>
-        public Vector3 Object1LocationAtCollision { get; set; }
-
-        /// <summary>
-        /// The second object's location at the collision.
-        /// </summary>
-        public Vector3 Object2LocationAtCollision { get; set; }
+        public ITransformable TransformableContainer2 { get; set; }
     }
 }

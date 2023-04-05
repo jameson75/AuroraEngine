@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Linq;
 using SharpDX;
-using CipherPark.Aurora.Core.Animation;
-using CipherPark.Aurora.Core;
-using CipherPark.Aurora.Core.World;
 
 namespace CipherPark.Aurora.Core.Utils
 {
@@ -152,6 +149,19 @@ namespace CipherPark.Aurora.Core.Utils
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="sphere"></param>
+        /// <returns></returns>
+        public bool Intersects(ref BoundingSphere sphere)
+        {
+            var p = GetPlane();
+            var c = sphere.Center - Vector3.Dot(sphere.Center - (p.Normal * -p.D), p.Normal) * p.Normal;
+            return ContainsCoplanar(ref c) &&
+                   Vector3.Distance(sphere.Center, c) <= sphere.Radius;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public Plane GetPlane()
         {
@@ -218,18 +228,23 @@ namespace CipherPark.Aurora.Core.Utils
         public bool ContainsCoplanar(ref Vector3 coplanarPoint)
         {
             Plane plane = GetPlane();
+            
             Vector3[] _corners = GetCorners();
+            if(_corners.Contains(coplanarPoint))
+            {
+                return true;
+            }
+
             for (int i = 0; i < _corners.Length; i++)
             {                
                 Vector3 p1 = coplanarPoint;
                 Vector3 p2 = _corners[i];
                 Vector3 p3 = i < _corners.Length - 1 ? _corners[i + 1] : _corners[0];
                 Vector3 c = Vector3.Normalize(Vector3.Cross(p2 - p1, p3 - p2));
-                //CollisionDebugWriter.QuadContainsCoplanarPointInfo(c, plane, coplanarPoint);
                 if (c != Vector3.Normalize(plane.Normal) && c != Vector3.Zero)
                     return false;                
             }
-            //CollisionDebugWriter.QuadContainsCoplanarSuccessInfo();
+
             return true;
         }
 
@@ -249,21 +264,9 @@ namespace CipherPark.Aurora.Core.Utils
             return string.Format("TopLeft: {0}, TopRight: {1}, BottomRight: {2}, BottomLeft: {3}",
                                   TopLeft, TopRight, BottomRight, BottomLeft);
         }
-
-        public static BoundingQuadOA FromBox(BoundingBox boundingBox)
-        {
-            return new BoundingQuadOA()
-            {
-                TopLeft = new Vector3(boundingBox.Minimum.X, 0, boundingBox.Maximum.Z),
-                TopRight = new Vector3(boundingBox.Maximum.X, 0, boundingBox.Maximum.Z),
-                BottomRight = new Vector3(boundingBox.Maximum.X, 0, boundingBox.Minimum.Z),
-                BottomLeft = new Vector3(boundingBox.Minimum.X, 0, boundingBox.Minimum.Z)
-            };
-        }
     }
     
     /// <summary>
-    /// 
     /// </summary>
     public enum QuadIntersectionType
     {

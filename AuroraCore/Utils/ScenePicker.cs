@@ -18,7 +18,7 @@ namespace CipherPark.Aurora.Core.Utils
 
             Func<SceneNode, bool> filter = (node) => node is GameObjectSceneNode && (customFilter == null || customFilter(node.As<GameObjectSceneNode>()));
 
-            var nodes = scene.Select(filter)
+            var nodes = scene.SelectNodes(filter)
                                      .Distinct()
                                      .Cast<GameObjectSceneNode>()
                                      .ToArray();
