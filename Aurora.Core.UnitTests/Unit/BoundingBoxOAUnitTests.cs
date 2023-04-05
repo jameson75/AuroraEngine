@@ -226,6 +226,22 @@ namespace Aurora.Core.Tests.Unit
             result.Should().BeFalse();
         }
 
+        [Test]
+        public void When_BoxCreatedFromAABox_ThenBoxHasExpectedCorners()
+        {
+            //arrange
+            var min = new Vector3(-100);
+            var max = new Vector3(100);
+            var box = new BoundingBox(min, max);            
+
+            //act
+            var sut = BoundingBoxOA.FromAABoundingBox(box);
+
+            //assert
+            sut.BackTopRight.Should().Be(max);
+            sut.FrontBottomLeft.Should().Be(min);
+        }
+
         public static BoundingBoxOA CreateBox(Vector3 origin, float size)
         {
             return CreateBox(origin, new Vector3(size));

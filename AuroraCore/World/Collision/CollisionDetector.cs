@@ -49,6 +49,11 @@ namespace CipherPark.Aurora.Core.World.Collision
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public List<CollisionEvent> CollisionEvents { get => collisionEvents; }
+
+        /// <summary>
         /// Updates the state of collision detection.
         /// </summary>
         /// <param name="gameTime"></param>
@@ -100,13 +105,13 @@ namespace CipherPark.Aurora.Core.World.Collision
             }
         }
 
-        private void DetectCollisions(IList<GameObject> gameObjects)
+        private void DetectCollisions(IList<GameObject> gameObjectsA)
         {
-            var gameObjectsB = gameObjects.ToList();
-            foreach (var gameObjectA in gameObjects)
+            var gameObjectsB = gameObjectsA.ToList();
+            foreach (var gameObjectA in gameObjectsA)
             {
                 gameObjectsB.Remove(gameObjectA);
-                foreach (var gameObjectB in gameObjects)
+                foreach (var gameObjectB in gameObjectsB)
                 {
                     var collisionEvent = gameObjectA.Collider.DetectCollision(gameObjectA.ContainerNode, gameObjectB.Collider, gameObjectB.ContainerNode);
                     if (collisionEvent != null)
