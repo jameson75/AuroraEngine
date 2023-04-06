@@ -2,6 +2,13 @@
 using System.Linq;
 using SharpDX;
 
+///////////////////////////////////
+// Developer: Eugene Adams
+// Copyright © 2010-2013
+// Aurora Engine is licensed under 
+// MIT License.
+///////////////////////////////////
+
 namespace CipherPark.Aurora.Core.Utils
 {
     /// <summary>

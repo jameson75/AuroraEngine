@@ -18,6 +18,8 @@ namespace CipherPark.Aurora.Core.World.Collision
     {                
         private readonly List<CollisionEvent> collisionEvents;
         private readonly List<GameObject> gameObjects;
+        private List<Collider> firedColliders;
+        private List<CollisionEvent> collisionEventsInPreviousPass;
         private PartitionTreeNode partitionTree;
 
         /// <summary>
@@ -28,6 +30,8 @@ namespace CipherPark.Aurora.Core.World.Collision
         {            
             collisionEvents = new List<CollisionEvent>();
             gameObjects = new List<GameObject>();
+            firedColliders = new List<Collider>();
+            collisionEventsInPreviousPass = new List<CollisionEvent>();
         }
         
         /// <summary>
@@ -59,11 +63,7 @@ namespace CipherPark.Aurora.Core.World.Collision
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            collisionEvents.Clear();
-
-            //***********************************************************************************
-            //Basic, Broad-Phase collision detection using spatial partitioning.
-            //***********************************************************************************                            
+            FlushCollisionEvents();
 
             //Stage I. Broad Phase
             //--------------------
@@ -82,9 +82,16 @@ namespace CipherPark.Aurora.Core.World.Collision
             else
             {
                 DetectCollisions(gameObjects);
-            }          
+            }
         }
         
+        private void FlushCollisionEvents()
+        {
+            collisionEventsInPreviousPass.Clear();
+            collisionEventsInPreviousPass.AddRange(collisionEvents);
+            collisionEvents.Clear();
+        }
+
         private void DetectCollisions(PartitionTreeNode partitionTree)
         {
             if (partitionTree == null)
@@ -113,41 +120,53 @@ namespace CipherPark.Aurora.Core.World.Collision
                 gameObjectsB.Remove(gameObjectA);
                 foreach (var gameObjectB in gameObjectsB)
                 {
-                    var collisionEvent = gameObjectA.Collider.DetectCollision(gameObjectA.ContainerNode, gameObjectB.Collider, gameObjectB.ContainerNode);
-                    if (collisionEvent != null)
+                    if (CanCollide(gameObjectA) && CanCollide(gameObjectB))
                     {
-                        collisionEvents.Add(collisionEvent);
+                        var collisionEvent = gameObjectA.Collider.DetectCollision(gameObjectA.ContainerNode, gameObjectB.Collider, gameObjectB.ContainerNode);
+                        if (collisionEvent != null)
+                        {
+                            if (!IsEcho(collisionEvent) || (CanEchoCollisionFor(gameObjectA) && CanEchoCollisionFor(gameObjectB)))
+                            {
+                                RecordCollisionEvent(collisionEvent);
+                            }
+                        }
                     }
                 }
             }
         }
-    }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class PartitionTreeNode
-    {
-        private List<GameObject> gameObjects { get; set; }
-
-        public PartitionTreeNode(IList<GameObject> gameObjects)
+        private bool CanEchoCollisionFor(GameObject gameObject)
         {
-            this.gameObjects = new List<GameObject>(gameObjects);
+            return gameObject.Collider.Mode != ColliderMode.FireAlwaysNoEcho;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<GameObject> GameObjects { get => gameObjects; }
+        private bool IsEcho(CollisionEvent collisionEvent)
+        {
+            return collisionEventsInPreviousPass.Any(e => 
+                (e.Collider1 == collisionEvent.Collider1 && e.Collider2 == collisionEvent.Collider2) ||
+                (e.Collider1 == collisionEvent.Collider2 && e.Collider2 == collisionEvent.Collider1));
+        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public PartitionTreeNode LeftChild { get; set; }
+        private bool CanCollide(GameObject gameObject)
+        {
+            return gameObject.Collider != null &&             
+                   gameObject.Collider.Mode != ColliderMode.InActive &&
+                   gameObject.Collider.Mode != ColliderMode.FireOnce || !firedColliders.Contains(gameObject.Collider);
+        }      
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public PartitionTreeNode RightChild { get; set; }
+        private void RecordCollisionEvent(CollisionEvent collisionEvent)
+        {
+            collisionEvents.Add(collisionEvent);
+
+            if (!firedColliders.Contains(collisionEvent.Collider1))
+            {
+                firedColliders.Add(collisionEvent.Collider1);
+            }
+            
+            if (!firedColliders.Contains(collisionEvent.Collider2))
+            {
+                firedColliders.Add(collisionEvent.Collider2);
+            }
+        }      
     }
 }

@@ -11,6 +11,8 @@ namespace CipherPark.Aurora.Core.World.Collision
 { 
     public abstract class Collider 
     {
+        public ColliderMode Mode { get; set; } = ColliderMode.FireAlways;
+
         public abstract CollisionEvent DetectCollision(
             ITransformable transformableContainer, 
             Collider targetCollider, 
