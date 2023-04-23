@@ -90,13 +90,29 @@ namespace Aurora.Core.Tests.Unit
         }
 
         [Test]
-        public void When_BoxBisectsBox_ThenIntersectsIsTrue()
+        public void When_Box1BisectsBox2_ThenIntersectsIsTrue()
         {
             //arrange
             const float size = 100f;
             var origin = Vector3.Zero;
             var sut = CreateBox(origin, size);
             var targetBox = CreateBox(origin, size + new Vector3(50, -50, 0));
+
+            //act
+            var result = sut.Intersects(targetBox);
+
+            //assert
+            result.Should().BeTrue();
+        }
+
+        [Test]
+        public void When_Box2BisectsBox1_ThenIntersectsIsTrue()
+        {
+            //arrange
+            const float size = 100f;
+            var origin = Vector3.Zero;
+            var targetBox = CreateBox(origin, size);
+            var sut = CreateBox(origin, size + new Vector3(50, -50, 0));
 
             //act
             var result = sut.Intersects(targetBox);
@@ -183,7 +199,7 @@ namespace Aurora.Core.Tests.Unit
             const float radius = size / 2f;
             var origin = Vector3.Zero;
             var sut = CreateBox(origin, size);
-            var targetSphere = new BoundingSphere(origin + new Vector3(distance, distance/2.0f, 0), radius);
+            var targetSphere = new BoundingSphere(origin + new Vector3(distance, distance / 2.0f, 0), radius);
 
             //act
             var result = sut.Intersects(targetSphere);
@@ -232,7 +248,7 @@ namespace Aurora.Core.Tests.Unit
             //arrange
             var min = new Vector3(-100);
             var max = new Vector3(100);
-            var box = new BoundingBox(min, max);            
+            var box = new BoundingBox(min, max);
 
             //act
             var sut = BoundingBoxOA.FromAABoundingBox(box);
@@ -241,6 +257,35 @@ namespace Aurora.Core.Tests.Unit
             sut.BackTopRight.Should().Be(max);
             sut.FrontBottomLeft.Should().Be(min);
         }
+
+        [Test]
+        public void When_BoxesHaveIntersectingPlanesAndAreDisjoint_ThenIntersectsIsFlase()
+        {
+            var box1 = new BoundingBoxOA()
+            {
+                BackBottomLeft =    new Vector3(350f, 0f,   2375f),
+                BackBottomRight =   new Vector3(850f, 0f,   2375f),
+                BackTopLeft =       new Vector3(350f, 100f, 2375f),
+                BackTopRight =      new Vector3(850f, 100f, 2375f),
+                FrontBottomLeft =   new Vector3(350f, 0f,   2125f),
+                FrontBottomRight =  new Vector3(850f, 0f,   2125f),
+                FrontTopLeft =      new Vector3(350f, 100f, 2125f),
+                FrontTopRight =     new Vector3(850f, 100f, 2125f),
+            };
+            var box2 = new BoundingBoxOA()
+            {
+                BackBottomLeft =    new Vector3(11.02129f,  -0.00073f,  2125.327f),
+                BackBottomRight =   new Vector3(-11.02129f, -0.00073f,  2125.327f),
+                BackTopLeft =       new Vector3(11.02129f,  59.27826f,  2125.327f),
+                BackTopRight =      new Vector3(-11.02129f, 59.27826f,  2125.327f),
+                FrontBottomLeft =   new Vector3(11.0213f,   -0.00073f,  2200.064f),
+                FrontBottomRight =  new Vector3(-11.02128f, -0.00073f,  2200.064f),
+                FrontTopLeft =      new Vector3(11.0213f,   59.27826f,  2200.064f),
+                FrontTopRight =     new Vector3(-11.02128f, 59.27826f,  2200.064f),
+            };
+
+            box1.Intersects(box2).Should().BeFalse();
+        }        
 
         public static BoundingBoxOA CreateBox(Vector3 origin, float size)
         {

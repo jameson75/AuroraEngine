@@ -86,7 +86,7 @@ namespace Aurora.Core.Editor.Util
             => sceneNode.As<GameObjectSceneNode>()?.GameObject;
 
         public static BoundingBoxOA GetWorldBoundingBox(this GameObjectSceneNode sceneNode)
-          => sceneNode.ParentToWorldBoundingBox(sceneNode.GameObject.GetBoundingBox().GetValueOrDefault());
+          => sceneNode.LocalToWorldBoundingBox(sceneNode.GameObject.GetBoundingBox().GetValueOrDefault());
 
         public static void Orphan(this SceneNode sceneNode)
             => sceneNode.Parent?.Children.Remove(sceneNode);

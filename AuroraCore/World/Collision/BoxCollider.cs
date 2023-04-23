@@ -17,19 +17,19 @@ namespace CipherPark.Aurora.Core.World.Collision
         public override CollisionEvent DetectCollision(ITransformable transformableContainer, Collider targetCollider, ITransformable targetTransformableContainer)
         {
             var collisionDetected = false;
-            var worldBoxA = transformableContainer?.ParentToWorldBoundingBox(Box) ??
+            var worldBoxA = transformableContainer?.LocalToWorldBoundingBox(Box) ??
                                Box;
 
             if (targetCollider is SphereCollider)
             {
-                var worldSphereB = targetTransformableContainer?.ParentToWorldBoundingSphere(((SphereCollider)targetCollider).Sphere) ??
+                var worldSphereB = targetTransformableContainer?.LocalToWorldBoundingSphere(((SphereCollider)targetCollider).Sphere) ??
                                    ((SphereCollider)targetCollider).Sphere;
                 collisionDetected = worldBoxA.Intersects(worldSphereB);
             }
 
             else if (targetCollider is BoxCollider)
             {
-                var worldBoxB = targetTransformableContainer?.ParentToWorldBoundingBox(((BoxCollider)targetCollider).Box) ??
+                var worldBoxB = targetTransformableContainer?.LocalToWorldBoundingBox(((BoxCollider)targetCollider).Box) ??
                                 ((BoxCollider)targetCollider).Box;
                 collisionDetected = worldBoxB.Intersects(worldBoxA);
             }

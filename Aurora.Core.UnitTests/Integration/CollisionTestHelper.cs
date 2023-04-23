@@ -3,7 +3,7 @@ using SharpDX;
 
 namespace Aurora.Core.Tests.Integration
 {
-    public static class ColliderTestHelper
+    public static class CollisionTestHelper
     {
         public static BoxCollider CreateBoxCollider(Vector3 origin, float size)
         {

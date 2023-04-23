@@ -24,19 +24,19 @@ namespace CipherPark.Aurora.Core.World.Collision
             ITransformable targetTransformableContainer)
         {
             var collisionDetected = false;
-            var worldSphereA = transformableContainer?.ParentToWorldBoundingSphere(Sphere) ?? 
+            var worldSphereA = transformableContainer?.LocalToWorldBoundingSphere(Sphere) ?? 
                                Sphere;
 
             if (targetCollider is SphereCollider)
             {               
-                var worldSphereB = targetTransformableContainer?.ParentToWorldBoundingSphere(((SphereCollider)targetCollider).Sphere) ?? 
+                var worldSphereB = targetTransformableContainer?.LocalToWorldBoundingSphere(((SphereCollider)targetCollider).Sphere) ?? 
                                    ((SphereCollider)targetCollider).Sphere;                
                 collisionDetected = worldSphereA.Intersects(worldSphereB);
             }
 
             else if (targetCollider is BoxCollider)
             {
-                var worldBoxB = targetTransformableContainer?.ParentToWorldBoundingBox(((BoxCollider)targetCollider).Box) ??
+                var worldBoxB = targetTransformableContainer?.LocalToWorldBoundingBox(((BoxCollider)targetCollider).Box) ??
                                 ((BoxCollider)targetCollider).Box;
                 collisionDetected = worldBoxB.Intersects(worldSphereA);
             }

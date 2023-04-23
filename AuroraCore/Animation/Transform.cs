@@ -13,8 +13,10 @@ namespace CipherPark.Aurora.Core.Animation
     /// 
     /// </summary>
 #pragma warning disable CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
+#pragma warning disable CS0661
     public struct Transform
 #pragma warning restore CS0660 // Type defines operator == or operator != but does not override Object.Equals(object o)
+#pragma warning restore CS0661
     {
         private static Transform _zero = new Transform { Rotation = Quaternion.Zero, Translation = Vector3.Zero, Scale = 1f };
         private static Transform _identity = new Transform { Rotation = Quaternion.Identity, Translation = Vector3.Zero, Scale = 1f };

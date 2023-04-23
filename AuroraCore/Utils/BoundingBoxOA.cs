@@ -198,25 +198,17 @@ namespace CipherPark.Aurora.Core.Utils
                     return true;
             }
 
-            var thisPlanes = GetPlanes();
-            for(int i = 0; i < thisPlanes.Length; i+=2)
+            var thisQuads = GetQuads();
+            var boxQuads = box.GetQuads();
+            
+            foreach(var thisQuad in thisQuads)
             {
-                Ray ray1 = thisPlanes[i].GetRay().Reverse();
-                Ray ray2 = thisPlanes[i + 1].GetRay().Reverse();
-                if( box.Intersects(ref ray1, out _) && box.Intersects(ref ray2, out _))
+                foreach(var boxQuad in boxQuads)
                 {
-                    return true;
-                }
-            }
-
-            var boxPlanes = box.GetPlanes();
-            for (int i = 0; i < boxPlanes.Length; i+=2)
-            {
-                Ray ray1 = boxPlanes[i].GetRay().Reverse();
-                Ray ray2 = boxPlanes[i + 1].GetRay().Reverse();
-                if (Intersects(ref ray1, out _) && Intersects(ref ray2, out _))
-                {
-                    return true;
+                    if (thisQuad.Intersects(boxQuad))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -324,7 +316,7 @@ namespace CipherPark.Aurora.Core.Utils
         }
 
         /// <summary>
-        /// 
+        /// returns quads in this order: front, back, top, bottom, left, right.
         /// </summary>
         /// <returns></returns>
         public BoundingQuadOA[] GetQuads()

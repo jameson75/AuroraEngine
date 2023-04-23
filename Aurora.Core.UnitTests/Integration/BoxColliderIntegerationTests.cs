@@ -12,8 +12,8 @@ namespace Aurora.Core.Tests.Integration
             //arrange
             const float size = 100f;
             var origin = Vector3.Zero;
-            var sut = ColliderTestHelper.CreateBoxCollider(origin, size);
-            var targetCollider = ColliderTestHelper.CreateBoxCollider(origin, size - 50);
+            var sut = CollisionTestHelper.CreateBoxCollider(origin, size);
+            var targetCollider = CollisionTestHelper.CreateBoxCollider(origin, size - 50);
 
             //act
             var collisionEvent = sut.DetectCollision(null, targetCollider, null);
@@ -30,8 +30,8 @@ namespace Aurora.Core.Tests.Integration
             //arrange
             const float size = 100f;
             var origin = Vector3.Zero;
-            var sut = ColliderTestHelper.CreateBoxCollider(origin, size);
-            var targetCollider = ColliderTestHelper.CreateBoxCollider(origin + 200, size);
+            var sut = CollisionTestHelper.CreateBoxCollider(origin, size);
+            var targetCollider = CollisionTestHelper.CreateBoxCollider(origin + 200, size);
 
             //act
             var collisionEvent = sut.DetectCollision(null, targetCollider, null);
@@ -47,8 +47,8 @@ namespace Aurora.Core.Tests.Integration
             const float size = 100f;
             const float radius = size / 2f;
             var origin = Vector3.Zero;
-            var sut = ColliderTestHelper.CreateBoxCollider(origin, size);
-            var targetCollider = ColliderTestHelper.CreateSphereCollider(origin + new Vector3(size, 0, 0), radius);
+            var sut = CollisionTestHelper.CreateBoxCollider(origin, size);
+            var targetCollider = CollisionTestHelper.CreateSphereCollider(origin + new Vector3(size, 0, 0), radius);
 
             //act
             var collisionEvent = sut.DetectCollision(null, targetCollider, null);

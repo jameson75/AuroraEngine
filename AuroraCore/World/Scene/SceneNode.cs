@@ -101,23 +101,7 @@ namespace CipherPark.Aurora.Core.World.Scene
         public virtual void Update(GameTime gameTime)
         {
             Behaviour?.Update(this);
-        }   
-
-        /*
-        public virtual BoundingBox CalcBoundingBox()
-        {
-            return BoundingBoxExtension.Empty;
-        }
-
-        public virtual BoundingBox  CalcWorldBoundingBox()
-        {
-            var localBoundingBox = CalcBoundingBox();
-            if (localBoundingBox == BoundingBoxExtension.Empty)
-                return BoundingBoxExtension.Empty;
-            else
-                return this.LocalToWorldBoundingBox(localBoundingBox);
-        }
-        */
+        }         
 
         public virtual ITransformable TransformableParent
         {
@@ -138,6 +122,16 @@ namespace CipherPark.Aurora.Core.World.Scene
         { 
             get; set; 
         }
+
+        public bool IsVisibleInTree
+        {
+            get
+            {
+                return Visible && (Parent == null || Parent.IsVisibleInTree);
+            }
+        }
+
+        public int RenderPass { get; set; }
 
         public void Dispose()
         {

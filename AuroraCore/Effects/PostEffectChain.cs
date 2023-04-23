@@ -89,9 +89,9 @@ namespace CipherPark.Aurora.Core.Effects
             this._tempShaderResource = new ShaderResourceView(_game.GraphicsDevice, texture, resourceDesc);
             this._tempAuxShaderResource = new ShaderResourceView(_game.GraphicsDevice, auxTexture, resourceDesc);
 
-            this.passThruEffect = new PassThruPostEffect(_game);                   
-        }     
-
+            this.passThruEffect = new PassThruPostEffect(_game);
+        }
+        
         public void Apply()
         {        
             //1. Save orginal render targets.            
@@ -141,7 +141,7 @@ namespace CipherPark.Aurora.Core.Effects
 
             //8. It's important to immediate COM Release() any swap chain resource.
             _originalDepthStencilView?.Dispose();
-            _originalRenderView.Dispose();
+            _originalRenderView?.Dispose();
         }
 
         private static void Swap<T>(ref T a, ref T b)

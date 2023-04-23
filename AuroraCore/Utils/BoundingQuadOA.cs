@@ -53,8 +53,11 @@ namespace CipherPark.Aurora.Core.Utils
         }
 
         /// <summary>
-        /// 
+        /// creates a bounding quad from points
         /// </summary>
+        /// <remarks>
+        /// expects points in this order: top-left, top-right, bottom-right, bottom-left.
+        /// </remarks>
         /// <param name="points"></param>
         /// <returns></returns>
         public static BoundingQuadOA FromPoints(Vector3[] points)
@@ -72,14 +75,14 @@ namespace CipherPark.Aurora.Core.Utils
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public QuadIntersectionType Intersects(ref Vector3 point)
+        public QuadIntersectionType Intersects(Vector3 point)
         {
             Plane plane = GetPlane();
             PlaneIntersectionType t = plane.Intersects(ref point);
             switch (t)
             {
                 case PlaneIntersectionType.Intersecting:
-                    return this.ContainsCoplanar(ref point) ? QuadIntersectionType.Intersects : QuadIntersectionType.CoplanarExterior;
+                    return this.ContainsCoplanar(point) ? QuadIntersectionType.Intersects : QuadIntersectionType.CoplanarExterior;
                 case PlaneIntersectionType.Back:
                     return QuadIntersectionType.Back;
                 case PlaneIntersectionType.Front:
@@ -115,11 +118,11 @@ namespace CipherPark.Aurora.Core.Utils
                 else
                 {
                     point = ray.Position;
-                    return ContainsCoplanar(ref point);
+                    return ContainsCoplanar(point);
                 }
             }
             else               
-                return ray.Intersects(ref plane, out point) && ContainsCoplanar(ref point);            
+                return ray.Intersects(ref plane, out point) && ContainsCoplanar(point);            
         }
 
         /// <summary>
@@ -162,7 +165,7 @@ namespace CipherPark.Aurora.Core.Utils
         {
             var p = GetPlane();
             var c = sphere.Center - Vector3.Dot(sphere.Center - (p.Normal * -p.D), p.Normal) * p.Normal;
-            return ContainsCoplanar(ref c) &&
+            return ContainsCoplanar(c) &&
                    Vector3.Distance(sphere.Center, c) <= sphere.Radius;
         }
 
@@ -232,7 +235,7 @@ namespace CipherPark.Aurora.Core.Utils
         /// </summary>
         /// <param name="coplanarPoint"></param>
         /// <returns></returns>
-        public bool ContainsCoplanar(ref Vector3 coplanarPoint)
+        public bool ContainsCoplanar(Vector3 coplanarPoint)
         {
             Plane plane = GetPlane();
             
@@ -255,6 +258,59 @@ namespace CipherPark.Aurora.Core.Utils
             return true;
         }
 
+        public bool Intersects(BoundingQuadOA quad)
+        {
+            foreach (var corner in quad.GetCorners())
+            {
+                if (ContainsCoplanar(corner))
+                {
+                    return true;
+                }
+            }
+
+            GetEdges(out Vector3[] thisEdgePointsA, out Vector3[] thisEdgePointsB);
+            var thisRays = thisEdgePointsA.Select((p, i) => new Ray(p, Vector3.Normalize(thisEdgePointsB[i] - p))).ToArray();
+            for (int i = 0; i < thisRays.Length; i++)
+            {
+                if (quad.Intersects(thisRays[i]))
+                {
+                    var intersectionTypes = new[]
+                    {
+                        quad.GetPlane().Intersects(ref thisEdgePointsA[i]),
+                        quad.GetPlane().Intersects(ref thisEdgePointsB[i]),
+                    };
+
+                    if (intersectionTypes.Contains(PlaneIntersectionType.Back) &&
+                        intersectionTypes.Contains(PlaneIntersectionType.Front))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            quad.GetEdges(out Vector3[] quadEdgePointsA, out Vector3[] quadEdgePointsB);
+            var quadRays = quadEdgePointsA.Select((p, i) => new Ray(p, Vector3.Normalize(quadEdgePointsB[i] - p))).ToArray();
+            for (int i = 0; i < quadRays.Length; i++)
+            {
+                if (Intersects(quadRays[i]))
+                {
+                    var intersectionTypes = new[]
+                    {
+                        GetPlane().Intersects(ref thisEdgePointsA[i]),
+                        GetPlane().Intersects(ref thisEdgePointsB[i]),
+                    };
+
+                    if (intersectionTypes.Contains(PlaneIntersectionType.Back) &&
+                        intersectionTypes.Contains(PlaneIntersectionType.Front))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public BoundingQuadOA Transform(Matrix m)
         {
             return new BoundingQuadOA()
@@ -264,6 +320,30 @@ namespace CipherPark.Aurora.Core.Utils
                 TopLeft = Vector3.TransformCoordinate(TopLeft, m),
                 TopRight = Vector3.TransformCoordinate(TopRight, m),
             };
+        }
+
+        /// <summary>
+        /// returns edges in clockwise order, starting with left edge, ending with bottom edge.
+        /// </summary>
+        /// <param name="pointA"></param>
+        /// <param name="pointB"></param>
+        public void GetEdges(out Vector3[] pointA, out Vector3[] pointB)
+        {
+            pointA = new Vector3[4];
+            pointB = new Vector3[4];
+            
+            //left edge
+            pointA[0] = BottomLeft;
+            pointB[0] = TopLeft;
+            //top edge
+            pointA[1] = TopLeft;
+            pointB[1] = TopRight;
+            //right edge
+            pointA[2] = TopRight;
+            pointB[2] = BottomRight;
+            //bottom edge
+            pointA[3] = BottomRight;
+            pointB[3] = BottomLeft;           
         }
 
         public override string ToString()

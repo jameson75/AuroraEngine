@@ -29,7 +29,26 @@ namespace CipherPark.Aurora.Core.Effects
         SharpDX.Direct3D11.Buffer _guassianHorizontalConstantBuffer = null;
         SharpDX.Direct3D11.Buffer _guassianVerticalConstantBuffer = null;
         SharpDX.Direct3D11.Buffer _bloomCombineConstantBuffer = null;
+        Mesh _quad = null;
+        VertexShader _passThruVertexShader = null;
+        PixelShader _gaussianBlurPixelShader = null;
+        PixelShader _bloomExtractPixelShader = null;
+        PixelShader _bloomCombinePixelShader = null;
         private bool _isInitialized = false;
+        private SamplerState _inputTextureSamplerState;
+        private Texture2D _bloomExtractTexture;
+        private ShaderResourceView _bloomExtractShaderResourceView;
+        private SamplerState _bloomExtractSamplerState;
+        private RenderTargetView _bloomExtractRenderTargetView;
+        private Texture2D _tempTexture;
+        private ShaderResourceView _tempShaderResourceView;
+        private SamplerState _tempSamplerState;
+        private RenderTargetView _tempRenderTargetView;
+        private Texture2D _blurTexture;
+        private ShaderResourceView _blurShaderResourceView;
+        private SamplerState _blurSamplerState;
+        private RenderTargetView _blurRenderTargetView;
+        private byte[] _vertexShaderByteCode;
 
         public float Threshold { get; set; }
         public float BlurAmount { get; set; }
@@ -75,76 +94,43 @@ namespace CipherPark.Aurora.Core.Effects
 
         protected override void OnBeginApply()
         {
-            /////////////////////////////////////////////////////
-            //TODO: Fix this hack... Because the Input/Output textures
-            //may change between calls to Apply(), I needed a place to 
-            //set the input of the first (and second) pass as well 
-            //as output of the last pass only after Apply() is called.
-            //This is the quickest place I could come up with.
-            Passes[0].PixelShaderResources[0] = InputTexture;
-            Passes[1].PixelShaderResources[0] = InputTexture;
-            Passes[Passes.Count - 1].RenderTarget = OutputTexture;
-            /////////////////////////////////////////////////////
-
+            if (Passes.Count == 0)
+            {
+                CreatePasses();
+            }
             WriteShaderConstants();
             base.OnBeginApply();
-        }      
+        }
 
-        private void Initialize()
-        {        
-            Mesh _quad = null;           
-            VertexShader _passThruVertexShader = null;
-            PixelShader _gaussianBlurPixelShader = null;
-            PixelShader _bloomExtractPixelShader = null;
-            PixelShader _bloomCombinePixelShader = null;
+        protected override void OnDispose()
+        {
+            _bloomExtractConstantBuffer.Dispose();
+            _guassianHorizontalConstantBuffer.Dispose();
+            _guassianVerticalConstantBuffer.Dispose();
+            _bloomCombineConstantBuffer.Dispose();
+            _quad.Dispose();
+            _passThruVertexShader.Dispose();
+            _gaussianBlurPixelShader.Dispose();
+            _bloomExtractPixelShader.Dispose();
+            _bloomCombinePixelShader.Dispose();
+            _inputTextureSamplerState.Dispose();
+            _bloomExtractTexture.Dispose();
+            _bloomExtractShaderResourceView.Dispose();
+            _bloomExtractSamplerState.Dispose();
+            _bloomExtractRenderTargetView.Dispose();
+            _tempTexture.Dispose();
+            _tempShaderResourceView.Dispose();
+            _tempSamplerState.Dispose();
+            _tempRenderTargetView.Dispose();
+            _blurTexture.Dispose();
+            _blurShaderResourceView.Dispose();
+            _blurSamplerState.Dispose();
+            _blurRenderTargetView.Dispose();
+            base.OnDispose();
+        }
 
-            //Create Constant Buffers
-            //------------------------
-            _bloomExtractConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, BloomExtractConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _guassianHorizontalConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, GuassianConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _guassianVerticalConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, GuassianConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _bloomCombineConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, BloomCombineConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-
-            //Create descriptions for textures and samplers
-            //---------------------------------------------
-            Size2 gameScreenSize = new Size2(_game.RenderTargetView.GetTextureDescription().Width, _game.RenderTargetView.GetTextureDescription().Height);
-            Texture2DDescription textureDesc = CreateCommonTextureDesc(gameScreenSize);
-            ShaderResourceViewDescription shaderResourceViewDesc = CreateCommonShaderResourceViewDesc(textureDesc);
-            RenderTargetViewDescription renderTargetViewDesc = CreateCommonRenderTargetViewDesc(textureDesc);
-            SamplerStateDescription samplerStateDesc = CreateCommonSamplerStateDesc();
-            
-            //Input Texture...
-            SamplerState _inputTextureSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
-            
-            //Bloom Extract Texture...
-            Texture2D _bloomExtractTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
-            ShaderResourceView _bloomExtractShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _bloomExtractTexture, shaderResourceViewDesc);
-            SamplerState _bloomExtractSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
-            RenderTargetView _bloomExtractRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _bloomExtractTexture, renderTargetViewDesc); 
-    
-            //Temp Texture...
-            Texture2D _tempTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
-            ShaderResourceView _tempShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _tempTexture, shaderResourceViewDesc);
-            SamplerState _tempSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);         
-            RenderTargetView _tempRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _tempTexture, renderTargetViewDesc);            
-            
-            //Blur Texture...
-            Texture2D _blurTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
-            ShaderResourceView _blurShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _blurTexture, shaderResourceViewDesc);
-            SamplerState _blurSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
-            RenderTargetView _blurRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _blurTexture, renderTargetViewDesc); 
-            
-            //Load Shaders
-            //-------------
-            byte[] _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\postpassthru-vs.cso", out _passThruVertexShader);
-            LoadPixelShader("Assets\\Shaders\\msbloom-guassian-ps.cso", out _gaussianBlurPixelShader);
-            LoadPixelShader("Assets\\Shaders\\msbloom-extract-ps.cso", out _bloomExtractPixelShader);           
-            LoadPixelShader("Assets\\Shaders\\msbloom-combine-ps.cso", out _bloomCombinePixelShader);
-
-            //Create Screen Quad
-            //------------------
-            _quad = ContentBuilder.BuildViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
-
+        private void CreatePasses()
+        {
             PostEffectPass[] passes = new PostEffectPass[4];
 
             //Create Pass0
@@ -156,7 +142,7 @@ namespace CipherPark.Aurora.Core.Effects
             passes[0].VertexShader = _passThruVertexShader;
             passes[0].PixelShader = _bloomExtractPixelShader;
             passes[0].PixelShaderConstantBuffers.Add(_bloomExtractConstantBuffer);
-            passes[0].PixelShaderResources.Add(null); //null indicates we'll be using the input texture. See OnApply().
+            passes[0].PixelShaderResources.Add(InputTexture);
             passes[0].PixelShaderSamplers.Add(_inputTextureSamplerState);
             passes[0].RenderTarget = _bloomExtractRenderTargetView;
             passes[0].ScreenQuad = _quad;
@@ -170,7 +156,7 @@ namespace CipherPark.Aurora.Core.Effects
             passes[1].VertexShader = _passThruVertexShader;
             passes[1].PixelShader = _gaussianBlurPixelShader;
             passes[1].PixelShaderConstantBuffers.Add(_guassianHorizontalConstantBuffer);
-            passes[1].PixelShaderResources.Add(null); //null indicates we'll be using the input texture. See OnApply().
+            passes[1].PixelShaderResources.Add(InputTexture);
             passes[1].PixelShaderSamplers.Add(_inputTextureSamplerState);
             passes[1].RenderTarget = _tempRenderTargetView;
             passes[1].ScreenQuad = _quad;
@@ -203,12 +189,63 @@ namespace CipherPark.Aurora.Core.Effects
             passes[3].PixelShaderSamplers.Add(_bloomExtractSamplerState);
             passes[3].PixelShaderResources.Add(_blurShaderResourceView);
             passes[3].PixelShaderSamplers.Add(_blurSamplerState);
-            passes[3].RenderTarget = null; //null indicates we'll be using the output texture. See OnApply().
-            passes[3].ScreenQuad = _quad;           
+            passes[3].RenderTarget = OutputTexture;
+            passes[3].ScreenQuad = _quad;
 
             //Add passes to the post effect
             //-----------------------------
-            Passes.AddRange(passes);          
+            Passes.Clear();
+            Passes.AddRange(passes);
+        }
+
+        private void Initialize()
+        {
+            //Create Screen Quad
+            //------------------
+            _quad = ContentBuilder.BuildViewportQuad(Game.GraphicsDevice, _vertexShaderByteCode);
+
+            //Create Constant Buffers
+            //------------------------
+            _bloomExtractConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, BloomExtractConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _guassianHorizontalConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, GuassianConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _guassianVerticalConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, GuassianConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _bloomCombineConstantBuffer = new SharpDX.Direct3D11.Buffer(Game.GraphicsDevice, BloomCombineConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+
+            //Create descriptions for textures and samplers
+            //---------------------------------------------
+            Size2 gameScreenSize = new Size2(_game.RenderTargetView.GetTextureDescription().Width, _game.RenderTargetView.GetTextureDescription().Height);
+            Texture2DDescription textureDesc = CreateCommonTextureDesc(gameScreenSize);
+            ShaderResourceViewDescription shaderResourceViewDesc = CreateCommonShaderResourceViewDesc(textureDesc);
+            RenderTargetViewDescription renderTargetViewDesc = CreateCommonRenderTargetViewDesc(textureDesc);
+            SamplerStateDescription samplerStateDesc = CreateCommonSamplerStateDesc();
+            
+            //Input Texture...
+            _inputTextureSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
+            
+            //Bloom Extract Texture...
+            _bloomExtractTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            _bloomExtractShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _bloomExtractTexture, shaderResourceViewDesc);
+            _bloomExtractSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
+            _bloomExtractRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _bloomExtractTexture, renderTargetViewDesc); 
+    
+            //Temp Texture...
+            _tempTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            _tempShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _tempTexture, shaderResourceViewDesc);
+            _tempSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);         
+            _tempRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _tempTexture, renderTargetViewDesc);            
+            
+            //Blur Texture...
+            _blurTexture = new Texture2D(Game.GraphicsDevice, textureDesc);
+            _blurShaderResourceView = new ShaderResourceView(Game.GraphicsDevice, _blurTexture, shaderResourceViewDesc);
+            _blurSamplerState = new SamplerState(Game.GraphicsDevice, samplerStateDesc);
+            _blurRenderTargetView = new RenderTargetView(Game.GraphicsDevice, _blurTexture, renderTargetViewDesc); 
+            
+            //Load Shaders
+            //-------------
+            _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\postpassthru-vs.cso", out _passThruVertexShader);
+            LoadPixelShader("Assets\\Shaders\\msbloom-guassian-ps.cso", out _gaussianBlurPixelShader);
+            LoadPixelShader("Assets\\Shaders\\msbloom-extract-ps.cso", out _bloomExtractPixelShader);           
+            LoadPixelShader("Assets\\Shaders\\msbloom-combine-ps.cso", out _bloomCombinePixelShader);                
         }
 
         private void WriteShaderConstants()

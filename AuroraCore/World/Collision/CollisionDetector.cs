@@ -19,7 +19,8 @@ namespace CipherPark.Aurora.Core.World.Collision
         private readonly List<CollisionEvent> collisionEvents;
         private readonly List<GameObject> gameObjects;
         private List<Collider> firedColliders;
-        private List<CollisionEvent> collisionEventsInPreviousPass;
+        private List<CollisionEvent> allCollisionEventsInPreviousPass;
+        private List<CollisionEvent> allCollisionEventsInCurrentPass;
         private PartitionTreeNode partitionTree;
 
         /// <summary>
@@ -31,7 +32,8 @@ namespace CipherPark.Aurora.Core.World.Collision
             collisionEvents = new List<CollisionEvent>();
             gameObjects = new List<GameObject>();
             firedColliders = new List<Collider>();
-            collisionEventsInPreviousPass = new List<CollisionEvent>();
+            allCollisionEventsInPreviousPass = new List<CollisionEvent>();
+            allCollisionEventsInCurrentPass = new List<CollisionEvent>();
         }
         
         /// <summary>
@@ -87,8 +89,9 @@ namespace CipherPark.Aurora.Core.World.Collision
         
         private void FlushCollisionEvents()
         {
-            collisionEventsInPreviousPass.Clear();
-            collisionEventsInPreviousPass.AddRange(collisionEvents);
+            allCollisionEventsInPreviousPass.Clear();
+            allCollisionEventsInPreviousPass.AddRange(allCollisionEventsInCurrentPass);
+            allCollisionEventsInCurrentPass.Clear();
             collisionEvents.Clear();
         }
 
@@ -129,10 +132,17 @@ namespace CipherPark.Aurora.Core.World.Collision
                             {
                                 RecordCollisionEvent(collisionEvent);
                             }
+
+                            MonitorCollisionForEcho(collisionEvent);
                         }
                     }
                 }
             }
+        }
+
+        private void MonitorCollisionForEcho(CollisionEvent collisionEvent)
+        {
+            allCollisionEventsInCurrentPass.Add(collisionEvent);
         }
 
         private bool CanEchoCollisionFor(GameObject gameObject)
@@ -142,7 +152,7 @@ namespace CipherPark.Aurora.Core.World.Collision
 
         private bool IsEcho(CollisionEvent collisionEvent)
         {
-            return collisionEventsInPreviousPass.Any(e => 
+            return allCollisionEventsInPreviousPass.Any(e => 
                 (e.Collider1 == collisionEvent.Collider1 && e.Collider2 == collisionEvent.Collider2) ||
                 (e.Collider1 == collisionEvent.Collider2 && e.Collider2 == collisionEvent.Collider1));
         }

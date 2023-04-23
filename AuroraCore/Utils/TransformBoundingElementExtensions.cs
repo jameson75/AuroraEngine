@@ -12,10 +12,10 @@ namespace CipherPark.Aurora.Core.Utils
         /// <param name="transformable"></param>
         /// <param name="box"></param>
         /// <returns></returns>
-        public static BoundingBoxOA ParentToWorldBoundingBox(this ITransformable transformable, BoundingBox box)
+        public static BoundingBoxOA LocalToWorldBoundingBox(this ITransformable transformable, BoundingBox box)
         {
             var boundingBoxOA = BoundingBoxOA.FromAABoundingBox(box);
-            return ParentToWorldBoundingBox(transformable, boundingBoxOA);
+            return LocalToWorldBoundingBox(transformable, boundingBoxOA);
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace CipherPark.Aurora.Core.Utils
         /// <param name="transformable"></param>
         /// <param name="box"></param>
         /// <returns></returns>
-        public static BoundingBoxOA ParentToWorldBoundingBox(this ITransformable transformable, BoundingBoxOA box)
+        public static BoundingBoxOA LocalToWorldBoundingBox(this ITransformable transformable, BoundingBoxOA box)
         {
             return box.Transform(transformable.WorldTransform().ToMatrix());
         }
@@ -33,9 +33,9 @@ namespace CipherPark.Aurora.Core.Utils
         /// <param name="transformable"></param>
         /// <param name="box"></param>
         /// <returns></returns>
-        public static BoundingSphere ParentToWorldBoundingSphere(this ITransformable transformable, BoundingSphere sphere)
+        public static BoundingSphere LocalToWorldBoundingSphere(this ITransformable transformable, BoundingSphere sphere)
         {
-            return new BoundingSphere(transformable.WorldToParentCoordinate(sphere.Center), sphere.Radius);
+            return new BoundingSphere(transformable.WorldToLocalCoordinate(sphere.Center), sphere.Radius);
         }
     }
 }

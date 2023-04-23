@@ -34,9 +34,6 @@
     <Filter Include="Shader Files\Flexboard">
       <UniqueIdentifier>{02dc957f-9c9a-4166-b2f7-6d3acafa8029}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader Files\PixelVelocityBlur">
-      <UniqueIdentifier>{205f6fdb-75b6-4782-9f0b-420d8c2c1645}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader Files\GlowFS">
       <UniqueIdentifier>{a4d14714-683c-42e7-ba87-42135ef48722}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,9 @@
     </Filter>
     <Filter Include="Shader Files\EdgeDraw">
       <UniqueIdentifier>{2155d413-031b-44a4-986b-8392146e1ad0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\Transition">
+      <UniqueIdentifier>{cfe253f3-ccec-4109-b3c3-12e44c1bffd2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -193,18 +193,6 @@
     <FxCompile Include="msbloom-guassian-ps.hlsl">
       <Filter>Shader Files\Bloom</Filter>
     </FxCompile>
-    <FxCompile Include="pixel-velocity-blur-clr-ps.hlsl">
-      <Filter>Shader Files\PixelVelocityBlur</Filter>
-    </FxCompile>
-    <FxCompile Include="pixel-velocity-blur-calc-vs.hlsl">
-      <Filter>Shader Files\PixelVelocityBlur</Filter>
-    </FxCompile>
-    <FxCompile Include="pixel-velocity-blur-vel-.ps.hlsl">
-      <Filter>Shader Files\PixelVelocityBlur</Filter>
-    </FxCompile>
-    <FxCompile Include="pixel-velocity-blur-blr-ps.hlsl">
-      <Filter>Shader Files\PixelVelocityBlur</Filter>
-    </FxCompile>
     <FxCompile Include="postpassthru-fix-vs.hlsl">
       <Filter>Shader Files\PassThru</Filter>
     </FxCompile>
@@ -281,6 +269,9 @@
     <FxCompile Include="flat-skinc-vs.hlsl" />
     <FxCompile Include="flat-skinct-vs.hlsl" />
     <FxCompile Include="flat-pnc-vs.hlsl" />
+    <FxCompile Include="transition-wipe.hlsl">
+      <Filter>Shader Files\Transition</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="postglowfs-inc.hlsli">

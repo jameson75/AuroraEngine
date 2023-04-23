@@ -118,13 +118,13 @@
     <Compile Include="Effects\Common\Light.cs" />
     <Compile Include="Effects\EdgeDraw.cs" />
     <Compile Include="Effects\OutlineEffect.cs" />
+    <Compile Include="Effects\TransitionEffect.cs" />
     <Compile Include="Effects\SpectrumAnalyzerProcEffect.cs" />
     <Compile Include="Effects\StreakEffect.cs" />
     <Compile Include="Effects\EffectPass.cs" />
     <Compile Include="Effects\FlexboardEffect.cs" />
     <Compile Include="Effects\CameraMotionBlur.cs" />
     <Compile Include="Effects\BlinnPhongEffect2.cs" />
-    <Compile Include="Effects\PixelVelocityBlurPostEffect.cs" />
     <Compile Include="Effects\GlowRTTPostEffect.cs" />
     <Compile Include="GameAppWPF.cs" />
     <Compile Include="Services\CastExtensions.cs" />
