@@ -37,7 +37,7 @@ namespace CipherPark.Aurora.Core.Utils
 
         public static Ray GetPickRay(IGameApp gameApp, int x, int y)
         {
-            var camera = gameApp.GetActiveScene().CameraNode;
+            var camera = gameApp.GetActiveCamera();
             ViewportF vp = gameApp.GraphicsDeviceContext.Rasterizer.GetViewports<ViewportF>()[0];
             Vector3 near = Vector3.Unproject(new Vector3(x, y, vp.MinDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, camera.RiggedViewMatrix * camera.ProjectionMatrix);
             Vector3 far = Vector3.Unproject(new Vector3(x, y, vp.MaxDepth), vp.X, vp.X, vp.Width, vp.Height, vp.MinDepth, vp.MaxDepth, camera.RiggedViewMatrix * camera.ProjectionMatrix);

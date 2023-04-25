@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CipherPark.Aurora.Core.Animation;
 
@@ -13,12 +11,6 @@ using CipherPark.Aurora.Core.Animation;
 
 namespace CipherPark.Aurora.Core.World.Scene
 {
-    [Obsolete]
-    public interface ISceneObject
-    {
-
-    }
-
     public abstract class SceneNode : ITransformable, IDisposable
     {       
         private SceneNode _parent = null;
@@ -131,8 +123,6 @@ namespace CipherPark.Aurora.Core.World.Scene
             }
         }
 
-        public int RenderPass { get; set; }
-
         public void Dispose()
         {
             Dispose(false);
@@ -207,32 +197,4 @@ namespace CipherPark.Aurora.Core.World.Scene
 
         }        
     }
-     
-    public class SceneNodes :  ObservableCollection<SceneNode>
-    {   
-        public SceneNodes()
-        { }    
-
-        public SceneNodes(IEnumerable<SceneNode> nodes)
-        {
-            AddRange(nodes);
-        }
-       
-        public void AddRange(IEnumerable<SceneNode> nodes)
-        {
-            foreach( SceneNode node in nodes )
-                this.Add(node);
-        }
-
-        public SceneNode this[string name]
-        {
-            get
-            {
-                for (int i = 0; i < this.Count; i++)
-                    if (this[i].Name == name)
-                        return this[i];
-                throw new IndexOutOfRangeException();
-            }
-        }
-    }    
 }

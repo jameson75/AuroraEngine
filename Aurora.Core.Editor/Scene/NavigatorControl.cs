@@ -45,7 +45,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
                 sceneModifierService = Game.Services.GetService<SceneModifierService>();
             }
 
-            if ((inputService.IsMouseInViewport(inputState) && Game.IsViewportWindowActive) || this.Capture)
+            if ((inputService.IsMouseInActiveViewport(inputState) && Game.IsViewportWindowActive) || this.Capture)
             {
                 InputState.MouseButton[] pressedMouseButtons = inputState.GetMouseButtonsPressed();
                 for (int i = 0; i < pressedMouseButtons.Length; i++)                

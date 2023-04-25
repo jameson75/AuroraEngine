@@ -98,15 +98,14 @@ namespace CipherPark.Aurora.Core.World
                 //particle system.                                                                                 
                 //**************************************************************************************    
 
-                //TODO: Ensure that the correct buffer size of instance data is being determined.                
-                IEnumerable<InstanceVertexData> instanceData = instances.Where(p => !IsInstanceClipped(p, mesh))
+                //TODO: Ensure that the correct buffer size of instance data is being determined.
+                var cameraNode = _game.GetRenderingCamera();                
+                IEnumerable<InstanceVertexData> instanceData = instances.Where(p => !IsInstanceClipped(p, mesh, cameraNode))
                                                                                 .Select(p => new InstanceVertexData()
                                                                                 {
                                                                                     Matrix = Matrix.Transpose(p.Transform.ToMatrix())
                                                                                 });
-                mesh.UpdateInstanceStream(instanceData.ToArray());
-                var cameraNode = _game.GetActiveScene()
-                                      .CameraNode;
+                mesh.UpdateInstanceStream(instanceData.ToArray());                
                 effect.View = cameraNode.RiggedViewMatrix;
                 effect.Projection = cameraNode.ProjectionMatrix;
                 effect.World = container == null ? Matrix.Identity : container.WorldTransform().ToMatrix();
@@ -121,9 +120,9 @@ namespace CipherPark.Aurora.Core.World
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private bool IsInstanceClipped(ITransformable p, Mesh mesh)
+        private bool IsInstanceClipped(ITransformable p, Mesh mesh, CameraSceneNode cameraNode)
         {
-            return EnableFustrumClipping && IsInstanceInFustrum(p, mesh);
+            return EnableFustrumClipping && IsInstanceInFustrum(p, mesh, cameraNode);
         }
 
         /// <summary>
@@ -131,11 +130,10 @@ namespace CipherPark.Aurora.Core.World
         /// </summary>
         /// <param name="instance"></param>
         /// <returns></returns>
-        private bool IsInstanceInFustrum(ITransformable instance, Mesh mesh)
-        {
-            SceneGraph scene = Game.GetActiveScene();
-            Matrix viewMatrix = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
-            Matrix projMatrix = scene.CameraNode.Camera.ProjectionMatrix;
+        private bool IsInstanceInFustrum(ITransformable instance, Mesh mesh, CameraSceneNode cameraNode)
+        {           
+            Matrix viewMatrix = Camera.TransformToViewMatrix(cameraNode.WorldTransform());
+            Matrix projMatrix = cameraNode.Camera.ProjectionMatrix;
             BoundingFrustum fustrum = new BoundingFrustum(viewMatrix * projMatrix);
             BoundingBox box = mesh.BoundingBox.Transform(instance.WorldTransform().ToMatrix());
             return fustrum.Intersects(ref box);

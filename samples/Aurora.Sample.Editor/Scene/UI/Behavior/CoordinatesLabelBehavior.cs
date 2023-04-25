@@ -15,10 +15,10 @@ namespace Aurora.Sample.Editor.Scene.UI.Behavior
             IInputService inputService = gameApp.Services.GetService<IInputService>();
             InputState inputState = inputService.GetInputState();
 
-            if (inputService.IsMouseInViewport(inputState) && gameApp.IsViewportWindowActive)
+            if (inputService.IsMouseInActiveViewport(inputState) && gameApp.IsViewportWindowActive)
             {
                 var mouseLocation = inputState.GetMouseLocation();
-                var cameraNode = gameApp.GetActiveScene().CameraNode;
+                var cameraNode = gameApp.GetActiveCamera();
                 var camera = cameraNode.Camera;
                 var pickInfo = ScenePicker.PickNodes(
                     gameApp,

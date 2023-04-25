@@ -565,8 +565,7 @@ namespace Aurora.Core.Editor
         {
             if (pathMesh != null)
             {
-                var cameraNode = game.GetActiveScene()
-                                     .CameraNode;
+                var cameraNode = game.GetRenderingCamera();
                 pathMeshEffect.World = Matrix.Identity;
                 pathMeshEffect.View = cameraNode.RiggedViewMatrix;
                 pathMeshEffect.Projection = cameraNode.ProjectionMatrix;

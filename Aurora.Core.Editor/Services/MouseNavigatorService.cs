@@ -64,7 +64,7 @@ namespace CipherPark.Aurora.Core.Services
   
         public void OnMouseWheelChange(float mouseWheelDelta)
         { 
-            var camera = Game.GetActiveScene().CameraNode.Camera;
+            var camera = Game.GetActiveCamera().Camera;
             camera.ViewMatrix = camera.ViewMatrix * Matrix.Translation(0, 0, -mouseWheelDelta / 5);
         }
 
@@ -74,8 +74,8 @@ namespace CipherPark.Aurora.Core.Services
         }       
         
         private void OnMouseMove(bool buttonDown, Point location)
-        { 
-            var cameraNode = Game.GetActiveScene().CameraNode;
+        {
+            var cameraNode = Game.GetActiveCamera();
             var camera = cameraNode.Camera;
             var mode = IsModeInversionOn ? InvertMode(Mode) : Mode;            
             Vector2 mouseOffset = -Vector2.Subtract(new Vector2(location.X, location.Y), new Vector2(mouseMoveFrom.X, mouseMoveFrom.Y));

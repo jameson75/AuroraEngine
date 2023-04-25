@@ -186,6 +186,9 @@
     <Compile Include="World\Renderers\InstanceRenderer.cs" />
     <Compile Include="World\Renderers\ModelRenderer.cs" />
     <Compile Include="World\Scene\GameObjectSceneNode.cs" />
+    <Compile Include="World\Scene\SceneNodePipeline.cs" />
+    <Compile Include="World\Scene\SceneNodes.cs" />
+    <Compile Include="World\Scene\SceneRenderContext.cs" />
     <Compile Include="World\Scene\SceneNodeBehaviour.cs" />
     <Compile Include="World\Collision\BoxCollider.cs" />
     <Compile Include="World\Collision\Collider.cs" />
@@ -202,7 +205,7 @@
     <Compile Include="World\Systems\Solver.cs" />
     <Compile Include="Sequencer\CodeBlockTimedEvent.cs" />
     <Compile Include="Services\IPerformanceService.cs" />
-    <Compile Include="Utils\ActiveSceneHelper.cs" />
+    <Compile Include="Utils\SceneContextHelper.cs" />
     <Compile Include="UI\Animation\UIAnimationBuilder.cs" />
     <Compile Include="UI\Animation\UIContentAnimationController.cs" />
     <Compile Include="UI\Controls\AlertBox.cs" />

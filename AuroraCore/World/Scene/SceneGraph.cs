@@ -21,7 +21,6 @@ namespace CipherPark.Aurora.Core.World.Scene
         private IGameApp _game = null;
         private SceneNodes _nodes = null;
         private List<SpriteBatchContext> _spriteBatchContexts = null;
-        private uint _maxStandardPipelineDrawPasses;
 
         public SceneGraph(IGameApp game)
         {
@@ -29,7 +28,6 @@ namespace CipherPark.Aurora.Core.World.Scene
             _nodes = new SceneNodes();            
             _nodes.CollectionChanged += OnCollectionChanged;
             _spriteBatchContexts = new List<SpriteBatchContext>();
-            MaxStandardPipelineDrawPasses = 1;
         }
 
         public IGameApp Game { get { return _game; } }
@@ -39,20 +37,6 @@ namespace CipherPark.Aurora.Core.World.Scene
         public CameraSceneNode CameraNode { get; set; }
 
         public Model SkyModel { get; set; }
-        
-        public uint MaxStandardPipelineDrawPasses
-        {
-            get => _maxStandardPipelineDrawPasses;
-            set
-            {
-                if (value < 1)
-                {
-                    throw new InvalidOperationException($"{nameof(MaxStandardPipelineDrawPasses)} value must be greater than 0");
-                }
-
-                _maxStandardPipelineDrawPasses = value;
-            }
-        }
 
         public List<SpriteBatchContext> SpriteBatchContexts { get { return _spriteBatchContexts; } }        
 
@@ -64,31 +48,31 @@ namespace CipherPark.Aurora.Core.World.Scene
             OnEndUpdate();
         }
 
-        public void Draw()
+        public void Draw(SceneRenderContext context = null)
         {
-            OnBeginDraw();   
+            OnBeginDraw(context);   
             DrawSkyModel();
-            DrawStandardNodePipline();
-            DrawTransparentNodePipline();
+            DrawStandardNodePipline(context);
+            DrawTransparentNodePipline(context);
             ProcessNodePostEffects();
             DrawSprites();
-            OnEndDraw();            
+            OnEndDraw(context);            
         }
 
-        private void DrawStandardNodePipline()
+        private void DrawStandardNodePipline(SceneRenderContext context)
         {
-            for (int i = 0; i < MaxStandardPipelineDrawPasses; i++)
+            foreach (SceneNode node in Nodes)
             {
-                OnBeginDrawPass(i);
-                foreach (SceneNode node in Nodes)
-                    DrawStandardNodeHierarchy(node, i);
-                OnEndDrawPass(i);
-            }
+                DrawStandardNodeHierarchy(node, context);
+            }          
         }
 
-        private void DrawTransparentNodePipline()
+        private void DrawTransparentNodePipline(SceneRenderContext context)
         {
-            var transparencyNodes = Nodes.SelectNodes(n => n.Pipeline == SceneNodePipeline.Transparency && n.IsVisibleInTree);
+            var transparencyNodes = Nodes.SelectNodes(n => 
+                                        n.Pipeline == SceneNodePipeline.Transparency && 
+                                        (n.IsVisibleInTree || context.ShowAll) &&
+                                        n.MatchesFilter(context.NodeFilter));
             var orderedTransparencyNodes = transparencyNodes.OrderByDescending(n => Vector3.DistanceSquared(CameraNode.WorldPosition(), n.WorldPosition()));
             foreach (var transparentNode in orderedTransparencyNodes)
             {
@@ -132,32 +116,32 @@ namespace CipherPark.Aurora.Core.World.Scene
             }
         }
 
-        private void DrawStandardNodeHierarchy(SceneNode node, int pass)
+        private void DrawStandardNodeHierarchy(SceneNode node, SceneRenderContext context)
         {
-            if (node.Visible && 
-                node.RenderPass == pass && 
-                node.Pipeline == SceneNodePipeline.Standard)
+            if (node.Pipeline == SceneNodePipeline.Standard &&
+                (node.Visible || context.ShowAll) &&
+                node.MatchesFilter(context.NodeFilter))
             {
                 node.Draw();
                 foreach (SceneNode child in node.Children)
                 {
-                    DrawStandardNodeHierarchy(child, pass);
+                    DrawStandardNodeHierarchy(child, context);
                 }
             }
         }
 
-        protected virtual void OnBeginDraw()
+        protected virtual void OnBeginDraw(SceneRenderContext context)
         {
-            EventHandler handler = BeginDraw;
+            EventHandler<SceneRenderContext> handler = BeginDraw;
             if (handler != null)
-                handler(this, EventArgs.Empty);
+                handler(this, context);
         }
 
-        protected virtual void OnEndDraw()
+        protected virtual void OnEndDraw(SceneRenderContext context)
         {
-            EventHandler handler = EndDraw;
+            EventHandler<SceneRenderContext> handler = EndDraw;
             if (handler != null)
-                handler(this, EventArgs.Empty);
+                handler(this, context);
         }
 
         protected virtual void OnBeginUpdate()
@@ -172,22 +156,8 @@ namespace CipherPark.Aurora.Core.World.Scene
             EventHandler handler = EndUpdate;
             if (handler != null)
                 handler(this, EventArgs.Empty);
-        }
-        
-        protected virtual void OnBeginDrawPass(int pass)
-        {
-            EventHandler<int> handler = BeginDrawPass;
-            if (handler != null)
-                handler(this, pass);
-        }
-
-        protected virtual void OnEndDrawPass(int pass)
-        {
-            EventHandler<int> handler = EndDrawPass;
-            if (handler != null)
-                handler(this, pass);
-        }
-
+        }        
+      
         protected virtual void OnBeginPostEffects()
         {
             EventHandler handler = BeginPostEffects;
@@ -245,19 +215,11 @@ namespace CipherPark.Aurora.Core.World.Scene
 
         }
 
-        public event EventHandler BeginDraw;
-        public event EventHandler EndDraw;
+        public event EventHandler<SceneRenderContext> BeginDraw;
+        public event EventHandler<SceneRenderContext> EndDraw;
         public event EventHandler BeginUpdate;
         public event EventHandler EndUpdate;
-        public event EventHandler<int> BeginDrawPass;
-        public event EventHandler<int> EndDrawPass;
         public event EventHandler BeginPostEffects;
         public event EventHandler EndPostEffects;
-    }
-
-    public enum SceneNodePipeline
-    {
-        Standard =     0,
-        Transparency = 1
     }
 }

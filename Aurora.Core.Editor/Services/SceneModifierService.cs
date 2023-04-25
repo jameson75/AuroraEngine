@@ -149,8 +149,8 @@ namespace CipherPark.Aurora.Core.Services
         private void OnMouseMove(bool buttonDown, Point location)
         {
             if (IsActive && buttonDown && currentPickedNode != null)
-            {              
-                var cameraNode = gameApp.GetActiveScene().CameraNode;             
+            {
+                var cameraNode = gameApp.GetActiveCamera();        
 
                 var pickFromRay = ScenePicker.GetPickRay(gameApp, mouseMoveFrom.X, mouseMoveFrom.Y);
                 
@@ -266,7 +266,7 @@ namespace CipherPark.Aurora.Core.Services
 
         private GameObjectSceneNode MousePickNode(int mouseX, int mouseY)
         {
-            var cameraNode = gameApp.GetActiveScene().CameraNode;
+            var cameraNode = gameApp.GetActiveCamera();
             var camera = cameraNode.Camera;
 
             return ScenePicker.PickNodes(

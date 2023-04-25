@@ -149,8 +149,7 @@ namespace CipherPark.Aurora.Core.Services
 
         private void RenderWorldSpaceDynamicMesh()
         {
-            var cameraNode = gameApp.GetActiveScene()
-                                    .CameraNode;
+            var cameraNode = gameApp.GetRenderingCamera();
             meshEffect.World = Matrix.Identity;
             meshEffect.View = cameraNode.RiggedViewMatrix;
             meshEffect.Projection = cameraNode.ProjectionMatrix;            

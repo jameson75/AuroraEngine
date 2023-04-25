@@ -32,9 +32,8 @@ namespace CipherPark.Aurora.Core.World
             {
                 if (LightTrail.Effect == null)
                     throw new InvalidOperationException("Effect not set for light trail.");
-                var cameraNode = _game.GetActiveScene()
-                                      .CameraNode;
-
+                
+                var cameraNode = _game.GetRenderingCamera();
                 LightTrail.Effect.World = Matrix.Identity; //TODO: Verifty whether I should be using the world transform here.
                 LightTrail.Effect.View = cameraNode.RiggedViewMatrix;
                 LightTrail.Effect.Projection = cameraNode.ProjectionMatrix;                
@@ -76,8 +75,8 @@ namespace CipherPark.Aurora.Core.World
             {
                 if (Streak.Effect == null)
                     throw new InvalidOperationException("Effect not set for light trail.");
-                var cameraNode = _game.GetActiveScene()
-                                      .CameraNode;
+
+                var cameraNode = _game.GetRenderingCamera();
                 Streak.Effect.World = Matrix.Identity; //TODO: Verifty whether I should be using the world transform here.
                 Streak.Effect.View = cameraNode.RiggedViewMatrix;
                 Streak.Effect.Projection = cameraNode.ProjectionMatrix;

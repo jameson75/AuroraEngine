@@ -76,6 +76,17 @@ namespace CipherPark.Aurora.Core.Utils
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="node"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        internal static bool MatchesFilter(this SceneNode node, Func<SceneNode, bool> filter)
+        {
+            return filter == null || filter.Invoke(node);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="root"></param>
         /// <param name="names"></param>
         /// <param name="results"></param>

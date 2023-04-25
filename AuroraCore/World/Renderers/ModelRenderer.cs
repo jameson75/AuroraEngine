@@ -37,9 +37,7 @@ namespace CipherPark.Aurora.Core.World
         {
             if (Model != null)
             {
-                var cameraNode = _game.GetActiveScene()
-                                      .CameraNode;
-               
+                var cameraNode = _game.GetRenderingCamera();               
                 Model.Effect.World = container?.WorldTransform().ToMatrix() ?? Matrix.Identity;
                 Model.Effect.View = cameraNode.RiggedViewMatrix;
                 Model.Effect.Projection = cameraNode.ProjectionMatrix;

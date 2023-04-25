@@ -20,7 +20,7 @@ using Aurora.Core.Editor.Util;
 
 namespace Aurora.Sample.Editor
 {
-    public class EditorGameApp : GameAppWPF, IContainActiveScene, IEditorGameApp
+    public class EditorGameApp : GameAppWPF, IContainerActiveScene, IEditorGameApp
     {
         private readonly UIElement imageHost;
         private Color viewportColor = Color.Black;
@@ -367,8 +367,8 @@ namespace Aurora.Sample.Editor
         public override bool IsViewportWindowActive => base.IsViewportWindowActive && !IsViewportFeedbackSuspended;       
 
         public Vector3 GetDropLocation(SharpDX.Point mouseLocation)
-        {            
-            var cameraNode = this.GetActiveScene().CameraNode;
+        {
+            var cameraNode = this.GetActiveCamera();
             var camera = cameraNode.Camera;
             var pickInfo = ScenePicker.PickNodes(
                 this,

@@ -241,9 +241,9 @@ namespace CipherPark.Aurora.Core.Systems
         /// <returns></returns>
         public bool IsParticleInFustrum(Particle particle)
         {
-            SceneGraph scene = Game.GetActiveScene();
-            Matrix viewMatrix = Camera.TransformToViewMatrix(scene.CameraNode.WorldTransform());
-            Matrix projMatrix = scene.CameraNode.Camera.ProjectionMatrix;
+            CameraSceneNode cameraNode = Game.GetRenderingCamera();
+            Matrix viewMatrix = Camera.TransformToViewMatrix(cameraNode.WorldTransform());
+            Matrix projMatrix = cameraNode.Camera.ProjectionMatrix;
             BoundingFrustum fustrum = new BoundingFrustum(viewMatrix * projMatrix);
             BoundingBox box = particle.Description.Mesh.BoundingBox.Transform(particle.WorldTransform().ToMatrix());
             return fustrum.Intersects(ref box);

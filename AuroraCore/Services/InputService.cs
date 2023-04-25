@@ -1,4 +1,5 @@
 ﻿using CipherPark.Aurora.Core.Utils;
+using SharpDX;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -36,7 +37,7 @@ namespace CipherPark.Aurora.Core.Services
         /// </summary>
         /// <param name="inputState"></param>
         /// <returns></returns>
-        bool IsMouseInViewport(InputState inputState);
+        bool IsMouseInActiveViewport(InputState inputState);
     }
 
     /// <summary>
@@ -109,12 +110,13 @@ namespace CipherPark.Aurora.Core.Services
             this.cim = cim;
         }
 
-        public bool IsMouseInViewport(InputState state)
+        public bool IsMouseInActiveViewport(InputState state)
         {
             var location = state.GetMouseLocation();
-            var renderTargetSize = game.RenderTargetView.GetTexture2DSize();
-            return location.X >= 0 && location.X <= renderTargetSize.Width &&
-                   location.Y >= 0 && location.Y <= renderTargetSize.Height;
+            var vp = game.GraphicsDeviceContext.Rasterizer.GetViewports<ViewportF>()[0];
+            //var renderTargetSize = game.RenderTargetView.GetTexture2DSize();
+            return location.X >= 0 && location.X <= vp.Width &&
+                   location.Y >= 0 && location.Y <= vp.Height;
         }
     }
 }
