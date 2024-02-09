@@ -7,7 +7,7 @@ using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
-using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.World.Scene;
@@ -295,12 +295,12 @@ namespace Aurora.Core.Editor
                 }
             };
 
-            actionGameNode.Reposition(dropLocation.Add(0, 5, 0));
+            actionGameNode.TranslateTo(dropLocation.Add(0, 5, 0));
             game.Scene.Nodes.Add(actionGameNode);
             ViewModel.Project.Scene.AddSceneNode(actionGameNode);
 
             actionGameNode.Children.Add(cameraGameNode);
-            cameraGameNode.Reposition(new Vector3(0, 300, 0));
+            cameraGameNode.TranslateTo(new Vector3(0, 300, 0));
             cameraGameNode.PointZAtTarget(Vector3.BackwardLH, actionGameNode.WorldPosition());
             ViewModel.Project.Scene.AddSceneNode(cameraGameNode);
 
@@ -345,7 +345,7 @@ namespace Aurora.Core.Editor
             for (int i = 0; i < pathNodeDropLocations.Length; i++)
             {
                 var pathNode = CreateNavigationPathNode();
-                pathNode.Reposition(pathNodeDropLocations[i].Add(0, 4, 0));
+                pathNode.TranslateTo(pathNodeDropLocations[i].Add(0, 4, 0));
                 pathRootNode.Children.Add(pathNode);
                 navigationPath.Nodes.Add(pathNode);
             }
@@ -815,7 +815,7 @@ namespace Aurora.Core.Editor
             {
                 if (Path.Count != 0)
                 {
-                    Navigator.Reposition(Path[0], Vector3.Zero);
+                    Navigator.TranslateTo(Path[0], Vector3.Zero);
                 }
  
                  PointNavigatorToNextNode(false);

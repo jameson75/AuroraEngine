@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using SharpDX;
 using SharpDX.DirectInput;
 using SharpDX.XInput;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

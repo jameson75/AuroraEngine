@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
 using CipherPark.Aurora.Core.World.Scene;
-using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.Services;
 
 namespace CipherPark.Aurora.Core.Utils

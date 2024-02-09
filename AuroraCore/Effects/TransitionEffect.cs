@@ -1,7 +1,7 @@
 ﻿using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.Aurora.Core.Content;
-using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.World.Geometry;
 
 /////////////////////////////////////////////
@@ -15,7 +15,7 @@ namespace CipherPark.Aurora.Core.Effects
 {
     public class TransitionEffect : PostEffect
     {
-        private const int ConstantsBufferSize = 16;
+        private const int ConstantsBufferSize = 32;
         private Buffer constantsBuffer;
         private SamplerState inputTextureSamplerState;
         private Texture2D wipeTexture;

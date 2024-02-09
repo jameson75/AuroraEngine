@@ -10,19 +10,19 @@ using CipherPark.Aurora.Core.Services;
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace CipherPark.Aurora.Core
-{ 
+{
     public static class SceneContextHelper
     {
         public static SceneGraph GetActiveScene(this IGameApp game)
         {
-            IContainerActiveScene container = game as IContainerActiveScene;
+            IContainActiveScene container = game as IContainActiveScene;
             if (container != null)
                 return container.Scene;
 
             var moduleService = game.Services.GetService<ModuleService>();
             if (moduleService != null && moduleService.ActiveModule != null)
             {
-                container = moduleService.ActiveModule as IContainerActiveScene;
+                container = moduleService.ActiveModule as IContainActiveScene;
                 if (container != null)
                     return container.Scene;
             }
@@ -73,20 +73,5 @@ namespace CipherPark.Aurora.Core
                 throw new InvalidOperationException("Active camera not accessible.", ex);
             }
         }
-    }
-
-    public interface IManageRenderingCamera
-    {
-        CameraSceneNode GetRenderingCamera();
-    }
-
-    public interface IManageActiveCamera
-    {
-        CameraSceneNode GetActiveCamera();
-    }
-
-    public interface IContainerActiveScene
-    {
-        SceneGraph Scene { get; }
     }
 }

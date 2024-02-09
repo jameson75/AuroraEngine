@@ -1,5 +1,6 @@
 ﻿using SharpDX;
 using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Animation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -8,7 +9,7 @@ using CipherPark.Aurora.Core.Utils;
 // MIT License.
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace CipherPark.Aurora.Core.Animation
+namespace CipherPark.Aurora.Core.Extensions
 {
     /// <summary>
     /// 
@@ -196,14 +197,14 @@ namespace CipherPark.Aurora.Core.Animation
             transformable.Transform = new Transform(transformable.Transform.Rotation, transformable.Transform.Translation + delta, transformable.Transform.Scale);
         }
         
-        public static void Reposition(this ITransformable transformable, Vector3 position)
+        public static void TranslateTo(this ITransformable transformable, Vector3 position)
         {
             transformable.Transform = new Transform(transformable.Transform.Rotation, position, transformable.Transform.Scale);
         }
 
-        public static void Reposition(this ITransformable transformable, ITransformable referenceFrame, Vector3 position)
+        public static void TranslateTo(this ITransformable transformable, ITransformable referenceFrame, Vector3 position)
         {
-            transformable.Reposition(
+            transformable.TranslateTo(
                 transformable.WorldToParentCoordinate(
                     referenceFrame.LocalToWorldCoordinate(position)));            
         }
@@ -219,13 +220,13 @@ namespace CipherPark.Aurora.Core.Animation
             transformable.Transform = new Transform(delta * transformable.Transform.Rotation, transformable.Transform.Translation, transformable.Transform.Scale);
         }
 
-        public static void Orient(this ITransformable transformable, Vector3 axis, float angle)
+        public static void RotateTo(this ITransformable transformable, Vector3 axis, float angle)
         {
             var orientation = Quaternion.RotationAxis(axis, angle);
-            Orient(transformable, orientation);
+            RotateTo(transformable, orientation);
         }
 
-        public static void Orient(this ITransformable transformable, Quaternion orientation)
+        public static void RotateTo(this ITransformable transformable, Quaternion orientation)
         {            
             transformable.Transform = new Transform(orientation, transformable.Transform.Translation, transformable.Transform.Scale);
         }

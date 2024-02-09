@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SharpDX;
-using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.Animation;

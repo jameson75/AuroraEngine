@@ -1,5 +1,5 @@
 ﻿using System;
-using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Toolkit;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;

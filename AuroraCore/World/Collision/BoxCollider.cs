@@ -1,5 +1,6 @@
 ﻿using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

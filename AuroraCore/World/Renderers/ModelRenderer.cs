@@ -1,4 +1,5 @@
 ﻿using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.World.Geometry;
 using SharpDX;
 

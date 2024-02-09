@@ -22,8 +22,8 @@ namespace CipherPark.Aurora.Core.Animation
         {
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
-            Size2F frameVal0 = (f0.Value != null) ? (Size2F)f0.Value : Utils.Size2FExtension.Zero;
-            Size2F frameVal1 = (f1 != null && f1.Value != null) ? (Size2F)f1.Value : Utils.Size2FExtension.Zero;
+            Size2F frameVal0 = (f0.Value != null) ? (Size2F)f0.Value : Extensions.Size2FExtension.Zero;
+            Size2F frameVal1 = (f1 != null && f1.Value != null) ? (Size2F)f1.Value : Extensions.Size2FExtension.Zero;
             if (f1 == null)
                 return frameVal0;
             else
@@ -43,7 +43,7 @@ namespace CipherPark.Aurora.Core.Animation
                     //    {
 
                     //    }
-                    return Utils.Size2FExtension.Zero;
+                    return Extensions.Size2FExtension.Zero;
                 }
             }
         }

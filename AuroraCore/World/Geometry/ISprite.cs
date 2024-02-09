@@ -1,7 +1,7 @@
 ﻿using System;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Toolkit;
 
 namespace CipherPark.Aurora.Core.World
 {

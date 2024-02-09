@@ -5,6 +5,7 @@ using CipherPark.Aurora.Core.UI.Components;
 using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.Utils;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -15,12 +16,12 @@ using Aurora.Sample.Editor.Scene;
 using Aurora.Sample.Editor.Scene.UI.Behavior;
 using Aurora.Core.Editor;
 using System.Linq;
-using CipherPark.Aurora.Core.Animation;
+
 using Aurora.Core.Editor.Util;
 
 namespace Aurora.Sample.Editor
 {
-    public class EditorGameApp : GameAppWPF, IContainerActiveScene, IEditorGameApp
+    public class EditorGameApp : GameAppWPF, IContainActiveScene, IEditorGameApp
     {
         private readonly UIElement imageHost;
         private Color viewportColor = Color.Black;

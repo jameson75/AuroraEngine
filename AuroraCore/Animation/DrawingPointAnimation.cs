@@ -22,8 +22,8 @@ namespace CipherPark.Aurora.Core.Animation
         {
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
-            Vector2 frameVal0 = (f0.Value != null) ? (Vector2)f0.Value : Utils.Vector2Extension.Zero;
-            Vector2 frameVal1 = (f1 != null && f1.Value != null) ? (Vector2)f1.Value : Utils.Vector2Extension.Zero;
+            Vector2 frameVal0 = (f0.Value != null) ? (Vector2)f0.Value : Extensions.Vector2Extension.Zero;
+            Vector2 frameVal1 = (f1 != null && f1.Value != null) ? (Vector2)f1.Value : Extensions.Vector2Extension.Zero;
             if (f1 == null)
                 return frameVal0;
             else

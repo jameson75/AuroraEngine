@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using SharpDX;
-using SharpDX.Direct3D11;
+﻿using SharpDX.Direct3D11;
 using CipherPark.Aurora.Core.World.Geometry;
-using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.Content;
 
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////
 
 namespace CipherPark.Aurora.Core.Effects
 {
@@ -106,56 +97,4 @@ namespace CipherPark.Aurora.Core.Effects
             _quad = null;
         }
     }
-
-    //public static class CommonBlendStates
-    //{
-    //    public static BlendState Create(Device Game.GraphicsDevice, BlendStatePresets preset)
-    //    {
-    //        BlendStateDescription desc = BlendStateDescription.Default();
-    //        switch (preset)
-    //        {
-    //            case BlendStatePresets.Premultiplied:
-    //                desc.RenderTarget[0].AlphaBlendOperation = BlendOperation.Add;
-    //                desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
-    //                desc.RenderTarget[0].SourceBlend = BlendOption.SourceColor;
-    //                desc.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
-    //                desc.RenderTarget[0].DestinationBlend = BlendOption.DestinationColor;
-    //                desc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
-    //                break;
-    //            case BlendStatePresets.NonPremultiplied:
-    //                desc.RenderTarget[0].AlphaBlendOperation = BlendOperation.Add;
-    //                desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
-    //                desc.RenderTarget[0].SourceBlend = BlendOption.SourceColor;
-    //                desc.RenderTarget[0].SourceAlphaBlend = BlendOption.SourceAlpha;
-    //                desc.RenderTarget[0].DestinationBlend = BlendOption.DestinationColor;
-    //                desc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
-    //                break;
-    //            case BlendStatePresets.Additive:
-    //                desc.RenderTarget[0].AlphaBlendOperation = BlendOperation.Add;
-    //                desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
-    //                desc.RenderTarget[0].SourceBlend = BlendOption.SourceColor;
-    //                desc.RenderTarget[0].SourceAlphaBlend = BlendOption.SourceAlpha;
-    //                desc.RenderTarget[0].DestinationBlend = BlendOption.DestinationColor;
-    //                desc.RenderTarget[0].DestinationAlphaBlend = BlendOption.One;
-    //                break;
-    //            case BlendStatePresets.Multiplicative:
-    //                desc.RenderTarget[0].AlphaBlendOperation = BlendOperation.Add;
-    //                desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
-    //                desc.RenderTarget[0].SourceBlend = BlendOption.SourceColor;
-    //                desc.RenderTarget[0].SourceAlphaBlend = BlendOption.Zero;
-    //                desc.RenderTarget[0].DestinationBlend = BlendOption.DestinationColor;
-    //                desc.RenderTarget[0].DestinationAlphaBlend = BlendOption.SourceColor;
-    //                break;
-    //        }
-    //        return new BlendState(graphicsDevice, desc);
-    //    }
-    //}
-
-    //public enum BlendStatePresets
-    //{
-    //    Premultiplied,
-    //    NonPremultiplied,
-    //    Additive,
-    //    Multiplicative
-    //}
 }

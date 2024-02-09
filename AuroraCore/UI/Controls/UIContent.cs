@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Toolkit;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -188,7 +188,7 @@ namespace CipherPark.Aurora.Core.UI.Controls
             if (!HasDrawParameters)
                 Container.ControlSpriteBatch.Begin();
             else
-                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.Aurora.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);                                               
+                Container.ControlSpriteBatch.Begin(SpriteSortMode == null ? CipherPark.Aurora.Core.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);                                               
 
             _beginDrawCallOpen = true;
         }

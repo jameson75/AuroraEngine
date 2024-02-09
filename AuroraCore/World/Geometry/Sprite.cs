@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.Utils.Toolkit;
-using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Toolkit;
+using CipherPark.Aurora.Core.Extensions;
 
 namespace CipherPark.Aurora.Core.World
 {
@@ -51,7 +48,7 @@ namespace CipherPark.Aurora.Core.World
             if (!HasDrawParameters)
                 _renderer.Begin();
             else
-                _renderer.Begin(SpriteSortMode == null ? CipherPark.Aurora.Core.Utils.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);
+                _renderer.Begin(SpriteSortMode == null ? CipherPark.Aurora.Core.Toolkit.SpriteSortMode.Deferred : SpriteSortMode.Value, BlendState, SamplerState, DepthStencilState, RasterizerState, internalCallback, TransformationMatrix);
 
             for (int i = 0; i < _sprites.Count; i++)   
                 if(_sprites[i].Visible)
@@ -115,7 +112,7 @@ namespace CipherPark.Aurora.Core.World
             Position = Vector2.Zero;                    
             Tint = Color.White;
             SourceRectangle = null;
-            SpriteEffects = Utils.Toolkit.SpriteEffects.None;
+            SpriteEffects = SpriteEffects.None;
             Rotation = 0;
             Origin = Vector2.Zero;
             Scale = Vector2.One;

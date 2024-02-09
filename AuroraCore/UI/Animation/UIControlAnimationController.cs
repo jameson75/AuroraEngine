@@ -1,19 +1,10 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpDX;
-using SharpDX.Direct3D11;
+﻿using SharpDX;
 using CipherPark.Aurora.Core.UI.Controls;
-using CipherPark.Aurora.Core.Utils.Toolkit;
-using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.

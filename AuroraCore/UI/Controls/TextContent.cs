@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using CipherPark.Aurora.Core.Utils;
-using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Extensions;
+using CipherPark.Aurora.Core.Toolkit;
 using SharpDX;
-using SharpDX.Direct3D11;
 
 namespace CipherPark.Aurora.Core.UI.Controls
 {
     public class TextContent : ColorContent
     {
-        private BlendState cachedBlendState;
-
         public TextContent()
         {
             VAlignment = VerticalAlignment.Top;

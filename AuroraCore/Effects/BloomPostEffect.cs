@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Content;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
@@ -21,8 +18,8 @@ namespace CipherPark.Aurora.Core.Effects
     public class BloomPostEffect : PostEffect
     {
         private const int SampleCount = 15;
-        private const int BloomExtractConstantBufferSize = 16;
-        private const int BloomCombineConstantBufferSize = 16;
+        private const int BloomExtractConstantBufferSize = 32;
+        private const int BloomCombineConstantBufferSize = 32;
         private readonly int GuassianConstantBufferSize;
         private IGameApp _game = null;
         SharpDX.Direct3D11.Buffer _bloomExtractConstantBuffer = null;
@@ -34,7 +31,6 @@ namespace CipherPark.Aurora.Core.Effects
         PixelShader _gaussianBlurPixelShader = null;
         PixelShader _bloomExtractPixelShader = null;
         PixelShader _bloomCombinePixelShader = null;
-        private bool _isInitialized = false;
         private SamplerState _inputTextureSamplerState;
         private Texture2D _bloomExtractTexture;
         private ShaderResourceView _bloomExtractShaderResourceView;
@@ -376,7 +372,7 @@ namespace CipherPark.Aurora.Core.Effects
 
         private static int CalculateRequiredConstantBufferSize(int minimumSize)
         {
-            return minimumSize + (16 - minimumSize % 16);
+            return minimumSize + (32 - minimumSize % 32);
         }
     }
 

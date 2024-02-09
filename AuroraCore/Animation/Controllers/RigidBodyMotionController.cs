@@ -1,6 +1,7 @@
 ﻿using SharpDX;
 using CipherPark.Aurora.Core.Systems;
 using CipherPark.Aurora.Core.World.Geometry;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

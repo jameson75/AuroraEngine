@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using SharpDX;
-using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.Utils;
 using Aurora.Core.Editor.Util;
 

@@ -7,9 +7,8 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Aurora.Core.Editor;
 using Aurora.Core.Editor.Util;
-using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.Services;
-using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.World.Scene;
 using Microsoft.Wpf.Interop.DirectX;
 using SharpDX;
@@ -290,7 +289,7 @@ namespace Aurora.Sample.Editor
                 var newEye = oldEye + offset;
                 var newLookAt = oldLookAt + offset;              
 
-                referenceGridNode.Reposition(Vector3.Zero.AddY(guardianNode.WorldPosition().Y));
+                referenceGridNode.TranslateTo(Vector3.Zero.AddY(guardianNode.WorldPosition().Y));
                                 
                 game.Scene.CameraNode.Camera.ViewMatrix = SharpDX.Matrix.LookAtLH(
                     newEye,

@@ -4,7 +4,7 @@ using CipherPark.Aurora.Core;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
-using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Geometry;
 using SharpDX;

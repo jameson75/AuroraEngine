@@ -77,6 +77,7 @@
     <Compile Include="Environment\ReferenceGridMode.cs" />
     <Compile Include="Scene\InvalidOperation.cs" />
     <Compile Include="Util\DataMap.cs" />
+    <Compile Include="Util\EditorObjectContext.cs" />
     <Compile Include="Util\ModelTypeNames.cs" />
     <Compile Include="Util\CoreExtensions.cs" />
     <Compile Include="Views\Converters\DXColorToMediaColorConverter.cs" />

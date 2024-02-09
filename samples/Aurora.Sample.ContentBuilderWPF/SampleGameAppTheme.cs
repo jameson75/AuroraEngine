@@ -4,7 +4,7 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct3D11;
 using CipherPark.Aurora.Core.Content;
-using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Toolkit;
 using CipherPark.Aurora.Core;
 using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.UI.Components;

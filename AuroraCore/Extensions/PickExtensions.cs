@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using CipherPark.Aurora.Core.Utils;
 using SharpDX;
 
-namespace CipherPark.Aurora.Core.Utils
+namespace CipherPark.Aurora.Core.Extensions
 {
     public static class PickExtensions
     {

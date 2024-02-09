@@ -4,6 +4,7 @@ using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.World.Scene;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.Utils;
 using System;
 using System.Linq;

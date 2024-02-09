@@ -9,7 +9,7 @@ using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.World.Scene;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Effects;
-using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Toolkit;
 using CipherPark.Aurora.Core.Systems;
 
 ///////////////////////////////////////////////////////////////////////////////

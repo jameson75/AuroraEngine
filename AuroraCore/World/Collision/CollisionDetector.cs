@@ -21,7 +21,9 @@ namespace CipherPark.Aurora.Core.World.Collision
         private List<Collider> firedColliders;
         private List<CollisionEvent> allCollisionEventsInPreviousPass;
         private List<CollisionEvent> allCollisionEventsInCurrentPass;
+#pragma warning disable CS0649
         private PartitionTreeNode partitionTree;
+#pragma warning restore CS0649
 
         /// <summary>
         /// Instanciates new collision detector.

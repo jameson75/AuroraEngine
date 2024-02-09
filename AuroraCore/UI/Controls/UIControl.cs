@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using CipherPark.Aurora.Core.UI.Components;
-using CipherPark.Aurora.Core.UI.Animation;
 using CipherPark.Aurora.Core.Utils;
-using CipherPark.Aurora.Core.Utils.Toolkit;
-using CipherPark.Aurora.Core.Module;
+using CipherPark.Aurora.Core.Extensions;
+using CipherPark.Aurora.Core.Toolkit;
 using System.Linq;
 using SharpDX;
-using CipherPark.Aurora.Core.World.Scene;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

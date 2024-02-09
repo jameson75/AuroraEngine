@@ -4,12 +4,12 @@ using System.Linq;
 using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Extensions;
 using SharpDX;
 using SharpDX.DirectInput;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.

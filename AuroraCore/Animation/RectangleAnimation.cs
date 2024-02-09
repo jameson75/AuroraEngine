@@ -23,8 +23,8 @@ namespace CipherPark.Aurora.Core.Animation
         {
             AnimationKeyFrame f0 = GetActiveKeyFrameAtT(t);
             AnimationKeyFrame f1 = GetNextKeyFrame(f0);
-            RectangleF frameVal0 = (f0.Value != null) ? (RectangleF)f0.Value : Utils.RectangleFExtension.Empty;
-            RectangleF frameVal1 = (f1 != null && f1.Value != null) ? (RectangleF)f1.Value : Utils.RectangleFExtension.Empty;
+            RectangleF frameVal0 = (f0.Value != null) ? (RectangleF)f0.Value : Extensions.RectangleFExtension.Empty;
+            RectangleF frameVal1 = (f1 != null && f1.Value != null) ? (RectangleF)f1.Value : Extensions.RectangleFExtension.Empty;
             if (f1 == null)
                 return frameVal0;
             else

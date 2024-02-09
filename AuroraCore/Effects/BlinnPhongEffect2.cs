@@ -2,8 +2,7 @@
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct3D11;
-using CipherPark.Aurora.Core.Utils;
-using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

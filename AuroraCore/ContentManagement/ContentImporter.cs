@@ -11,7 +11,7 @@ using CoreTransform = CipherPark.Aurora.Core.Animation.Transform;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Animation;
 using CipherPark.Aurora.Core.Animation.Controllers;
-using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Toolkit;
 using CipherPark.Aurora.Core.Utils;
 using System.Reflection;
 using CipherPark.Aurora.Core.Effects;

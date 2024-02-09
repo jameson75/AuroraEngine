@@ -3,7 +3,7 @@ using SharpDX;
 using CipherPark.Aurora.Core.Utils;
 using CipherPark.Aurora.Core.World;
 using CipherPark.Aurora.Core.World.Scene;
-using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 using Aurora.Core.Editor.Util;
 
 namespace CipherPark.Aurora.Core.Services
@@ -216,7 +216,7 @@ namespace CipherPark.Aurora.Core.Services
                                     currentPickedNode.Rotate(rotation);
 
                                     var translation = Vector3.Transform(currentPickedNode.Transform.Translation, rotation);
-                                    currentPickedNode.Reposition(translation);                                    
+                                    currentPickedNode.TranslateTo(translation);                                    
                                 }
                                 break;
                             case TransformSpace.ParentSpaceRevolveY:
@@ -228,7 +228,7 @@ namespace CipherPark.Aurora.Core.Services
 
                                     var positionOrientation = Quaternion.RotationAxis(axis, MathUtil.DegreesToRadians(rotationDelta));
                                     var newPosition = Vector3.Transform(currentPickedNode.Transform.Translation, positionOrientation);
-                                    currentPickedNode.Reposition(newPosition);                                    
+                                    currentPickedNode.TranslateTo(newPosition);                                    
                                     var orientationRotation = Quaternion.RotationAxis(axis, MathUtil.DegreesToRadians(rotationDelta));
                                     currentPickedNode.Rotate(orientationRotation);
                                 }

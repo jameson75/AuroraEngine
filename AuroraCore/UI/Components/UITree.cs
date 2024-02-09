@@ -4,6 +4,7 @@ using SharpDX.Direct3D11;
 using SharpDX;
 using CipherPark.Aurora.Core.UI.Controls;
 using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 using System.Linq;
 
 ///////////////////////////////////////////////////////////////////////////////

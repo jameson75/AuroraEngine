@@ -70,7 +70,7 @@ namespace Aurora.Sample.ContentBuilder
             content = CipherPark.Aurora.Core.Content.ContentBuilder.BuildColoredTriangle(
                 this.GraphicsDevice,
                 contentEffect.GetVertexShaderByteCode(),
-                RectangleDimensions.FromCenter(100, 100),
+                QuadDimensions.FromCenter(100, 100),
                 Color.Aquamarine);
         }
 

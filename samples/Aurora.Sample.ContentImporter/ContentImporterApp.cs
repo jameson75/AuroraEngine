@@ -5,7 +5,8 @@ using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World.Geometry;
 using CipherPark.Aurora.Core.Content;
 using CipherPark.Aurora.Core.Effects;
-using CipherPark.Aurora.Core.Utils.Toolkit;
+using CipherPark.Aurora.Core.Toolkit;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

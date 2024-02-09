@@ -1,6 +1,6 @@
 ﻿using Aurora.Core.Editor.Environment;
 using Aurora.Core.Editor.Util;
-using CipherPark.Aurora.Core.Animation;
+using CipherPark.Aurora.Core.Extensions;
 using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World;

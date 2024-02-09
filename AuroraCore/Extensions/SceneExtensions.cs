@@ -5,7 +5,7 @@ using CipherPark.Aurora.Core.Effects;
 using CipherPark.Aurora.Core.Services;
 using CipherPark.Aurora.Core.World.Scene;
 
-namespace CipherPark.Aurora.Core.Utils
+namespace CipherPark.Aurora.Core.Extensions
 {
     public static class SceneExtensions
     {

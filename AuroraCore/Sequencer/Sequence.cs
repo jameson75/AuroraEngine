@@ -1,0 +1,15 @@
+﻿using System.Collections.Generic;
+
+///////////////////////////////////////////////////////////////////////////////
+// Developer: Eugene Adams
+// 
+// Copyright © 2010-2013
+// Aurora Engine is licensed under 
+// MIT License.
+///////////////////////////////////////////////////////////////////////////////
+
+namespace CipherPark.Aurora.Core.Sequencer
+{
+    public class Sequence : List<TimedEvent>
+    { }
+}

@@ -1,6 +1,7 @@
 ﻿using System;
 using SharpDX;
 using SharpDX.Direct3D11;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams

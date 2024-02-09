@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.Direct3D;
 using DXBuffer = SharpDX.Direct3D11.Buffer;
-using CipherPark.Aurora.Core.Utils;
+using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
