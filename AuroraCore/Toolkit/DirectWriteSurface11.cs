@@ -8,7 +8,6 @@ using SharpDX.Direct3D11;
 using CipherPark.Aurora.Core.Effects;
 using System.Collections.Generic;
 using CipherPark.Aurora.Core.Extensions;
-using CipherPark.Aurora.Core;
 
 namespace CipherPark.Aurora.Core.Toolkit
 {

@@ -12,13 +12,13 @@ using CipherPark.Aurora.Core.Animation;
 namespace CipherPark.Aurora.Core.World.Scene
 {
     public abstract class SceneNode : ITransformable, IDisposable
-    {       
+    {
         private SceneNode _parent = null;
         private SceneNodes _children = null;
         private SceneGraph _scene = null;
         private ITransformable _transformableParent = null;
         private SceneNodeBehaviour _behaviour = null;
-        private IGameApp _game = null;      
+        private IGameApp _game = null;
 
         public SceneNode(IGameApp game)
         {
@@ -35,16 +35,23 @@ namespace CipherPark.Aurora.Core.World.Scene
             Name = name;
         }
 
-        public IGameApp Game { get { return _game; } } 
+        public IGameApp Game 
+        { 
+            get { return _game; } 
+        }
 
         public virtual string Name { get; set; }
 
-        public SceneGraph Scene 
-        { 
-            get { return _scene; } 
-            set { _scene = value; OnSceneChanged(); } 
+        public SceneGraph Scene
+        {
+            get { return _scene; }
+            set 
+            { 
+                _scene = value; 
+                HandleSceneChanged(); 
+            }
         }
-        
+
         public SceneNode Parent
         {
             get { return _parent; }
@@ -58,7 +65,7 @@ namespace CipherPark.Aurora.Core.World.Scene
                 _transformableParent = value;
             }
         }
-        
+
         public SceneNodes Children { get { return _children; } }
 
         public SceneNodeBehaviour Behaviour
@@ -71,7 +78,7 @@ namespace CipherPark.Aurora.Core.World.Scene
                     var b = _behaviour;
                     _behaviour = null;
                     if (b.ContainerNode == this)
-                        b.ContainerNode = null;                 
+                        b.ContainerNode = null;
                 }
                 else
                 {
@@ -88,13 +95,6 @@ namespace CipherPark.Aurora.Core.World.Scene
 
         public SceneNodePipeline Pipeline { get; set; } = SceneNodePipeline.Standard;
 
-        public virtual void Draw() { }
-
-        public virtual void Update(GameTime gameTime)
-        {
-            Behaviour?.Update(this);
-        }         
-
         public virtual ITransformable TransformableParent
         {
             get { return this._transformableParent; }
@@ -110,10 +110,9 @@ namespace CipherPark.Aurora.Core.World.Scene
             }
         }
 
-        public bool Visible 
-        { 
-            get; set; 
-        }
+        public string[] Tags { get; set; }
+
+        public bool Visible { get; set; }
 
         public bool IsVisibleInTree
         {
@@ -121,6 +120,15 @@ namespace CipherPark.Aurora.Core.World.Scene
             {
                 return Visible && (Parent == null || Parent.IsVisibleInTree);
             }
+        }
+
+        public virtual void Draw() 
+        { 
+        }
+
+        public virtual void Update(GameTime gameTime)
+        {
+            Behaviour?.Update(this);
         }
 
         public void Dispose()
@@ -136,7 +144,36 @@ namespace CipherPark.Aurora.Core.World.Scene
                     child.Dispose(true);
             }
 
-            OnDispose();
+            OnDisposed();
+        }
+
+        protected virtual void OnChildAdded(SceneNode child)
+        {
+            if (child.Parent != this)
+                child.Parent = this;
+
+            if (child.Scene != this.Scene)
+                child.Scene = this.Scene;
+        }
+
+        protected virtual void OnChildRemoved(SceneNode child)
+        {
+            child.Parent = null;
+            child.Scene = null;
+        }
+
+        protected virtual void OnChildReset()
+        {
+        }     
+
+        protected virtual void OnDisposed()
+        {
+        }
+
+        private void HandleSceneChanged()
+        {
+            foreach (SceneNode child in Children)
+                child.Scene = this._scene;
         }
 
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
@@ -147,54 +184,23 @@ namespace CipherPark.Aurora.Core.World.Scene
                     foreach (SceneNode child in args.NewItems)
                         OnChildAdded(child);
                     break;
-                
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (SceneNode child in args.OldItems)
                         OnChildRemoved(child);
                     break;
-               
+
                 case NotifyCollectionChangedAction.Replace:
                     foreach (SceneNode child in args.NewItems)
                         OnChildAdded(child);
                     foreach (SceneNode child in args.OldItems)
                         OnChildRemoved(child);
                     break;
-                
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     OnChildReset();
                     break;
-            }           
+            }
         }
-
-        protected void OnChildAdded(SceneNode child)
-        {
-            if (child.Parent != this)            
-                child.Parent = this;
-
-            if (child.Scene != this.Scene)
-                child.Scene = this.Scene;            
-        }
-
-        protected void OnChildRemoved(SceneNode child)
-        {
-            child.Parent = null;
-            child.Scene = null;          
-        }
-
-        protected void OnChildReset()
-        {
-            
-        }
-
-        protected void OnSceneChanged()
-        {
-            foreach (SceneNode child in Children)
-                child.Scene = this._scene;
-        }
-
-        protected virtual void OnDispose()
-        {
-
-        }        
     }
 }

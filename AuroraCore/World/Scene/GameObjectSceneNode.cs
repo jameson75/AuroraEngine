@@ -43,11 +43,11 @@
             base.Draw();            
         }
 
-        protected override void OnDispose()
+        protected override void OnDisposed()
         {
             if (GameObject != null)
                 GameObject.Dispose();
-            base.OnDispose();
+            base.OnDisposed();
         }
     }
 }

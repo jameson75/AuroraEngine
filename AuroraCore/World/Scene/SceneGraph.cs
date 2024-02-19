@@ -53,7 +53,7 @@ namespace CipherPark.Aurora.Core.World.Scene
             DrawSkyModel();
             DrawStandardNodePipline(context);
             DrawTransparentNodePipline(context);
-            ProcessNodePostEffects();
+            RenderPostEffects();
             DrawSprites();
             OnEndDraw(context);            
         }
@@ -79,7 +79,7 @@ namespace CipherPark.Aurora.Core.World.Scene
             }
         }
 
-        private void ProcessNodePostEffects()
+        private void RenderPostEffects()
         {
             OnBeginPostEffects();
             CameraNode.Camera.PostEffectChain.InputTexture = Game.RenderTargetShaderResource;
