@@ -27,18 +27,61 @@ namespace CipherPark.Aurora.Core.Effects
         private int VertexConstantBufferCommonSize = 256;
         private int VertexConstantBufferSkinSize = 3712;
         private int PixelConstantBufferSize = 320;
-
         private Vector3[] _lampDirPosArray = new Vector3[MaxLights];
         private Color[] _lampColorArray = new Color[MaxLights];
-
         private RasterizerState _oldRasterizerState = null;
-        private bool _isRestoreRequired = false;
+        private BlendState _oldBlendState = null;
+        private DepthStencilState _oldDepthStencilState = null;
+        private Color4 _oldBlendFactor = Color.Zero;
+        private bool _restoreRastrizerState = false;
+        private bool _restoreBlendState = false;
+        private bool _restoreDepthStencilState = false;
+        private SurfaceVertexType _surfaceVertexType = SurfaceVertexType.None;
+        private BlinnPhongLampType[] _lampTypes = new BlinnPhongLampType[8];
+        private SamplerState _textureSamplerState = null;
+        private SamplerState _alphaSamplerState = null;
 
-        public BlinnPhongLampType[] _lampTypes = new BlinnPhongLampType[8];
-        public SamplerState _textureSamplerState = null;
-        public SamplerState _alphaSamplerState = null;
+        public BlinnPhongEffect2(IGameApp game, SurfaceVertexType svt)
+         : base(game)
+        {
+            FirstActiveLightsCount = 1;
 
-        SurfaceVertexType _surfaceVertexType = SurfaceVertexType.None;
+            _surfaceVertexType = svt;
+
+            //Create constant buffer... 
+            _vertexConstantsBufferCommon = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferCommonSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _vertexConstantsBufferSkin = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferSkinSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            _pixelConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, PixelConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+
+            //Create sampler states...
+            SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
+            samplerStateDesc.Filter = Filter.MinMagMipLinear;
+            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+            samplerStateDesc.AddressV = TextureAddressMode.Clamp;
+            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
+            _textureSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
+            _alphaSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
+
+            switch (svt)
+            {
+                case SurfaceVertexType.SkinNormalTexture:
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-skin-vs.cso", out _vertexShader);
+                    break;
+                case SurfaceVertexType.PositionNormalTexture:
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-pnt-vs.cso", out _vertexShader);
+                    break;
+                case SurfaceVertexType.PositionNormalColor:
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-pnc-vs.cso", out _vertexShader);
+                    break;
+                case SurfaceVertexType.InstancePositionNormalColor:
+                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-p-pnc-vs.cso", out _vertexShader);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unsupported surface vertex type {svt} specified");
+            }
+
+            LoadPixelShader("Assets\\Shaders\\blinnphong2-ps.cso", out _pixelShader);
+        }
 
         public Matrix WorldInverseTranspose
         {
@@ -81,47 +124,13 @@ namespace CipherPark.Aurora.Core.Effects
 
         public Light[] Lighting { get; set; }
 
-        public BlinnPhongEffect2(IGameApp game, SurfaceVertexType svt)
-            : base(game)
-        {
-            FirstActiveLightsCount = 1;
+        public BlendState BlendState { get; set; }
 
-            _surfaceVertexType = svt;
+        public DepthStencilState DepthStencilState { get; set; }
 
-            //Create constant buffer... 
-            _vertexConstantsBufferCommon = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferCommonSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _vertexConstantsBufferSkin = new SharpDX.Direct3D11.Buffer(GraphicsDevice, VertexConstantBufferSkinSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-            _pixelConstantsBuffer = new SharpDX.Direct3D11.Buffer(GraphicsDevice, PixelConstantBufferSize, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+        public bool EnableBackFace { get; set; }
 
-            //Create sampler states...
-            SamplerStateDescription samplerStateDesc = SamplerStateDescription.Default();
-            samplerStateDesc.Filter = Filter.MinMagMipLinear;
-            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
-            samplerStateDesc.AddressV = TextureAddressMode.Clamp;
-            samplerStateDesc.AddressU = TextureAddressMode.Clamp;
-            _textureSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
-            _alphaSamplerState = new SamplerState(GraphicsDevice, samplerStateDesc);
-
-            switch (svt)
-            {
-                case SurfaceVertexType.SkinNormalTexture:
-                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-skin-vs.cso", out _vertexShader);
-                    break;
-                case SurfaceVertexType.PositionNormalTexture:
-                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-pnt-vs.cso", out _vertexShader);
-                    break;
-                case SurfaceVertexType.PositionNormalColor:
-                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-pnc-vs.cso", out _vertexShader);
-                    break;
-                case SurfaceVertexType.InstancePositionNormalColor:
-                    _vertexShaderByteCode = LoadVertexShader("Assets\\Shaders\\blinnphong2-p-pnc-vs.cso", out _vertexShader);
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unsupported surface vertex type {svt} specified");
-            }
-
-            LoadPixelShader("Assets\\Shaders\\blinnphong2-ps.cso", out _pixelShader);
-        }
+        public bool UseSceneLighting { get; set; }
 
         public override void Apply()
         {
@@ -180,17 +189,50 @@ namespace CipherPark.Aurora.Core.Effects
                 RasterizerStateDescription newRasterizerStateDesc = (_oldRasterizerState != null) ? _oldRasterizerState.Description : RasterizerStateDescription.Default();
                 newRasterizerStateDesc.CullMode = CullMode.None;
                 GraphicsDevice.ImmediateContext.Rasterizer.State = new RasterizerState(GraphicsDevice, newRasterizerStateDesc);
-                _isRestoreRequired = true;
+                _restoreRastrizerState = true;
+            }
+
+            if (BlendState != null)
+            {
+                _oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
+                _oldBlendFactor = GraphicsDevice.ImmediateContext.OutputMerger.BlendFactor;
+                GraphicsDevice.ImmediateContext.OutputMerger.BlendState = BlendState;
+                _restoreBlendState = true;
+            }
+
+            if (DepthStencilState != null)
+            {
+                _oldDepthStencilState = GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState;
+                GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = DepthStencilState;
+                _restoreDepthStencilState = true;
             }
         }
 
         public override void Restore()
         {
-            if (_isRestoreRequired)
+            if (_restoreRastrizerState)
             {
                 GraphicsDevice.ImmediateContext.Rasterizer.State = _oldRasterizerState;
-                _isRestoreRequired = false;
+                _oldRasterizerState = null;
+                _restoreRastrizerState = false;
             }
+
+            if (_restoreBlendState)
+            {
+                GraphicsDevice.ImmediateContext.OutputMerger.BlendState = _oldBlendState;
+                GraphicsDevice.ImmediateContext.OutputMerger.BlendFactor = _oldBlendFactor;
+                _oldBlendState = null;
+                _oldBlendFactor = Color.Zero;
+                _restoreBlendState = false;
+            }
+
+            if (_restoreDepthStencilState)
+            {
+                GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = _oldDepthStencilState;
+                _oldDepthStencilState = null;
+                _restoreDepthStencilState = false;
+            }
+
             base.Restore();
         }
 
@@ -365,9 +407,6 @@ namespace CipherPark.Aurora.Core.Effects
 
             return offset;
         }
-
-        public bool EnableBackFace { get; set; }
-        public bool UseSceneLighting { get; set; }
 
         protected override void OnDispose()
         {

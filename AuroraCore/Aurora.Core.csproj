@@ -117,6 +117,9 @@
     <Compile Include="Animation\Controllers\RigidBodyMotionController.cs" />
     <Compile Include="Animation\ITransformable.cs" />
     <Compile Include="Animation\SpatialAnimation.cs" />
+    <Compile Include="Effects\EffectHelper.cs" />
+    <Compile Include="Effects\ISkinEffect.cs" />
+    <Compile Include="Effects\SurfaceVertexType.cs" />
     <Compile Include="Extensions\FluentTransformExtensions.cs" />
     <Compile Include="Extensions\TransformableExtension.cs" />
     <Compile Include="Animation\Vector3Animation.cs" />
@@ -132,7 +135,7 @@
     <Compile Include="Effects\SpectrumAnalyzerProcEffect.cs" />
     <Compile Include="Effects\StreakEffect.cs" />
     <Compile Include="Effects\EffectPass.cs" />
-    <Compile Include="Effects\FlexboardEffect.cs" />
+    <Compile Include="Module\FlexboardEffect.cs" />
     <Compile Include="Effects\CameraMotionBlur.cs" />
     <Compile Include="Effects\BlinnPhongEffect2.cs" />
     <Compile Include="Effects\GlowRTTPostEffect.cs" />

@@ -27,9 +27,11 @@ namespace CipherPark.Aurora.Core.Effects
 
         private RasterizerState _oldRasterizerState = null;
         private BlendState _oldBlendState = null;
+        private DepthStencilState _oldDepthStencilState = null;
         private Color4 _oldBlendFactor = Color.Zero;
         private bool _restoreRastrizerState = false;
         private bool _restoreBlendState = false;
+        private bool _restoreDepthStencilState = false;
 
         public SamplerState _textureSamplerState = null;
 
@@ -87,6 +89,8 @@ namespace CipherPark.Aurora.Core.Effects
 
         public BlendState BlendState { get; set; } 
 
+        public DepthStencilState DepthStencilState { get; set; }
+
         public bool EnableBackFace { get; set; }
 
         private Matrix WorldViewProjection
@@ -136,18 +140,24 @@ namespace CipherPark.Aurora.Core.Effects
                 _restoreRastrizerState = true;
             }
 
-            if(BlendState != null)
+            if (BlendState != null)
             {
                 _oldBlendState = GraphicsDevice.ImmediateContext.OutputMerger.BlendState;
                 _oldBlendFactor = GraphicsDevice.ImmediateContext.OutputMerger.BlendFactor;
                 GraphicsDevice.ImmediateContext.OutputMerger.BlendState = BlendState;
                 _restoreBlendState = true;
             }
+
+            if (DepthStencilState != null)
+            {
+                _oldDepthStencilState = GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState;
+                GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = DepthStencilState;
+                _restoreDepthStencilState = true;
+            }
         }
 
         public override void Restore()
         {
-
             if (_restoreRastrizerState)
             {
                 GraphicsDevice.ImmediateContext.Rasterizer.State = _oldRasterizerState;
@@ -162,6 +172,13 @@ namespace CipherPark.Aurora.Core.Effects
                 _oldBlendState = null;
                 _oldBlendFactor = Color.Zero;
                 _restoreBlendState = false;
+            }
+
+            if (_restoreDepthStencilState)
+            {
+                GraphicsDevice.ImmediateContext.OutputMerger.DepthStencilState = _oldDepthStencilState;
+                _oldDepthStencilState = null;
+                _restoreDepthStencilState = false;
             }
 
             base.Restore();
@@ -213,7 +230,6 @@ namespace CipherPark.Aurora.Core.Effects
             GraphicsDevice.ImmediateContext.UnmapSubresource(_vertexConstantsBufferSkin, 0);
         }
 
-
         private void WriteVertexConstantsCommon()
         {
             //Open Access to Buffer
@@ -263,43 +279,7 @@ namespace CipherPark.Aurora.Core.Effects
             base.OnDispose();
         }
     }
-
-    public enum SurfaceVertexType
-    {
-        None = 0,
-        PositionColor,
-        PositionTexture,
-        SkinColor,
-        SkinTexture,
-        InstancePositionColor,
-        InstancePositionTexture,
-        BillboardInstancePositionColor,
-        BillboardInstancePositionTexture,
-        PositionNormalColor,
-        PositionNormalTexture,
-        SkinNormalColor,
-        SkinNormalTexture,
-        InstancePositionNormalColor,
-        InstancePositionNormalTexture,
-    }
-
-    public static class CommonBlendStates
-    {
-        public static BlendState CreateAlphaBlend(Device device)
-        {
-            BlendStateDescription blendDesc = BlendStateDescription.Default();
-            blendDesc.RenderTarget[0].IsBlendEnabled = true;
-            blendDesc.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
-            blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.SourceAlpha;
-            blendDesc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
-            blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
-            return new BlendState(device, blendDesc);
-        }
-    }
-
-    public interface ISkinEffect
-    {
-        Matrix[] BoneTransforms { get; set; }
-    }
 }
+
+
 

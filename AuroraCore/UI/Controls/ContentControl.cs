@@ -3,7 +3,6 @@ using CipherPark.Aurora.Core.Extensions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.
@@ -73,21 +72,5 @@ namespace CipherPark.Aurora.Core.UI.Controls
             contentControl.ApplyTemplate(template);
             return contentControl;
         }    
-  
-
-        /*
-        public static ContentControl CreateLabelControl(IUIRoot visualRoot, TextContent text, Color? backgroundColor = null)
-        {
-            Color backgroundColor_ = backgroundColor != null ? backgroundColor.Value : Color.Transparent;
-            return new ContentControl(visualRoot, new LayeredContent(new UIContent[] { new ColorContent(backgroundColor_), text}));
-        }
-
-        public static ContentControl CreateLabelControl(IUIRoot visualRoot, string text, SpriteFont font, Color fontColor, Color? backgroundColor = null)
-        {
-            Color backgroundColor_ = backgroundColor != null ? backgroundColor.Value : Color.Transparent;
-            return new ContentControl(visualRoot, new LayeredContent(new UIContent[] {  new ColorContent(backgroundColor_),
-                                                                                        new TextContent(text, font, fontColor)                                                                                         }));
-        }
-        */
     }
 }

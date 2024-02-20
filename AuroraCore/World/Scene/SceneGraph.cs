@@ -49,6 +49,11 @@ namespace CipherPark.Aurora.Core.World.Scene
 
         public void Draw(SceneRenderContext context = null)
         {
+            if (context == null)
+            {
+                context = SceneRenderContext.Default;
+            }
+
             OnBeginDraw(context);   
             DrawSkyModel();
             DrawStandardNodePipline(context);
