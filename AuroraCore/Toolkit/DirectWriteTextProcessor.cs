@@ -1,9 +1,10 @@
-﻿using System;
+﻿using CipherPark.Aurora.Core.Utils;
+using System;
 using System.Collections.Generic;
 
 namespace CipherPark.Aurora.Core.Toolkit
 {
-    public class DirectWriteTextProcessor: IDisposable
+    public class DirectWriteTextProcessor: IDisposable, IProceduralTextureProcessor
     {
         public DirectWriteTextProcessor(DirectWriteSurface11 surface)
         {

@@ -5,7 +5,6 @@ using CipherPark.Aurora.Core.Services;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams
-// 
 // Copyright © 2010-2013
 // Aurora Engine is licensed under 
 // MIT License.

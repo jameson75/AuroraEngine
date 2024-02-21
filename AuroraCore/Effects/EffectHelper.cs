@@ -2,7 +2,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Developer: Eugene Adams// 
-// Copyright © 2010-2013
+// Copyright © 2010-2024
 // Aurora Engine is licensed under 
 // MIT License.
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,6 +20,14 @@ namespace CipherPark.Aurora.Core.Effects
             blendDesc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
             blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
             return new BlendState(device, blendDesc);
+        }
+
+        public static DepthStencilState CreateDepthStencilStateForTransparency(Device device)
+        {
+            var currentDepthStencilState = device.ImmediateContext.OutputMerger.DepthStencilState;
+            var newDepthStencilStateDescription = currentDepthStencilState.Description;
+            newDepthStencilStateDescription.IsDepthEnabled = false;
+            return new DepthStencilState(device, newDepthStencilStateDescription);
         }
     }
 }

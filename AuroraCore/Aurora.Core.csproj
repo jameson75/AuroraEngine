@@ -154,6 +154,7 @@
     <Compile Include="Utils\IContainActiveScene.cs" />
     <Compile Include="Utils\IManageActiveCamera.cs" />
     <Compile Include="Utils\IManageRenderingCamera.cs" />
+    <Compile Include="Utils\IProceduralTextureProcessor.cs" />
     <Compile Include="Utils\RayRayIntersectionResult.cs" />
     <Compile Include="Extensions\KeyboardStateExtension.cs" />
     <Compile Include="Utils\MathHelper.cs" />
@@ -238,7 +239,7 @@
     <Compile Include="World\Geometry\StaticMeshModel.cs" />
     <Compile Include="World\Geometry\Triangle.cs" />
     <Compile Include="World\Geometry\VertexTypes.cs" />
-    <Compile Include="World\Renderers\IProvideBoundingContext.cs" />
+    <Compile Include="World\IProvideBoundingContext.cs" />
     <Compile Include="World\Renderers\InstanceRenderer.cs" />
     <Compile Include="World\Renderers\ModelRenderer.cs" />
     <Compile Include="World\Scene\GameObjectSceneNode.cs" />
